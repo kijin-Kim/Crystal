@@ -1,0 +1,6 @@
+[submodule "Dalkom/external/imgui"]
+	path = Dalkom/external/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "Crystal/external/DirectXTex"]
+	path = Crystal/external/DirectXTex
+	url = https://github.com/microsoft/DirectXTex.git
