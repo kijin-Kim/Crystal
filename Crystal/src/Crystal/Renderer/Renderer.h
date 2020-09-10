@@ -9,6 +9,8 @@
 #include "Pipeline.h"
 #include "ShaderLibrary.h"
 
+#include "Model.h"
+
 namespace Crystal {
 
 	class Renderer
@@ -72,5 +74,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 LightPositionInWorld;
 			DirectX::XMFLOAT3 CameraPositionInWorld;
 		} m_ConstantBufferData;
+
+		Model* model;
 	};
 }

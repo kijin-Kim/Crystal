@@ -19,7 +19,7 @@ struct VS_OUTPUT
     float4 PositionInWorld : POSITION;
     float4 LightPositionInWorld : POSITION1;
     float4 CameraPositionInWorld : POSITION2;
-    float3 Normal : NORMAL;
+    float3 NormalInWorld : NORMAL;
     float2 TexCoord : TEXCOORD;
 };
 
@@ -34,7 +34,7 @@ VS_OUTPUT vsMain(VS_INPUT input)
 
     output.LightPositionInWorld = LightPositionInWorld;
     output.CameraPositionInWorld = CameraPositionInWorld;
-    output.Normal = input.Normal;
+    output.NormalInWorld = mul(input.Normal, (float3x3)World);
     output.TexCoord = input.TexCoord;
     return output;
 }

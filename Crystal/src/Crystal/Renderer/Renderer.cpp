@@ -131,15 +131,14 @@ namespace Crystal {
 		cbvDesc.SizeInBytes = 256;
 		m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-
 		//-------------
-		std::filesystem::path filePath(L"assets/textures/Megaphone_01_8-bit_Diffuse.png");
-		CS_ASSERT(std::filesystem::exists(filePath), "경로에 파일이 존재하지 않습니다.");
+		std::filesystem::path filePath("assets/textures/Megaphone_01_8-bit_Diffuse.png");
+		CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
 
 		DirectX::TexMetadata metaData;
 		DirectX::ScratchImage scratchImage;
 		hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐를 로드하는데 실패하였습니다.");
+		CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
 		metaData.format = DirectX::MakeSRGB(metaData.format);
 
@@ -290,7 +289,7 @@ namespace Crystal {
 		m_Level->SpawnActor(m_Actor);
 		m_MainWorld->DestroyActor(m_Actor);*/
 
-
+		model = new Model("assets/models/Megaphone_01.fbx");
 	}
 
 	void Renderer::Render()
@@ -311,7 +310,7 @@ namespace Crystal {
 
 		m_ConstantBufferData.World = m_WorldMat;
 		m_ConstantBufferData.ViewProj = m_Camera->GetViewProjection();
-		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(0.0f, 10.0f, -200.0f);
+		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(0.0f, 200.0f, 200.0f);
 		m_ConstantBufferData.CameraPositionInWorld = m_Camera->GetWorldPosition();
 
 		D3D12_RANGE readRange = { 0,0 };
@@ -350,6 +349,7 @@ namespace Crystal {
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), clearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
+		model->Render(cmdList);
 
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
 

@@ -67,10 +67,10 @@ namespace Crystal {
 		switch (uMsg)
 		{
 		case WM_KEYDOWN:
-			m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Pressed));
+			//m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Pressed));
 			break;
 		case WM_KEYUP:
-			m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Released));
+			//m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Released));
 			break;
 		case WM_CLOSE:
 			__debugbreak(); //Should Make Window Close Event to Destroy Main Game Loop

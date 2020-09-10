@@ -3,6 +3,7 @@
 #include "Crystal/Renderer/Renderer.h"
 #include "DirectXTex/DirectXTex.h"
 
+
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
 
@@ -12,7 +13,6 @@ namespace Crystal {
 	Application::Application(HINSTANCE hInstance, int width, int height) :
 		m_Window(std::make_shared<WindowsWindow>(hInstance, width, height))
 	{
-		////HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 		/////// Manual Call ////
 		auto& renderer = Renderer::Get();
 		renderer.Init(m_Window);

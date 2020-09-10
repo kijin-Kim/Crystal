@@ -8,7 +8,7 @@ struct VS_OUTPUT
     float4 PositionInWorld : POSITION;
     float4 LightPositionInWorld : POSITION1;
     float4 CameraPositionInWorld : POSITION2;
-    float3 Normal : NORMAL;
+    float3 NormalInWorld : NORMAL;
     float2 TexCoord : TEXCOORD;
 };
 
@@ -24,16 +24,16 @@ float4 psMain(VS_OUTPUT input) : SV_TARGET
 
     // Diffuse Light
     float diffusePower = 0.7f;
-    float3 normal = normalize(input.Normal);
+    float3 normal = normalize(input.NormalInWorld);
     float3 lightDirection = normalize(input.PositionInWorld - input.LightPositionInWorld).xyz;
-    float diffuseFactor = max(dot(input.Normal, -lightDirection), 0.0f);
+    float diffuseFactor = max(dot(input.NormalInWorld, -lightDirection), 0.0f);
     float3 diffuseLight = diffuseFactor * diffuseColor.xyz * diffusePower;
 
     // Specular Light
     float specularPower = 1.0f;
     float3 viewDirection = normalize(input.PositionInWorld - input.CameraPositionInWorld).xyz;
     float3 halfwayDirection = normalize(-lightDirection + -viewDirection);
-    float specularFactor = pow(max(dot(input.Normal, halfwayDirection), 0.0f), 32 * 8);
+    float specularFactor = pow(max(dot(input.NormalInWorld, halfwayDirection), 0.0f), 32 * 8);
     float3 specularLight = specularFactor * lightColor * specularPower; 
 
     

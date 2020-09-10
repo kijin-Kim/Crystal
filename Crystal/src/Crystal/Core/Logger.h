@@ -37,6 +37,18 @@ namespace Crystal {
 			OutputDebugStringA(output);
 		}
 
+		static void FormatOutput(char* const outBuffer, const char* fmt, ...)
+		{
+			char buffer[200] = {};
+
+			va_list ap;
+			va_start(ap, fmt);
+			vsprintf_s(buffer, fmt, ap);
+			va_end(ap);
+
+			sprintf(outBuffer, "[ Crystal Error : %s ]\n", buffer);
+		}
+
 	private:
 		Logger() {};
 	};
@@ -47,7 +59,14 @@ namespace Crystal {
 #define CS_ERROR(...) Crystal::Logger::Error(__VA_ARGS__)
 
 #ifdef CS_DEBUG
-#define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR("Assertion Failed : %s", __VA_ARGS__); __debugbreak();}
+#define CS_ASSERT(x, ...) if(!(x)) \
+{ \
+	CS_ERROR(__VA_ARGS__); \
+	char buffer[200] = {}; \
+	Crystal::Logger::FormatOutput(buffer, __VA_ARGS__);\
+	 MessageBoxA(NULL, buffer, "Assertion Failed", MB_OK); \
+	__debugbreak();\
+}
 #elif defined(CS_RELEASE)
-#define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR("Assertion Failed : %s", __VA_ARGS__);}
+#define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR(__VA_ARGS__);}
 #endif

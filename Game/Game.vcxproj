@@ -67,7 +67,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul)</Command>
@@ -91,7 +91,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>IF EXIST "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul)</Command>
