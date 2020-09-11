@@ -5,6 +5,7 @@
 #include "DepthStencil.h"
 
 #include "DirectXTex/DirectXTex.h"
+#include <iostream>
 
 namespace Crystal {
 
@@ -13,7 +14,6 @@ namespace Crystal {
 		m_Window = window;
 
 		HRESULT hr = E_FAIL;
-
 		UINT createFactoryDebugFlags = 0;
 
 #if defined CS_DEBUG
@@ -206,9 +206,9 @@ namespace Crystal {
 
 		D3D12_SAMPLER_DESC samplerDesc = {};
 		samplerDesc.Filter = D3D12_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
-		samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-		samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-		samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 		samplerDesc.MipLODBias = 0.0f;
 		samplerDesc.MaxAnisotropy = 1;
 		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
@@ -277,8 +277,7 @@ namespace Crystal {
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 		m_GraphicsPipeline = std::make_unique<GraphicsPipeline>(&pipelineStateStreamDesc);
-
-
+		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 
@@ -289,7 +288,7 @@ namespace Crystal {
 		m_Level->SpawnActor(m_Actor);
 		m_MainWorld->DestroyActor(m_Actor);*/
 
-		model = new Model("assets/models/Megaphone_01.fbx");
+		model = new Model("assets/models/SportsCar.fbx");
 	}
 
 	void Renderer::Render()
@@ -304,6 +303,7 @@ namespace Crystal {
 		angleA += 1.0f * timer.DeltaTime();
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
+
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
 			DirectX::XMMatrixRotationRollPitchYaw(0.0f, angleA, 0.0f)));
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
