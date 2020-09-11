@@ -71,9 +71,7 @@
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /q /y "$(SolutionDir)bin\Game\bin\$(Configuration)\Game.exe" "$(ProjectDir)"
-IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul)
-IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "$(ProjectDir)" &gt; nul)</Command>
+      <Command>IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -97,9 +95,7 @@ IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q 
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /q /y "$(SolutionDir)bin\Game\bin\$(Configuration)\Game.exe" "$(ProjectDir)"
-IF EXIST "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul)
-IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "$(ProjectDir)" &gt; nul)</Command>
+      <Command>IF EXIST "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
