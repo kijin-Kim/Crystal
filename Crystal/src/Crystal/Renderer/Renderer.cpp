@@ -288,7 +288,7 @@ namespace Crystal {
 		m_Level->SpawnActor(m_Actor);
 		m_MainWorld->DestroyActor(m_Actor);*/
 
-		model = new Model("assets/models/SportsCar.fbx");
+		model = new Model("assets/models/Megaphone_01.fbx");
 	}
 
 	void Renderer::Render()
