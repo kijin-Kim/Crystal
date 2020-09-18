@@ -194,31 +194,6 @@ namespace Crystal {
 		m_Device->CreateShaderResourceView(m_TextureBuffer.Get(), &shaderResourceViewDesc, nextHandle);
 
 
-		D3D12_DESCRIPTOR_HEAP_DESC samplerHeapDesc = {};
-		samplerHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-		samplerHeapDesc.NumDescriptors = 1;
-		samplerHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		samplerHeapDesc.NodeMask = 0;
-
-		hr = m_Device->CreateDescriptorHeap(&samplerHeapDesc, IID_PPV_ARGS(&m_SamplerDescriptorHeap));
-		CS_ASSERT(SUCCEEDED(hr), "샘플러 힙을 생성하는데 실패하였습니다.");
-
-
-		D3D12_SAMPLER_DESC samplerDesc = {};
-		samplerDesc.Filter = D3D12_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
-		samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-		samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-		samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MaxAnisotropy = 1;
-		samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-		samplerDesc.BorderColor;
-		samplerDesc.MinLOD = 0.0f;
-		samplerDesc.MaxLOD = 0.0f;
-
-		m_Device->CreateSampler(&samplerDesc, m_SamplerDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-
 		
 
 		m_ShaderLibrary->Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
@@ -231,15 +206,15 @@ namespace Crystal {
 		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-		CD3DX12_DESCRIPTOR_RANGE1 samplerDescriptorHeapRanges[1] = {};
-		samplerDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0);
+
+		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
+		StaticSamplerDescs[0].Init(0);
 
 
-		CD3DX12_ROOT_PARAMETER1 rootParameter[2];
+		CD3DX12_ROOT_PARAMETER1 rootParameter[1];
 		rootParameter[0].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
-		rootParameter[1].InitAsDescriptorTable(_countof(samplerDescriptorHeapRanges), samplerDescriptorHeapRanges);
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc(_countof(rootParameter), rootParameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		m_RootSignature = std::make_unique<RootSignature>(rootsigDesc);
 
@@ -261,6 +236,7 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} pipelineStateStream;
 
+
 		pipelineStateStream.RootSignature = m_RootSignature->GetRaw();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -275,6 +251,9 @@ namespace Crystal {
 		rtvFormat.RTFormats[0] = m_RenderTargets[0]->GetFormat();
 		pipelineStateStream.RTVFormats = rtvFormat;
 
+
+		
+
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 		m_GraphicsPipeline = std::make_unique<GraphicsPipeline>(&pipelineStateStreamDesc);
 		
@@ -288,6 +267,8 @@ namespace Crystal {
 		m_Level->SpawnActor(m_Actor);
 		m_MainWorld->DestroyActor(m_Actor);*/
 
+
+		// TODO : STATIC SAMPLER
 		model = new Model("assets/models/Megaphone_01.fbx");
 	}
 
@@ -303,9 +284,10 @@ namespace Crystal {
 		angleA += 1.0f * timer.DeltaTime();
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
+		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
-		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
-			DirectX::XMMatrixRotationRollPitchYaw(0.0f, angleA, 0.0f)));
+		/*XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
+			DirectX::XMMatrixRotationRollPitchYaw(0.0f, angleA, 0.0f)));*/
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		m_ConstantBufferData.World = m_WorldMat;
@@ -333,11 +315,10 @@ namespace Crystal {
 		cmdList->SetPipelineState(m_GraphicsPipeline.get()->GetRaw());
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
 
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get(), m_SamplerDescriptorHeap.Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-		cmdList->SetGraphicsRootDescriptorTable(1, m_SamplerDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->RSSetViewports(1, &m_Camera->GetViewport());

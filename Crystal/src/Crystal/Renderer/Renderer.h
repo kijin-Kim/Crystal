@@ -63,7 +63,6 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_TextureDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_ConstantBufferResource = nullptr;
 
 
