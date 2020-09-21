@@ -3,7 +3,7 @@
 
 namespace Crystal {
 
-	class RootSignature
+	class RootSignature final
 	{
 	public:
 		RootSignature(D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc);

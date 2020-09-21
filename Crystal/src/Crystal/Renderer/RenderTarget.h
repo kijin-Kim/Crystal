@@ -4,7 +4,7 @@
 
 namespace Crystal {
 
-	class RenderTarget
+	class RenderTarget final
 	{
 	public:
 		RenderTarget(ID3D12Resource* rtvBuffer);

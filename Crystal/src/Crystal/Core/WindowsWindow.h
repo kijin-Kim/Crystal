@@ -5,7 +5,7 @@
 
 namespace Crystal {
 
-	class WindowsWindow
+	class WindowsWindow final
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
@@ -22,12 +22,16 @@ namespace Crystal {
 
 		void SetEventCallbackFn(class Application* application, const std::function<void(class Application*, Event&)>& function);
 
+		//Imple Future
+		const HACCEL& GetAccelTable() const { return m_AccelTable; }
+
 	private:
 		HWND m_Handle = nullptr;
 		int m_Width = 0;
 		int m_Height = 0;
 
-		EventCallbackFn m_EventCallbackFn;
+		HACCEL m_AccelTable = nullptr;
+		EventCallbackFn m_EventCallbackFn = nullptr;
 	};
 
 };

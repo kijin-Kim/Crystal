@@ -2,7 +2,7 @@
 
 namespace Crystal {
 
-	class Timer
+	class Timer final
 	{
 	public:
 		Timer();

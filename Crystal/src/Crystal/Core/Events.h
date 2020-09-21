@@ -3,6 +3,9 @@
 
 class Event
 {
+public:
+	Event() = default;
+	virtual ~Event() = default;
 };
 
 class KeyEvent : public Event
@@ -20,14 +23,8 @@ public:
 class EventDispatcher
 {
 public:
-	EventDispatcher(Event& event) : m_Event(event) {}
-
-	
-	void Dispatch()
+	static void Dispatch(Event& e)
 	{
-		
-	}
 
-private:
-	Event& m_Event;
+	}
 };

@@ -9,14 +9,14 @@ namespace Crystal {
 	public:
 		static void Log(const char* fmt, ...)
 		{
-			char buffer[200] = {};
+			char buffer[1000] = {};
 
 			va_list ap;
 			va_start(ap, fmt);
 			vsprintf_s(buffer, fmt, ap);
 			va_end(ap);
 
-			char output[200] = {};
+			char output[1000] = {};
 			sprintf_s(output, "[ Crystal Log : %s ]\n", buffer);
 
 			OutputDebugStringA(output);
@@ -24,14 +24,14 @@ namespace Crystal {
 
 		static void Error(const char* fmt, ...)
 		{
-			char buffer[200] = {};
+			char buffer[1000] = {};
 
 			va_list ap;
 			va_start(ap, fmt);
 			vsprintf_s(buffer, fmt, ap);
 			va_end(ap);
 
-			char output[200] = {};
+			char output[1000] = {};
 			sprintf_s(output, "[ Crystal Error : %s ]\n", buffer);
 
 			OutputDebugStringA(output);
@@ -39,7 +39,7 @@ namespace Crystal {
 
 		static void FormatOutput(char* const outBuffer, const char* fmt, ...)
 		{
-			char buffer[200] = {};
+			char buffer[1000] = {};
 
 			va_list ap;
 			va_start(ap, fmt);
@@ -62,7 +62,7 @@ namespace Crystal {
 #define CS_ASSERT(x, ...) if(!(x)) \
 { \
 	CS_ERROR(__VA_ARGS__); \
-	char buffer[200] = {}; \
+	char buffer[1000] = {}; \
 	Crystal::Logger::FormatOutput(buffer, __VA_ARGS__);\
 	 MessageBoxA(NULL, buffer, "Assertion Failed", MB_OK); \
 	__debugbreak();\

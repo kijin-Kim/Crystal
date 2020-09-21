@@ -13,7 +13,7 @@ namespace Crystal {
 		None, Vertex, Pixel
 	};
 
-	class Shader
+	class Shader final
 	{
 		friend class ShaderLibrary;
 	public:

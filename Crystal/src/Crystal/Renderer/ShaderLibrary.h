@@ -8,7 +8,7 @@
 namespace Crystal {
 
 	
-	class ShaderLibrary
+	class ShaderLibrary final
 	{
 	public:
 		ShaderLibrary();

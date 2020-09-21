@@ -5,7 +5,7 @@
 
 namespace Crystal {
 	
-	class CommandQueue
+	class CommandQueue final
 	{
 	public:
 		CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type);

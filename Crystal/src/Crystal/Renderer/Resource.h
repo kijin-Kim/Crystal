@@ -5,7 +5,7 @@
 
 namespace Crystal {
 
-	class Resource
+	class Resource final
 	{
 	public:
 		Resource(D3D12_RESOURCE_STATES initialState, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_DESC bufferResourceDesc);

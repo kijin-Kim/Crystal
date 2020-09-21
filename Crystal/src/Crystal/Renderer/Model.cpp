@@ -17,8 +17,22 @@ namespace Crystal {
 		vertices.reserve(mesh->mNumVertices);
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			vertices.emplace_back(*(DirectX::XMFLOAT3*)&mesh->mVertices[i], *(DirectX::XMFLOAT3*)&mesh->mNormals[i], DirectX::XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
-			//vertices.emplace_back(*(DirectX::XMFLOAT3*)&mesh->mVertices[i], *(DirectX::XMFLOAT3*)&mesh->mNormals[i], DirectX::XMFLOAT2(1.0f,1.0f));
+			Vertex vertex = {};
+			vertex.Position = *(DirectX::XMFLOAT3*)&mesh->mVertices[i];
+			vertex.Normal = *(DirectX::XMFLOAT3*) & mesh->mNormals[i];
+
+			/*if(HasBitangent)
+			{
+
+			}*/
+
+			if (mesh->HasTextureCoords(0))
+			{
+				vertex.TexCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+			}
+
+			vertices.push_back(vertex);
+			
 		}
 
 		m_VertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), (UINT)(sizeof(float) * 8), (UINT)vertices.size());

@@ -4,7 +4,7 @@
 
 namespace Crystal {
 
-	class VertexBuffer
+	class VertexBuffer final
 	{
 	public:
 		VertexBuffer(void* data, UINT strideInByte, UINT count);
@@ -19,7 +19,7 @@ namespace Crystal {
 		D3D12_VERTEX_BUFFER_VIEW m_VertxBufferView = {};
 	};
 
-	class IndexBuffer
+	class IndexBuffer final
 	{
 	public:
 		IndexBuffer(void* data, UINT strideInByte, UINT count);

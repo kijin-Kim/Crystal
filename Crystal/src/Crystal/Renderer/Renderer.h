@@ -13,7 +13,7 @@
 
 namespace Crystal {
 
-	class Renderer
+	class Renderer final
 	{
 	public:
 		void Init(const std::shared_ptr<WindowsWindow>& window);
@@ -74,6 +74,9 @@ namespace Crystal {
 			DirectX::XMFLOAT3 CameraPositionInWorld;
 		} m_ConstantBufferData;
 
+
 		Model* model;
+
+
 	};
 }

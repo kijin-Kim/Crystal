@@ -6,8 +6,10 @@ namespace Crystal {
 
 	class TransformComponent : public Component
 	{
-		
 	public:
+		TransformComponent() = default;
+		virtual ~TransformComponent() = default;
+
 		DirectX::XMFLOAT4X4 WorldTransform;
 	};
 

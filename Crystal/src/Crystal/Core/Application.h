@@ -20,9 +20,6 @@
 
 //----
 #include "Timer.h"
-#include "Crystal/GamePlay/World.h"
-#include "Crystal/GamePlay/Level.h"
-#include "Crystal/GamePlay/Actors/Actor.h"
 //----
 
 namespace Crystal {
@@ -36,7 +33,7 @@ namespace Crystal {
 		void Run();
 
 		virtual void OnUpdate() {}
-		virtual void OnEvent(Event& event) {}
+		virtual void OnEvent(Event& event);
 
 	private:
 		bool m_bShouldRun = true;

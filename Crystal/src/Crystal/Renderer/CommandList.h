@@ -4,7 +4,7 @@
 
 namespace Crystal {
 
-	class CommandList
+	class CommandList final
 	{
 	public:
 		CommandList();

@@ -5,7 +5,7 @@
 
 namespace Crystal {
 	
-	class DepthStencil
+	class DepthStencil final
 	{
 	public:
 		DepthStencil(int width, int height);

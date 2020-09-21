@@ -8,7 +8,7 @@
 
 namespace Crystal {
 
-	class GraphicsPipeline 
+	class GraphicsPipeline final
 	{
 	public:
 		GraphicsPipeline(const D3D12_PIPELINE_STATE_STREAM_DESC* desc);

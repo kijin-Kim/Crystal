@@ -132,7 +132,7 @@ namespace Crystal {
 		m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 		//-------------
-		std::filesystem::path filePath("assets/textures/Megaphone_01_8-bit_Diffuse.png");
+		std::filesystem::path filePath("assets/textures/metal_plate_1k_png/metal_plate_diff_1k.png");
 		CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
 
 		DirectX::TexMetadata metaData;
@@ -197,6 +197,7 @@ namespace Crystal {
 		
 
 		m_ShaderLibrary->Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
+		m_ShaderLibrary->Load("assets/shaders/PBRShader", "PBRShader"); 
 
 		///////////////////////////////////////////////////
 		///////////////////// SHADER //////////////////////
@@ -209,7 +210,6 @@ namespace Crystal {
 
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 		StaticSamplerDescs[0].Init(0);
-
 
 		CD3DX12_ROOT_PARAMETER1 rootParameter[1];
 		rootParameter[0].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
@@ -241,7 +241,7 @@ namespace Crystal {
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		auto& shaderDatablobs = m_ShaderLibrary->GetShader("BlinnPhongShader")->GetRaw();
+		auto& shaderDatablobs = m_ShaderLibrary->GetShader("PBRShader")->GetRaw();
 		pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
@@ -261,15 +261,10 @@ namespace Crystal {
 		
 
 		m_Camera = std::make_unique<Camera>(1366, 768);
-		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, 500.0f));
+		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, 100.0f));
 
-		/*m_MainWorld->AddLevel(m_Level);
-		m_Level->SpawnActor(m_Actor);
-		m_MainWorld->DestroyActor(m_Actor);*/
+		model = new Model("assets/models/Sphere.fbx");
 
-
-		// TODO : STATIC SAMPLER
-		model = new Model("assets/models/Megaphone_01.fbx");
 	}
 
 	void Renderer::Render()
@@ -286,13 +281,13 @@ namespace Crystal {
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
-		/*XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
-			DirectX::XMMatrixRotationRollPitchYaw(0.0f, angleA, 0.0f)));*/
+		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
+			DirectX::XMMatrixRotationRollPitchYaw(0.0f, angleA, 0.0f)));
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		m_ConstantBufferData.World = m_WorldMat;
 		m_ConstantBufferData.ViewProj = m_Camera->GetViewProjection();
-		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(0.0f, 200.0f, 200.0f);
+		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(20.0f, 50.0f, 100.0f);
 		m_ConstantBufferData.CameraPositionInWorld = m_Camera->GetWorldPosition();
 
 		D3D12_RANGE readRange = { 0,0 };
@@ -330,9 +325,11 @@ namespace Crystal {
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), clearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
+
 		model->Render(cmdList);
 
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
+
 
 		m_CommandQueue->Execute(cmdList);
 		m_CommandQueue->Flush();

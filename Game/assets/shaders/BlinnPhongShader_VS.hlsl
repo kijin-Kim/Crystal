@@ -2,8 +2,8 @@ cbuffer Constants : register(b0)
 {
     float4x4 World : packoffset(c0);
     float4x4 ViewProj : packoffset(c4);
-    float4 LightPositionInWorld : packoffset(c8);
-    float4 CameraPositionInWorld : packoffset(c9);
+    float4 WorldLightPosition : packoffset(c8);
+    float4 WorldCameraPosition : packoffset(c9);
 };
 
 struct VS_INPUT
@@ -16,10 +16,10 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float4 PositionInWorld : POSITION;
-    float4 LightPositionInWorld : POSITION1;
-    float4 CameraPositionInWorld : POSITION2;
-    float3 NormalInWorld : NORMAL;
+    float4 WorldPosition : POSITION;
+    float4 WorldLightPosition : POSITION1;
+    float4 WorldCameraPosition : POSITION2;
+    float3 WorldNormal : NORMAL;
     float2 TexCoord : TEXCOORD;
 };
 
@@ -28,13 +28,13 @@ VS_OUTPUT vsMain(VS_INPUT input)
     VS_OUTPUT output;
 
     output.Position = mul(mul(float4(input.Position,1.0f), World), ViewProj);
-    output.PositionInWorld = mul(float4(input.Position, 1.0f), World);
+    output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
-    float3 LightDir = normalize(output.PositionInWorld.xyz - LightPositionInWorld.xyz);   
+    float3 LightDir = normalize(output.WorldPosition.xyz - WorldLightPosition.xyz);   
 
-    output.LightPositionInWorld = LightPositionInWorld;
-    output.CameraPositionInWorld = CameraPositionInWorld;
-    output.NormalInWorld = mul(input.Normal, (float3x3)World);
+    output.WorldLightPosition = WorldLightPosition;
+    output.WorldCameraPosition = WorldCameraPosition;
+    output.WorldNormal = mul(input.Normal, (float3x3)World);
     output.TexCoord = input.TexCoord;
     return output;
 }

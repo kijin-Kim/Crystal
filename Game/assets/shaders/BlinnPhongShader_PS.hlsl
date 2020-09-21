@@ -5,10 +5,10 @@ SamplerState NormalSampler : register(s0);
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float4 PositionInWorld : POSITION;
-    float4 LightPositionInWorld : POSITION1;
-    float4 CameraPositionInWorld : POSITION2;
-    float3 NormalInWorld : NORMAL;
+    float4 WorldPosition : POSITION;
+    float4 WorldLightPosition : POSITION1;
+    float4 WorldCameraPosition : POSITION2;
+    float3 WorldNormal : NORMAL;
     float2 TexCoord : TEXCOORD;
 };
 
@@ -24,16 +24,16 @@ float4 psMain(VS_OUTPUT input) : SV_TARGET
 
     // Diffuse Light
     float diffusePower = 0.7f;
-    float3 normal = normalize(input.NormalInWorld);
-    float3 lightDirection = normalize(input.PositionInWorld - input.LightPositionInWorld).xyz;
-    float diffuseFactor = max(dot(input.NormalInWorld, -lightDirection), 0.0f);
+    float3 normal = normalize(input.WorldNormal);
+    float3 lightDirection = normalize(input.WorldPosition - input.WorldLightPosition).xyz;
+    float diffuseFactor = max(dot(input.WorldNormal, -lightDirection), 0.0f);
     float3 diffuseLight = diffuseFactor * diffuseColor.xyz * diffusePower;
 
     // Specular Light
     float specularPower = 1.0f;
-    float3 viewDirection = normalize(input.PositionInWorld - input.CameraPositionInWorld).xyz;
+    float3 viewDirection = normalize(input.WorldPosition - input.WorldCameraPosition).xyz;
     float3 halfwayDirection = normalize(-lightDirection + -viewDirection);
-    float specularFactor = pow(max(dot(input.NormalInWorld, halfwayDirection), 0.0f), 32 * 8);
+    float specularFactor = pow(max(dot(input.WorldNormal, halfwayDirection), 0.0f), 32 * 8);
     float3 specularLight = specularFactor * lightColor * specularPower; 
 
     

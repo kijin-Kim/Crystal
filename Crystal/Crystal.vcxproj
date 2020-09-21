@@ -179,8 +179,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\RenderComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Level.h" />
-    <ClInclude Include="src\Crystal\GamePlay\World.h" />
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\Camera.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
@@ -201,8 +199,6 @@
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\Level.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\World.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Buffers.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Camera.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />

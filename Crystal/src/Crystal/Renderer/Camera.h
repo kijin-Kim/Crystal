@@ -7,11 +7,10 @@
 namespace Crystal {
 
 	// 윈도우의 해상도가 변경될 시 카메라를 다시 만들어야한다.
-	class Camera
+	class Camera final
 	{
 	public:
 		Camera(int width, int height);
-		~Camera() {};
 
 		void OnEvent(Event& event);
 
