@@ -10,7 +10,7 @@ struct VS_OUTPUT
     float2 TexCoord : TEXCOORD;
 };
 
-Texture2D textures[2] : register(t0);
+Texture2D textures[3] : register(t0);
 SamplerState normalSampler : register(s0);
 
 static const float PI = 3.14159265359;
@@ -64,7 +64,7 @@ float3 FresnelSchlick(float cosTheta, float3 F0)
 float4 psMain(VS_OUTPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 lightColor = 1.0f;
+    float3 lightColor = 10.0f;
     float3 albedo = pow(textures[0].Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f,2.2f));
     float roughness = textures[1].Sample(normalSampler, input.TexCoord).r;
     float metallic = textures[2].Sample(normalSampler, input.TexCoord).r;
@@ -83,11 +83,7 @@ float4 psMain(VS_OUTPUT input) : SV_TARGET
         // L()
         float3 L = normalize(input.WorldLightPosition - input.WorldPosition).xyz;
         float3 H = normalize(V + L);
-        float distance = length(input.WorldLightPosition - input.WorldCameraPosition);
-        float attenuation = 1.0f / (distance * distance);
-        //float attenuation = 1.0f / dot(float3(1.0f, 0.0f, 1.0f), float3(1.0f, distance, distance*distance));
-
-        attenuation = 1.0f; // TEMP
+        float attenuation = 1.0f; // Directional Light
         float3 radiance = lightColor * attenuation;
 
         //Cook-Torrance BRDF
@@ -102,11 +98,10 @@ float4 psMain(VS_OUTPUT input) : SV_TARGET
 
         //Energy Conservation
         float3 specularEnergy = fresnel;
-        float3 diffuseEnergy = float3(1.0f, 1.0f, 1.0f) - fresnel;
+        float3 diffuseEnergy = float3(1.0f, 1.0f, 1.0f) - specularEnergy;
         //No Diffuse for Conductor
-        diffuseEnergy = lerp(float3(1.0f,1.0f, 1.0f) - specularEnergy, float3(0.0f, 0.0f, 0.0f), metallic);
+        diffuseEnergy *= 1.0f - metallic;
         
-
         Lo += (diffuseEnergy * albedo / PI + specular) * radiance * max(dot(N,L), 0.0f);
     }
 

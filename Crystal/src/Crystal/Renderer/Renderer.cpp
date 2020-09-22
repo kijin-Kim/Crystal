@@ -119,7 +119,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 1 + 3;
+		descriptorHeapDesc.NumDescriptors = 1 + 4;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -139,13 +139,23 @@ namespace Crystal {
 
 
 		std::string filePaths[] = {
-			/*"assets/textures/Metal035_2K-PNG/Metal035_2K_Color.png",
-			"assets/textures/Metal035_2K-PNG/Metal035_2K_Roughness.png",
-			"assets/textures/Metal035_2K-PNG/Metal035_2K_Metalness.png",*/
 
-			"assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png",
+			//"assets/textures/metal_plate_1k_png/metal_plate_diff_1k.png",
+			//"assets/textures/metal_plate_1k_png/metal_plate_rough_1k.png",
+			//"assets/textures/metal_plate_1k_png/metal_plate_spec_1k.png",
+
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png",
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png",
+
+			/*"assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png",
 			"assets/textures/rustediron1-alt2-bl/rustediron2_roughness.png",
-			"assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png",
+			"assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png",*/
+
+			//"assets/textures/Ottoman/Ottoman_01_16-bit_Diffuse.png",
+			//"assets/textures/Ottoman/Ottoman_01_16-bit_Roughness.png",
+			//"assets/textures/Ottoman/Ottoman_01_16-bit_Metallic.png",
 		};
 
 		m_TextureBuffers.resize(_countof(filePaths));
@@ -287,11 +297,13 @@ namespace Crystal {
 		
 
 		m_Camera = std::make_unique<Camera>(1366, 768);
-		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, 100.0f));
-		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 200.0f, 400.0f));
+		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -100.0f));
+		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -100.0f));
 
-		model = new Model("assets/models/Sphere.fbx");
-		//model = new Model("assets/models/Megaphone_01.fbx");
+		//model = new Model("assets/models/Sphere.fbx");
+		model = new Model("assets/models/Megaphone_01.fbx");
+		//model = new Model("assets/models/Ottoman_01.fbx");
 
 	}
 
@@ -315,7 +327,7 @@ namespace Crystal {
 
 		m_ConstantBufferData.World = m_WorldMat;
 		m_ConstantBufferData.ViewProj = m_Camera->GetViewProjection();
-		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(20.0f, 50.0f, 100.0f);
+		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(1000.0f, 1000.0F, 0.0F);
 		m_ConstantBufferData.CameraPositionInWorld = m_Camera->GetWorldPosition();
 
 		D3D12_RANGE readRange = { 0,0 };
@@ -332,7 +344,6 @@ namespace Crystal {
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
 
-		DirectX::XMFLOAT3 lightPosition = DirectX::XMFLOAT3(200.0f, 200.0f, 200.0f);
 		//float clearColor[] = { 135.0f / 255.0f, 206.0f / 255.0f  , 250.0f / 255.0f, 1.0f };
 		float clearColor[] = { 0.0f, 0.0f, 0.0f};
 
