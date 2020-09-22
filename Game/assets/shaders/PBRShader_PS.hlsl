@@ -10,82 +10,113 @@ struct VS_OUTPUT
     float2 TexCoord : TEXCOORD;
 };
 
-Texture2D DiffuseMap : register(t0);
-SamplerState NormalSampler : register(s0);
+Texture2D textures[2] : register(t0);
+SamplerState normalSampler : register(s0);
 
 static const float PI = 3.14159265359;
 
 float NormalDistributionGGX(float3 normal, float3 halfway, float roughness)
 {
     //Trowbridge-Reitz GGX
+    float roughnessSquared = roughness * roughness;
+    float a2 = roughnessSquared * roughnessSquared;
+
     float dotNH = max(dot(normal, halfway), 0.0f);
-    return (roughness * roughness) / max(PI * (((dotNH * dotNH) * (roughness * roughness - 1) + 1)  * ((dotNH * dotNH) * (roughness * roughness - 1) + 1)),0.001f);
+
+    float numerator = a2;
+    float denominator = ((dotNH * dotNH) * (a2 - 1.0f) + 1.0f);
+    denominator = PI * denominator * denominator;
+
+    return numerator / max(denominator, 0.001f);
 }
 
-float GeometrySchlickGGX(float3 dotNV, float roughness)
+
+float ndfGGX(float cosLh, float roughness)
 {
-    float kDirect  = (roughness + 1) * (roughness + 1) / 8.0f; //ONLY FOR DIRECT LIGHT
-    return dotNV / (dotNV * (1 - kDirect) + kDirect);
+	float alpha   = roughness * roughness;
+	float alphaSq = alpha * alpha;
+
+	float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+	return alphaSq / (PI * denom * denom);
 }
 
-float GeometrySmith(float3 dotNV, float3 dotNL, float roughness)
+float GeometrySchlickGGX(float cosTheta, float roughness)
+{
+    float kDirect  = ((roughness + 1) * (roughness + 1)) / 8.0f; //ONLY FOR DIRECT LIGHT
+
+    float numerator = cosTheta;
+    float denominator = cosTheta * (1.0 - kDirect) + kDirect;
+
+    return numerator / denominator;
+}
+
+float GeometrySmith(float dotNV, float dotNL, float roughness)
 {
     return GeometrySchlickGGX(dotNV, roughness) * GeometrySchlickGGX(dotNL, roughness);
 }
 
-float3 fresnelSchlick(float dotHV, float3 F0)
+float3 FresnelSchlick(float cosTheta, float3 F0)
 {
-    return F0 + (1.0 - F0) * pow((1 - dotHV), 5.0f);
+    return (F0 + (1.0f - F0) * pow(1.0 - cosTheta, 5.0f));
 }
 
 
 float4 psMain(VS_OUTPUT input) : SV_TARGET
 {
     //Current we have only one directional light
+    float3 lightColor = 1.0f;
+    float3 albedo = pow(textures[0].Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f,2.2f));
+    float roughness = textures[1].Sample(normalSampler, input.TexCoord).r;
+    float metallic = textures[2].Sample(normalSampler, input.TexCoord).r;
+    int lightCount = 1;
+    ////////////////
 
-    //F0 for dielectric 
-    float3 albedo = float3(0.98, 0.97, 0.95);
-    float metallic = 1.0f;
+    float3 N = normalize(input.WorldNormal);
+    float3 V = normalize(input.WorldCameraPosition - input.WorldPosition).xyz;
+
     float3 F0 = 0.04f;
-    F0 = lerp(F0, albedo, metallic); 
+    F0 = lerp(F0, albedo, metallic);
 
     float3 Lo = 0.0f;
+    for(int i= 0; i < lightCount; i++)
+    {
+        // L()
+        float3 L = normalize(input.WorldLightPosition - input.WorldPosition).xyz;
+        float3 H = normalize(V + L);
+        float distance = length(input.WorldLightPosition - input.WorldCameraPosition);
+        float attenuation = 1.0f / (distance * distance);
+        //float attenuation = 1.0f / dot(float3(1.0f, 0.0f, 1.0f), float3(1.0f, distance, distance*distance));
 
-    float roughness = 0.1f;
-    
-    float3 lightDirection = normalize(input.WorldPosition - input.WorldLightPosition).xyz;
-    float3 cameraDirection = normalize(input.WorldPosition - input.WorldCameraPosition).xyz;
-    float3 halfway = normalize(-lightDirection + -cameraDirection);
-    float3 normal = normalize(input.WorldNormal);
+        attenuation = 1.0f; // TEMP
+        float3 radiance = lightColor * attenuation;
 
-    // Radiance L()
-    float distance = length(input.WorldLightPosition - input.WorldPosition);
-    float attenuation = 1.0f / (distance * distance);
-    float3 radiance = float3(1.0f, 1.0f, 1.0f);
+        //Cook-Torrance BRDF
+        float normalDistribution = NormalDistributionGGX(N, H, roughness);
+        float geometry = GeometrySmith(max(dot(N,V), 0.0f), max(dot(N,L), 0.0f), roughness);
+        float3 fresnel = FresnelSchlick(saturate(dot(H,V)), F0);
 
-    // Cook-Torrance BRDF f()
-    float normalDistribution = NormalDistributionGGX(normal, halfway, roughness); //D
-    float geometry = GeometrySmith(max(dot(normal, -cameraDirection), 0.0f), max(dot(normal, -lightDirection), 0.0f), roughness); //G
-    float3 fresnel = fresnelSchlick(max(dot(halfway, -cameraDirection), 0.0f), F0);
 
-    float3 specular = (normalDistribution * geometry * fresnel) / max(4 * max(dot(normal, -cameraDirection), 0.0f) * max(dot(normal, -lightDirection), 0.0f), 0.001f);
+        float3 numerator = normalDistribution * geometry * fresnel;
+        float denominator = 4 * max(dot(N,V), 0.0f) * max(dot(N,L), 0.0f);
+        float3 specular = numerator / max(denominator, 0.001f);
 
-    //Energy Conservation
-    float3 specularFraction = fresnel;
-    float3 diffuseFraction = float3(1.0f, 1.0f, 1.0f) - specularFraction;
-    //Conductor Has no diffuse
-    diffuseFraction *= 1.0f - metallic;
+        //Energy Conservation
+        float3 specularEnergy = fresnel;
+        float3 diffuseEnergy = float3(1.0f, 1.0f, 1.0f) - fresnel;
+        //No Diffuse for Conductor
+        diffuseEnergy = lerp(float3(1.0f,1.0f, 1.0f) - specularEnergy, float3(0.0f, 0.0f, 0.0f), metallic);
+        
 
-    float dotNL = max(dot(normal, -lightDirection), 0.0f);
-    
-    Lo += (diffuseFraction * float3(1.0f, 1.0f, 1.0f) / PI + specular) * radiance * dotNL;
+        Lo += (diffuseEnergy * albedo / PI + specular) * radiance * max(dot(N,L), 0.0f);
+    }
 
-    float3 ambient = float3(0.03f, 0.03f, 0.03f) * float3(1.0f, 1.0f, 1.0f);
-
+    float3 ambient = float3(0.03f,0.03f,0.03f) * albedo;
     float3 finalColor = Lo + ambient;
+
+    //HDR
     finalColor = finalColor / (finalColor + float3(1.0f, 1.0f, 1.0f));
-    finalColor = pow(finalColor, float3(1.0f/2.2f,1.0f/2.2f,1.0f/2.2f));
-
-
+    //Gamma Correction
+    finalColor = pow(finalColor, float3(1.0f/2.2f, 1.0f/2.2f, 1.0f/2.2f));
+    
     return float4(finalColor, 1.0f);
 }

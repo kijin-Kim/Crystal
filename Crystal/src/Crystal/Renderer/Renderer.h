@@ -59,7 +59,8 @@ namespace Crystal {
 
 		Timer timer;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_TextureBuffer = nullptr;
+		//Microsoft::WRL::ComPtr<ID3D12Resource> m_TextureBuffer = nullptr;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_TextureBuffers;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_TextureDescriptorHeap = nullptr;

@@ -119,7 +119,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 2;
+		descriptorHeapDesc.NumDescriptors = 1 + 3;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -131,67 +131,93 @@ namespace Crystal {
 		cbvDesc.SizeInBytes = 256;
 		m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-		//-------------
-		std::filesystem::path filePath("assets/textures/metal_plate_1k_png/metal_plate_diff_1k.png");
-		CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////// TEMP TEMP ///////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		DirectX::TexMetadata metaData;
-		DirectX::ScratchImage scratchImage;
-		hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
-		CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
-		metaData.format = DirectX::MakeSRGB(metaData.format);
+		std::string filePaths[] = {
+			/*"assets/textures/Metal035_2K-PNG/Metal035_2K_Color.png",
+			"assets/textures/Metal035_2K-PNG/Metal035_2K_Roughness.png",
+			"assets/textures/Metal035_2K-PNG/Metal035_2K_Metalness.png",*/
 
-		hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Tex2D(metaData.format, (UINT64)metaData.width, (UINT)metaData.height, (UINT16)metaData.arraySize, (UINT16)metaData.mipLevels), D3D12_RESOURCE_STATE_COMMON,
-			nullptr, IID_PPV_ARGS(&m_TextureBuffer));
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
+			"assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png",
+			"assets/textures/rustediron1-alt2-bl/rustediron2_roughness.png",
+			"assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png",
+		};
 
-		std::vector<D3D12_SUBRESOURCE_DATA> subResources(scratchImage.GetImageCount());
-		const DirectX::Image* image = scratchImage.GetImages();
-		for (int i = 0; i < scratchImage.GetImageCount(); i++)
-		{
-			auto& subResource = subResources[i];
-			subResource.RowPitch = image[i].rowPitch;
-			subResource.SlicePitch = image[i].slicePitch;
-			subResource.pData = image[i].pixels;
-		}
-
-		UINT64 requiredSize = 0;
-		m_Device->GetCopyableFootprints(&m_TextureBuffer->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
-
-		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
-		hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&textureUploadBuffer));
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
-
-		auto cmdList = m_CommandQueue->GetCommandList();
-		UpdateSubresources(cmdList.Get(), m_TextureBuffer.Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(), subResources.data());
-
-		D3D12_RESOURCE_BARRIER resourceBarrier = {};
-		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		resourceBarrier.Transition.pResource = m_TextureBuffer.Get();
-		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-		cmdList->ResourceBarrier(1, &resourceBarrier);
-
-		m_CommandQueue->Execute(cmdList);
-		m_CommandQueue->Flush();
+		m_TextureBuffers.resize(_countof(filePaths));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE nextHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		nextHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
+		for (int i = 0; i < _countof(filePaths); i++)
+		{
+			nextHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			std::filesystem::path filePath(filePaths[i].c_str());
+			CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
 
 
-		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-		shaderResourceViewDesc.Format = metaData.format;
-		shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		shaderResourceViewDesc.Texture2D.MipLevels = 1;
-		m_Device->CreateShaderResourceView(m_TextureBuffer.Get(), &shaderResourceViewDesc, nextHandle);
+			DirectX::TexMetadata metaData;
+			DirectX::ScratchImage scratchImage;
+			hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
+			CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
+
+			metaData.format = DirectX::MakeSRGB(metaData.format);
+
+			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Tex2D(metaData.format, (UINT64)metaData.width, (UINT)metaData.height, (UINT16)metaData.arraySize, (UINT16)metaData.mipLevels), D3D12_RESOURCE_STATE_COMMON,
+				nullptr, IID_PPV_ARGS(&m_TextureBuffers[i]));
+			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
+
+			std::vector<D3D12_SUBRESOURCE_DATA> subResources(scratchImage.GetImageCount());
+			const DirectX::Image* image = scratchImage.GetImages();
+			for (int i = 0; i < scratchImage.GetImageCount(); i++)
+			{
+				auto& subResource = subResources[i];
+				subResource.RowPitch = image[i].rowPitch;
+				subResource.SlicePitch = image[i].slicePitch;
+				subResource.pData = image[i].pixels;
+			}
+
+			UINT64 requiredSize = 0;
+			m_Device->GetCopyableFootprints(&m_TextureBuffers[i]->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
+
+			Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
+			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr, IID_PPV_ARGS(&textureUploadBuffer));
+			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
+
+			auto cmdList = m_CommandQueue->GetCommandList();
+			UpdateSubresources(cmdList.Get(), m_TextureBuffers[i].Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(), subResources.data());
+
+			D3D12_RESOURCE_BARRIER resourceBarrier = {};
+			resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			resourceBarrier.Transition.pResource = m_TextureBuffers[i].Get();
+			resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+			resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+			cmdList->ResourceBarrier(1, &resourceBarrier);
+
+			m_CommandQueue->Execute(cmdList);
+			m_CommandQueue->Flush();
+
+
+			D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+			shaderResourceViewDesc.Format = metaData.format;
+			shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			shaderResourceViewDesc.Texture2D.MipLevels = 1;
+			m_Device->CreateShaderResourceView(m_TextureBuffers[i].Get(), &shaderResourceViewDesc, nextHandle);
+		}		
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 		
@@ -205,7 +231,7 @@ namespace Crystal {
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
 		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0);
 
 
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
@@ -262,8 +288,10 @@ namespace Crystal {
 
 		m_Camera = std::make_unique<Camera>(1366, 768);
 		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, 100.0f));
+		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 200.0f, 400.0f));
 
 		model = new Model("assets/models/Sphere.fbx");
+		//model = new Model("assets/models/Megaphone_01.fbx");
 
 	}
 
@@ -305,7 +333,8 @@ namespace Crystal {
 		auto cmdList = m_CommandQueue->GetCommandList();
 
 		DirectX::XMFLOAT3 lightPosition = DirectX::XMFLOAT3(200.0f, 200.0f, 200.0f);
-		float clearColor[] = { 135.0f / 255.0f, 206.0f / 255.0f  , 250.0f / 255.0f, 1.0f };
+		//float clearColor[] = { 135.0f / 255.0f, 206.0f / 255.0f  , 250.0f / 255.0f, 1.0f };
+		float clearColor[] = { 0.0f, 0.0f, 0.0f};
 
 		cmdList->SetPipelineState(m_GraphicsPipeline.get()->GetRaw());
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
