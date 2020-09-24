@@ -2,6 +2,9 @@
 #include "WindowsWindow.h"
 #include "Application.h"
 
+#include "examples/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Crystal {
 
@@ -62,10 +65,17 @@ namespace Crystal {
 		DestroyWindow(m_Handle);
 	}
 
+
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+			return true;
+
 		switch (uMsg)
 		{
+		case WM_MOUSEMOVE:
+			
+			break;
 		case WM_KEYDOWN:
 			//m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Pressed));
 			break;

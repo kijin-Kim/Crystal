@@ -7,12 +7,15 @@
 #include "DirectXTex/DirectXTex.h"
 #include <iostream>
 
+#include "examples/imgui_impl_dx12.h"
+#include "examples/imgui_impl_win32.h"
+ID3D12DescriptorHeap* g_pd3dSrvDescHeap = nullptr;
+
 namespace Crystal {
 
 	void Renderer::Init(const std::shared_ptr<WindowsWindow>& window)
 	{
 		m_Window = window;
-
 		HRESULT hr = E_FAIL;
 		UINT createFactoryDebugFlags = 0;
 
@@ -70,10 +73,11 @@ namespace Crystal {
 		////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////
 
+		auto [left, top, width, height] = m_Window->GetClientSize();
 		// #DirectX Swap Chain Description
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		swapChainDesc.Width = m_Window->GetWidth();
-		swapChainDesc.Height = m_Window->GetHeight();
+		swapChainDesc.Width = width;
+		swapChainDesc.Height = height;
 		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -83,7 +87,7 @@ namespace Crystal {
 		swapChainDesc.Scaling = DXGI_SCALING_NONE;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-		//swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 		// #DirectX Swap Chain FullScreen Description
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC  swapChainFullscreenDesc;
@@ -91,13 +95,31 @@ namespace Crystal {
 		swapChainFullscreenDesc.RefreshRate.Denominator = 1;
 		swapChainFullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		swapChainFullscreenDesc.Windowed = TRUE;
+		swapChainFullscreenDesc.Windowed = true;
 
 
 		// #DirectX Create Swap Chain https://gamedev.stackexchange.com/questions/149822/direct3d-12-cant-create-a-swap-chain
 		hr = m_Factory->CreateSwapChainForHwnd(m_CommandQueue->GetRaw(), m_Window->GetWindowHandle(), &swapChainDesc,
 			&swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
 		CS_ASSERT(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
+
+
+		/*RECT rt = {};
+		GetClientRect(m_Window->GetWindowHandle(), &rt);
+
+		DXGI_MODE_DESC targetParam = {};
+		targetParam.Width = 1920;
+		targetParam.Height = 1080;
+		targetParam.RefreshRate.Numerator = 60;
+		targetParam.RefreshRate.Denominator = 1;
+		targetParam.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		m_SwapChain->ResizeTarget(&targetParam);
+
+		m_SwapChain->ResizeBuffers(2, 1920, 1080, DXGI_FORMAT_R8G8B8A8_UNORM, swapChainDesc.Flags);*/
+
+		
 
 		Renderer::Get().GetFactory()->MakeWindowAssociation(m_Window->GetWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
 
@@ -110,7 +132,9 @@ namespace Crystal {
 			SAFE_RELEASE(rtvBuffer);
 		}
 
-		m_DepthStencil = std::make_unique<DepthStencil>(m_Window->GetWidth(), m_Window->GetHeight());
+
+		m_DepthStencil = std::make_unique<DepthStencil>(width, height);
+		//m_DepthStencil = std::make_unique<DepthStencil>(1920, 1080);
 
 
 		hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(256),
@@ -287,7 +311,7 @@ namespace Crystal {
 		rtvFormat.RTFormats[0] = m_RenderTargets[0]->GetFormat();
 		pipelineStateStream.RTVFormats = rtvFormat;
 
-
+		
 		
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
@@ -305,6 +329,34 @@ namespace Crystal {
 		model = new Model("assets/models/Megaphone_01.fbx");
 		//model = new Model("assets/models/Ottoman_01.fbx");
 
+
+		//////////////////////////////////////////
+		///// IMGUI IMPLE ////////////////////////
+		//////////////////////////////////////////
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsClassic();
+
+		// Setup Platform/Renderer bindings
+
+		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors = 1;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		m_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_pd3dSrvDescHeap));
+
+		bool c = ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
+		bool d = ImGui_ImplDX12_Init(m_Device.Get(), 2,
+			DXGI_FORMAT_R8G8B8A8_UNORM, g_pd3dSrvDescHeap,
+			g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(),
+			g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 
 	void Renderer::Render()
@@ -313,6 +365,10 @@ namespace Crystal {
 		///// UPDATE /////////////////////////////
 		//////////////////////////////////////////
 
+
+		//TEMP///
+		m_Camera->OnEvent(Event());
+		////////////
 
 		timer.Tick();
 		static float angleA = 0.0f;
@@ -341,19 +397,66 @@ namespace Crystal {
 		///// RENDER /////////////////////////////
 		//////////////////////////////////////////
 
+
+
+		//////////////////////////////////////////
+		///// IMGUI IMPLE ////////////////////////
+		//////////////////////////////////////////
+		bool show_demo_window = true;
+		bool show_another_window = true;
+		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		// Start the Dear ImGui frame
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+		if (show_demo_window)
+			ImGui::ShowDemoWindow(&show_demo_window);
+
+		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		{
+			static float f = 0.0f;
+			static int counter = 0;
+
+			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Another Window", &show_another_window);
+
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+				counter++;
+			ImGui::SameLine();
+			ImGui::Text("counter = %d", counter);
+
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+
+		// 3. Show another simple window.
+		if (show_another_window)
+		{
+			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close Me"))
+				show_another_window = false;
+			ImGui::End();
+		}
+
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
 
-		//float clearColor[] = { 135.0f / 255.0f, 206.0f / 255.0f  , 250.0f / 255.0f, 1.0f };
-		float clearColor[] = { 0.0f, 0.0f, 0.0f};
+		float clearColor[] = { 135.0f / 255.0f, 206.0f / 255.0f  , 250.0f / 255.0f, 1.0f };
+		//float clearColor[] = { 0.0f, 0.0f, 0.0f};
 
 		cmdList->SetPipelineState(m_GraphicsPipeline.get()->GetRaw());
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
 
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
-		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->RSSetViewports(1, &m_Camera->GetViewport());
@@ -365,8 +468,16 @@ namespace Crystal {
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), clearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
+		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 		model->Render(cmdList);
+
+
+		cmdList->SetDescriptorHeaps(1, &g_pd3dSrvDescHeap);
+		ImGui::Render();
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
 
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
 

@@ -43,6 +43,18 @@ namespace Crystal {
 
 	void Application::OnEvent(Event& event)
 	{
+		//Handle Application Level Event
+		//World
+		
+
+		//Handle Mode Level Event
+		// for (auto world : m_Worlds)
+		//		bool isHandled = world->OnEvent();
+		//		if(isHandled)
+		//			break;
+
+
+
 		/*SetActionInput("MoveForward", VK_RETURN);
 		ActionMap[VK_RETURN] = "MoveForward"
 		ActionFunctionMap["MoveForward"] = std::bind(function, this, std::placeholders::_1);
@@ -54,9 +66,6 @@ namespace Crystal {
 
 		"MoveForward"
 */
-
-		
-		
 	}
 
 }
