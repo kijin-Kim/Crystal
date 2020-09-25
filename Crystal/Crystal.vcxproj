@@ -220,8 +220,8 @@
     <ProjectReference Include="external\DirectXTex\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
-    <ProjectReference Include="external\imgui\imgui.vcxproj">
-      <Project>{0098A80F-6CAC-D0C0-352E-7420A101CDF1}</Project>
+    <ProjectReference Include="external\imgui\ImGui.vcxproj">
+      <Project>{02b47dd8-a39b-4d49-8efe-c8ed273e241f}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
