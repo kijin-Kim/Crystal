@@ -14,7 +14,6 @@ namespace Crystal {
 
 		HRESULT hr = E_FAIL;
 		//#Temp
-
 		if (!s_Heap)
 		{
 			// #DirectX Depth / Stencil View heap desrciption
@@ -65,8 +64,6 @@ namespace Crystal {
 			D3D12_RESOURCE_STATE_DEPTH_WRITE, &dsvClearValue, IID_PPV_ARGS(&m_Buffer));
 		CS_ASSERT(SUCCEEDED(hr), "DepthStencil 리소스를 만드는데 실패하였습니다");
 
-		
-
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuStartHandle = s_Heap->GetCPUDescriptorHandleForHeapStart();
 		m_CpuHandle.ptr = cpuStartHandle.ptr + (s_Count * s_HeapIncrementSize);
 		// #DirectX Create Depth Stencil View
@@ -90,6 +87,11 @@ namespace Crystal {
 		m_DepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
 		m_DepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
 		m_DepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
+	}
+
+	DepthStencil::~DepthStencil()
+	{
+		s_Count--;
 	}
 
 }

@@ -9,7 +9,7 @@ namespace Crystal {
 	{
 	public:
 		DepthStencil(int width, int height);
-
+		~DepthStencil();
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHandle() const { return m_CpuHandle; }
 		const DXGI_FORMAT& GetFormat() const { return m_Format; }
 		const D3D12_DEPTH_STENCIL_DESC GetDesc() const { return m_DepthStencilDesc; }

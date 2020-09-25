@@ -26,6 +26,13 @@ namespace Crystal {
 		IDXGIFactory4* GetFactory() const { return m_Factory.Get(); }
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
 		const std::shared_ptr<ShaderLibrary> GetShaderLibrary() const { return m_ShaderLibrary; }
+
+		/////////////////////////////////////////////////////////////////////////////////
+		//TEMP//////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////
+		void ChangeResolution(const char* formattedResolution);
+		
+
 	private:
 		Renderer() {};
 
@@ -78,6 +85,15 @@ namespace Crystal {
 
 		Model* model;
 
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescHeap = nullptr;
+		//ID3D12DescriptorHeap* m_ImGuiDescHeap = nullptr;
+		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
+		
+		int m_ResWidth = 1366;
+		int m_ResHeight = 768;
+
+		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
+		int m_CurrentResolutionIndex = 0;
 
 	};
 }

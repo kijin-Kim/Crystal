@@ -57,4 +57,9 @@ namespace Crystal {
 
 	}
 
+	RenderTarget::~RenderTarget()
+	{
+		s_Count--;
+	}
+
 }

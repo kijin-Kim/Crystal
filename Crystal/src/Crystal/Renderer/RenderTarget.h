@@ -8,6 +8,7 @@ namespace Crystal {
 	{
 	public:
 		RenderTarget(ID3D12Resource* rtvBuffer);
+		~RenderTarget();
 		RenderTarget(const RenderTarget&) = delete;
 		RenderTarget& operator=(const RenderTarget&) = delete;
 
