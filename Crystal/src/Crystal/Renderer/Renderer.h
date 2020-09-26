@@ -35,6 +35,7 @@ namespace Crystal {
 
 	private:
 		Renderer() {};
+		~Renderer();
 
 	private:
 		std::shared_ptr<WindowsWindow> m_Window = nullptr;
@@ -70,7 +71,6 @@ namespace Crystal {
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_TextureBuffers;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_TextureDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_ConstantBufferResource = nullptr;
 
 
@@ -85,8 +85,7 @@ namespace Crystal {
 
 		Model* model;
 
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescHeap = nullptr;
-		//ID3D12DescriptorHeap* m_ImGuiDescHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 		
 		int m_ResWidth = 1366;

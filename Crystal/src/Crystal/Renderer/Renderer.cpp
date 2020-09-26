@@ -142,6 +142,39 @@ namespace Crystal {
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 
+		//////////////////////////////////////////
+		///// IMGUI IMPLE ////////////////////////
+		//////////////////////////////////////////
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsLight();
+		//ImGui::StyleColorsClassic();
+
+		// Setup Platform/Renderer bindings
+
+		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors = 2;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		hr = m_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_ImGuiDescriptorHeap));
+		CS_ASSERT(SUCCEEDED(hr), "ImGui의 Descriptor Heap을 생성하는데 실패하였습니다.");
+
+		ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
+		ImGui_ImplDX12_Init(m_Device.Get(), 2,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			m_ImGuiDescriptorHeap.Get(),
+			m_ImGuiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
 
 		std::string filePaths[] = {
 
@@ -229,13 +262,25 @@ namespace Crystal {
 			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 			shaderResourceViewDesc.Texture2D.MipLevels = 1;
 			m_Device->CreateShaderResourceView(m_TextureBuffers[i].Get(), &shaderResourceViewDesc, nextHandle);
-		}		
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 		
+			
+		}		
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+		shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_ImGuiDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_Device->CreateShaderResourceView(m_RenderTargets[0]->GetRaw(), &shaderResourceViewDesc, handle);
+
+
+
 		m_ShaderLibrary->Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		m_ShaderLibrary->Load("assets/shaders/PBRShader", "PBRShader"); 
 
@@ -309,37 +354,9 @@ namespace Crystal {
 		//model = new Model("assets/models/Ottoman_01.fbx");
 
 
-		//////////////////////////////////////////
-		///// IMGUI IMPLE ////////////////////////
-		//////////////////////////////////////////
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		
 
-		// Setup Dear ImGui style
-		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsLight();
-		//ImGui::StyleColorsClassic();
 
-		// Setup Platform/Renderer bindings
 
-		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		desc.NumDescriptors = 1;
-		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		hr = m_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_ImGuiDescHeap));
-		CS_ASSERT(SUCCEEDED(hr), "ImGui의 Descriptor Heap을 생성하는데 실패하였습니다.");
-
-		ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
-		ImGui_ImplDX12_Init(m_Device.Get(), 2, 
-			DXGI_FORMAT_R8G8B8A8_UNORM, 
-			m_ImGuiDescHeap.Get(), 
-			m_ImGuiDescHeap->GetCPUDescriptorHandleForHeapStart(), 
-			m_ImGuiDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 
 		
@@ -358,7 +375,7 @@ namespace Crystal {
 
 		timer.Tick();
 		static float modelAngle[] = { 0.0f, 0.0f, 0.0f };
-		//angleA += 1.0f * timer.DeltaTime();
+		modelAngle[1] += 1.0f * timer.DeltaTime();
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
@@ -413,15 +430,19 @@ namespace Crystal {
 
 			ImGui::PushItemWidth(-1);
 			ImGui::ColorEdit3("##Clear Color", m_ClearColor);
-			ImGui::SliderFloat3("##Model Rotation Angle", modelAngle, 0.0f, 359.0f);
+			ImGui::DragFloat3("##Model Rotation Angle", modelAngle, 1.0f, 0.0f, 359.0f);
 
-			ImGui::Combo("Resolution", &m_CurrentResolutionIndex, m_ResolutionItems, _countof(m_ResolutionItems));
+			ImGui::Combo("##Resolution", &m_CurrentResolutionIndex, m_ResolutionItems, _countof(m_ResolutionItems));
 			ImGui::PopItemWidth();
 
+			/*D3D12_GPU_DESCRIPTOR_HANDLE textureGpuHandle = m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+			textureGpuHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			ImGui::Image((ImTextureID)textureGpuHandle.ptr, { 1280,720 }, { 0, 1 }, { 1, 0 });*/
 
 			ImGui::Columns(1);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
+
 		}
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
@@ -447,15 +468,16 @@ namespace Crystal {
 
 		model->Render(cmdList);
 
-		cmdList->SetDescriptorHeaps(1, m_ImGuiDescHeap.GetAddressOf());
+		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
+
 
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
 
 
 		m_CommandQueue->Execute(cmdList);
-	
+
 		DXGI_PRESENT_PARAMETERS presentParameters;
 		presentParameters.DirtyRectsCount = 0;
 		presentParameters.pDirtyRects = NULL;
@@ -463,13 +485,14 @@ namespace Crystal {
 		presentParameters.pScrollOffset = NULL;
 		m_SwapChain->Present1(1, 0, &presentParameters);
 
+
 		m_CommandQueue->Flush();
+		
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;	
 
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
-
 	}
 
 	void Renderer::ChangeResolution(const char* formattedResolution)
@@ -552,6 +575,13 @@ namespace Crystal {
 		m_Camera->SetScissorRect({ 0, 0, width, height });
 
 
+	}
+
+	Renderer::~Renderer()
+	{
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 }
