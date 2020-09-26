@@ -11,10 +11,11 @@ namespace Crystal {
 		m_MainComponent(new TransformComponent())
 	{
 		////// TEMPORARY ////
-		m_Model = new Model("assets/models/Megaphone_01.fbx");
 		m_MeshComponent = new MeshComponent();
-		m_MeshComponent->SetMesh(m_Model);
+		m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
+
 		m_MeshComponent->AttachToComponent(m_MainComponent);
+
 	}
 
 	Actor::~Actor()

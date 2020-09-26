@@ -179,6 +179,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\RenderComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\World\World.h" />
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\Camera.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />

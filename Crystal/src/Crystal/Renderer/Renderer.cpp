@@ -10,6 +10,8 @@
 #include "examples/imgui_impl_dx12.h"
 #include "examples/imgui_impl_win32.h"
 
+#include "Crystal/GamePlay/World/World.h"
+
 namespace Crystal {
 
 	void Renderer::Init(const std::shared_ptr<WindowsWindow>& window)
@@ -97,8 +99,7 @@ namespace Crystal {
 		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapChainFullscreenDesc.Windowed = true;
 
-		
-		
+	
 
 		// #DirectX Create Swap Chain https://gamedev.stackexchange.com/questions/149822/direct3d-12-cant-create-a-swap-chain
 		hr = m_Factory->CreateSwapChainForHwnd(m_CommandQueue->GetRaw(), m_Window->GetWindowHandle(), &swapChainDesc,
@@ -354,12 +355,8 @@ namespace Crystal {
 		//model = new Model("assets/models/Ottoman_01.fbx");
 
 
-
-
-
-
-
-		
+		World* world = new World();
+		world->SpawnActor<Actor>();
 
 	}
 
@@ -368,6 +365,9 @@ namespace Crystal {
 		//////////////////////////////////////////
 		///// UPDATE /////////////////////////////
 		//////////////////////////////////////////
+
+		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
+		ChangeDisplayMode();
 
 		//TEMP///
 		m_Camera->OnEvent(Event());
@@ -422,27 +422,29 @@ namespace Crystal {
 			ImGui::Begin("Properties");
 
 			ImGui::Columns(2);
+			
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Clear Color");
+			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Model Rotation Angle");
+			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Resolution");
-			ImGui::NextColumn();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("FullScreen");
 
+			ImGui::NextColumn();
 			ImGui::PushItemWidth(-1);
+
 			ImGui::ColorEdit3("##Clear Color", m_ClearColor);
 			ImGui::DragFloat3("##Model Rotation Angle", modelAngle, 1.0f, 0.0f, 359.0f);
-
 			ImGui::Combo("##Resolution", &m_CurrentResolutionIndex, m_ResolutionItems, _countof(m_ResolutionItems));
+			ImGui::Checkbox("##Full Screen", &m_bIsFullScreen);
+
 			ImGui::PopItemWidth();
-
-			/*D3D12_GPU_DESCRIPTOR_HANDLE textureGpuHandle = m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-			textureGpuHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			ImGui::Image((ImTextureID)textureGpuHandle.ptr, { 1280,720 }, { 0, 1 }, { 1, 0 });*/
-
 			ImGui::Columns(1);
+
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
-
 		}
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
@@ -466,7 +468,9 @@ namespace Crystal {
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		model->Render(cmdList);
+		//model->Render(cmdList);
+		for (const auto& drawable : m_Drawables)
+			drawable->Render(cmdList);
 
 		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
 		ImGui::Render();
@@ -491,8 +495,6 @@ namespace Crystal {
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;	
-
-		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 	}
 
 	void Renderer::ChangeResolution(const char* formattedResolution)
@@ -573,8 +575,6 @@ namespace Crystal {
 
 		m_Camera->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		m_Camera->SetScissorRect({ 0, 0, width, height });
-
-
 	}
 
 	Renderer::~Renderer()
@@ -582,6 +582,33 @@ namespace Crystal {
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
+	}
+
+	void Renderer::ChangeDisplayMode()
+	{
+		BOOL bIsFullScreen = false;
+		m_SwapChain->GetFullscreenState(&bIsFullScreen, nullptr);
+		if (m_bIsFullScreen == (bool)bIsFullScreen)
+			return;
+		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
+		CS_ASSERT(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
+
+		for (auto& rt : m_RenderTargets)
+		{
+			rt.reset();
+		}
+		m_RenderTargets.clear();
+
+		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		CS_ASSERT(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
+		for (int i = 0; i < 2; i++)
+		{
+			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
+			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
+			m_RenderTargets.push_back(std::make_unique<RenderTarget>(rtvBuffer.Get()));
+		}
+
+		m_RtvIndex = 0;
 	}
 
 }

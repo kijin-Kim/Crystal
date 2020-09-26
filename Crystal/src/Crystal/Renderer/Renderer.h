@@ -27,10 +27,16 @@ namespace Crystal {
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
 		const std::shared_ptr<ShaderLibrary> GetShaderLibrary() const { return m_ShaderLibrary; }
 
+
+
 		/////////////////////////////////////////////////////////////////////////////////
 		//TEMP//////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////
 		void ChangeResolution(const char* formattedResolution);
+		void ChangeDisplayMode();
+
+		/// SHOULD GET DRAWABLE //
+		void RegisterDrawable(const std::shared_ptr<Drawable> drawable) { m_Drawables.push_back(drawable); }
 		
 
 	private:
@@ -84,6 +90,7 @@ namespace Crystal {
 
 
 		Model* model;
+		std::vector<std::shared_ptr<Drawable>> m_Drawables;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
@@ -93,6 +100,8 @@ namespace Crystal {
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
 		int m_CurrentResolutionIndex = 0;
+
+		bool m_bIsFullScreen = false;
 
 	};
 }

@@ -11,10 +11,12 @@ namespace Crystal {
 		virtual ~MeshComponent() = default;
 		
 		/////// TEMPORARY //////
-		void SetMesh(Model* model) { m_ModelMesh = model; }
+		void SetMesh(const std::shared_ptr<Model>& modelMesh) { m_ModelMesh = modelMesh; }
+
+		const std::shared_ptr<Model>& GetDrawable() const { return m_ModelMesh; }
 
 	private:
-		Model* m_ModelMesh;
+		std::shared_ptr<Model> m_ModelMesh = nullptr;
 		//Materials
 	};
 }

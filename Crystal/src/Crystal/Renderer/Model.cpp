@@ -6,7 +6,6 @@
 #include <assimp/mesh.h>
 #include <assimp/Vertex.h>
 #include <assimp/postprocess.h>
-#include "Buffers.h"
 #include "CommandList.h"
 
 namespace Crystal {
