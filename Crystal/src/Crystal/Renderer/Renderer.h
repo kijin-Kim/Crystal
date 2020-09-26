@@ -7,7 +7,7 @@
 #include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
 #include "Pipeline.h"
-#include "ShaderLibrary.h"
+#include "Crystal/AssetManager/ShaderManager.h"
 
 #include "Model.h"
 
@@ -25,7 +25,6 @@ namespace Crystal {
 		ID3D12Device2* GetDevice() const { return m_Device.Get(); }
 		IDXGIFactory4* GetFactory() const { return m_Factory.Get(); }
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
-		const std::shared_ptr<ShaderLibrary> GetShaderLibrary() const { return m_ShaderLibrary; }
 
 
 
@@ -57,8 +56,6 @@ namespace Crystal {
 		UINT m_RtvIndex = 0;
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
-
-		std::shared_ptr<ShaderLibrary> m_ShaderLibrary = std::make_shared<ShaderLibrary>();
 
 		std::vector<std::unique_ptr<RenderTarget>> m_RenderTargets;
 		std::unique_ptr<DepthStencil> m_DepthStencil = nullptr;

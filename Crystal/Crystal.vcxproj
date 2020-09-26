@@ -168,6 +168,7 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
+    <ClInclude Include="src\Crystal\AssetManager\TextureManager.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
     <ClInclude Include="src\Crystal\Core\Events.h" />
@@ -192,10 +193,11 @@
     <ClInclude Include="src\Crystal\Renderer\Resource.h" />
     <ClInclude Include="src\Crystal\Renderer\RootSignature.h" />
     <ClInclude Include="src\Crystal\Renderer\Shader.h" />
-    <ClInclude Include="src\Crystal\Renderer\ShaderLibrary.h" />
+    <ClInclude Include="src\Crystal\AssetManager\ShaderManager.h" />
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Crystal\AssetManager\TextureManager.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
@@ -212,7 +214,7 @@
     <ClCompile Include="src\Crystal\Renderer\Resource.cpp" />
     <ClCompile Include="src\Crystal\Renderer\RootSignature.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\ShaderLibrary.cpp" />
+    <ClCompile Include="src\Crystal\AssetManager\ShaderManager.cpp" />
     <ClCompile Include="src\cspch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

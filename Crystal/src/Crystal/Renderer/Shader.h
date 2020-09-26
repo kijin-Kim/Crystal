@@ -15,7 +15,7 @@ namespace Crystal {
 
 	class Shader final
 	{
-		friend class ShaderLibrary;
+		friend class ShaderManager;
 	public:
 		Shader(const std::string& fileName);
 		Shader(const Shader&) = delete;

@@ -12,6 +12,9 @@
 
 #include "Crystal/GamePlay/World/World.h"
 
+#include "Crystal/AssetManager/ShaderManager.h"
+#include "Crystal/AssetManager/TextureManager.h"
+
 namespace Crystal {
 
 	void Renderer::Init(const std::shared_ptr<WindowsWindow>& window)
@@ -196,8 +199,16 @@ namespace Crystal {
 			//"assets/textures/Ottoman/Ottoman_01_16-bit_Roughness.png",
 			//"assets/textures/Ottoman/Ottoman_01_16-bit_Metallic.png",
 		};
+
+		auto& shaderManager = ShaderManager::Get();
+		auto& textureManager = TextureManager::Get();
+
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
 			
-		m_TextureBuffers.resize(_countof(filePaths));
+		/*m_TextureBuffers.resize(_countof(filePaths));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE nextHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	
@@ -266,7 +277,7 @@ namespace Crystal {
 
 		
 			
-		}		
+		}		*/
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -282,8 +293,8 @@ namespace Crystal {
 
 
 
-		m_ShaderLibrary->Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
-		m_ShaderLibrary->Load("assets/shaders/PBRShader", "PBRShader"); 
+		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
+		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
 
 		///////////////////////////////////////////////////
 		///////////////////// SHADER //////////////////////
@@ -327,7 +338,7 @@ namespace Crystal {
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		auto& shaderDatablobs = m_ShaderLibrary->GetShader("PBRShader")->GetRaw();
+		auto& shaderDatablobs = shaderManager.GetShader("PBRShader")->GetRaw();
 		pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
@@ -358,6 +369,56 @@ namespace Crystal {
 		World* world = new World();
 		world->SpawnActor<Actor>();
 
+
+		struct Material
+		{
+			void SetProperties(const std::vector<std::string>& prop) 
+			{
+				m_PropertyTags = prop;
+			}
+			void SetData(const std::string& name, void* data)
+			{
+				
+			}
+
+		private:
+			ID3D12DescriptorHeap* descHeap;
+			std::vector<std::string> m_PropertyTags;
+			bool bPropertyIsSetted;
+		};
+
+	/*	Material* material;
+		void* albedoMap;
+		material->SetProperties({ "Albedo", "Diffuse", "Metalic" });
+		material->SetData("Albedo", albedoMap);
+		*/
+		
+		D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
+		D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
+		D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle =textureManager.GetTexture("Megaphone_Metallic");
+		D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
+
+		D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		srvStartHandle.ptr += incrementSize;
+
+		D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
+		srvStartHandle.ptr += incrementSize;
+		D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
+		srvStartHandle.ptr += incrementSize;
+		D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
+		srvStartHandle.ptr += incrementSize;
+		D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
+
+		
+		D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
+		UINT destRangeSize[] = { 1, 1, 1, 1 };
+		D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
+		UINT srcRangeSize[] = { 1, 1, 1, 1 };
+
+		m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		
 	}
 
 	void Renderer::Render()
@@ -463,7 +524,7 @@ namespace Crystal {
 
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), m_ClearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
+		
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
