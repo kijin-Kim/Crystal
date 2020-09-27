@@ -5,7 +5,6 @@
 #define WINDOW_HEIGHT 768
 
 
-
 class GameApplication : public Crystal::Application
 {
 public:

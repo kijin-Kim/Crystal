@@ -14,6 +14,7 @@
 
 #include "Crystal/AssetManager/ShaderManager.h"
 #include "Crystal/AssetManager/TextureManager.h"
+#include "Crystal/AssetManager/ConstantBufferManager.h"
 
 namespace Crystal {
 
@@ -128,23 +129,20 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 1 + 4;
+		descriptorHeapDesc.NumDescriptors = 1 + 4 + 5 + 1000;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
-		CS_ASSERT(SUCCEEDED(hr), "");
+		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = m_ConstantBufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = 256;
-		m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////// TEMP TEMP ///////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////
+		//m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		D3D12_CPU_DESCRIPTOR_HANDLE hCom = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		hCom.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
+		m_Device->CreateConstantBufferView(&cbvDesc, hCom	);
 
 		//////////////////////////////////////////
 		///// IMGUI IMPLE ////////////////////////
@@ -160,8 +158,6 @@ namespace Crystal {
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsLight();
-		//ImGui::StyleColorsClassic();
 
 		// Setup Platform/Renderer bindings
 
@@ -180,121 +176,21 @@ namespace Crystal {
 			m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 
-		std::string filePaths[] = {
-
-			//"assets/textures/metal_plate_1k_png/metal_plate_diff_1k.png",
-			//"assets/textures/metal_plate_1k_png/metal_plate_rough_1k.png",
-			//"assets/textures/metal_plate_1k_png/metal_plate_spec_1k.png",
-
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png",
-
-			/*"assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png",
-			"assets/textures/rustediron1-alt2-bl/rustediron2_roughness.png",
-			"assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png",*/
-
-			//"assets/textures/Ottoman/Ottoman_01_16-bit_Diffuse.png",
-			//"assets/textures/Ottoman/Ottoman_01_16-bit_Roughness.png",
-			//"assets/textures/Ottoman/Ottoman_01_16-bit_Metallic.png",
-		};
-
 		auto& shaderManager = ShaderManager::Get();
 		auto& textureManager = TextureManager::Get();
+		auto& constantBufferManager = ConstantBufferManager::Get();
 
 		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
 		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
 		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
 		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
-			
-		/*m_TextureBuffers.resize(_countof(filePaths));
-
-		D3D12_CPU_DESCRIPTOR_HANDLE nextHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	
-		for (int i = 0; i < _countof(filePaths); i++)
-		{
-			nextHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			std::filesystem::path filePath(filePaths[i].c_str());
-			CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
-
-
-			DirectX::TexMetadata metaData;
-			DirectX::ScratchImage scratchImage;
-			hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
-			CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
-
-			metaData.format = DirectX::MakeSRGB(metaData.format);
-
-			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Tex2D(metaData.format, (UINT64)metaData.width, (UINT)metaData.height, (UINT16)metaData.arraySize, (UINT16)metaData.mipLevels), D3D12_RESOURCE_STATE_COMMON,
-				nullptr, IID_PPV_ARGS(&m_TextureBuffers[i]));
-			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
-
-			std::vector<D3D12_SUBRESOURCE_DATA> subResources(scratchImage.GetImageCount());
-			const DirectX::Image* image = scratchImage.GetImages();
-			for (int i = 0; i < scratchImage.GetImageCount(); i++)
-			{
-				auto& subResource = subResources[i];
-				subResource.RowPitch = image[i].rowPitch;
-				subResource.SlicePitch = image[i].slicePitch;
-				subResource.pData = image[i].pixels;
-			}
-
-			UINT64 requiredSize = 0;
-			m_Device->GetCopyableFootprints(&m_TextureBuffers[i]->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
-
-			Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
-			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr, IID_PPV_ARGS(&textureUploadBuffer));
-			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
-
-			auto cmdList = m_CommandQueue->GetCommandList();
-			UpdateSubresources(cmdList.Get(), m_TextureBuffers[i].Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(), subResources.data());
-
-			D3D12_RESOURCE_BARRIER resourceBarrier = {};
-			resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			resourceBarrier.Transition.pResource = m_TextureBuffers[i].Get();
-			resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-			cmdList->ResourceBarrier(1, &resourceBarrier);
-
-			m_CommandQueue->Execute(cmdList);
-			m_CommandQueue->Flush();
-
-			
-			D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-			shaderResourceViewDesc.Format = metaData.format;
-			shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			shaderResourceViewDesc.Texture2D.MipLevels = 1;
-			m_Device->CreateShaderResourceView(m_TextureBuffers[i].Get(), &shaderResourceViewDesc, nextHandle);
-
-		
-			
-		}		*/
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-		shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		shaderResourceViewDesc.Texture2D.MipLevels = 1;
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_ImGuiDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		m_Device->CreateShaderResourceView(m_RenderTargets[0]->GetRaw(), &shaderResourceViewDesc, handle);
-
-
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
+
+		
+
+		
 
 		///////////////////////////////////////////////////
 		///////////////////// SHADER //////////////////////
@@ -302,7 +198,7 @@ namespace Crystal {
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
 		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0);
+		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
 
 
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
@@ -357,68 +253,13 @@ namespace Crystal {
 		
 
 		m_Camera = std::make_unique<Camera>(m_ResWidth, m_ResHeight);
-		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -100.0f));
 		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
-		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -100.0f));
-
-		//model = new Model("assets/models/Sphere.fbx");
-		model = new Model("assets/models/Megaphone_01.fbx");
-		//model = new Model("assets/models/Ottoman_01.fbx");
-
 
 		World* world = new World();
 		world->SpawnActor<Actor>();
 
+		m_CBuffer = constantBufferManager.CreateConstantBuffer(256);
 
-		struct Material
-		{
-			void SetProperties(const std::vector<std::string>& prop) 
-			{
-				m_PropertyTags = prop;
-			}
-			void SetData(const std::string& name, void* data)
-			{
-				
-			}
-
-		private:
-			ID3D12DescriptorHeap* descHeap;
-			std::vector<std::string> m_PropertyTags;
-			bool bPropertyIsSetted;
-		};
-
-	/*	Material* material;
-		void* albedoMap;
-		material->SetProperties({ "Albedo", "Diffuse", "Metalic" });
-		material->SetData("Albedo", albedoMap);
-		*/
-		
-		D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
-		D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
-		D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle =textureManager.GetTexture("Megaphone_Metallic");
-		D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
-
-		D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		srvStartHandle.ptr += incrementSize;
-
-		D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
-		srvStartHandle.ptr += incrementSize;
-		D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
-		srvStartHandle.ptr += incrementSize;
-		D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
-		srvStartHandle.ptr += incrementSize;
-		D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
-
-		
-		D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
-		UINT destRangeSize[] = { 1, 1, 1, 1 };
-		D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
-		UINT srcRangeSize[] = { 1, 1, 1, 1 };
-
-		m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		
 	}
 
 	void Renderer::Render()
@@ -436,26 +277,35 @@ namespace Crystal {
 
 		timer.Tick();
 		static float modelAngle[] = { 0.0f, 0.0f, 0.0f };
-		modelAngle[1] += 1.0f * timer.DeltaTime();
+		modelAngle[1] += 10.0f * timer.DeltaTime();
+		if (modelAngle[1] > 359.0f)
+			modelAngle[1] = 0.0f;
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
+		
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
-			DirectX::XMMatrixRotationRollPitchYaw(modelAngle[0], modelAngle[1], modelAngle[2])));
+			DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
+
 		
 
+		
 		m_ConstantBufferData.World = m_WorldMat;
 		m_ConstantBufferData.ViewProj = m_Camera->GetViewProjection();
-		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT3(1000.0f, 1000.0F, 0.0F);
-		m_ConstantBufferData.CameraPositionInWorld = m_Camera->GetWorldPosition();
+		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
+		auto camPos = m_Camera->GetWorldPosition();
+		m_ConstantBufferData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 
-		D3D12_RANGE readRange = { 0,0 };
-		UINT8* bufferBegin = nullptr;
-		m_ConstantBufferResource->Map(0, &readRange, (void**)&bufferBegin);
-		memcpy(bufferBegin, (void*)&m_ConstantBufferData, sizeof(m_ConstantBufferData));
-		m_ConstantBufferResource->Unmap(0, nullptr);
+		//D3D12_RANGE readRange = {};
+		//readRange.Begin = 0;
+		//readRange.End = 256;
+		//UINT8* bufferBegin = nullptr;
+		//m_ConstantBufferResource->Map(0, &readRange, (void**)&bufferBegin);
+		//memcpy(bufferBegin, (void*)&m_ConstantBufferData, sizeof(m_ConstantBufferData));
+		//m_ConstantBufferResource->Unmap(0, &readRange);
+		
 
 
 		//////////////////////////////////////////
@@ -507,10 +357,88 @@ namespace Crystal {
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
+
+
+		{
+			auto& constantBufferManager = ConstantBufferManager::Get();
+			m_CBuffer.SetData((void*)&m_ConstantBufferData);
+
+			D3D12_CPU_DESCRIPTOR_HANDLE cbVdestStartHandles[] = { m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart()};
+			UINT cbVdestRangeSize[] = { 1 };
+			D3D12_CPU_DESCRIPTOR_HANDLE cbVSrcStartHandles[] = { m_CBuffer.GetView() };
+			UINT cbVSrcRangeSize[] = { 1 };
+
+			m_Device->CopyDescriptors(_countof(cbVdestStartHandles), cbVdestStartHandles, cbVdestRangeSize,
+				_countof(cbVSrcStartHandles), cbVSrcStartHandles, cbVSrcRangeSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			//Copy Descriptors in Texture pool
+			auto& textureManager = TextureManager::Get();
+			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
+
+			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			srvStartHandle.ptr += incrementSize;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
+			UINT destRangeSize[] = { 1, 1, 1, 1 };
+			D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
+			UINT srcRangeSize[] = { 1, 1, 1, 1 };
+
+			m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		}
+
+
+		{
+
+
+			//Copy Descriptors in Texture pool
+			auto& textureManager = TextureManager::Get();
+			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
+
+			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			srvStartHandle.ptr += incrementSize;
+			srvStartHandle.ptr += incrementSize * 5;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
+			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
+			UINT destRangeSize[] = { 1, 1, 1, 1 };
+			D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
+			UINT srcRangeSize[] = { 1, 1, 1, 1 };
+
+			m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+		}
+		
+
+
+
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
-
-		//float clearColor[] = { 0.0f, 0.0f, 0.0f};
 
 		cmdList->SetPipelineState(m_GraphicsPipeline.get()->GetRaw());
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
@@ -529,9 +457,26 @@ namespace Crystal {
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		//model->Render(cmdList);
-		for (const auto& drawable : m_Drawables)
-			drawable->Render(cmdList);
+
+		/*D3D12_GPU_DESCRIPTOR_HANDLE hCommon = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		cmdList->SetGraphicsRootDescriptorTable(0, hCommon);*/
+
+		for (const auto& meshComponent : m_Meshes)
+		{
+			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
+
+			Component* transformComponent = meshComponent;
+			while (transformComponent = transformComponent->GetParent())
+			{
+				transformComponent->GetTransform();
+				DirectX::XMStoreFloat4x4(&m_WorldMat,
+					DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&world),
+						DirectX::XMLoadFloat4x4(&transformComponent->GetTransform())));
+			}
+
+			meshComponent->GetDrawable()->Render(cmdList);
+		}
 
 		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
 		ImGui::Render();
@@ -606,13 +551,9 @@ namespace Crystal {
 		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-	
 
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_ASSERT(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
-
-
-
 
 
 		for (auto& rt : m_RenderTargets)

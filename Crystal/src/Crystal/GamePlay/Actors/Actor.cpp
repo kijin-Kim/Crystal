@@ -1,21 +1,18 @@
 #include "cspch.h"
 #include "Actor.h"
 
-#include "Crystal/GamePlay/Components/TransformComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponent.h"
 #include "Crystal/Renderer/Model.h"
 
 namespace Crystal {
 
 	Actor::Actor() :
-		m_MainComponent(new TransformComponent())
+		m_MainComponent(new Component())
 	{
 		////// TEMPORARY ////
 		m_MeshComponent = new MeshComponent();
 		m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
-
 		m_MeshComponent->AttachToComponent(m_MainComponent);
-
 	}
 
 	Actor::~Actor()

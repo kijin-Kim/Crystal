@@ -9,7 +9,8 @@
 #include "Pipeline.h"
 #include "Crystal/AssetManager/ShaderManager.h"
 
-#include "Model.h"
+#include "Crystal/Gameplay/Components/MeshComponent.h"
+#include "Crystal/AssetManager/ConstantBufferManager.h"
 
 namespace Crystal {
 
@@ -35,9 +36,8 @@ namespace Crystal {
 		void ChangeDisplayMode();
 
 		/// SHOULD GET DRAWABLE //
-		void RegisterDrawable(const std::shared_ptr<Drawable> drawable) { m_Drawables.push_back(drawable); }
+		void RegisterMesh(MeshComponent* mesh) { m_Meshes.push_back(mesh); }
 		
-
 	private:
 		Renderer() {};
 		~Renderer();
@@ -81,13 +81,12 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT4X4 World;
 			DirectX::XMFLOAT4X4 ViewProj;
-			DirectX::XMFLOAT3 LightPositionInWorld;
-			DirectX::XMFLOAT3 CameraPositionInWorld;
+			DirectX::XMFLOAT4 LightPositionInWorld;
+			DirectX::XMFLOAT4 CameraPositionInWorld;
 		} m_ConstantBufferData;
 
 
-		Model* model;
-		std::vector<std::shared_ptr<Drawable>> m_Drawables;
+		std::vector<MeshComponent*> m_Meshes;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
@@ -100,5 +99,6 @@ namespace Crystal {
 
 		bool m_bIsFullScreen = false;
 
+		ConstantBuffer m_CBuffer;
 	};
 }

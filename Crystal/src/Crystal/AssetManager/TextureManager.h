@@ -6,7 +6,7 @@ namespace Crystal {
 	class TextureManager final
 	{
 	public:
-		// TODO : Free list of pool Ptr
+		// TODO : Fix it to use pool as ring buffer
 		struct Texture
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> Buffer = nullptr;
@@ -29,7 +29,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_TexturesHeap;
 		D3D12_CPU_DESCRIPTOR_HANDLE m_TexturePoolCpuHandle;
 
-		size_t m_TexturePoolSize = 1000;
+		UINT m_TexturePoolSize = 1000;
 	};
 }
 

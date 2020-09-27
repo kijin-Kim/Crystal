@@ -4,7 +4,6 @@
 namespace Crystal {
 
 	class Component;
-	class TransformComponent;
 	class MeshComponent;
 	class Model;
 
@@ -20,7 +19,7 @@ namespace Crystal {
 		MeshComponent* GetMeshComponent() { return m_MeshComponent; }
 
 	private:
-		TransformComponent* m_MainComponent;
+		Component* m_MainComponent;
 		std::vector<Component*> m_Components;
 
 		//////////////////Temporary//////////////

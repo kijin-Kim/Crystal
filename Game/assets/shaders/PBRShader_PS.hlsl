@@ -1,14 +1,4 @@
-
-
-struct VS_OUTPUT
-{
-    float4 Position : SV_POSITION;
-    float4 WorldPosition : POSITION;
-    float4 WorldLightPosition : POSITION1;
-    float4 WorldCameraPosition : POSITION2;
-    float3 WorldNormal : NORMAL;
-    float2 TexCoord : TEXCOORD;
-};
+#include "PBRHeader.hlsli"
 
 Texture2D textures[3] : register(t0);
 SamplerState normalSampler : register(s0);
@@ -114,4 +104,5 @@ float4 psMain(VS_OUTPUT input) : SV_TARGET
     finalColor = pow(finalColor, float3(1.0f/2.2f, 1.0f/2.2f, 1.0f/2.2f));
     
     return float4(finalColor, 1.0f);
+    
 }

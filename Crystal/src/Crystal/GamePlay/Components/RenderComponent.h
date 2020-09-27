@@ -1,9 +1,9 @@
 #pragma once
-#include "TransformComponent.h"
+#include "Component.h"
 
 namespace Crystal {
 
-	class RenderComponent : public TransformComponent
+	class RenderComponent : public Component
 	{
 	public:
 		RenderComponent() = default;

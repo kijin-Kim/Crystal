@@ -1,3 +1,5 @@
+#include "PBRHeader.hlsli"
+
 cbuffer Constants : register(b0)
 {
     float4x4 World : packoffset(c0);
@@ -6,22 +8,7 @@ cbuffer Constants : register(b0)
     float4 WorldCameraPosition : packoffset(c9);
 };
 
-struct VS_INPUT
-{
-    float3 Position : POSITION;
-    float3 Normal : NORMAL;
-    float2 TexCoord : TEXCOORD;
-};
 
-struct VS_OUTPUT
-{
-    float4 Position : SV_POSITION;
-    float4 WorldPosition : POSITION;
-    float4 WorldLightPosition : POSITION1;
-    float4 WorldCameraPosition : POSITION2;
-    float3 WorldNormal : NORMAL;
-    float2 TexCoord : TEXCOORD;
-};
 
 VS_OUTPUT vsMain(VS_INPUT input)
 {

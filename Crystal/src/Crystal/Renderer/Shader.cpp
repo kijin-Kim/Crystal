@@ -42,7 +42,7 @@ namespace Crystal {
 		compilationTarget = staticShaderType + compilationTarget;
 
 		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-		HRESULT hr = D3DCompileFromFile(shaderPath.c_str(), nullptr, nullptr,
+		HRESULT hr = D3DCompileFromFile(shaderPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			entryPoint.c_str(), compilationTarget.c_str(), compileFlag, 0, &m_ShaderDataBlobs[type], &errorBlob);
 		if (errorBlob)
 		{

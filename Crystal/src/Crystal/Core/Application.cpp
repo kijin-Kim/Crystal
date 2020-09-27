@@ -10,6 +10,7 @@
 
 namespace Crystal {
 
+
 	Application::Application(HINSTANCE hInstance, int width, int height) :
 		m_Window(std::make_shared<WindowsWindow>(hInstance, width, height))
 	{

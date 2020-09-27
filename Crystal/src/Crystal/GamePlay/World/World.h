@@ -39,8 +39,7 @@ namespace Crystal {
 			if (level == nullptr)
 				m_Levels[0]->AddActor(newActor);
 
-		
-			Renderer::Get().RegisterDrawable(newActor->GetMeshComponent()->GetDrawable());
+			Renderer::Get().RegisterMesh(newActor->GetMeshComponent());
 			
 
 			return newActor;
