@@ -180,10 +180,17 @@ namespace Crystal {
 		auto& textureManager = TextureManager::Get();
 		auto& constantBufferManager = ConstantBufferManager::Get();
 
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
+		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png", "rustediron_bascolor");
+		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_roughness.png", "rustediron_roughness");
+		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png", "rustediron_metallic");
+		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_normal.png", "rustediron_normal");
+
+
+		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
+		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
+		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
+		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
+
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
@@ -373,10 +380,20 @@ namespace Crystal {
 
 			//Copy Descriptors in Texture pool
 			auto& textureManager = TextureManager::Get();
-			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
+			/*D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
+			*/
+
+
+			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("rustediron_bascolor");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("rustediron_roughness");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("rustediron_metallic");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("rustediron_normal");
+
+
+
 
 			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -398,42 +415,6 @@ namespace Crystal {
 			m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
 				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
-
-
-		{
-
-
-			//Copy Descriptors in Texture pool
-			auto& textureManager = TextureManager::Get();
-			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
-
-			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			srvStartHandle.ptr += incrementSize;
-			srvStartHandle.ptr += incrementSize * 5;
-
-			D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
-
-			D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
-			UINT destRangeSize[] = { 1, 1, 1, 1 };
-			D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
-			UINT srcRangeSize[] = { 1, 1, 1, 1 };
-
-			m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
-				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-
-		}
-		
 
 
 
@@ -609,6 +590,21 @@ namespace Crystal {
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
 			m_RenderTargets.push_back(std::make_unique<RenderTarget>(rtvBuffer.Get()));
 		}
+
+
+		DXGI_MODE_DESC targetParam = {};
+		targetParam.Width = m_ResWidth;
+		targetParam.Height = m_ResHeight;
+		targetParam.RefreshRate.Numerator = 60;
+		targetParam.RefreshRate.Denominator = 1;
+		targetParam.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+
+		hr = m_SwapChain->ResizeTarget(&targetParam);
+		CS_ASSERT(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
+
 
 		m_RtvIndex = 0;
 	}

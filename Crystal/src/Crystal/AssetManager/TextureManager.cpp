@@ -106,7 +106,7 @@ namespace Crystal {
 			return m_TexturePool[textureName].CpuHandle;
 		else
 		{
-			CS_ASSERT(false, "%s 텍스쳐가 존재하지 않습니다. 먼저 로드해주세요.", textureName);
+			CS_ASSERT(false, "%s 텍스쳐가 존재하지 않습니다. 먼저 로드해주세요.", textureName.c_str());
 			return D3D12_CPU_DESCRIPTOR_HANDLE();
 		}
 	}
