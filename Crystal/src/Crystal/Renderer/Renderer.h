@@ -70,21 +70,22 @@ namespace Crystal {
 
 		Timer timer;
 
-		//Microsoft::WRL::ComPtr<ID3D12Resource> m_TextureBuffer = nullptr;
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_TextureBuffers;
-
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_ConstantBufferResource = nullptr;
 
 
-		struct ConstantBufferData
+
+		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
-			DirectX::XMFLOAT4X4 ViewProj;
+		}m_PerObjectData;
+
+		struct PerFrameData
+		{
+			DirectX::XMFLOAT4X4 View;
+			DirectX::XMFLOAT4X4 Projection;
 			DirectX::XMFLOAT4 LightPositionInWorld;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
-		} m_ConstantBufferData;
-
+		}m_PerFrameData;
 
 		std::vector<MeshComponent*> m_Meshes;
 
@@ -99,6 +100,7 @@ namespace Crystal {
 
 		bool m_bIsFullScreen = false;
 
-		ConstantBuffer m_CBuffer;
+		ConstantBuffer m_PerFrameBuffer;
+		ConstantBuffer m_PerObjectBuffer;
 	};
 }

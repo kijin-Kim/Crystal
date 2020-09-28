@@ -10,12 +10,15 @@ namespace Crystal {
 		friend class ConstantBufferManager;
 	public:
 		void SetData(void* data) { memcpy(m_CpuDataOffsetPtr, data, m_Size); }
-		const D3D12_CPU_DESCRIPTOR_HANDLE& GetView() const { return m_CpuDescriptorHandle; }
+		const D3D12_CPU_DESCRIPTOR_HANDLE& GetCpuDescriptorHandle() const { return m_CpuDescriptorHandle; }
+		const D3D12_GPU_VIRTUAL_ADDRESS& GetGpuVirtualAddress() const { return m_GpuVirtualAddress; }
 
 	private:
 		SIZE_T m_Size = 256;
-		UINT8* m_CpuDataOffsetPtr = 0;
+		void* m_CpuDataOffsetPtr = 0;
+
 		D3D12_CPU_DESCRIPTOR_HANDLE m_CpuDescriptorHandle = {};
+		D3D12_GPU_VIRTUAL_ADDRESS m_GpuVirtualAddress = {};
 	};
 
 

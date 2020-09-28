@@ -1,20 +1,23 @@
 #include "PBRHeader.hlsli"
 
-cbuffer Constants : register(b0)
+cbuffer PerFrameData : register(b0)
 {
-    float4x4 World : packoffset(c0);
-    float4x4 ViewProj : packoffset(c4);
-    float4 WorldLightPosition : packoffset(c8);
-    float4 WorldCameraPosition : packoffset(c9);
-};
+    float4x4 View;
+    float4x4 Projection;
+    float4 WorldCameraPosition;
+    float4 WorldLightPosition;
+}
 
+cbuffer PerObjectData : register(b1)
+{
+    float4x4 World;
+}
 
 
 VS_OUTPUT vsMain(VS_INPUT input)
 {
     VS_OUTPUT output;
-
-    output.Position = mul(mul(float4(input.Position,1.0f), World), ViewProj);
+    output.Position = mul(mul(mul(float4(input.Position,1.0f), World), View), Projection);
     output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
     output.WorldLightPosition = WorldLightPosition;

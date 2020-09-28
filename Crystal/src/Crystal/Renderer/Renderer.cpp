@@ -119,13 +119,9 @@ namespace Crystal {
 			m_RenderTargets.push_back(std::make_unique<RenderTarget>(rtvBuffer.Get()));
 		}
 
-
 		m_DepthStencil = std::make_unique<DepthStencil>(m_ResWidth, m_ResHeight);
 
 
-		hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(256),
-			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_ConstantBufferResource));
-		CS_ASSERT(SUCCEEDED(hr), "");
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -136,30 +132,19 @@ namespace Crystal {
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
 		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = m_ConstantBufferResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = 256;
-		//m_Device->CreateConstantBufferView(&cbvDesc, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-		D3D12_CPU_DESCRIPTOR_HANDLE hCom = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		hCom.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
-		m_Device->CreateConstantBufferView(&cbvDesc, hCom	);
 
-		//////////////////////////////////////////
-		///// IMGUI IMPLE ////////////////////////
-		//////////////////////////////////////////
+
+		//////////////////////////////////////////////////
+		///// IMGUI IMPLE ////////////////////////////////
+		//////////////////////////////////////////////////
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-
-		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
-
-		// Setup Platform/Renderer bindings
 
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -176,43 +161,47 @@ namespace Crystal {
 			m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 
+		///////////////////////////////////////////////////
+		/////LOAD SHADER, TEXTURE, CONSTANT BUFFER///////
+		///////////////////////////////////////////////////
+		
 		auto& shaderManager = ShaderManager::Get();
 		auto& textureManager = TextureManager::Get();
 		auto& constantBufferManager = ConstantBufferManager::Get();
 
-		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_basecolor.png", "rustediron_bascolor");
-		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_roughness.png", "rustediron_roughness");
-		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_metallic.png", "rustediron_metallic");
-		textureManager.Load("assets/textures/rustediron1-alt2-bl/rustediron2_normal.png", "rustediron_normal");
 
-
-		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
-		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
-		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
-		//textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
+		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
 
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
 
+		m_PerFrameBuffer = constantBufferManager.CreateConstantBuffer(256);
+		m_PerObjectBuffer = constantBufferManager.CreateConstantBuffer(256);
 		
-
 		
+		///////////////////////////////////////////////////
+		//////////////ROOT SIGNATURE /////////////////////
+		///////////////////////////////////////////////////
 
-		///////////////////////////////////////////////////
-		///////////////////// SHADER //////////////////////
-		///////////////////////////////////////////////////
+		CD3DX12_ROOT_PARAMETER1 rootParameter[2];
+		rootParameter[0].InitAsConstantBufferView(0);
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
-		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
+		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
+		// [0] Root Constant Buffer View     Per Frame Data ( CameraPosition, LightPosition etc.)
+		// [1] Root Descriptor Table          [1] Object1 ( Transform, Material )
+		//								          [2] Object2 ( Transform, Material )
+		//								          [3] Object3 ( Transform, Material )
 
 
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 		StaticSamplerDescs[0].Init(0);
-
-		CD3DX12_ROOT_PARAMETER1 rootParameter[1];
-		rootParameter[0].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -236,7 +225,11 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} pipelineStateStream;
 
-		
+
+		////////////////////////////////////////////////////
+		////////PIPELINE STATE//////////////////////////////
+		////////////////////////////////////////////////////
+
 		pipelineStateStream.RootSignature = m_RootSignature->GetRaw();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -251,13 +244,15 @@ namespace Crystal {
 		rtvFormat.RTFormats[0] = m_RenderTargets[0]->GetFormat();
 		pipelineStateStream.RTVFormats = rtvFormat;
 
-		
-		
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 		m_GraphicsPipeline = std::make_unique<GraphicsPipeline>(&pipelineStateStreamDesc);
 		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		
+		
+		
+		////////////////////////////////////////////////////
+		////////TEST OBJECTS///////////////////////////////
+		///////////////////////////////////////////////////
 
 		m_Camera = std::make_unique<Camera>(m_ResWidth, m_ResHeight);
 		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
@@ -265,7 +260,7 @@ namespace Crystal {
 		World* world = new World();
 		world->SpawnActor<Actor>();
 
-		m_CBuffer = constantBufferManager.CreateConstantBuffer(256);
+
 
 	}
 
@@ -297,21 +292,19 @@ namespace Crystal {
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		
-
-		
-		m_ConstantBufferData.World = m_WorldMat;
-		m_ConstantBufferData.ViewProj = m_Camera->GetViewProjection();
-		m_ConstantBufferData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
+		m_PerFrameData.View = m_Camera->GetView();
+		m_PerFrameData.Projection = m_Camera->GetProjection();
 		auto camPos = m_Camera->GetWorldPosition();
-		m_ConstantBufferData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
+		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
+		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
+		
 
-		//D3D12_RANGE readRange = {};
-		//readRange.Begin = 0;
-		//readRange.End = 256;
-		//UINT8* bufferBegin = nullptr;
-		//m_ConstantBufferResource->Map(0, &readRange, (void**)&bufferBegin);
-		//memcpy(bufferBegin, (void*)&m_ConstantBufferData, sizeof(m_ConstantBufferData));
-		//m_ConstantBufferResource->Unmap(0, &readRange);
+		m_PerObjectData.World = m_WorldMat;
+
+
+		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
+		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
+
 		
 
 
@@ -367,33 +360,27 @@ namespace Crystal {
 
 
 		{
-			auto& constantBufferManager = ConstantBufferManager::Get();
-			m_CBuffer.SetData((void*)&m_ConstantBufferData);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE cbVdestStartHandles[] = { m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart()};
+			// Copying Per Object Datas
+			/*D3D12_CPU_DESCRIPTOR_HANDLE baseHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			D3D12_CPU_DESCRIPTOR_HANDLE cbVdestStartHandles[] = { baseHandle };
 			UINT cbVdestRangeSize[] = { 1 };
-			D3D12_CPU_DESCRIPTOR_HANDLE cbVSrcStartHandles[] = { m_CBuffer.GetView() };
+			D3D12_CPU_DESCRIPTOR_HANDLE cbVSrcStartHandles[] = { m_PerObjectBuffer.GetCpuDescriptorHandle() };
 			UINT cbVSrcRangeSize[] = { 1 };
-
 			m_Device->CopyDescriptors(_countof(cbVdestStartHandles), cbVdestStartHandles, cbVdestRangeSize,
-				_countof(cbVSrcStartHandles), cbVSrcStartHandles, cbVSrcRangeSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				_countof(cbVSrcStartHandles), cbVSrcStartHandles, cbVSrcRangeSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);*/
+
+			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer.GetCpuDescriptorHandle(),
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 
 			//Copy Descriptors in Texture pool
 			auto& textureManager = TextureManager::Get();
-			/*D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
+			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
-			*/
-
-
-			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("rustediron_bascolor");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("rustediron_roughness");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("rustediron_metallic");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("rustediron_normal");
-
-
-
+			
 
 			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -428,15 +415,16 @@ namespace Crystal {
 		cmdList->RSSetViewports(1, &m_Camera->GetViewport());
 		cmdList->RSSetScissorRects(1, &m_Camera->GetScissorRect());
 		cmdList->OMSetRenderTargets(1, &m_RenderTargets[m_RtvIndex]->GetCpuHandle(), TRUE, &m_DepthStencil->GetCpuHandle());
-
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), m_ClearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 		
+		
+		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer.GetGpuVirtualAddress());
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-		cmdList->SetGraphicsRootDescriptorTable(0, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		cmdList->SetGraphicsRootDescriptorTable(1, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 
 		/*D3D12_GPU_DESCRIPTOR_HANDLE hCommon = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -447,14 +435,6 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
 
-			Component* transformComponent = meshComponent;
-			while (transformComponent = transformComponent->GetParent())
-			{
-				transformComponent->GetTransform();
-				DirectX::XMStoreFloat4x4(&m_WorldMat,
-					DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&world),
-						DirectX::XMLoadFloat4x4(&transformComponent->GetTransform())));
-			}
 
 			meshComponent->GetDrawable()->Render(cmdList);
 		}

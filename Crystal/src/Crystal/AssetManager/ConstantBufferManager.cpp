@@ -30,21 +30,23 @@ namespace Crystal {
 
 	Crystal::ConstantBuffer ConstantBufferManager::CreateConstantBuffer(UINT dataSize /*= 256*/)
 	{
-		// Need Some Validation for overlap
+		// Need Some Validation
+
 		auto device = Renderer::Get().GetDevice();
 
 		UINT cpuOffsetByte = m_CpuOffsetEnd;
 
 		ConstantBuffer cBuffer = {};
 		cBuffer.m_CpuDescriptorHandle = m_CbvPoolCpuHandle;
-		cBuffer.m_CpuDataOffsetPtr = m_CpuBasePtr + cpuOffsetByte;
+		cBuffer.m_GpuVirtualAddress = (D3D12_GPU_VIRTUAL_ADDRESS)((char*)m_ConstantBufferDataPool->GetGPUVirtualAddress() + cpuOffsetByte);
+		cBuffer.m_CpuDataOffsetPtr = ((char*)m_CpuBasePtr + cpuOffsetByte);
 		cBuffer.m_Size = 256;
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = m_ConstantBufferDataPool->GetGPUVirtualAddress();
+		cbvDesc.BufferLocation = (D3D12_GPU_VIRTUAL_ADDRESS)((char*)m_ConstantBufferDataPool->GetGPUVirtualAddress() + cpuOffsetByte);
 		cbvDesc.SizeInBytes = dataSize;
 		device->CreateConstantBufferView(&cbvDesc, m_CbvPoolCpuHandle);
-
+	
 		m_CbvPoolCpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		m_CpuOffsetEnd += dataSize;
