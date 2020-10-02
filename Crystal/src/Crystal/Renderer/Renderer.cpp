@@ -172,10 +172,17 @@ namespace Crystal {
 		auto& constantBufferManager = ConstantBufferManager::Instance();
 
 
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", "Megaphone_Roughness");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", "Megaphone_Metallic");
-		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png", "Megaphone_Normal");
+		/*textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png" }, "Megaphone_Diffuse");
+		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png" }, "Megaphone_Roughness");
+		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png" }, "Megaphone_Metallic");
+		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png" }, "Megaphone_Normal");*/
+
+		textureManager.Load(
+			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", 
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", }, 
+			"MegaphoneMaterial");
 
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
@@ -362,7 +369,6 @@ namespace Crystal {
 
 
 		{
-
 			// Copying Per Object Datas
 			/*D3D12_CPU_DESCRIPTOR_HANDLE baseHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			D3D12_CPU_DESCRIPTOR_HANDLE cbVdestStartHandles[] = { baseHandle };
@@ -375,34 +381,31 @@ namespace Crystal {
 			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer.GetCpuDescriptorHandle(),
 				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+			{
+				struct SRVMaterial
+				{
+					D3D12_CPU_DESCRIPTOR_HANDLE srcHandle;
+					UINT numDescriptor;
+				};
 
+				struct Material
+				{
+					std::string ShaderName;// Or Shader Itself
+					ConstantBuffer CBuffer = {};
+					
+				};
+
+			}
+			
 			//Copy Descriptors in Texture pool
 			auto& textureManager = TextureManager::Instance();
-			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
-			D3D12_CPU_DESCRIPTOR_HANDLE srcNormalHandle = textureManager.GetTexture("Megaphone_Normal");
-			
 
-			D3D12_CPU_DESCRIPTOR_HANDLE srvStartHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			auto incrementSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			srvStartHandle.ptr += incrementSize;
+			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE destAlbedoHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destRoughnessHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destMetallicHandle = srvStartHandle;
-			srvStartHandle.ptr += incrementSize;
-			D3D12_CPU_DESCRIPTOR_HANDLE destNormalHandle = srvStartHandle;
+			auto& texture = textureManager.GetTexture("MegaphoneMaterial");
+			m_Device->CopyDescriptorsSimple(texture.Count, destHeapHandle, texture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE destStartHandles[] = { destAlbedoHandle, destRoughnessHandle, destMetallicHandle, destNormalHandle };
-			UINT destRangeSize[] = { 1, 1, 1, 1 };
-			D3D12_CPU_DESCRIPTOR_HANDLE srcStartHandles[] = { srcAlbedoHandle , srcRoughnessHandle, srcMetallicHandle, srcNormalHandle };
-			UINT srcRangeSize[] = { 1, 1, 1, 1 };
-
-			m_Device->CopyDescriptors(_countof(destStartHandles), destStartHandles, destRangeSize, _countof(srcStartHandles), srcStartHandles, srcRangeSize,
-				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
 

@@ -16,8 +16,8 @@ public:
 
 	KeyEvent(KeyCode keyCode, KeyState keyState) {}
 
-	KeyState State;
-	KeyCode Key;
+	KeyState State = {};
+	KeyCode Key = {};
 };
 
 class EventDispatcher
