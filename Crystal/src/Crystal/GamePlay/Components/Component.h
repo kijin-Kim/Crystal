@@ -9,7 +9,7 @@ namespace Crystal {
 	public:
 		Component() 
 		{ 
-			m_ConstantBuffer = ConstantBufferManager::Get().CreateConstantBuffer(256);
+			m_ConstantBuffer = ConstantBufferManager::Instance().CreateConstantBuffer(256);
 			DirectX::XMStoreFloat4x4(&m_World, DirectX::XMMatrixIdentity());
 		}
 		virtual ~Component()

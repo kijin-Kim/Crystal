@@ -38,7 +38,7 @@ namespace Crystal {
 		}
 		else
 		{
-			auto device = Renderer::Get().GetDevice();
+			auto device = Renderer::Instance().GetDevice();
 			HRESULT hr = device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&d3d12CommandAllcator));
 			CS_ASSERT(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
 		}
@@ -51,7 +51,7 @@ namespace Crystal {
 		}
 		else
 		{
-			auto device = Renderer::Get().GetDevice();
+			auto device = Renderer::Instance().GetDevice();
 			HRESULT hr = device->CreateCommandList(0, m_d3d12CommandListType, d3d12CommandAllcator.Get(), nullptr, IID_PPV_ARGS(&d3d12CommandList));
 			CS_ASSERT(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
 		}

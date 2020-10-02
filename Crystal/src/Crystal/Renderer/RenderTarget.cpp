@@ -11,7 +11,7 @@ namespace Crystal {
 
 	RenderTarget::RenderTarget(ID3D12Resource* rtvBuffer)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		HRESULT hr = E_FAIL;
 

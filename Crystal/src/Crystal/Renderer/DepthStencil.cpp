@@ -10,7 +10,7 @@ namespace Crystal {
 
 	DepthStencil::DepthStencil(int width, int height)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		HRESULT hr = E_FAIL;
 		//#Temp

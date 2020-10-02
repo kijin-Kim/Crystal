@@ -26,7 +26,7 @@ namespace Crystal {
 	class ConstantBufferManager final 
 	{
 	public:
-		static ConstantBufferManager& Get() { static ConstantBufferManager instance; return instance; }
+		static ConstantBufferManager& Instance() { static ConstantBufferManager instance; return instance; }
 		ConstantBuffer CreateConstantBuffer(UINT dataSize = 256);
 
 	private:

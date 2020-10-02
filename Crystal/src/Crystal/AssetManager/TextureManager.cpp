@@ -7,7 +7,7 @@ namespace Crystal {
 
 	TextureManager::TextureManager()
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -27,7 +27,7 @@ namespace Crystal {
 	{
 		Texture texture;
 
-		auto& renderer = Renderer::Get();
+		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
 		auto commandQueue = renderer.GetCommandQueue();
 

@@ -19,7 +19,7 @@ namespace Crystal {
 	public:
 		void Init(const std::shared_ptr<WindowsWindow>& window);
 		Renderer(const Renderer&) = delete;
-		static Renderer& Get() { static Renderer instance; return instance; }
+		static Renderer& Instance() { static Renderer instance; return instance; }
 
 		void Render();
 

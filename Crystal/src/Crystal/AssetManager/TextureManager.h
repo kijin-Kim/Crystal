@@ -13,7 +13,7 @@ namespace Crystal {
 			D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle;
 		};
 
-		static TextureManager& Get() { static TextureManager instance; return instance; }
+		static TextureManager& Instance() { static TextureManager instance; return instance; }
 		
 		D3D12_CPU_DESCRIPTOR_HANDLE GetTexture(const std::string& textureName);
 

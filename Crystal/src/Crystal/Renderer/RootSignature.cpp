@@ -8,7 +8,7 @@ namespace Crystal {
 
 	RootSignature::RootSignature(D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		HRESULT hr = E_FAIL;
 		ID3DBlob* rootSignatureDataBlob = nullptr;

@@ -7,7 +7,7 @@ namespace Crystal {
 
 	CommandList::CommandList()
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 		HRESULT hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator));
 		CS_ASSERT(SUCCEEDED(hr), "Command Allocator 를 생성하는데 실패하였습니다");
 		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator.Get(), nullptr, IID_PPV_ARGS(&m_CommandList));
@@ -16,7 +16,7 @@ namespace Crystal {
 
 	CommandList::CommandList(ID3D12PipelineState* initialPipelinState)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 		HRESULT hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator));
 		CS_ASSERT(SUCCEEDED(hr), "Command Allocator 를 생성하는데 실패하였습니다");
 		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator.Get(), initialPipelinState, IID_PPV_ARGS(&m_CommandList));

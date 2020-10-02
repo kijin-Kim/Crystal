@@ -11,7 +11,8 @@ namespace Crystal {
 	{
 		////// TEMPORARY ////
 		m_MeshComponent = new MeshComponent();
-		m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
+		//m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
+		m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/SK_Mannequin.FBX"));
 		m_MeshComponent->AttachToComponent(m_MainComponent);
 	}
 

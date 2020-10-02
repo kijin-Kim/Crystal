@@ -8,7 +8,7 @@ namespace Crystal {
 	Resource::Resource(D3D12_RESOURCE_STATES initialState, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_DESC bufferResourceDesc) :
 		m_ResourceState(initialState)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_HEAP_PROPERTIES heapProperties = {};
 		heapProperties.Type = heapType;

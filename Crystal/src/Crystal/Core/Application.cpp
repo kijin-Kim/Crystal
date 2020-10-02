@@ -15,7 +15,7 @@ namespace Crystal {
 		m_Window(std::make_shared<WindowsWindow>(hInstance, width, height))
 	{
 		/////// Manual Call ////
-		auto& renderer = Renderer::Get();
+		auto& renderer = Renderer::Instance();
 		renderer.Init(m_Window);
 		
 		m_Window->SetEventCallbackFn(this, &Application::OnEvent);
@@ -37,7 +37,7 @@ namespace Crystal {
 				}
 			}
 			OnUpdate();
-			Renderer::Get().Render();
+			Renderer::Instance().Render();
 		}
 
 	}

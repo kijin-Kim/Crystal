@@ -7,7 +7,7 @@ namespace Crystal {
 
 	VertexBuffer::VertexBuffer(void* data, UINT strideInByte, UINT count)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_RESOURCE_DESC bufferResourceDesc = {};
 		bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -32,7 +32,7 @@ namespace Crystal {
 				D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IntermediateBuffer));
 			CS_ASSERT(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
-			auto commandQueue = Renderer::Get().GetCommandQueue();
+			auto commandQueue = Renderer::Instance().GetCommandQueue();
 			auto cmdList = commandQueue->GetCommandList();
 
 			D3D12_SUBRESOURCE_DATA subResourceData = {};
@@ -53,7 +53,7 @@ namespace Crystal {
 	IndexBuffer::IndexBuffer(void* data, UINT sizeInbyte, UINT count) :
 		m_Count(count)
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_RESOURCE_DESC bufferResourceDesc = {};
 		bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -78,7 +78,7 @@ namespace Crystal {
 				D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IntermediateBuffer));
 			CS_ASSERT(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
-			auto commandQueue = Renderer::Get().GetCommandQueue();
+			auto commandQueue = Renderer::Instance().GetCommandQueue();
 			auto cmdList = commandQueue->GetCommandList();
 
 			D3D12_SUBRESOURCE_DATA subResourceData = {};

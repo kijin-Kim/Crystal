@@ -75,6 +75,8 @@ namespace Crystal {
 
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
+
+
 		////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +111,7 @@ namespace Crystal {
 		hr = m_Factory->CreateSwapChainForHwnd(m_CommandQueue->GetRaw(), m_Window->GetWindowHandle(), &swapChainDesc,
 			&swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
 		CS_ASSERT(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
-		Renderer::Get().GetFactory()->MakeWindowAssociation(m_Window->GetWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
+		Renderer::Instance().GetFactory()->MakeWindowAssociation(m_Window->GetWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
 
 
 		for (int i = 0; i < 2; i++)
@@ -165,9 +167,9 @@ namespace Crystal {
 		/////LOAD SHADER, TEXTURE, CONSTANT BUFFER///////
 		///////////////////////////////////////////////////
 		
-		auto& shaderManager = ShaderManager::Get();
-		auto& textureManager = TextureManager::Get();
-		auto& constantBufferManager = ConstantBufferManager::Get();
+		auto& shaderManager = ShaderManager::Instance();
+		auto& textureManager = TextureManager::Instance();
+		auto& constantBufferManager = ConstantBufferManager::Instance();
 
 
 		textureManager.Load("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", "Megaphone_Diffuse");
@@ -255,7 +257,8 @@ namespace Crystal {
 		///////////////////////////////////////////////////
 
 		m_Camera = std::make_unique<Camera>(m_ResWidth, m_ResHeight);
-		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 150.0f , -200.0f));
 
 		World* world = new World();
 		world->SpawnActor<Actor>();
@@ -278,7 +281,7 @@ namespace Crystal {
 		////////////
 
 		timer.Tick();
-		static float modelAngle[] = { 0.0f, 0.0f, 0.0f };
+		static float modelAngle[] = { 0.0f, 90.0f, 0.0f };
 		modelAngle[1] += 10.0f * timer.DeltaTime();
 		if (modelAngle[1] > 359.0f)
 			modelAngle[1] = 0.0f;
@@ -286,7 +289,6 @@ namespace Crystal {
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
-		
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
 			DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
@@ -375,7 +377,7 @@ namespace Crystal {
 
 
 			//Copy Descriptors in Texture pool
-			auto& textureManager = TextureManager::Get();
+			auto& textureManager = TextureManager::Instance();
 			D3D12_CPU_DESCRIPTOR_HANDLE srcAlbedoHandle = textureManager.GetTexture("Megaphone_Diffuse");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcRoughnessHandle = textureManager.GetTexture("Megaphone_Roughness");
 			D3D12_CPU_DESCRIPTOR_HANDLE srcMetallicHandle = textureManager.GetTexture("Megaphone_Metallic");
@@ -434,8 +436,6 @@ namespace Crystal {
 		for (const auto& meshComponent : m_Meshes)
 		{
 			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
-
-
 			meshComponent->GetDrawable()->Render(cmdList);
 		}
 

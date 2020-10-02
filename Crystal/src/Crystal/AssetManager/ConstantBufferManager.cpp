@@ -8,7 +8,7 @@ namespace Crystal {
 
 	ConstantBufferManager::ConstantBufferManager()
 	{
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -32,7 +32,7 @@ namespace Crystal {
 	{
 		// Need Some Validation
 
-		auto device = Renderer::Get().GetDevice();
+		auto device = Renderer::Instance().GetDevice();
 
 		UINT cpuOffsetByte = m_CpuOffsetEnd;
 

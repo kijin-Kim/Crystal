@@ -11,7 +11,7 @@ namespace Crystal {
 	class ShaderManager final
 	{
 	public:
-		static ShaderManager& Get() { static ShaderManager instance; return instance; }
+		static ShaderManager& Instance() { static ShaderManager instance; return instance; }
 
 		void Load(const std::string& fileName, const std::string& shaderName);
 		void Add(const std::shared_ptr<Shader>& shader, const std::string& shaderName);
