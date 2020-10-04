@@ -16,6 +16,12 @@ namespace Crystal {
 		void AddActor(Actor* actor) { m_Actors.push_back(actor); }
 		//void RemoveActor() {}
 
+		void Update(float deltaTime)
+		{
+			for(const auto actor : m_Actors)
+				actor->Update(deltaTime);
+		}
+
 	private:
 		std::vector<Actor*> m_Actors;
 	};
@@ -38,11 +44,14 @@ namespace Crystal {
 
 			if (level == nullptr)
 				m_Levels[0]->AddActor(newActor);
-
-			Renderer::Instance().RegisterMesh(newActor->GetMeshComponent());
 			
-
 			return newActor;
+		}
+
+		void Update(float deltaTime)
+		{
+			for(const auto level : m_Levels)
+				level->Update(deltaTime);
 		}
 
 	private:

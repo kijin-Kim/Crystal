@@ -15,6 +15,8 @@
 #include "Crystal/AssetManager/ShaderManager.h"
 #include "Crystal/AssetManager/TextureManager.h"
 #include "Crystal/AssetManager/ConstantBufferManager.h"
+#include "Crystal/GamePlay/Actors/Pawn.h"
+#include "Crystal/GamePlay/Actors/Controllers/PlayerController.h"
 
 namespace Crystal {
 
@@ -267,9 +269,10 @@ namespace Crystal {
 		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
 		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 150.0f , -200.0f));
 
-		World* world = new World();
-		world->SpawnActor<Actor>();
-
+		m_World = new World();
+		Pawn* pawn = m_World->SpawnActor<Pawn>();
+		PlayerController* playerController = m_World->SpawnActor<PlayerController>();
+		playerController->Possess(pawn);
 
 
 	}
@@ -280,6 +283,8 @@ namespace Crystal {
 		///// UPDATE /////////////////////////////
 		//////////////////////////////////////////
 
+		
+		
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 		ChangeDisplayMode();
 
@@ -288,6 +293,7 @@ namespace Crystal {
 		////////////
 
 		timer.Tick();
+		m_World->Update(timer.DeltaTime());
 		static float modelAngle[] = { 0.0f, 90.0f, 0.0f };
 		modelAngle[1] += 10.0f * timer.DeltaTime();
 		if (modelAngle[1] > 359.0f)
@@ -436,10 +442,10 @@ namespace Crystal {
 		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cmdList->SetGraphicsRootDescriptorTable(0, hCommon);*/
 
-		for (const auto& meshComponent : m_Meshes)
+		for (const auto& meshComponent : m_MeshComponents)
 		{
 			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
-			meshComponent->GetDrawable()->Render(cmdList);
+			meshComponent->GetMesh()->Render(cmdList);
 		}
 
 		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());

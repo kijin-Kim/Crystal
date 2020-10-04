@@ -6,7 +6,7 @@
 
 namespace Crystal {
 
-	class RenderComponent;
+	class DrawableComponent;
 
 	enum class ShaderType
 	{
@@ -22,7 +22,7 @@ namespace Crystal {
 		Shader& operator=(const Shader&) = delete;
 
 		std::map< ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>>& GetRaw() const { return m_ShaderDataBlobs; }
-		const std::vector<RenderComponent*>& GetRenderComponents() const { return m_RenderComponents; }
+		const std::vector<DrawableComponent*>& GetRenderComponents() const { return m_RenderComponents; }
 	private:
 		void loadFromFile(const std::string& filePath, ShaderType type);
 
@@ -32,7 +32,7 @@ namespace Crystal {
 		std::string m_Name;
 		ShaderType m_Type = ShaderType::None;
 
-		std::vector<RenderComponent*> m_RenderComponents;
+		std::vector<DrawableComponent*> m_RenderComponents;
 	};
 
 }

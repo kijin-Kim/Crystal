@@ -36,7 +36,7 @@ namespace Crystal {
 		void ChangeDisplayMode();
 
 		/// SHOULD GET DRAWABLE //
-		void RegisterMesh(MeshComponent* mesh) { m_Meshes.push_back(mesh); }
+		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
 		
 	private:
 		Renderer() {};
@@ -87,7 +87,7 @@ namespace Crystal {
 			DirectX::XMFLOAT4 CameraPositionInWorld;
 		}m_PerFrameData;
 
-		std::vector<MeshComponent*> m_Meshes;
+		std::vector<MeshComponent*> m_MeshComponents;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
@@ -102,5 +102,8 @@ namespace Crystal {
 
 		ConstantBuffer m_PerFrameBuffer;
 		ConstantBuffer m_PerObjectBuffer;
+
+
+		class World* m_World;
 	};
 }

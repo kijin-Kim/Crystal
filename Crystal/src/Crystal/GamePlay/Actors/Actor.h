@@ -1,11 +1,10 @@
 #pragma once
-#include <memory>
 
 namespace Crystal {
 
-	class Component;
+	class TransformComponent;
 	class MeshComponent;
-	class Model;
+	class Mesh;
 
 	class Actor
 	{
@@ -14,17 +13,18 @@ namespace Crystal {
 		virtual ~Actor();
 
 		virtual void Start() {}
-		virtual void Update(float DeltaTime);
+		virtual void End() {} 
+		virtual void Update(float deltaTime);
 
-		MeshComponent* GetMeshComponent() { return m_MeshComponent; }
+	protected:
+		//void CreateComponent() {}
+
+	protected:
+		TransformComponent* m_MainComponent = nullptr;
 
 	private:
-		Component* m_MainComponent;
-		std::vector<Component*> m_Components;
+		std::vector<TransformComponent*> m_TransformComponents;
 
-		//////////////////Temporary//////////////
-		// Need to be memeber of some specialized child class e.g. MeshActor
-		MeshComponent* m_MeshComponent = nullptr;
 	};
 
 }

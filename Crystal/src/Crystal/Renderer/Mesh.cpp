@@ -1,5 +1,5 @@
 #include "cspch.h"
-#include "Model.h"
+#include "Mesh.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -10,7 +10,7 @@
 
 namespace Crystal {
 
-	Mesh::Mesh(aiMesh* mesh, const aiScene* scene)
+	SubMesh::SubMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		std::vector<Vertex> vertices;
 		vertices.reserve(mesh->mNumVertices);
@@ -49,14 +49,14 @@ namespace Crystal {
 		m_IndexBuffer = std::make_unique<IndexBuffer>(indices.data(), (UINT)(indices.size() * sizeof(UINT)), (UINT)indices.size());
 	}
 
-	void Mesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void SubMesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		commandList->IASetVertexBuffers(0, 1, &m_VertexBuffer->GetView(commandList.Get()));
 		commandList->IASetIndexBuffer(&m_IndexBuffer->GetView(commandList.Get()));
 		commandList->DrawIndexedInstanced(m_IndexBuffer->GetCount(), 1, 0, 0, 0);
 	}
 
-	Model::Model(const std::string& filePath)
+	Mesh::Mesh(const std::string& filePath)
 	{
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
@@ -64,7 +64,7 @@ namespace Crystal {
 		processNode(scene->mRootNode, scene);
 	}
 
-	void Model::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void Mesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		for (const auto& mesh : m_Meshes)
 		{
@@ -72,12 +72,12 @@ namespace Crystal {
 		}
 	}
 
-	void Model::processNode(aiNode* node, const aiScene* scene)
+	void Mesh::processNode(aiNode* node, const aiScene* scene)
 	{
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			m_Meshes.push_back(std::make_unique<Mesh>(mesh, scene));
+			m_Meshes.push_back(std::make_unique<SubMesh>(mesh, scene));
 		}
 
 		for (unsigned int i = 0; i < node->mNumChildren; i++)

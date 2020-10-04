@@ -2,27 +2,22 @@
 #include "Actor.h"
 
 #include "Crystal/GamePlay/Components/MeshComponent.h"
-#include "Crystal/Renderer/Model.h"
+#include "Crystal/Renderer/Mesh.h"
 
 namespace Crystal {
 
-	Actor::Actor() :
-		m_MainComponent(new Component())
+	Actor::Actor()
 	{
-		////// TEMPORARY ////
-		m_MeshComponent = new MeshComponent();
-		//m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
-		m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/SK_Mannequin.FBX"));
-		m_MeshComponent->AttachToComponent(m_MainComponent);
+
 	}
 
 	Actor::~Actor()
 	{
 		//Component Liftime is with Actor
-		while (!m_Components.empty())
+		while (!m_TransformComponents.empty())
 		{
-			delete m_Components.back();
-			m_Components.pop_back();
+			delete m_TransformComponents.back();
+			m_TransformComponents.pop_back();
 		}
 
 		if(m_MainComponent)
@@ -32,9 +27,12 @@ namespace Crystal {
 	void Actor::Update(float DeltaTime)
 	{
 		CS_LOG("Actor is Updating");
-		//Update All Components!
+		//1. Update Physics
+
+
+		//2. Update Transforms
 		m_MainComponent->Update(DeltaTime);
-		for (Component* component : m_Components)
+		for (TransformComponent* component : m_TransformComponents)
 			component->Update(DeltaTime);
 	}
 

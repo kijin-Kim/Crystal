@@ -1,22 +1,20 @@
 #pragma once
-#include "RenderComponent.h"
-#include "Crystal/Renderer/Model.h"
+#include "TransformComponent.h"
+#include "Crystal/Renderer/Mesh.h"
 
 namespace Crystal {
 
-	class MeshComponent : public RenderComponent
+	class MeshComponent : public TransformComponent
 	{
 	public:
-		MeshComponent() = default;
+		MeshComponent();
 		virtual ~MeshComponent() = default;
 		
 		/////// TEMPORARY //////
-		void SetMesh(const std::shared_ptr<Model>& modelMesh) { m_ModelMesh = modelMesh; }
-
-		const std::shared_ptr<Model>& GetDrawable() const { return m_ModelMesh; }
+		void SetMesh(const std::shared_ptr<Mesh>& modelMesh) { m_Mesh = modelMesh; }
+		const std::shared_ptr<Mesh>& GetMesh() const { return m_Mesh; }
 
 	private:
-		std::shared_ptr<Model> m_ModelMesh = nullptr;
-		//Materials
+		std::shared_ptr<Mesh> m_Mesh = nullptr;
 	};
 }

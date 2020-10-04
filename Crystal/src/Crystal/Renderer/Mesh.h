@@ -12,15 +12,6 @@ struct aiMesh;
 
 namespace Crystal {
 
-	class Drawable 
-	{
-	public:
-		Drawable() = default;
-		virtual ~Drawable() = default;
-
-		virtual void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) = 0;
-	};
-
 	struct Vertex final
 	{
 		Vertex() = default;
@@ -30,30 +21,30 @@ namespace Crystal {
 		DirectX::XMFLOAT2 TexCoord = {};
 	};
 
-	class Mesh final : public Drawable
+	class SubMesh final
 	{
 	public:
-		Mesh(aiMesh* mesh, const aiScene* scene);
-		virtual ~Mesh() = default;
+		SubMesh(aiMesh* mesh, const aiScene* scene);
+		virtual ~SubMesh() = default;
 
-		virtual void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList);
 
 	private:
 		std::unique_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer = nullptr;
 	};
 
-	class Model final : public Drawable
+	class Mesh final
 	{
 	public:
-		Model(const std::string& filePath);
-		virtual ~Model() = default;
-		virtual void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+		Mesh(const std::string& filePath);
+		virtual ~Mesh() = default;
+		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList);
 
 	private:
 		void processNode(aiNode* node, const aiScene* scene);
 
 	private:
-		std::vector<std::unique_ptr<Mesh>> m_Meshes;
+		std::vector<std::unique_ptr<SubMesh>> m_Meshes;
 	};
 }
