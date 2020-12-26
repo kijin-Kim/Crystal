@@ -12,15 +12,16 @@ namespace Crystal {
 		{
 			////// TEMPORARY ////
 			m_MeshComponent = new MeshComponent();
-			//m_MeshComponent->SetMesh(std::make_shared<Model>("assets/models/Megaphone_01.fbx"));
-			m_MeshComponent->SetMesh(std::make_shared<Mesh>("assets/models/SK_Mannequin.FBX"));
+			m_MeshComponent->SetMesh(std::make_shared<Mesh>("assets/models/Megaphone_01.fbx"));
+			//m_MeshComponent->SetMesh(std::make_shared<Mesh>("assets/models/SK_Mannequin.FBX"));
 			m_MainComponent = m_MeshComponent;
 			//m_MeshComponent->AttachToComponent(m_MainComponent);
 		}
 
 		virtual ~Pawn()
 		{
-
+			delete m_MeshComponent;
+			delete m_InputComponent;
 		}
 
 		virtual void Start() override
@@ -36,14 +37,17 @@ namespace Crystal {
 
 		void SetupInputComponent(InputComponent* inputComponent)
 		{
+			//PlayerInputComponent->BindAxis('W', this, &Camera::MoveForward);
 			
 		}
 
-		MeshComponent* GetMeshComponent() { return m_MeshComponent; }
+		MeshComponent* GetMeshComponent() const { return m_MeshComponent; }
+		InputComponent* GetInputComponent() const { return m_InputComponent; }
 
 	private:
 		//////////////////Temporary//////////////
 		// Need to be memeber of some specialized child class e.g. MeshActor
 		MeshComponent* m_MeshComponent = nullptr;
+		InputComponent* m_InputComponent = nullptr;
 	};
 }

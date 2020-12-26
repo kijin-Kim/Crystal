@@ -20,6 +20,8 @@ namespace Crystal {
 		{
 			for(const auto actor : m_Actors)
 				actor->Update(deltaTime);
+			for (const auto actor : m_Actors)
+				actor->UpdateTransfromData();
 		}
 
 	private:

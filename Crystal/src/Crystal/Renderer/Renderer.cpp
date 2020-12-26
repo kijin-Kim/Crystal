@@ -20,7 +20,7 @@
 
 namespace Crystal {
 
-	void Renderer::Init(const std::shared_ptr<WindowsWindow>& window)
+	void Renderer::Init(WindowsWindow* window)
 	{
 		m_Window = window;
 		HRESULT hr = E_FAIL;
@@ -183,17 +183,23 @@ namespace Crystal {
 			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", 
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", }, 
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", },
+			D3D12_SRV_DIMENSION_TEXTURE2D,
 			"MegaphoneMaterial");
+
+		textureManager.Load({ "assets/textures/shanghai_bund_1k/shanghai_bund_1k.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
+		//textureManager.Load({ "assets/textures/shanghai_bund_1k/AnyConv.com__DebugCubeMap.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
 
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
+		shaderManager.Load("assets/shaders/SkyboxShader", "CubemapShader"); 
 
 		m_PerFrameBuffer = constantBufferManager.CreateConstantBuffer(256);
 		m_PerObjectBuffer = constantBufferManager.CreateConstantBuffer(256);
+		m_CubemapCbuffer = constantBufferManager.CreateConstantBuffer(256);
 		
-		
+	
 		///////////////////////////////////////////////////
 		//////////////ROOT SIGNATURE /////////////////////
 		///////////////////////////////////////////////////
@@ -203,7 +209,7 @@ namespace Crystal {
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
 		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
+		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0);
 		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
 		// [0] Root Constant Buffer View     Per Frame Data ( CameraPosition, LightPosition etc.)
 		// [1] Root Descriptor Table          [1] Object1 ( Transform, Material )
@@ -214,7 +220,9 @@ namespace Crystal {
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 		StaticSamplerDescs[0].Init(0);
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;
+		rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
 
 		m_RootSignature = std::make_unique<RootSignature>(rootsigDesc);
 
@@ -232,9 +240,10 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
 			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
 			CD3DX12_PIPELINE_STATE_STREAM_PS PS;
+			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DSV;
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-		} pipelineStateStream;
+		} pipelineStateStream, cubemapPipelineStream;
 
 
 		////////////////////////////////////////////////////
@@ -249,6 +258,7 @@ namespace Crystal {
 		pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
+		pipelineStateStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(m_DepthStencil->GetDesc());
 		pipelineStateStream.DSVFormat = m_DepthStencil->GetFormat();
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 		rtvFormat.NumRenderTargets = 1;
@@ -260,21 +270,87 @@ namespace Crystal {
 		
 		
 		
+
+
+		///////////////////////////////////////////////////
+		//////////////ROOT SIGNATURE /////////////////////
+		///////////////////////////////////////////////////
+
+		CD3DX12_DESCRIPTOR_RANGE1 cubemapCommonDescriptorHeapRanges[1] = {};
+		cubemapCommonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+		CD3DX12_ROOT_PARAMETER1 cubemapRootParameter[2];
+		cubemapRootParameter[0].InitAsConstantBufferView(0);
+		cubemapRootParameter[1].InitAsDescriptorTable(_countof(cubemapCommonDescriptorHeapRanges), cubemapCommonDescriptorHeapRanges);
+
+
+
+
+		CD3DX12_STATIC_SAMPLER_DESC cubemapStaticSamplerDescs[1] = {};
+		cubemapStaticSamplerDescs[0].Init(0);
+
+		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC cubemapRootsigDesc(_countof(cubemapRootParameter), cubemapRootParameter, _countof(cubemapStaticSamplerDescs), cubemapStaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		m_CubemapRootSignature = std::make_unique<RootSignature>(cubemapRootsigDesc);
+
+
+		D3D12_INPUT_ELEMENT_DESC cubemapInputLayout[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		};
+
+		
+
+		////////////////////////////////////////////////////
+		////////PIPELINE STATE//////////////////////////////
+		////////////////////////////////////////////////////
+
+		cubemapPipelineStream.RootSignature = m_CubemapRootSignature->GetRaw();
+		cubemapPipelineStream.InputLayout = { cubemapInputLayout, _countof(cubemapInputLayout) };
+		cubemapPipelineStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+		auto& cubemapShaderDatablobs = shaderManager.GetShader("CubemapShader")->GetRaw();
+		cubemapPipelineStream.VS = { cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
+		cubemapPipelineStream.PS = { cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
+
+		cubemapPipelineStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(m_DepthStencil->GetDesc());
+		cubemapPipelineStream.DSVFormat = m_DepthStencil->GetFormat();
+		D3D12_RT_FORMAT_ARRAY cubemapRtvFormat = {};
+		cubemapRtvFormat.NumRenderTargets = 1;
+		cubemapRtvFormat.RTFormats[0] = m_RenderTargets[0]->GetFormat();
+		cubemapPipelineStream.RTVFormats = cubemapRtvFormat;
+
+		D3D12_PIPELINE_STATE_STREAM_DESC cubemapPipelineStreamDesc = { sizeof(cubemapPipelineStream), &cubemapPipelineStream };
+		m_CubemapGraphicsPipeline = std::make_unique<GraphicsPipeline>(&cubemapPipelineStreamDesc);
+		
 		
 		////////////////////////////////////////////////////
 		////////TEST OBJECTS///////////////////////////////
 		///////////////////////////////////////////////////
 
 		m_Camera = std::make_unique<Camera>(m_ResWidth, m_ResHeight);
-		//m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
-		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 150.0f , -200.0f));
+		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+
 
 		m_World = new World();
 		Pawn* pawn = m_World->SpawnActor<Pawn>();
-		PlayerController* playerController = m_World->SpawnActor<PlayerController>();
-		playerController->Possess(pawn);
+		m_PlayerController = new PlayerController();
+		m_PlayerController->Possess(pawn);
+		float quadVertices[] = {
+			-1.0f, -1.0f,
+			-1.0f, 1.0f,
+			1.0f, 1.0f,
+			1.0f, -1.0f,
+		};
+
+		uint32_t quadIndices[] = {
+			0, 1, 2,
+			0, 2, 3
+		};
 
 
+		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, sizeof(float) * 2, 4);
+		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, sizeof(uint32_t) * _countof(quadIndices), _countof(quadIndices));
+		
 	}
 
 	void Renderer::Render()
@@ -283,13 +359,14 @@ namespace Crystal {
 		///// UPDATE /////////////////////////////
 		//////////////////////////////////////////
 
-		
-		
+		static float angle = 0.0f;
+		angle += timer.DeltaTime();
+		m_Camera->SetLookAt(DirectX::XMFLOAT3(0.0f, 0.0f, 0 + cos(angle)));
+
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 		ChangeDisplayMode();
 
 		//TEMP///
-		m_Camera->OnEvent(Event());
 		////////////
 
 		timer.Tick();
@@ -307,8 +384,7 @@ namespace Crystal {
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		
-		m_PerFrameData.View = m_Camera->GetView();
-		m_PerFrameData.Projection = m_Camera->GetProjection();
+		m_PerFrameData.ViewProjection = m_Camera->GetViewProjection();
 		auto camPos = m_Camera->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
@@ -319,7 +395,7 @@ namespace Crystal {
 
 		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
 		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
-
+		m_CubemapCbuffer.SetData((void*)&m_Camera->GetInverseViewProjection());
 		
 
 
@@ -411,15 +487,18 @@ namespace Crystal {
 
 			auto& texture = textureManager.GetTexture("MegaphoneMaterial");
 			m_Device->CopyDescriptorsSimple(texture.Count, destHeapHandle, texture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 4;
+
+			auto& cubemapTexture = textureManager.GetTexture("CubemapMaterial");
+			m_Device->CopyDescriptorsSimple(cubemapTexture.Count, destHeapHandle, cubemapTexture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		}
-
 
 
 	
 		auto cmdList = m_CommandQueue->GetCommandList();
 
-		cmdList->SetPipelineState(m_GraphicsPipeline.get()->GetRaw());
+		cmdList->SetPipelineState(m_GraphicsPipeline->GetRaw());
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -430,6 +509,7 @@ namespace Crystal {
 
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), m_ClearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
 		
 		
 		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer.GetGpuVirtualAddress());
@@ -448,6 +528,18 @@ namespace Crystal {
 			meshComponent->GetMesh()->Render(cmdList);
 		}
 
+		//---------------Cubemap
+		//cmdList->SetPipelineState(m_CubemapGraphicsPipeline->GetRaw());
+		//cmdList->SetGraphicsRootSignature(m_CubemapRootSignature->GetRaw());
+		//cmdList->SetGraphicsRootConstantBufferView(0, m_CubemapCbuffer.GetGpuVirtualAddress());
+		//D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		//handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
+		//cmdList->SetGraphicsRootDescriptorTable(1, handle);
+		//cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
+		//cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
+		//cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
+
+
 		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
@@ -460,11 +552,10 @@ namespace Crystal {
 
 		DXGI_PRESENT_PARAMETERS presentParameters;
 		presentParameters.DirtyRectsCount = 0;
-		presentParameters.pDirtyRects = NULL;
-		presentParameters.pScrollRect = NULL;
-		presentParameters.pScrollOffset = NULL;
+		presentParameters.pDirtyRects = nullptr;
+		presentParameters.pScrollRect = nullptr;
+		presentParameters.pScrollOffset = nullptr;
 		m_SwapChain->Present1(1, 0, &presentParameters);
-
 
 		m_CommandQueue->Flush();
 		
@@ -543,7 +634,7 @@ namespace Crystal {
 			m_RenderTargets.push_back(std::make_unique<RenderTarget>(rtvBuffer.Get()));
 		}
 
-		m_DepthStencil.reset(new DepthStencil(width, height));
+		m_DepthStencil = std::make_unique<DepthStencil>(width, height);
 
 		m_Camera->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		m_Camera->SetScissorRect({ 0, 0, width, height });

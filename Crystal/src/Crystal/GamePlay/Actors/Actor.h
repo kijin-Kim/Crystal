@@ -15,6 +15,7 @@ namespace Crystal {
 		virtual void Start() {}
 		virtual void End() {} 
 		virtual void Update(float deltaTime);
+		void UpdateTransfromData();
 
 	protected:
 		//void CreateComponent() {}

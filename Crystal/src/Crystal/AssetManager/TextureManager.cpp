@@ -23,7 +23,7 @@ namespace Crystal {
 
 
 
-	void TextureManager::Load(const std::vector<std::string>& filepaths, const std::string& textureAlias /*= ""*/)
+	void TextureManager::Load(const std::vector<std::string>& filepaths, D3D12_SRV_DIMENSION srvDimension, const std::string& textureAlias /*= ""*/)
 	{
 		Texture texture;
 		texture.CpuHandle = m_TexturePoolCpuHandle;
@@ -94,7 +94,7 @@ namespace Crystal {
 
 			D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 			shaderResourceViewDesc.Format = metaData.format;
-			shaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			shaderResourceViewDesc.ViewDimension = srvDimension;
 			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 			shaderResourceViewDesc.Texture2D.MipLevels = 1;
 

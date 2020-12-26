@@ -68,20 +68,16 @@ namespace Crystal {
 
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 			return true;
 
+		if (m_InputEventFunction)
+			m_InputEventFunction(hWnd, uMsg, wParam, lParam);
+
+		/*Process Global Window Events*/
 		switch (uMsg)
 		{
-		case WM_MOUSEMOVE:
-			
-			break;
-		case WM_KEYDOWN:
-			//m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Pressed));
-			break;
-		case WM_KEYUP:
-			//m_EventCallbackFn(KeyEvent(wParam, KeyEvent::KeyState::Released));
-			break;
 		case WM_CLOSE:
 			__debugbreak(); //Should Make Window Close Event to Destroy Main Game Loop
 			break;
@@ -91,13 +87,14 @@ namespace Crystal {
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
-		}
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		default:
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		}	
 	}
 
-	void WindowsWindow::SetEventCallbackFn(Application* application, const std::function<void(Application*, Event&)>& function)
+	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<void(Application*, HWND, UINT, WPARAM, LPARAM)>& function)
 	{
-		m_EventCallbackFn = std::bind(function, application, std::placeholders::_1);
+		 m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	}
 
 }

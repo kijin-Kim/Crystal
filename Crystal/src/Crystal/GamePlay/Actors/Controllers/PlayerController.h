@@ -12,7 +12,6 @@ namespace Crystal {
 		virtual void Possess(Pawn* pawn) override
 		{
 			Controller::Possess(pawn);
-			m_InputComponents.push(new InputComponent());
 			pawn->SetupInputComponent(m_InputComponents.top());
 		}
 

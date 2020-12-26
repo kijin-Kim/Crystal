@@ -4,7 +4,6 @@
 #include <dxgi1_4.h>
 #include <DirectXMath.h>
 #include <memory>
-#include <wrl/client.h>
 
 #include "WindowsWindow.h"
 #include "Crystal/Renderer/Shader.h"
@@ -15,8 +14,8 @@
 #include "Crystal/Renderer/Camera.h"
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"
+#include "Crystal/Core/State.h"
 
-#include "Events.h"
 
 //----
 #include "Timer.h"
@@ -28,23 +27,30 @@ namespace Crystal {
 	{
 	public:
 		Application(HINSTANCE hInstance, int width, int height);
-		virtual ~Application() {}
+		virtual ~Application() = default;
 
 		void Run();
 
-		virtual void OnUpdate() {}
-		virtual void OnEvent(Event& event);
+		virtual void OnUpdate();
+
+		void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	
+	protected:
+		void PushState(State* state) { m_StateStack.PushState(state); }
+		void PopState(State* state) { m_StateStack.PopState(state); }
 
 	private:
 		bool m_bShouldRun = true;
-		std::shared_ptr<WindowsWindow> m_Window;
+		WindowsWindow* m_Window;
+		StateStack m_StateStack;
+		Timer m_MainTimer;
 	};
 
-	static Application* CreateApplication(HINSTANCE hInstance);
+	Application* CreateApplication(HINSTANCE hInstance);
 }
 
 
-#define Register_Application(x, width, height) static Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
+#define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
 {\
 	return new x(hInstance, width, height);\
 }

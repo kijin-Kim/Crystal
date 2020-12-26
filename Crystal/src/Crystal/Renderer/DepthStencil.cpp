@@ -75,7 +75,7 @@ namespace Crystal {
 		// #DirectX Depth / Stencil description
 		m_DepthStencilDesc.DepthEnable = true;
 		m_DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		m_DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		m_DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		m_DepthStencilDesc.StencilEnable = false;
 		m_DepthStencilDesc.StencilReadMask = 0x00;
 		m_DepthStencilDesc.StencilWriteMask = 0x00;

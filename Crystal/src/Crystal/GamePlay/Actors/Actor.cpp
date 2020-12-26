@@ -27,13 +27,15 @@ namespace Crystal {
 	void Actor::Update(float DeltaTime)
 	{
 		CS_LOG("Actor is Updating");
-		//1. Update Physics
-
-
-		//2. Update Transforms
 		m_MainComponent->Update(DeltaTime);
 		for (TransformComponent* component : m_TransformComponents)
-			component->Update(DeltaTime);
+				component->Update(DeltaTime);
+	}
+
+	void Actor::UpdateTransfromData()
+	{
+		for (TransformComponent* component : m_TransformComponents)
+			component->UpdateConstantBuffer();
 	}
 
 }

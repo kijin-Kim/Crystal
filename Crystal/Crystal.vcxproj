@@ -176,8 +176,9 @@
     <ClInclude Include="src\Crystal\AssetManager\TextureManager.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
-    <ClInclude Include="src\Crystal\Core\Events.h" />
+    <ClInclude Include="src\Crystal\Core\GlobalTypes.h" />
     <ClInclude Include="src\Crystal\Core\Logger.h" />
+    <ClInclude Include="src\Crystal\Core\State.h" />
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Actor.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="src\Crystal\AssetManager\ConstantBufferManager.cpp" />
     <ClCompile Include="src\Crystal\AssetManager\TextureManager.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
+    <ClCompile Include="src\Crystal\Core\State.cpp" />
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />

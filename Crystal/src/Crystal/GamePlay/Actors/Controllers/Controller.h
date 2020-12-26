@@ -5,7 +5,7 @@
 
 namespace Crystal {
 
-	class Controller : public Actor
+	class Controller
 	{
 	public:
 		Controller() = default;
@@ -18,12 +18,16 @@ namespace Crystal {
 			}
 		}
 
-		virtual void Possess(Pawn* pawn) {}
-
-		virtual void Update(float deltaTime) override
+		virtual void Possess(Pawn* pawn) 
 		{
-			m_InputComponents.top()->Update(deltaTime);
+			m_InputComponents.push(new InputComponent());
 		}
+
+		void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		{
+
+		}
+
 
 	protected:
 		std::stack<InputComponent*> m_InputComponents;

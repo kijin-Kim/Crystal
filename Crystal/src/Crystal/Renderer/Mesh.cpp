@@ -51,8 +51,8 @@ namespace Crystal {
 
 	void SubMesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
-		commandList->IASetVertexBuffers(0, 1, &m_VertexBuffer->GetView(commandList.Get()));
-		commandList->IASetIndexBuffer(&m_IndexBuffer->GetView(commandList.Get()));
+		commandList->IASetVertexBuffers(0, 1, &m_VertexBuffer->GetView());
+		commandList->IASetIndexBuffer(&m_IndexBuffer->GetView());
 		commandList->DrawIndexedInstanced(m_IndexBuffer->GetCount(), 1, 0, 0, 0);
 	}
 

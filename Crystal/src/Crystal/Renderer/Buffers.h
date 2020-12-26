@@ -11,7 +11,7 @@ namespace Crystal {
 		VertexBuffer(const VertexBuffer&) = delete;
 		VertexBuffer& operator=(const VertexBuffer&) = delete;
 
-		const D3D12_VERTEX_BUFFER_VIEW& GetView(ID3D12GraphicsCommandList2* commandList) const { return m_VertxBufferView; }
+		const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return m_VertxBufferView; }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_DestinationBuffer = nullptr;
@@ -22,11 +22,11 @@ namespace Crystal {
 	class IndexBuffer final
 	{
 	public:
-		IndexBuffer(void* data, UINT strideInByte, UINT count);
+		IndexBuffer(void* data, UINT sizeInByte, UINT count);
 		IndexBuffer(const IndexBuffer&) = delete;
 		IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-		const D3D12_INDEX_BUFFER_VIEW& GetView(ID3D12GraphicsCommandList2* commandList) const { return m_IndexBufferView; }
+		const D3D12_INDEX_BUFFER_VIEW& GetView() const { return m_IndexBufferView; }
 
 		UINT GetCount() const { return m_Count; }
 

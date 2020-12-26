@@ -14,10 +14,12 @@
 
 namespace Crystal {
 
+	class PlayerController;
+
 	class Renderer final
 	{
 	public:
-		void Init(const std::shared_ptr<WindowsWindow>& window);
+		void Init(WindowsWindow* window);
 		Renderer(const Renderer&) = delete;
 		static Renderer& Instance() { static Renderer instance; return instance; }
 
@@ -39,11 +41,11 @@ namespace Crystal {
 		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
 		
 	private:
-		Renderer() {};
+		Renderer() = default;;
 		~Renderer();
 
 	private:
-		std::shared_ptr<WindowsWindow> m_Window = nullptr;
+		WindowsWindow* m_Window = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Device2> m_Device = nullptr;
 		Microsoft::WRL::ComPtr<IDXGIFactory4> m_Factory = nullptr;
@@ -81,8 +83,7 @@ namespace Crystal {
 
 		struct PerFrameData
 		{
-			DirectX::XMFLOAT4X4 View;
-			DirectX::XMFLOAT4X4 Projection;
+			DirectX::XMFLOAT4X4 ViewProjection;
 			DirectX::XMFLOAT4 LightPositionInWorld;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
 		}m_PerFrameData;
@@ -102,8 +103,18 @@ namespace Crystal {
 
 		ConstantBuffer m_PerFrameBuffer;
 		ConstantBuffer m_PerObjectBuffer;
+		ConstantBuffer m_CubemapCbuffer;
 
 
 		class World* m_World;
+
+
+		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
+		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
+
+		std::unique_ptr<RootSignature> m_CubemapRootSignature = nullptr;
+		std::unique_ptr<GraphicsPipeline> m_CubemapGraphicsPipeline = nullptr;
+
+		PlayerController* m_PlayerController = nullptr;
 	};
 }

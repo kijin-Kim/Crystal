@@ -24,7 +24,7 @@ namespace Crystal {
 		
 		const Texture& GetTexture(const std::string& textureAlias) const ;
 
-		void Load(const std::vector<std::string>& filepaths, const std::string& textureAlias = "");
+		void Load(const std::vector<std::string>& filepaths, D3D12_SRV_DIMENSION srvDimension, const std::string& textureAlias = "");
 
 	private:
 		TextureManager();

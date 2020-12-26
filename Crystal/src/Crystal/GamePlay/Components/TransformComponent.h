@@ -21,7 +21,6 @@ namespace Crystal {
 		virtual void Update(float deltaTime) override
 		{
 			Component::Update(deltaTime);
-			UpdateConstantBuffer();
 		}
 
 		void UpdateConstantBuffer()

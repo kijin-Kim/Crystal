@@ -12,13 +12,13 @@ namespace Crystal {
 
 
 	Application::Application(HINSTANCE hInstance, int width, int height) :
-		m_Window(std::make_shared<WindowsWindow>(hInstance, width, height))
+		m_Window(new WindowsWindow(hInstance, width, height))
 	{
 		/////// Manual Call ////
 		auto& renderer = Renderer::Instance();
 		renderer.Init(m_Window);
-		
-		m_Window->SetEventCallbackFn(this, &Application::OnEvent);
+		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
+	
 	}
 
 	void Application::Run()
@@ -28,7 +28,7 @@ namespace Crystal {
 			MSG msg;
 			while (PeekMessage(&msg, m_Window->GetWindowHandle(), 0, 0, PM_REMOVE))
 			{
-				if (!TranslateAccelerator(m_Window->GetWindowHandle(), m_Window->GetAccelTable(), &msg))
+				if (!TranslateAcceleratorW(m_Window->GetWindowHandle(), nullptr, &msg))
 				{
 					if (msg.message == WM_QUIT)
 						m_bShouldRun = false;
@@ -36,37 +36,36 @@ namespace Crystal {
 					DispatchMessage(&msg);
 				}
 			}
+			
 			OnUpdate();
 			Renderer::Instance().Render();
 		}
 
 	}
 
-	void Application::OnEvent(Event& event)
+	void Application::OnUpdate()
 	{
-		//Handle Application Level Event
-		//World
-		
+		m_MainTimer.Tick();
+		for (State* state : m_StateStack)
+			state->Update(m_MainTimer.DeltaTime());
+	}
 
-		//Handle Mode Level Event
-		// for (auto world : m_Worlds)
-		//		bool isHandled = world->OnEvent();
-		//		if(isHandled)
-		//			break;
-
-
-
-		/*SetActionInput("MoveForward", VK_RETURN);
-		ActionMap[VK_RETURN] = "MoveForward"
-		ActionFunctionMap["MoveForward"] = std::bind(function, this, std::placeholders::_1);
-
-
-
-		PlayerInputComponent->BindAxis("MoveForward", this, &Application::MoveForward);
-		
-
-		"MoveForward"
-*/
+	void Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_MOUSEMOVE:
+			break;
+		case 'W':
+			__debugbreak();
+			break;
+		case WM_KEYDOWN:
+			break;
+		case WM_KEYUP:
+			break;
+		default:
+			break;
+		}
 	}
 
 }
