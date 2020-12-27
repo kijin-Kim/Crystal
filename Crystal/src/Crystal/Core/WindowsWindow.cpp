@@ -72,24 +72,10 @@ namespace Crystal {
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 			return true;
 
-		if (m_InputEventFunction)
+		if(m_InputEventFunction)
 			m_InputEventFunction(hWnd, uMsg, wParam, lParam);
 
-		/*Process Global Window Events*/
-		switch (uMsg)
-		{
-		case WM_CLOSE:
-			__debugbreak(); //Should Make Window Close Event to Destroy Main Game Loop
-			break;
-		case WM_QUIT:
-			DestroyWindow(hWnd);
-			break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
-		default:
-			return DefWindowProc(hWnd, uMsg, wParam, lParam);
-		}	
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<void(Application*, HWND, UINT, WPARAM, LPARAM)>& function)

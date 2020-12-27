@@ -34,15 +34,11 @@ namespace Crystal {
 		virtual void OnUpdate();
 
 		void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	
-	protected:
-		void PushState(State* state) { m_StateStack.PushState(state); }
-		void PopState(State* state) { m_StateStack.PopState(state); }
+
 
 	private:
 		bool m_bShouldRun = true;
 		WindowsWindow* m_Window;
-		StateStack m_StateStack;
 		Timer m_MainTimer;
 	};
 
@@ -52,5 +48,6 @@ namespace Crystal {
 
 #define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
 {\
+	Crystal::ApplicationUtility::Init();\
 	return new x(hInstance, width, height);\
 }

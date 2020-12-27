@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "DirectXTex/DirectXTex.h"
+#include "ApplicationUtility.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 
 #define WINDOW_WIDTH 1366
@@ -46,26 +48,28 @@ namespace Crystal {
 	void Application::OnUpdate()
 	{
 		m_MainTimer.Tick();
-		for (State* state : m_StateStack)
+		for (State* state : ApplicationUtility::GetStateStack())
 			state->Update(m_MainTimer.DeltaTime());
 	}
 
 	void Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+
+		/*Process Global Window Events*/
 		switch (uMsg)
 		{
-		case WM_MOUSEMOVE:
+		case WM_CLOSE:
+			__debugbreak(); //Should Make Window Close Event to Destroy Main Game Loop
 			break;
-		case 'W':
-			__debugbreak();
+		case WM_QUIT:
+			DestroyWindow(hWnd);
 			break;
-		case WM_KEYDOWN:
-			break;
-		case WM_KEYUP:
-			break;
-		default:
+		case WM_DESTROY:
+			PostQuitMessage(0);
 			break;
 		}
+
+		ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);
 	}
 
 }

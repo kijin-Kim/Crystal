@@ -37,8 +37,18 @@ namespace Crystal {
 
 		void SetupInputComponent(InputComponent* inputComponent)
 		{
-			//PlayerInputComponent->BindAxis('W', this, &Camera::MoveForward);
-			
+			inputComponent->BindAxis("MoveForward", this, &Pawn::MoveForward);
+			inputComponent->BindAction("Jump", WM_KEYUP, this, &Pawn::Jump);
+		}
+
+		void MoveForward(float value)
+		{
+			__debugbreak();
+		}
+
+		void Jump()
+		{
+			__debugbreak();
 		}
 
 		MeshComponent* GetMeshComponent() const { return m_MeshComponent; }

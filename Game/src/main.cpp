@@ -11,7 +11,7 @@ class GameApplication : public Crystal::Application
 public:
 	GameApplication(HINSTANCE hIsntance, int width, int height) : Crystal::Application(hIsntance, width, height)
 	{
-		PushState(new MainState());
+		Crystal::ApplicationUtility::PushState(new MainState());
 	}
 
 	/*virtual void OnUpdate() {}

@@ -16,7 +16,8 @@
 #include "Crystal/AssetManager/TextureManager.h"
 #include "Crystal/AssetManager/ConstantBufferManager.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
-#include "Crystal/GamePlay/Actors/Controllers/PlayerController.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
+#include "../Core/ApplicationUtility.h"
 
 namespace Crystal {
 
@@ -333,8 +334,9 @@ namespace Crystal {
 
 		m_World = new World();
 		Pawn* pawn = m_World->SpawnActor<Pawn>();
-		m_PlayerController = new PlayerController();
-		m_PlayerController->Possess(pawn);
+		ApplicationUtility::GetPlayerController()->Possess(pawn);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", 'W', 3);
+		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", VK_LEFT);
 		float quadVertices[] = {
 			-1.0f, -1.0f,
 			-1.0f, 1.0f,
