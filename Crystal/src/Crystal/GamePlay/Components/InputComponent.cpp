@@ -11,7 +11,7 @@ namespace Crystal {
 		m_AxisFunctionmap.insert(std::make_pair(axisName, std::bind(function, owner, std::placeholders::_1)));
 	}
 
-	void InputComponent::BindAction(const std::string& actionName, int keyEventType, Pawn* owner, const std::function<void(Pawn*)>& function)
+	void InputComponent::BindAction(const std::string& actionName, EKeyStatus keyEventType, Pawn* owner, const std::function<void(Pawn*)>& function)
 	{
 		m_ActionFunctionMap.insert(std::make_pair(std::make_pair(actionName, keyEventType), std::bind(function, owner)));
 	}
@@ -40,12 +40,30 @@ namespace Crystal {
 			}
 		}
 
+
+		EKeyStatus keyStatus = EKeyStatus::KS_None;
+		switch (uMsg)
+		{
+		case WM_KEYDOWN:
+			if (!(HIWORD(lParam) & KF_REPEAT))
+				keyStatus = EKeyStatus::KS_Pressed;
+			else
+				keyStatus = EKeyStatus::KS_Repeat;
+			break;
+		case WM_KEYUP:
+			keyStatus = EKeyStatus::KS_Released;
+			break;
+		default:
+			break;
+		}
+
+
 		/*Process Action*/
 		auto actionIt =actionMap.find(wParam);
 		if (actionIt != actionMap.end())
 		{
 			std::string actionName = (*actionIt).second;
-			auto actionFnIt = m_ActionFunctionMap.find(std::make_pair(actionName, uMsg));
+			auto actionFnIt = m_ActionFunctionMap.find(std::make_pair(actionName, keyStatus));
 			if (actionFnIt != m_ActionFunctionMap.end())
 			{
 				bHandledOnAction = true;

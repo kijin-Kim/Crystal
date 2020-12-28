@@ -38,7 +38,7 @@ namespace Crystal {
 		void SetupInputComponent(InputComponent* inputComponent)
 		{
 			inputComponent->BindAxis("MoveForward", this, &Pawn::MoveForward);
-			inputComponent->BindAction("Jump", WM_KEYUP, this, &Pawn::Jump);
+			inputComponent->BindAction("Jump", EKeyStatus::KS_Repeat, this, &Pawn::Jump);
 		}
 
 		void MoveForward(float value)

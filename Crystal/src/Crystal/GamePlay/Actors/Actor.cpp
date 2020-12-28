@@ -26,7 +26,6 @@ namespace Crystal {
 
 	void Actor::Update(float DeltaTime)
 	{
-		CS_LOG("Actor is Updating");
 		m_MainComponent->Update(DeltaTime);
 		for (TransformComponent* component : m_TransformComponents)
 				component->Update(DeltaTime);

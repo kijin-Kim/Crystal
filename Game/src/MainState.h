@@ -17,6 +17,5 @@ public:
 	}
 	virtual void Update(float deltatTime) override
 	{
-		CS_LOG("MainState Update");
 	}
 };
