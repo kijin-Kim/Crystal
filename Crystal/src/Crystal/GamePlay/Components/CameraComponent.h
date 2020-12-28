@@ -17,7 +17,6 @@ namespace Crystal {
 		virtual ~CameraComponent() = default;
 
 		virtual void Update(float deltaTime) override;
-
 		void SetWorldPosition(const DirectX::XMFLOAT3& position) { m_Position = position; }
 //		void SetRelativePosition()
 		void SetLookAt(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt;}

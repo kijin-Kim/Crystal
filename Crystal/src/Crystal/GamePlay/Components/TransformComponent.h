@@ -23,7 +23,6 @@ namespace Crystal {
 
 		void UpdateTransform()
 		{
-			
 		}
 
 		void AttachToComponent(TransformComponent* parentComponent) { m_Parent = parentComponent; }
