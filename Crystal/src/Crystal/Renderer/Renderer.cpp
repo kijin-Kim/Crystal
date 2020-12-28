@@ -18,6 +18,7 @@
 #include "Crystal/GamePlay/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "../Core/ApplicationUtility.h"
+#include "../GamePlay/Actors/CameraPawn.h"
 
 namespace Crystal {
 
@@ -334,7 +335,9 @@ namespace Crystal {
 
 		m_World = new World();
 		Pawn* pawn = m_World->SpawnActor<Pawn>();
-		ApplicationUtility::GetPlayerController()->Possess(pawn);
+		CameraPawn* cameraPawn = m_World->SpawnActor<CameraPawn>();
+
+		ApplicationUtility::GetPlayerController()->Possess(cameraPawn);
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", 'W', 3);
 		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", VK_LEFT);
 		float quadVertices[] = {

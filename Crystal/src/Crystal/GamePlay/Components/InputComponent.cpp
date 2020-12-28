@@ -5,15 +5,14 @@
 
 namespace Crystal {
 
-
-	void InputComponent::BindAxis(const std::string& axisName, Pawn* owner, const std::function<void(Pawn*, float value)>& function)
+	void InputComponent::BindAxis(const std::string& axisName, const std::function<void(float value)>& function)
 	{
-		m_AxisFunctionmap.insert(std::make_pair(axisName, std::bind(function, owner, std::placeholders::_1)));
+		m_AxisFunctionmap.insert(std::make_pair(axisName, function));
 	}
 
-	void InputComponent::BindAction(const std::string& actionName, EKeyStatus keyEventType, Pawn* owner, const std::function<void(Pawn*)>& function)
+	void InputComponent::BindAction(const std::string& actionName, EKeyStatus keyEventType, const std::function<void(void)>& function)
 	{
-		m_ActionFunctionMap.insert(std::make_pair(std::make_pair(actionName, keyEventType), std::bind(function, owner)));
+		m_ActionFunctionMap.insert(std::make_pair(std::make_pair(actionName, keyEventType), function));
 	}
 
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

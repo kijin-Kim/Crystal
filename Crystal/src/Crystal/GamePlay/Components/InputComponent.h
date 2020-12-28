@@ -4,6 +4,9 @@
 
 namespace Crystal {
 
+#define CS_AXIS_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+#define CS_ACTION_FN(fn) std::bind(&fn, this)
+
 	class Pawn;
 
 	enum class EKeyStatus
@@ -13,7 +16,6 @@ namespace Crystal {
 		KS_Released,
 		KS_Repeat
 	};
-	
 
 	class InputComponent : public Component
 	{
@@ -21,8 +23,8 @@ namespace Crystal {
 		InputComponent() = default;
 		virtual ~InputComponent() = default;
 
-		void BindAxis(const std::string& axisName, Pawn* owner, const std::function<void(Pawn*, float value)>& function);
-		void BindAction(const std::string& actionName, EKeyStatus keyEventType, Pawn* owner, const std::function<void(Pawn*)>& function);
+		void BindAxis(const std::string& axisName, const std::function<void(float value)>& function);
+		void BindAction(const std::string& actionName, EKeyStatus keyEventType, const std::function<void(void)>& function);
 
 		bool ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

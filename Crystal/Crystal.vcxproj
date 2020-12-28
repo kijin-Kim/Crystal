@@ -182,6 +182,7 @@
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Actor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\Component.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />

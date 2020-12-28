@@ -32,27 +32,13 @@ namespace Crystal {
 		virtual void Update(float deltaTime) override
 		{
 			Actor::Update(deltaTime); // Updating All Component
-
 		}
 
-		void SetupInputComponent(InputComponent* inputComponent)
+		virtual void SetupInputComponent(InputComponent* inputComponent)
 		{
-			inputComponent->BindAxis("MoveForward", this, &Pawn::MoveForward);
-			inputComponent->BindAction("Jump", EKeyStatus::KS_Repeat, this, &Pawn::Jump);
 		}
 
-		void MoveForward(float value)
-		{
-			__debugbreak();
-		}
 
-		void Jump()
-		{
-			__debugbreak();
-		}
-
-		MeshComponent* GetMeshComponent() const { return m_MeshComponent; }
-		InputComponent* GetInputComponent() const { return m_InputComponent; }
 
 	private:
 		//////////////////Temporary//////////////
