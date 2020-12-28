@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Crystal/AssetManager/ConstantBufferManager.h"
+#include "Crystal/AssetManager/ConstantBuffer.h"
 #include "Component.h"
 
 namespace Crystal {
@@ -10,12 +10,10 @@ namespace Crystal {
 	public:
 		TransformComponent() 
 		{ 
-			m_ConstantBuffer = ConstantBufferManager::Instance().CreateConstantBuffer(256);
-			DirectX::XMStoreFloat4x4(&m_World, DirectX::XMMatrixIdentity());
+			DirectX::XMStoreFloat4x4(&m_Transform, DirectX::XMMatrixIdentity());
 		}
 		virtual ~TransformComponent()
 		{
-			// TODO : UNLOAD CONSTANT BUFFER
 		}
 
 		virtual void Update(float deltaTime) override
@@ -23,20 +21,19 @@ namespace Crystal {
 			Component::Update(deltaTime);
 		}
 
-		void UpdateConstantBuffer()
+		void UpdateTransform()
 		{
-			m_ConstantBuffer.SetData((void*)&m_World);
+			
 		}
 
 		void AttachToComponent(TransformComponent* parentComponent) { m_Parent = parentComponent; }
 		TransformComponent* GetParent() const { return m_Parent; }
 
-		DirectX::XMFLOAT4X4 GetTransform() { return m_World; }
+		DirectX::XMFLOAT4X4 GetTransform() { return m_Transform; }
 
 	private:
 		TransformComponent* m_Parent = nullptr;
-		ConstantBuffer m_ConstantBuffer;
-		DirectX::XMFLOAT4X4 m_World;
+		DirectX::XMFLOAT4X4 m_Transform;
 	};
 }
 

@@ -11,7 +11,6 @@
 #include "Crystal/Renderer/RenderTarget.h"
 #include "Crystal/Renderer/DepthStencil.h"
 #include "Crystal/Renderer/Pipeline.h"
-#include "Crystal/Renderer/Camera.h"
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/Core/State.h"

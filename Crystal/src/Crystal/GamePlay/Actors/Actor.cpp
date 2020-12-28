@@ -34,7 +34,7 @@ namespace Crystal {
 	void Actor::UpdateTransfromData()
 	{
 		for (TransformComponent* component : m_TransformComponents)
-			component->UpdateConstantBuffer();
+			component->UpdateTransform();
 	}
 
 }

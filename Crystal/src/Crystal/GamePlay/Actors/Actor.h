@@ -18,9 +18,6 @@ namespace Crystal {
 		void UpdateTransfromData();
 
 	protected:
-		//void CreateComponent() {}
-
-	protected:
 		TransformComponent* m_MainComponent = nullptr;
 
 	private:

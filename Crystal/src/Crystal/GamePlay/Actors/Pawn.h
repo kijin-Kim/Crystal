@@ -38,6 +38,11 @@ namespace Crystal {
 		{
 		}
 
+		void MoveForward(float value)
+		{
+			__debugbreak();
+		}
+
 
 
 	private:

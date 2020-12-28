@@ -2,7 +2,6 @@
 #include <wrl/client.h>
 #include <vector>
 
-#include "Camera.h"
 #include "CommandQueue.h"
 #include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
@@ -10,7 +9,7 @@
 #include "Crystal/AssetManager/ShaderManager.h"
 
 #include "Crystal/Gameplay/Components/MeshComponent.h"
-#include "Crystal/AssetManager/ConstantBufferManager.h"
+#include "Crystal/AssetManager/ConstantBuffer.h"
 
 namespace Crystal {
 
@@ -63,8 +62,6 @@ namespace Crystal {
 		std::unique_ptr<DepthStencil> m_DepthStencil = nullptr;
 
 		std::unique_ptr<GraphicsPipeline> m_GraphicsPipeline = nullptr;
-
-		std::unique_ptr<Camera> m_Camera = nullptr;
 
 		DirectX::XMFLOAT4X4 m_WorldMat = {};
 

@@ -14,7 +14,7 @@
 
 #include "Crystal/AssetManager/ShaderManager.h"
 #include "Crystal/AssetManager/TextureManager.h"
-#include "Crystal/AssetManager/ConstantBufferManager.h"
+#include "Crystal/AssetManager/ConstantBuffer.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "../Core/ApplicationUtility.h"
@@ -173,7 +173,7 @@ namespace Crystal {
 		
 		auto& shaderManager = ShaderManager::Instance();
 		auto& textureManager = TextureManager::Instance();
-		auto& constantBufferManager = ConstantBufferManager::Instance();
+		auto& constantBufferPoolManager = ConstantBufferPoolManager::Instance();
 
 
 		/*textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png" }, "Megaphone_Diffuse");
@@ -197,9 +197,9 @@ namespace Crystal {
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
 		shaderManager.Load("assets/shaders/SkyboxShader", "CubemapShader"); 
 
-		m_PerFrameBuffer = constantBufferManager.CreateConstantBuffer(256);
-		m_PerObjectBuffer = constantBufferManager.CreateConstantBuffer(256);
-		m_CubemapCbuffer = constantBufferManager.CreateConstantBuffer(256);
+		m_PerFrameBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerFrameBuffer));
+		m_PerObjectBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerObjectBuffer));
+		m_CubemapCbuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_CubemapCbuffer));
 		
 	
 		///////////////////////////////////////////////////
@@ -329,17 +329,13 @@ namespace Crystal {
 		////////TEST OBJECTS///////////////////////////////
 		///////////////////////////////////////////////////
 
-		m_Camera = std::make_unique<Camera>(m_ResWidth, m_ResHeight);
-		m_Camera->SetPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
-
-
 		m_World = new World();
 		Pawn* pawn = m_World->SpawnActor<Pawn>();
 		CameraPawn* cameraPawn = m_World->SpawnActor<CameraPawn>();
-
 		ApplicationUtility::GetPlayerController()->Possess(cameraPawn);
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", 'W', 3);
 		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", VK_LEFT);
+
 		float quadVertices[] = {
 			-1.0f, -1.0f,
 			-1.0f, 1.0f,
@@ -366,7 +362,7 @@ namespace Crystal {
 
 		static float angle = 0.0f;
 		angle += timer.DeltaTime();
-		m_Camera->SetLookAt(DirectX::XMFLOAT3(0.0f, 0.0f, 0 + cos(angle)));
+		//m_Camera->SetLookAt(DirectX::XMFLOAT3(0.0f, 0.0f, 0 + cos(angle)));
 
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 		ChangeDisplayMode();
@@ -388,19 +384,19 @@ namespace Crystal {
 			DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
 		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
-		
-		m_PerFrameData.ViewProjection = m_Camera->GetViewProjection();
-		auto camPos = m_Camera->GetWorldPosition();
+		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
+
+		m_PerFrameData.ViewProjection = cameraComponent->GetViewProjection();
+		auto camPos = cameraComponent->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
-		
-
 		m_PerObjectData.World = m_WorldMat;
+
 
 
 		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
 		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
-		m_CubemapCbuffer.SetData((void*)&m_Camera->GetInverseViewProjection());
+		m_CubemapCbuffer.SetData((void*)&cameraComponent->GetInverseViewProjection());
 		
 
 
@@ -507,8 +503,8 @@ namespace Crystal {
 		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		cmdList->RSSetViewports(1, &m_Camera->GetViewport());
-		cmdList->RSSetScissorRects(1, &m_Camera->GetScissorRect());
+		cmdList->RSSetViewports(1, &cameraComponent->GetViewport());
+		cmdList->RSSetScissorRects(1, &cameraComponent->GetScissorRect());
 		cmdList->OMSetRenderTargets(1, &m_RenderTargets[m_RtvIndex]->GetCpuHandle(), TRUE, &m_DepthStencil->GetCpuHandle());
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 
@@ -530,6 +526,7 @@ namespace Crystal {
 		for (const auto& meshComponent : m_MeshComponents)
 		{
 			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
+			m_PerObjectData.World = world;
 			meshComponent->GetMesh()->Render(cmdList);
 		}
 
@@ -641,8 +638,9 @@ namespace Crystal {
 
 		m_DepthStencil = std::make_unique<DepthStencil>(width, height);
 
-		m_Camera->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
-		m_Camera->SetScissorRect({ 0, 0, width, height });
+		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
+		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
+		cameraComponent->SetScissorRect({ 0, 0, width, height });
 	}
 
 	Renderer::~Renderer()

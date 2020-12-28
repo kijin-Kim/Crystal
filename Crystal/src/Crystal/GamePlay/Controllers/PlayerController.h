@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include "Controller.h"
+#include "Crystal/GamePlay/Components/CameraComponent.h"
 
 namespace Crystal {
 
@@ -42,16 +43,19 @@ namespace Crystal {
 					
 		}
 
+		void SetMainCamera(CameraComponent* cameraComponent) { m_MainCamera = cameraComponent; }
+		CameraComponent* GetMainCamera() const { return m_MainCamera; }
+
 		const std::map<int, std::pair<std::string, int>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<int, std::string>& GetActionMap() const { return m_ActionMap; }
-	private:
-		
 
+	private:
 		std::vector<InputComponent*> m_InputComponents;
 		/* KeyCode, AxisName, Scale */
 		std::map<int, std::pair<std::string, int>> m_AxisMap;
 		/* KeyCode, ActionName */
 		std::map<int, std::string> m_ActionMap;
 
+		CameraComponent* m_MainCamera = nullptr;
 	};
 }

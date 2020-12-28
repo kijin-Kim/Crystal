@@ -172,7 +172,7 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
-    <ClInclude Include="src\Crystal\AssetManager\ConstantBufferManager.h" />
+    <ClInclude Include="src\Crystal\AssetManager\ConstantBuffer.h" />
     <ClInclude Include="src\Crystal\AssetManager\TextureManager.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
@@ -184,6 +184,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Actors\Actor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Pawn.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\CameraComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\Component.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\InputComponent.h" />
@@ -192,7 +193,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Controllers\PlayerController.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\World.h" />
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
-    <ClInclude Include="src\Crystal\Renderer\Camera.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
     <ClInclude Include="src\Crystal\Renderer\DepthStencil.h" />
@@ -207,7 +207,7 @@
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Crystal\AssetManager\ConstantBufferManager.cpp" />
+    <ClCompile Include="src\Crystal\AssetManager\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\AssetManager\TextureManager.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
@@ -215,10 +215,10 @@
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\CameraComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\InputComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponent.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Buffers.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Camera.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
     <ClCompile Include="src\Crystal\Renderer\DepthStencil.cpp" />
