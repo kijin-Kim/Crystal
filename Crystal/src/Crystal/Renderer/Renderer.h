@@ -83,7 +83,6 @@ namespace Crystal {
 		PerFrameData m_PerFrameData = {};
 		std::vector<MeshComponent*> m_MeshComponents;
 
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
 		int m_ResWidth = 1366;

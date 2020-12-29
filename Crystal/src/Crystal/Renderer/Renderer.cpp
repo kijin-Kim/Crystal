@@ -7,8 +7,6 @@
 #include "DirectXTex/DirectXTex.h"
 #include <iostream>
 
-#include "examples/imgui_impl_dx12.h"
-#include "examples/imgui_impl_win32.h"
 
 #include "Crystal/GamePlay/World/World.h"
 
@@ -126,31 +124,6 @@ namespace Crystal {
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
 		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
-		//////////////////////////////////////////////////
-		///// IMGUI IMPLE ////////////////////////////////
-		//////////////////////////////////////////////////
-
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-		ImGui::StyleColorsDark();
-
-		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		desc.NumDescriptors = 2;
-		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		hr = m_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_ImGuiDescriptorHeap));
-		CS_ASSERT(SUCCEEDED(hr), "ImGui의 Descriptor Heap을 생성하는데 실패하였습니다.");
-
-		ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
-		ImGui_ImplDX12_Init(m_Device.Get(), 2,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			m_ImGuiDescriptorHeap.Get(),
-			m_ImGuiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-			m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 		///////////////////////////////////////////////////
 		/////LOAD SHADER, TEXTURE, CONSTANT BUFFER///////
@@ -372,49 +345,6 @@ namespace Crystal {
 		///// RENDER /////////////////////////////
 		//////////////////////////////////////////
 
-		//////////////////////////////////////////
-		///// IMGUI IMPLE ////////////////////////
-		//////////////////////////////////////////
-
-		// Start the Dear ImGui frame
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		bool show_demo_window = true;
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
-
-		{
-			//Record ImGui Stuffs
-
-			ImGui::Begin("Properties");
-
-			ImGui::Columns(2);
-
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Clear Color");
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Model Rotation Angle");
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Resolution");
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("FullScreen");
-
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			ImGui::ColorEdit3("##Clear Color", m_ClearColor);
-			ImGui::DragFloat3("##Model Rotation Angle", modelAngle, 1.0f, 0.0f, 359.0f);
-			ImGui::Combo("##Resolution", &m_CurrentResolutionIndex, m_ResolutionItems, _countof(m_ResolutionItems));
-			ImGui::Checkbox("##Full Screen", &m_bIsFullScreen);
-
-			ImGui::PopItemWidth();
-			ImGui::Columns(1);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
-		}
 
 		{
 			// Copying Per Object Datas
@@ -497,11 +427,7 @@ namespace Crystal {
 		//cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
 		//cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		//cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
-
-		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-
+	
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
 
 		m_CommandQueue->Execute(cmdList);
@@ -594,9 +520,7 @@ namespace Crystal {
 
 	Renderer::~Renderer()
 	{
-		ImGui_ImplDX12_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
+	
 	}
 
 	void Renderer::ChangeDisplayMode()

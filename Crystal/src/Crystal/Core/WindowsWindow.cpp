@@ -2,9 +2,6 @@
 #include "WindowsWindow.h"
 #include "Application.h"
 
-#include "examples/imgui_impl_win32.h"
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Crystal {
 	LRESULT CALLBACK WndProcProxy(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -66,7 +63,6 @@ namespace Crystal {
 
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 		if (m_InputEventFunction)
 		{
