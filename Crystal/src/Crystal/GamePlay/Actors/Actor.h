@@ -1,7 +1,6 @@
 #pragma once
 
 namespace Crystal {
-
 	class TransformComponent;
 	class MeshComponent;
 	class Mesh;
@@ -13,7 +12,7 @@ namespace Crystal {
 		virtual ~Actor();
 
 		virtual void Start() {}
-		virtual void End() {} 
+		virtual void End() {}
 		virtual void Update(float deltaTime);
 		void UpdateTransfromData();
 
@@ -22,10 +21,5 @@ namespace Crystal {
 
 	private:
 		std::vector<TransformComponent*> m_TransformComponents;
-
 	};
-
 }
-
-
-

@@ -3,8 +3,7 @@
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 
 namespace Crystal {
-
-	class CameraPawn  : public Pawn
+	class CameraPawn : public Pawn
 	{
 	public:
 		CameraPawn()
@@ -53,6 +52,5 @@ namespace Crystal {
 			__debugbreak();
 		}
 	private:
-
 	};
 }

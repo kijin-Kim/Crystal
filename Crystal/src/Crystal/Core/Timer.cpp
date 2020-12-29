@@ -2,7 +2,6 @@
 #include "Timer.h"
 
 namespace Crystal {
-
 	Timer::Timer()
 	{
 		UINT64 countsPerSec = 0;
@@ -19,13 +18,12 @@ namespace Crystal {
 			return;
 		}
 
-
 		UINT64 currentTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 		m_CurrentTime = (double)currentTime;
 
 		// 타이머는 언제나 첫틱에 0.0의 델타타임에서 시작합니다
-		if(m_LastTime != 0.0)
+		if (m_LastTime != 0.0)
 			m_DeltaTime = (m_CurrentTime - m_LastTime) * m_SecondsPerCount;
 
 		m_LastTime = m_CurrentTime;
@@ -35,5 +33,4 @@ namespace Crystal {
 			m_DeltaTime = 0.0;
 		}
 	}
-
 }

@@ -4,7 +4,6 @@
 #include <queue>
 
 namespace Crystal {
-	
 	class CommandQueue final
 	{
 	public:
@@ -25,7 +24,7 @@ namespace Crystal {
 
 		ID3D12CommandQueue* GetRaw() const { return m_d3d12CommandQueue.Get(); }
 		ID3D12Fence* getFence()  const { return m_d3d12Fence.Get(); }
-		uint64_t getFenceValue() const { return m_FenceValue;}
+		uint64_t getFenceValue() const { return m_FenceValue; }
 
 	private:
 		struct CommandAlloctorEntry
@@ -47,7 +46,6 @@ namespace Crystal {
 		HANDLE m_FenceEvent = nullptr;
 		uint64_t m_FenceValue = 0;
 	};
-
 }
 
 // this code is Inspired By https://github.com/jpvanoosten/LearningDirectX12/blob/5af740ce2c29846bf36b9814ae748271075bdcb8/Tutorial2/src/CommandQueue.cpp

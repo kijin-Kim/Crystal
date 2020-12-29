@@ -3,7 +3,6 @@
 #include "Resource.h"
 
 namespace Crystal {
-
 	class RenderTarget final
 	{
 	public:
@@ -18,7 +17,7 @@ namespace Crystal {
 		const D3D12_RENDER_TARGET_BLEND_DESC& GetBlendDesc() const { return m_BlendDesc; }
 		const DXGI_FORMAT& GetFormat() const { return m_Format; }
 		ID3D12Resource* GetRaw() const { return m_Resource.get()->GetRaw(); }
-		
+
 		void TransResourceState(ID3D12GraphicsCommandList2* commandList, D3D12_RESOURCE_STATES state) const { m_Resource->TransResourceState(commandList, state); }
 
 	private:
@@ -32,5 +31,4 @@ namespace Crystal {
 		D3D12_RENDER_TARGET_BLEND_DESC m_BlendDesc = {};
 		DXGI_FORMAT m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	};
-
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 namespace Crystal {
-
 	class Component
 	{
 	public:
@@ -10,5 +9,4 @@ namespace Crystal {
 
 		virtual void Update(float deltaTime) {}
 	};
-
 }

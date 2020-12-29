@@ -4,7 +4,6 @@
 #include "DirectXTex/DirectXTex.h"
 
 namespace Crystal {
-
 	TextureManager::TextureManager()
 	{
 		auto device = Renderer::Instance().GetDevice();
@@ -21,8 +20,6 @@ namespace Crystal {
 		m_TexturePoolCpuHandle = m_TexturesHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 
-
-
 	void TextureManager::Load(const std::vector<std::string>& filepaths, D3D12_SRV_DIMENSION srvDimension, const std::string& textureAlias /*= ""*/)
 	{
 		Texture texture;
@@ -32,13 +29,12 @@ namespace Crystal {
 		TextureData textureData;
 		textureData.Buffers.resize(filepaths.size());
 		textureData.texture = texture;
-		
+
 		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
 		auto commandQueue = renderer.GetCommandQueue();
 
-
-		for(int i =0; i<filepaths.size(); i++)
+		for (int i = 0; i < filepaths.size(); i++)
 		{
 			std::string alias = textureAlias == "" ? filepaths[i] : textureAlias;
 
@@ -102,11 +98,9 @@ namespace Crystal {
 			m_TexturePoolCpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			m_TexturePool[alias] = textureData;
 		}
-		
 	}
 
-
-	const Texture& TextureManager::GetTexture(const std::string& textureAlias) const
+	Texture TextureManager::GetTexture(const std::string& textureAlias) const
 	{
 		if (m_TexturePool.find(textureAlias) != m_TexturePool.end())
 			return m_TexturePool[textureAlias].texture;
@@ -117,5 +111,4 @@ namespace Crystal {
 			return nullTexture;
 		}
 	}
-
 }

@@ -5,14 +5,10 @@
 #include "ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
-
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
 
-
 namespace Crystal {
-
-
 	Application::Application(HINSTANCE hInstance, int width, int height) :
 		m_Window(new WindowsWindow(hInstance, width, height))
 	{
@@ -20,7 +16,6 @@ namespace Crystal {
 		auto& renderer = Renderer::Instance();
 		renderer.Init(m_Window);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
-	
 	}
 
 	void Application::Run()
@@ -30,18 +25,14 @@ namespace Crystal {
 			MSG msg;
 			while (PeekMessage(&msg, m_Window->GetWindowHandle(), 0, 0, PM_REMOVE))
 			{
-				if (!TranslateAcceleratorW(m_Window->GetWindowHandle(), nullptr, &msg))
-				{
-					if (msg.message == WM_QUIT)
-						m_bShouldRun = false;
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
+				if (msg.message == WM_QUIT)
+					m_bShouldRun = false;
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
 			OnUpdate();
 			Renderer::Instance().Render();
 		}
-
 	}
 
 	void Application::OnUpdate()
@@ -72,6 +63,4 @@ namespace Crystal {
 
 		return false;
 	}
-
 }
-

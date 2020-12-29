@@ -11,9 +11,7 @@ namespace Crystal {
 		virtual void Enter() {}
 		virtual void Exit() {}
 		virtual void Update(float deltatTime) {}
-
 	};
-
 
 	class StateStack final
 	{
@@ -31,4 +29,3 @@ namespace Crystal {
 		std::vector<State*> m_States;
 	};
 }
-

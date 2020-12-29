@@ -2,13 +2,10 @@
 #include "ConstantBuffer.h"
 #include "Crystal/Renderer/Renderer.h"
 
-
 namespace Crystal {
-
-
 	/* 사이즈가 m_BufferSize ( 256 / 512 / 1024 Bytes) 인 Constant Buffer View를 미리 다른 CBV_SRV_UAV 힙에 만들어 놓습니다.
 	이러한 Constant Buffer View는 리소스 바인딩 과정시 현재 파이프라인에 바인딩된 CBV_SRV_UAV 힙에
-	복사(Copy Descriptor)되어 최종적으로 바인딩 됩니다. Constant Buffer View를 미리 만들어 놓기 때문에 고정된 사이즈의 
+	복사(Copy Descriptor)되어 최종적으로 바인딩 됩니다. Constant Buffer View를 미리 만들어 놓기 때문에 고정된 사이즈의
 	Constant Buffer View만 제공하므로 각각의 256, 512, 1024 Byte의 Constant Buffer View를 만드는 ConstantBufferManager가 필요합니다.*/
 	ConstantBufferPool::ConstantBufferPool(int alignmentSize, int maxCbvCount)
 	{
@@ -31,11 +28,10 @@ namespace Crystal {
 
 		m_ConstantBufferData->Map(0, nullptr, (void**)&m_CpuBasePtr);
 
-
 		/* m_BufferSize의 Constant Buffer View를 m_CbvCount만큼 만듭니다.*/
 		UINT cpuOffsetByte = 0;
 		D3D12_CPU_DESCRIPTOR_HANDLE cbvPoolCpuHandle = m_CbvHeap->GetCPUDescriptorHandleForHeapStart();
-		for (int i = 0; i < m_MaxCbvCount; i++)
+		for (unsigned int i = 0; i < m_MaxCbvCount; i++)
 		{
 			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 			cbvDesc.BufferLocation = (D3D12_GPU_VIRTUAL_ADDRESS)((char*)m_ConstantBufferData->GetGPUVirtualAddress() + cpuOffsetByte);
@@ -45,7 +41,6 @@ namespace Crystal {
 
 			cpuOffsetByte += m_BufferAlignedSize;
 		}
-		
 	}
 
 	/* 미리 만들어 놓은 Constant Buffer View중 사용되고 있지 않은 Constant Buffer View를 리턴합니다.*/
@@ -66,8 +61,6 @@ namespace Crystal {
 		return cBuffer;
 	}
 
-
-
 	ConstantBufferPoolManager::ConstantBufferPoolManager()
 	{
 		m_256AlignedBufferPool = ConstantBufferPool(256, 1000);
@@ -78,21 +71,23 @@ namespace Crystal {
 	ConstantBuffer ConstantBufferPoolManager::GetConstantBuffer(int size)
 	{
 		int alignedSize = (size + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
+		ConstantBuffer cBuffer = {};
 		switch (alignedSize)
 		{
 		case 256:
-			return m_256AlignedBufferPool.CreateConstantBuffer();
+			cBuffer = m_256AlignedBufferPool.CreateConstantBuffer();
 			break;
 		case 512:
-			return m_512AlignedBufferPool.CreateConstantBuffer();
+			cBuffer = m_512AlignedBufferPool.CreateConstantBuffer();
 			break;
 		case 1024:
-			return m_1024AlignedBufferPool.CreateConstantBuffer();
+			cBuffer = m_1024AlignedBufferPool.CreateConstantBuffer();
 			break;
 		default:
 			CS_ASSERT(false, "%d사이즈의 ConstantBuffer는 현재 지원하지 않습니다.");
 			break;
 		}
-	}
 
+		return cBuffer;
+	}
 }

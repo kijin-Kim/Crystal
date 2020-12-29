@@ -2,9 +2,7 @@
 #include "Renderer.h"
 #include "RenderTarget.h"
 
-
 namespace Crystal {
-
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RenderTarget::s_Heap = nullptr;
 	UINT RenderTarget::s_Count = 0;
 	UINT RenderTarget::s_HeapIncrementSize = 0;
@@ -30,8 +28,7 @@ namespace Crystal {
 
 			hr = device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&s_Heap));
 			CS_ASSERT(SUCCEEDED(hr), "RenderTarget Descriptor Heap을 생성하는데 실패하였습니다.");
-		}		
-
+		}
 
 		m_Resource = std::make_unique<Resource>(rtvBuffer, D3D12_RESOURCE_STATE_PRESENT);
 
@@ -39,7 +36,6 @@ namespace Crystal {
 		m_CpuHandle.ptr = cpuStartHandle.ptr + (s_Count * s_HeapIncrementSize);
 		device->CreateRenderTargetView(rtvBuffer, nullptr, m_CpuHandle);
 		s_Count++;
-
 
 		m_BlendDesc.BlendEnable = false;
 		m_BlendDesc.LogicOpEnable = false;
@@ -54,12 +50,10 @@ namespace Crystal {
 
 		// #Temp
 		m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
 	}
 
 	RenderTarget::~RenderTarget()
 	{
 		s_Count--;
 	}
-
 }

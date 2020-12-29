@@ -15,13 +15,11 @@
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/Core/State.h"
 
-
 //----
 #include "Timer.h"
 //----
 
 namespace Crystal {
-
 	class Application
 	{
 	public:
@@ -34,7 +32,6 @@ namespace Crystal {
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-
 	private:
 		bool m_bShouldRun = true;
 		WindowsWindow* m_Window;
@@ -43,7 +40,6 @@ namespace Crystal {
 
 	Application* CreateApplication(HINSTANCE hInstance);
 }
-
 
 #define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
 {\

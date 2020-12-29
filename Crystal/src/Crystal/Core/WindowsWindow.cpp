@@ -7,7 +7,6 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Crystal {
-
 	LRESULT CALLBACK WndProcProxy(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		static WindowsWindow* windowsWindow = nullptr;
@@ -28,7 +27,7 @@ namespace Crystal {
 	}
 
 	WindowsWindow::WindowsWindow(HINSTANCE hInstance, int width, int height) :
-		m_Width(width), 
+		m_Width(width),
 		m_Height(height)
 	{
 		WNDCLASS wndClass;
@@ -65,26 +64,23 @@ namespace Crystal {
 		DestroyWindow(m_Handle);
 	}
 
-
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-		if (m_InputEventFunction) 
+		if (m_InputEventFunction)
 		{
 			if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 		else
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+
+		return 0;
 	}
 
 	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<bool(Application*, HWND, UINT, WPARAM, LPARAM)>& function)
 	{
-		 m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+		m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	}
-
 }
-
-

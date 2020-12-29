@@ -3,7 +3,6 @@
 #include "Component.h"
 
 namespace Crystal {
-
 #define CS_AXIS_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 #define CS_ACTION_FN(fn) std::bind(&fn, this)
 
@@ -33,5 +32,4 @@ namespace Crystal {
 		std::map<std::pair<std::string, EKeyStatus>, std::function<void(void)>> m_ActionFunctionMap;
 		std::map<std::string, std::function<void(float)>> m_AxisFunctionmap;
 	};
-
 }

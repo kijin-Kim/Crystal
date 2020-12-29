@@ -2,9 +2,7 @@
 #include <d3d12.h>
 #include <wrl/client.h>
 
-
 namespace Crystal {
-
 	class Resource final
 	{
 	public:

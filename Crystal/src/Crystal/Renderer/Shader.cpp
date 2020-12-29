@@ -3,7 +3,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
 	Shader::Shader(const std::string& fileName)
 	{
 		// assumed we have only vertex and pixel shader
@@ -50,5 +49,4 @@ namespace Crystal {
 		}
 		CS_ASSERT(SUCCEEDED(hr), "셰이더 컴파일에 실패하였습니다");
 	}
-
 }

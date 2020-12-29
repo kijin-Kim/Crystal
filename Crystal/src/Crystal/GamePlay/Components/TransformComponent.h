@@ -4,12 +4,11 @@
 #include "Component.h"
 
 namespace Crystal {
-
 	class TransformComponent : public Component
 	{
 	public:
-		TransformComponent() 
-		{ 
+		TransformComponent()
+		{
 			DirectX::XMStoreFloat4x4(&m_Transform, DirectX::XMMatrixIdentity());
 		}
 		virtual ~TransformComponent()
@@ -35,4 +34,3 @@ namespace Crystal {
 		DirectX::XMFLOAT4X4 m_Transform;
 	};
 }
-

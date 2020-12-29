@@ -9,7 +9,6 @@
 #include "CommandList.h"
 
 namespace Crystal {
-
 	SubMesh::SubMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		std::vector<Vertex> vertices;
@@ -17,12 +16,11 @@ namespace Crystal {
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex = {};
-			vertex.Position = *(DirectX::XMFLOAT3*)&mesh->mVertices[i];
+			vertex.Position = *(DirectX::XMFLOAT3*) & mesh->mVertices[i];
 			vertex.Normal = *(DirectX::XMFLOAT3*) & mesh->mNormals[i];
 
 			/*if(HasBitangent)
 			{
-
 			}*/
 
 			if (mesh->HasTextureCoords(0))
@@ -31,7 +29,6 @@ namespace Crystal {
 			}
 
 			vertices.push_back(vertex);
-			
 		}
 
 		m_VertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), (UINT)(sizeof(float) * 8), (UINT)vertices.size());
@@ -85,5 +82,4 @@ namespace Crystal {
 			processNode(node->mChildren[i], scene);
 		}
 	}
-
 }

@@ -4,7 +4,6 @@
 #include <wrl/client.h>
 
 namespace Crystal {
-	
 	class DepthStencil final
 	{
 	public:

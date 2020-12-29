@@ -21,13 +21,11 @@
 #include "../GamePlay/Actors/CameraPawn.h"
 
 namespace Crystal {
-
 	void Renderer::Init(WindowsWindow* window)
 	{
 		m_Window = window;
 		HRESULT hr = E_FAIL;
 		UINT createFactoryDebugFlags = 0;
-
 
 #if defined CS_DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
@@ -35,7 +33,6 @@ namespace Crystal {
 		CS_ASSERT(SUCCEEDED(hr), "D3D디버그 인터페이스를 가져오는데 실패하였습니다.");
 		debugController->EnableDebugLayer();
 
-		
 		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = NULL;
 		DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
 		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
@@ -56,13 +53,12 @@ namespace Crystal {
 				DXGI_ADAPTER_DESC1 adapterDesc;
 				adapter->GetDesc1(&adapterDesc);
 
-				// #DirectX Create Device 
+				// #DirectX Create Device
 				hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_Device));
 				CS_ASSERT(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다.");
 				break;
 			}
 		}
-
 
 #if defined CS_DEBUG
 		Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
@@ -79,13 +75,10 @@ namespace Crystal {
 
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-
-
 		////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////
 
-		
 		// #DirectX Swap Chain Description
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.Width = m_ResWidth;
@@ -109,14 +102,11 @@ namespace Crystal {
 		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapChainFullscreenDesc.Windowed = true;
 
-	
-
 		// #DirectX Create Swap Chain https://gamedev.stackexchange.com/questions/149822/direct3d-12-cant-create-a-swap-chain
 		hr = m_Factory->CreateSwapChainForHwnd(m_CommandQueue->GetRaw(), m_Window->GetWindowHandle(), &swapChainDesc,
 			&swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
 		CS_ASSERT(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
 		Renderer::Instance().GetFactory()->MakeWindowAssociation(m_Window->GetWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
-
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -127,8 +117,6 @@ namespace Crystal {
 
 		m_DepthStencil = std::make_unique<DepthStencil>(m_ResWidth, m_ResHeight);
 
-
-
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		descriptorHeapDesc.NumDescriptors = 1 + 4 + 5 + 1000;
@@ -137,8 +125,6 @@ namespace Crystal {
 
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
 		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
-
-
 
 		//////////////////////////////////////////////////
 		///// IMGUI IMPLE ////////////////////////////////
@@ -166,15 +152,13 @@ namespace Crystal {
 			m_ImGuiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 			m_ImGuiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-
 		///////////////////////////////////////////////////
 		/////LOAD SHADER, TEXTURE, CONSTANT BUFFER///////
 		///////////////////////////////////////////////////
-		
+
 		auto& shaderManager = ShaderManager::Instance();
 		auto& textureManager = TextureManager::Instance();
 		auto& constantBufferPoolManager = ConstantBufferPoolManager::Instance();
-
 
 		/*textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png" }, "Megaphone_Diffuse");
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png" }, "Megaphone_Roughness");
@@ -182,9 +166,9 @@ namespace Crystal {
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png" }, "Megaphone_Normal");*/
 
 		textureManager.Load(
-			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png", 
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png", 
+			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
+			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", },
 			D3D12_SRV_DIMENSION_TEXTURE2D,
 			"MegaphoneMaterial");
@@ -192,16 +176,14 @@ namespace Crystal {
 		textureManager.Load({ "assets/textures/shanghai_bund_1k/shanghai_bund_1k.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
 		//textureManager.Load({ "assets/textures/shanghai_bund_1k/AnyConv.com__DebugCubeMap.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
 
-
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
-		shaderManager.Load("assets/shaders/PBRShader", "PBRShader"); 
-		shaderManager.Load("assets/shaders/SkyboxShader", "CubemapShader"); 
+		shaderManager.Load("assets/shaders/PBRShader", "PBRShader");
+		shaderManager.Load("assets/shaders/SkyboxShader", "CubemapShader");
 
 		m_PerFrameBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerFrameBuffer));
 		m_PerObjectBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerObjectBuffer));
 		m_CubemapCbuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_CubemapCbuffer));
-		
-	
+
 		///////////////////////////////////////////////////
 		//////////////ROOT SIGNATURE /////////////////////
 		///////////////////////////////////////////////////
@@ -218,16 +200,13 @@ namespace Crystal {
 		//								          [2] Object2 ( Transform, Material )
 		//								          [3] Object3 ( Transform, Material )
 
-
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 		StaticSamplerDescs[0].Init(0);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;
 		rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-
 		m_RootSignature = std::make_unique<RootSignature>(rootsigDesc);
-
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -246,7 +225,6 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} pipelineStateStream, cubemapPipelineStream;
-
 
 		////////////////////////////////////////////////////
 		////////PIPELINE STATE//////////////////////////////
@@ -269,10 +247,6 @@ namespace Crystal {
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 		m_GraphicsPipeline = std::make_unique<GraphicsPipeline>(&pipelineStateStreamDesc);
-		
-		
-		
-
 
 		///////////////////////////////////////////////////
 		//////////////ROOT SIGNATURE /////////////////////
@@ -285,9 +259,6 @@ namespace Crystal {
 		cubemapRootParameter[0].InitAsConstantBufferView(0);
 		cubemapRootParameter[1].InitAsDescriptorTable(_countof(cubemapCommonDescriptorHeapRanges), cubemapCommonDescriptorHeapRanges);
 
-
-
-
 		CD3DX12_STATIC_SAMPLER_DESC cubemapStaticSamplerDescs[1] = {};
 		cubemapStaticSamplerDescs[0].Init(0);
 
@@ -295,12 +266,9 @@ namespace Crystal {
 
 		m_CubemapRootSignature = std::make_unique<RootSignature>(cubemapRootsigDesc);
 
-
 		D3D12_INPUT_ELEMENT_DESC cubemapInputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
-
-		
 
 		////////////////////////////////////////////////////
 		////////PIPELINE STATE//////////////////////////////
@@ -323,8 +291,7 @@ namespace Crystal {
 
 		D3D12_PIPELINE_STATE_STREAM_DESC cubemapPipelineStreamDesc = { sizeof(cubemapPipelineStream), &cubemapPipelineStream };
 		m_CubemapGraphicsPipeline = std::make_unique<GraphicsPipeline>(&cubemapPipelineStreamDesc);
-		
-		
+
 		////////////////////////////////////////////////////
 		////////TEST OBJECTS///////////////////////////////
 		///////////////////////////////////////////////////
@@ -355,10 +322,8 @@ namespace Crystal {
 			0, 2, 3
 		};
 
-
-		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, sizeof(float) * 2, 4);
-		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, sizeof(uint32_t) * _countof(quadIndices), _countof(quadIndices));
-		
+		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 2), 4);
+		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
 	}
 
 	void Renderer::Render()
@@ -399,19 +364,13 @@ namespace Crystal {
 		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
 		m_PerObjectData.World = m_WorldMat;
 
-
-
 		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
 		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
 		m_CubemapCbuffer.SetData((void*)&cameraComponent->GetInverseViewProjection());
-		
-
 
 		//////////////////////////////////////////
 		///// RENDER /////////////////////////////
 		//////////////////////////////////////////
-
-
 
 		//////////////////////////////////////////
 		///// IMGUI IMPLE ////////////////////////
@@ -432,7 +391,7 @@ namespace Crystal {
 			ImGui::Begin("Properties");
 
 			ImGui::Columns(2);
-			
+
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Clear Color");
 			ImGui::AlignTextToFramePadding();
@@ -456,7 +415,6 @@ namespace Crystal {
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
-
 
 		{
 			// Copying Per Object Datas
@@ -482,11 +440,9 @@ namespace Crystal {
 				{
 					std::string ShaderName;// Or Shader Itself
 					ConstantBuffer CBuffer = {};
-					
 				};
-
 			}
-			
+
 			//Copy Descriptors in Texture pool
 			auto& textureManager = TextureManager::Instance();
 
@@ -499,11 +455,8 @@ namespace Crystal {
 
 			auto& cubemapTexture = textureManager.GetTexture("CubemapMaterial");
 			m_Device->CopyDescriptorsSimple(cubemapTexture.Count, destHeapHandle, cubemapTexture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 		}
 
-
-	
 		auto cmdList = m_CommandQueue->GetCommandList();
 
 		cmdList->SetPipelineState(m_GraphicsPipeline->GetRaw());
@@ -518,13 +471,10 @@ namespace Crystal {
 		cmdList->ClearRenderTargetView(m_RenderTargets[m_RtvIndex]->GetCpuHandle(), m_ClearColor, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-		
-		
 		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer.GetGpuVirtualAddress());
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootDescriptorTable(1, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
 
 		/*D3D12_GPU_DESCRIPTOR_HANDLE hCommon = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -548,14 +498,11 @@ namespace Crystal {
 		//cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		//cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
 
-
 		cmdList->SetDescriptorHeaps(1, m_ImGuiDescriptorHeap.GetAddressOf());
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
 
-
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
-
 
 		m_CommandQueue->Execute(cmdList);
 
@@ -567,10 +514,9 @@ namespace Crystal {
 		m_SwapChain->Present1(1, 0, &presentParameters);
 
 		m_CommandQueue->Flush();
-		
 
 		m_RtvIndex++;
-		m_RtvIndex = m_RtvIndex % 2;	
+		m_RtvIndex = m_RtvIndex % 2;
 	}
 
 	void Renderer::ChangeResolution(const char* formattedResolution)
@@ -611,7 +557,6 @@ namespace Crystal {
 		m_ResWidth = width;
 		m_ResHeight = height;
 
-
 		DXGI_MODE_DESC targetParam = {};
 		targetParam.Width = width;
 		targetParam.Height = height;
@@ -621,10 +566,8 @@ namespace Crystal {
 		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_ASSERT(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
-
 
 		for (auto& rt : m_RenderTargets)
 		{
@@ -632,7 +575,6 @@ namespace Crystal {
 		}
 		m_RenderTargets.clear();
 
-		
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_ASSERT(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
@@ -681,7 +623,6 @@ namespace Crystal {
 			m_RenderTargets.push_back(std::make_unique<RenderTarget>(rtvBuffer.Get()));
 		}
 
-
 		DXGI_MODE_DESC targetParam = {};
 		targetParam.Width = m_ResWidth;
 		targetParam.Height = m_ResHeight;
@@ -691,12 +632,9 @@ namespace Crystal {
 		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-
 		hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_ASSERT(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
-
 		m_RtvIndex = 0;
 	}
-
 }

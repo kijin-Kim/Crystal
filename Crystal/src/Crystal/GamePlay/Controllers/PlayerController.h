@@ -4,10 +4,9 @@
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 
 namespace Crystal {
-
 	struct ActionKey
 	{
-		int KeyCode = 0;
+		int64_t KeyCode = 0;
 		bool bAltDown = false;
 		bool bCtrlDown = false;
 		bool bShiftDown = false;
@@ -31,7 +30,6 @@ namespace Crystal {
 		}
 	};
 
-
 	class PlayerController : public Controller
 	{
 	public:
@@ -42,7 +40,7 @@ namespace Crystal {
 				delete inputComponent;
 		}
 
-		void AddAxisMapping(const std::string& axisName, int key, int scale)
+		void AddAxisMapping(const std::string& axisName, int key, float scale)
 		{
 			m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
 		}
@@ -51,7 +49,7 @@ namespace Crystal {
 		{
 			m_ActionMap.insert(std::make_pair(key, actionName));
 		}
-		
+
 		virtual void Possess(Pawn* pawn) override
 		{
 			Controller::Possess(pawn);
@@ -67,24 +65,21 @@ namespace Crystal {
 				if (bHandled)
 					break;
 			}
-					
 		}
 
 		void SetMainCamera(CameraComponent* cameraComponent) { m_MainCamera = cameraComponent; }
 		CameraComponent* GetMainCamera() const { return m_MainCamera; }
 
-		const std::map<int, std::pair<std::string, int>>& GetAxisMap() const { return m_AxisMap; }
+		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionKey, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
 	private:
 		std::vector<InputComponent*> m_InputComponents;
 		/* KeyCode, AxisName, Scale */
-		std::map<int, std::pair<std::string, int>> m_AxisMap;
+		std::map<int64_t, std::pair<std::string, float>> m_AxisMap;
 		/* KeyCode, ActionName */
 		std::map<ActionKey, std::string, ActionKeyCompare> m_ActionMap;
 
 		CameraComponent* m_MainCamera = nullptr;
 	};
 }
-
-

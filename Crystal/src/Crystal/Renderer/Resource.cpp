@@ -3,8 +3,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
-
 	Resource::Resource(D3D12_RESOURCE_STATES initialState, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_DESC bufferResourceDesc) :
 		m_ResourceState(initialState)
 	{
@@ -20,7 +18,6 @@ namespace Crystal {
 		HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 			initialState, nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_ASSERT(SUCCEEDED(hr), "리소스를 만드는데 실패하였습니다");
-
 	}
 
 	Resource::Resource(ID3D12Resource* resource, D3D12_RESOURCE_STATES initialState) :
@@ -55,5 +52,4 @@ namespace Crystal {
 		memcpy(bufferBegin, data, memSize);
 		m_Resource->Unmap(0, nullptr);
 	}
-
 }

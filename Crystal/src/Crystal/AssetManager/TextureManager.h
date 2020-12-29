@@ -2,7 +2,6 @@
 #include <unordered_map>
 
 namespace Crystal {
-
 	// Data that API Expose to user (handle of data)
 	struct Texture
 	{
@@ -19,10 +18,10 @@ namespace Crystal {
 	class TextureManager final
 	{
 	public:
-		// TODO : Fix it to use pool as ring buffer	
+		// TODO : Fix it to use pool as ring buffer
 		static TextureManager& Instance() { static TextureManager instance; return instance; }
-		
-		const Texture& GetTexture(const std::string& textureAlias) const ;
+
+		Texture GetTexture(const std::string& textureAlias) const;
 
 		void Load(const std::vector<std::string>& filepaths, D3D12_SRV_DIMENSION srvDimension, const std::string& textureAlias = "");
 
@@ -39,5 +38,3 @@ namespace Crystal {
 		UINT m_TexturePoolSize = 1000;
 	};
 }
-
-

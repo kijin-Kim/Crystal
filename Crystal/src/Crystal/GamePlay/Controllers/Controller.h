@@ -4,7 +4,6 @@
 #include "Crystal/GamePlay/Components/InputComponent.h"
 
 namespace Crystal {
-
 	class Controller
 	{
 	public:
@@ -15,6 +14,4 @@ namespace Crystal {
 
 		virtual void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {  }
 	};
-
-
 }

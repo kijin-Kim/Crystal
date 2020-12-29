@@ -2,9 +2,7 @@
 #include "ApplicationUtility.h"
 #include "Crystal/Gameplay/Controllers/PlayerController.h"
 
-
 namespace Crystal {
-
 	StateStack ApplicationUtility::s_StateStack;
 	PlayerController* ApplicationUtility::s_PlayerController = nullptr;
 
@@ -32,5 +30,4 @@ namespace Crystal {
 	{
 		return s_PlayerController;
 	}
-
 }

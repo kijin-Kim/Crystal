@@ -2,7 +2,6 @@
 #include <d3d12.h>
 
 namespace Crystal {
-
 	class RootSignature final
 	{
 	public:

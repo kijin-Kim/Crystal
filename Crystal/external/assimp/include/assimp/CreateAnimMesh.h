@@ -4,7 +4,6 @@ Open Asset Import Library (assimp)
 
 Copyright (c) 2006-2019, assimp team
 
-
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -48,11 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assimp/mesh.h>
 
-namespace Assimp    {
-
-/** Create aiAnimMesh from aiMesh. */
-ASSIMP_API aiAnimMesh *aiCreateAnimMesh(const aiMesh *mesh);
-
+namespace Assimp {
+	/** Create aiAnimMesh from aiMesh. */
+	ASSIMP_API aiAnimMesh* aiCreateAnimMesh(const aiMesh* mesh);
 } // end of namespace Assimp
 #endif // INCLUDED_AI_CREATE_ANIM_MESH_H
-

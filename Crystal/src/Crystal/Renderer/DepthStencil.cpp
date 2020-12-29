@@ -3,7 +3,6 @@
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
-
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DepthStencil::s_Heap = nullptr;
 	UINT DepthStencil::s_Count = 0;
 	UINT DepthStencil::s_HeapIncrementSize = 0;
@@ -27,16 +26,14 @@ namespace Crystal {
 			hr = device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&s_Heap));
 			CS_ASSERT(SUCCEEDED(hr), "DepthStencil Descriptor Heap을 생성하는데 실패하였습니다");
 		}
-		
 
-		// #DirectX Depth / Stencil View heap properties 
+		// #DirectX Depth / Stencil View heap properties
 		D3D12_HEAP_PROPERTIES dsvHeapProperties = {};
 		dsvHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 		dsvHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 		dsvHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 		dsvHeapProperties.CreationNodeMask = 1;
 		dsvHeapProperties.VisibleNodeMask = 1;
-
 
 		// #DirectX Depth / Stencil View description
 		D3D12_RESOURCE_DESC dsvResourcDesc = {};
@@ -51,7 +48,6 @@ namespace Crystal {
 		dsvResourcDesc.SampleDesc.Quality = 0;
 		dsvResourcDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 		dsvResourcDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
 
 		// #DirectX Depth / Stencil View Clear Value
 		D3D12_CLEAR_VALUE dsvClearValue = {};
@@ -69,8 +65,6 @@ namespace Crystal {
 		// #DirectX Create Depth Stencil View
 		device->CreateDepthStencilView(m_Buffer.Get(), nullptr, m_CpuHandle);
 		s_Count++;
-
-
 
 		// #DirectX Depth / Stencil description
 		m_DepthStencilDesc.DepthEnable = true;
@@ -93,5 +87,4 @@ namespace Crystal {
 	{
 		s_Count--;
 	}
-
 }

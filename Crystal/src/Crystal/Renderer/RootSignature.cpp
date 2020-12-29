@@ -4,8 +4,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
-
 	RootSignature::RootSignature(D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc)
 	{
 		auto device = Renderer::Instance().GetDevice();
@@ -22,5 +20,4 @@ namespace Crystal {
 		SAFE_RELEASE(rootSignatureDataBlob);
 		SAFE_RELEASE(rootSignatureErrorBlob);
 	}
-
 }

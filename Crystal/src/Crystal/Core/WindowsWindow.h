@@ -3,7 +3,6 @@
 #include <windows.h>
 
 namespace Crystal {
-
 	class Application;
 
 	class WindowsWindow final
@@ -27,5 +26,4 @@ namespace Crystal {
 
 		std::function<bool(HWND, UINT, WPARAM, LPARAM)> m_InputEventFunction = nullptr;
 	};
-
 };

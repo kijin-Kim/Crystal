@@ -4,7 +4,6 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 namespace Crystal {
-
 	void InputComponent::BindAxis(const std::string& axisName, const std::function<void(float value)>& function)
 	{
 		m_AxisFunctionmap.insert(std::make_pair(axisName, function));
@@ -63,8 +62,6 @@ namespace Crystal {
 			}
 		}
 
-
-		return bHandledOnAction || bHandledOnAxis;	
+		return bHandledOnAction || bHandledOnAxis;
 	}
-
 }

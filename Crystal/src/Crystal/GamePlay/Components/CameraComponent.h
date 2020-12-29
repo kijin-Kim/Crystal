@@ -2,8 +2,7 @@
 #include "TransformComponent.h"
 
 namespace Crystal {
-
-	enum class ECameraProjectionMode 
+	enum class ECameraProjectionMode
 	{
 		CPM_Persepective,
 		CPM_Orthographic
@@ -18,8 +17,8 @@ namespace Crystal {
 
 		virtual void Update(float deltaTime) override;
 		void SetWorldPosition(const DirectX::XMFLOAT3& position) { m_Position = position; }
-//		void SetRelativePosition()
-		void SetLookAt(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt;}
+		//		void SetRelativePosition()
+		void SetLookAt(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt; }
 		void SetViewport(const D3D12_VIEWPORT& viewport) { m_Viewport = viewport; }
 		void SetScissorRect(const D3D12_RECT& scissorRect) { m_ScissorRect = scissorRect; }
 
@@ -48,5 +47,4 @@ namespace Crystal {
 
 		ECameraProjectionMode m_ProjectionMode = ECameraProjectionMode::CPM_Persepective;
 	};
-
 }

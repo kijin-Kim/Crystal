@@ -54,7 +54,6 @@ namespace Crystal {
 	};
 }
 
-
 #define CS_LOG(...) Crystal::Logger::Log(__VA_ARGS__)
 #define CS_ERROR(...) Crystal::Logger::Error(__VA_ARGS__)
 

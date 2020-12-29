@@ -11,7 +11,6 @@ struct aiScene;
 struct aiMesh;
 
 namespace Crystal {
-
 	struct Vertex final
 	{
 		Vertex() = default;

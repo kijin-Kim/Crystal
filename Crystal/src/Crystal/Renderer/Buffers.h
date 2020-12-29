@@ -3,7 +3,6 @@
 #include "Resource.h"
 
 namespace Crystal {
-
 	class VertexBuffer final
 	{
 	public:
@@ -15,7 +14,7 @@ namespace Crystal {
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_DestinationBuffer = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_IntermediateBuffer= nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_IntermediateBuffer = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW m_VertxBufferView = {};
 	};
 

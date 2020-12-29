@@ -4,7 +4,6 @@
 #include "Crystal/GamePlay/Components/InputComponent.h"
 
 namespace Crystal {
-
 	class Pawn : public Actor
 	{
 	public:
@@ -27,7 +26,6 @@ namespace Crystal {
 		virtual void Start() override
 		{
 			Actor::Start();
-
 		}
 		virtual void Update(float deltaTime) override
 		{
@@ -42,8 +40,6 @@ namespace Crystal {
 		{
 			__debugbreak();
 		}
-
-
 
 	private:
 		//////////////////Temporary//////////////

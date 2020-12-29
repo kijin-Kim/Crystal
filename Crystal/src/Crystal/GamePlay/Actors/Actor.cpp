@@ -5,10 +5,8 @@
 #include "Crystal/Renderer/Mesh.h"
 
 namespace Crystal {
-
 	Actor::Actor()
 	{
-
 	}
 
 	Actor::~Actor()
@@ -20,7 +18,7 @@ namespace Crystal {
 			m_TransformComponents.pop_back();
 		}
 
-		if(m_MainComponent)
+		if (m_MainComponent)
 			delete m_MainComponent;
 	}
 
@@ -28,7 +26,7 @@ namespace Crystal {
 	{
 		m_MainComponent->Update(DeltaTime);
 		for (TransformComponent* component : m_TransformComponents)
-				component->Update(DeltaTime);
+			component->Update(DeltaTime);
 	}
 
 	void Actor::UpdateTransfromData()
@@ -36,5 +34,4 @@ namespace Crystal {
 		for (TransformComponent* component : m_TransformComponents)
 			component->UpdateTransform();
 	}
-
 }

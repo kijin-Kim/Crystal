@@ -2,8 +2,6 @@
 #include "CameraComponent.h"
 
 namespace Crystal {
-
-
 	void CameraComponent::Update(float deltaTime)
 	{
 		TransformComponent::Update(deltaTime);
@@ -28,13 +26,11 @@ namespace Crystal {
 				DirectX::XMMatrixOrthographicLH(m_Viewport.Width, m_Viewport.Height, m_NearPlane, m_FarPlane)));
 			break;
 		default:
-			CS_ASSERT(false,"예상치 못한 Camera Projection Mode.");
+			CS_ASSERT(false, "예상치 못한 Camera Projection Mode.");
 			break;
 		}
 
 		XMStoreFloat4x4(&m_ViewProjection, viewProjection);
 		XMStoreFloat4x4(&m_InverseViewProjection, XMMatrixTranspose(XMMatrixInverse(nullptr, viewProjection)));
-		
 	}
-
 }

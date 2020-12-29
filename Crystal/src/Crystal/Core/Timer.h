@@ -1,7 +1,6 @@
 #pragma once
 
 namespace Crystal {
-
 	class Timer final
 	{
 	public:
@@ -9,9 +8,9 @@ namespace Crystal {
 		~Timer() = default;
 
 		void Tick();
-		
+
 		float DeltaTime() const { return (float)m_DeltaTime; }
-		 
+
 	private:
 		double m_SecondsPerCount = 0.0;
 

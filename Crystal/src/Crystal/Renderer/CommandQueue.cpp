@@ -3,8 +3,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
-
 	CommandQueue::CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type) :
 		m_d3d12CommandListType(type)
 	{
@@ -19,7 +17,6 @@ namespace Crystal {
 
 		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
 		CS_ASSERT(SUCCEEDED(hr), "Fence를 생성하는데 실패하였습니다.");
-
 
 		m_FenceEvent = ::CreateEvent(NULL, false, false, NULL);
 		CS_ASSERT(m_FenceEvent, "Fence Event를 생성하는데 실패하였습니다");
@@ -68,7 +65,6 @@ namespace Crystal {
 		m_d3d12CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
 		uint64_t fenceValue = SignalFence();
 
-
 		ID3D12CommandAllocator* d3d12CommandAllocator = nullptr;
 		UINT dataSize = sizeof(d3d12CommandAllocator);
 		commandList->GetPrivateData(__uuidof(ID3D12CommandAllocator), &dataSize, &d3d12CommandAllocator);
@@ -106,5 +102,4 @@ namespace Crystal {
 			::WaitForSingleObject(m_FenceEvent, INFINITE);
 		}
 	}
-
 }

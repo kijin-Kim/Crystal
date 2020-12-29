@@ -5,7 +5,6 @@
 #include "RootSignature.h"
 
 namespace Crystal {
-
 	class DrawableComponent;
 
 	enum class ShaderType
@@ -26,7 +25,6 @@ namespace Crystal {
 	private:
 		void loadFromFile(const std::string& filePath, ShaderType type);
 
-
 	private:
 		mutable std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>> m_ShaderDataBlobs;
 		std::string m_Name;
@@ -34,7 +32,4 @@ namespace Crystal {
 
 		std::vector<DrawableComponent*> m_RenderComponents;
 	};
-
 }
-
-

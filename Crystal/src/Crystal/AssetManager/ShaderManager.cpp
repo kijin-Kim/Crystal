@@ -2,7 +2,6 @@
 #include "ShaderManager.h"
 
 namespace Crystal {
-
 	void ShaderManager::Load(const std::string& fileName, const std::string& shaderName)
 	{
 		if (m_Shaders.find(shaderName) != m_Shaders.end())
@@ -23,5 +22,4 @@ namespace Crystal {
 		}
 		m_Shaders[shaderName] = shader;
 	}
-
 }

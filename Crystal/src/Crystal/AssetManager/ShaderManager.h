@@ -6,8 +6,6 @@
 #include "Crystal/Renderer/Shader.h"
 
 namespace Crystal {
-
-	
 	class ShaderManager final
 	{
 	public:

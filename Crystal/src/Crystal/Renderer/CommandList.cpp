@@ -3,8 +3,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
-
 	CommandList::CommandList()
 	{
 		auto device = Renderer::Instance().GetDevice();
@@ -22,5 +20,4 @@ namespace Crystal {
 		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator.Get(), initialPipelinState, IID_PPV_ARGS(&m_CommandList));
 		CS_ASSERT(SUCCEEDED(hr), "Command List를 생성하는데 실패하였습니다");
 	}
-
 }

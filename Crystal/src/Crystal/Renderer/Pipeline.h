@@ -7,7 +7,6 @@
 #include "Shader.h"
 
 namespace Crystal {
-
 	class GraphicsPipeline final
 	{
 	public:

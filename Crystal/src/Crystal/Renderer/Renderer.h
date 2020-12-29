@@ -12,7 +12,6 @@
 #include "Crystal/AssetManager/ConstantBuffer.h"
 
 namespace Crystal {
-
 	class PlayerController;
 
 	class Renderer final
@@ -28,8 +27,6 @@ namespace Crystal {
 		IDXGIFactory4* GetFactory() const { return m_Factory.Get(); }
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
 
-	
-
 		/////////////////////////////////////////////////////////////////////////////////
 		//TEMP//////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////
@@ -38,9 +35,9 @@ namespace Crystal {
 
 		/// SHOULD GET DRAWABLE //
 		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
-		
+
 	private:
-		Renderer() = default;;
+		Renderer() = default;
 		~Renderer();
 
 	private:
@@ -71,25 +68,24 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 
-
-
 		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
-		}m_PerObjectData;
+		};
 
+		PerObjectData m_PerObjectData = {};
 		struct PerFrameData
 		{
 			DirectX::XMFLOAT4X4 ViewProjection;
 			DirectX::XMFLOAT4 LightPositionInWorld;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
-		}m_PerFrameData;
-
+		};
+		PerFrameData m_PerFrameData = {};
 		std::vector<MeshComponent*> m_MeshComponents;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
-		
+
 		int m_ResWidth = 1366;
 		int m_ResHeight = 768;
 
@@ -102,9 +98,7 @@ namespace Crystal {
 		ConstantBuffer m_PerObjectBuffer;
 		ConstantBuffer m_CubemapCbuffer;
 
-
 		class World* m_World;
-
 
 		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
 		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
