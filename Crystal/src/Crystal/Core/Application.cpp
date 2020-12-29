@@ -38,7 +38,6 @@ namespace Crystal {
 					DispatchMessage(&msg);
 				}
 			}
-			
 			OnUpdate();
 			Renderer::Instance().Render();
 		}
@@ -52,24 +51,26 @@ namespace Crystal {
 			state->Update(m_MainTimer.DeltaTime());
 	}
 
-	void Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-
 		/*Process Global Window Events*/
 		switch (uMsg)
 		{
-		case WM_CLOSE:
-			__debugbreak(); //Should Make Window Close Event to Destroy Main Game Loop
-			break;
 		case WM_QUIT:
 			DestroyWindow(hWnd);
-			break;
+			return true;
 		case WM_DESTROY:
 			PostQuitMessage(0);
-			break;
+			return true;
+		case WM_SYSKEYDOWN:
+		case WM_CHAR:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+			ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			return true;
 		}
 
-		ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);
+		return false;
 	}
 
 }

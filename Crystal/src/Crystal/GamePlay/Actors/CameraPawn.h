@@ -40,7 +40,7 @@ namespace Crystal {
 		{
 			Pawn::SetupInputComponent(inputComponent);
 			inputComponent->BindAxis("MoveForward", CS_AXIS_FN(Pawn::MoveForward));
-			inputComponent->BindAction("Jump", EKeyStatus::KS_Repeat, CS_ACTION_FN(CameraPawn::Jump));
+			inputComponent->BindAction("Jump", EKeyStatus::KS_Pressed, CS_ACTION_FN(CameraPawn::Jump));
 		}
 
 		void MoveForward(float value)

@@ -69,16 +69,18 @@ namespace Crystal {
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-			return true;
+		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-		if(m_InputEventFunction)
-			m_InputEventFunction(hWnd, uMsg, wParam, lParam);
-
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		if (m_InputEventFunction) 
+		{
+			if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
+				return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		}
+		else
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<void(Application*, HWND, UINT, WPARAM, LPARAM)>& function)
+	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<bool(Application*, HWND, UINT, WPARAM, LPARAM)>& function)
 	{
 		 m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	}

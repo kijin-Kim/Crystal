@@ -24,7 +24,7 @@ namespace Crystal {
 		bool bHandledOnAction = false;
 
 		/*Process Axis*/
-		auto axisIt =axisMap.find(wParam);
+		auto axisIt = axisMap.find(wParam);
 		if (axisIt != axisMap.end())
 		{
 			std::string axisName = (*axisIt).second.first;
@@ -39,26 +39,16 @@ namespace Crystal {
 			}
 		}
 
+		ActionKey actionKey = {};
+		actionKey.KeyCode = wParam;
+		actionKey.bAltDown = GetKeyState(VK_MENU) & 0x8000;
+		actionKey.bCtrlDown = GetKeyState(VK_CONTROL) & 0x8000;
+		actionKey.bShiftDown = GetKeyState(VK_SHIFT) & 0x8000;
 
-		EKeyStatus keyStatus = EKeyStatus::KS_None;
-		switch (uMsg)
-		{
-		case WM_KEYDOWN:
-			if (!(HIWORD(lParam) & KF_REPEAT))
-				keyStatus = EKeyStatus::KS_Pressed;
-			else
-				keyStatus = EKeyStatus::KS_Repeat;
-			break;
-		case WM_KEYUP:
-			keyStatus = EKeyStatus::KS_Released;
-			break;
-		default:
-			break;
-		}
-
+		EKeyStatus keyStatus = (HIWORD(lParam) & KF_REPEAT) ? EKeyStatus::KS_Repeat : EKeyStatus::KS_Pressed;
 
 		/*Process Action*/
-		auto actionIt =actionMap.find(wParam);
+		auto actionIt = actionMap.find(actionKey);
 		if (actionIt != actionMap.end())
 		{
 			std::string actionName = (*actionIt).second;
@@ -72,7 +62,8 @@ namespace Crystal {
 			}
 		}
 
-		return bHandledOnAction || bHandledOnAxis;
+
+		return bHandledOnAction || bHandledOnAxis;	
 	}
 
 }

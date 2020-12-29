@@ -334,7 +334,14 @@ namespace Crystal {
 		CameraPawn* cameraPawn = m_World->SpawnActor<CameraPawn>();
 		ApplicationUtility::GetPlayerController()->Possess(cameraPawn);
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", 'W', 3);
-		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", VK_LEFT);
+
+		ActionKey actionKey = {};
+		actionKey.KeyCode = VK_LEFT;
+		actionKey.bAltDown = true;
+		actionKey.bCtrlDown = true;
+		actionKey.bShiftDown = true;
+
+		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", actionKey);
 
 		float quadVertices[] = {
 			-1.0f, -1.0f,

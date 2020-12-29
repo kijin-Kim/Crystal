@@ -32,7 +32,7 @@ namespace Crystal {
 
 		virtual void OnUpdate();
 
-		void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
 	private:
