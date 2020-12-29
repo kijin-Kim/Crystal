@@ -46,6 +46,7 @@ namespace Crystal {
 		actionKey.bShiftDown = GetKeyState(VK_SHIFT) & 0x8000;
 
 		EKeyStatus keyStatus = (HIWORD(lParam) & KF_REPEAT) ? EKeyStatus::KS_Repeat : EKeyStatus::KS_Pressed;
+		keyStatus = uMsg == WM_KEYUP ? EKeyStatus::KS_Released : keyStatus;
 
 		/*Process Action*/
 		auto actionIt = actionMap.find(actionKey);
