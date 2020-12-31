@@ -1,6 +1,6 @@
 #pragma once
 #include <windowsx.h>
-///// This KeyCodes and Mapping functions are from SFML https://github.com/SFML/SFML/blob/master/include/SFML/Window/Keyboard.hpp#L144
+///// This KeyCodes are from SFML https://github.com/SFML/SFML/blob/master/include/SFML/Window/Keyboard.hpp#L144
 ///// https://github.com/SFML/SFML/blob/master/include/SFML/Window/Mouse.hpp
 
 namespace Crystal {
@@ -148,32 +148,19 @@ namespace Crystal {
 		enum Button
 		{
 			UnKnown = 102,
-			Left,       //!< The left mouse button
-			Right,      //!< The right mouse button
-			Middle,     //!< The middle (wheel) mouse button
-			XButton1,   //!< The first extra mouse button
-			XButton2,   //!< The second extra mouse button
+			Left,      
+			Right,    
+			Middle,   
+			XButton1, 
+			XButton2, 
 
-			ButtonCount,//!< Keep last -- the total number of mouse buttons
-
-			////////////////////////////////////////////////////////////
-			/// \brief Mouse wheels
-			///
-			////////////////////////////////////////////////////////////
+			ButtonCount,
 		};
 
 		enum Wheel
 		{
-			VerticalWheel = 109,  //!< The vertical mouse wheel
-			HorizontalWheel //!< The horizontal mouse wheel
-
-			////////////////////////////////////////////////////////////
-			/// \brief Check if a mouse button is pressed
-			///
-			/// \param button Button to check
-			///
-			/// \return True if the button is pressed, false otherwise
-			///
+			VerticalWheel = 109, 
+			HorizontalWheel 
 		};
 
 		enum Move

@@ -85,11 +85,11 @@ namespace Crystal {
 
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
-		int m_ResWidth = 1920;
-		int m_ResHeight = 1080;
+		int m_ResWidth = 1366;
+		int m_ResHeight = 768;
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
-		int m_CurrentResolutionIndex = 3;
+		int m_CurrentResolutionIndex = 1;
 
 		bool m_bIsFullScreen = false;
 

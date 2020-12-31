@@ -44,9 +44,6 @@ namespace Crystal {
 			inputComponent->BindAxis("MoveRight", CS_AXIS_FN(CameraPawn::MoveRight));
 			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::AddControllerPitchInput));
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::AddControllerYawInput));
-			inputComponent->BindAction("Jump", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::Jump));
-			inputComponent->BindAction("Zoom", EKeyEvent::KE_Released, CS_ACTION_FN(CameraPawn::Zoom));
-			inputComponent->BindAxis("Zoom2", CS_AXIS_FN(CameraPawn::Zoom2));
 		}
 
 		void AddControllerYawInput(float value)
@@ -82,17 +79,6 @@ namespace Crystal {
 			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(right, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
 			mainCamera->SetWorldPosition(newPosition);
 		}
-		void Zoom2(float value)
-		{
-			__debugbreak();
-		}
-		void Zoom()
-		{
-			__debugbreak();
-		}
 
-		void Jump()
-		{
-		}
 	};
 }

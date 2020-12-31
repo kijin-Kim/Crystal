@@ -280,7 +280,6 @@ namespace Crystal {
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveRight", Keyboard::A, -1.0f);
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("Turn", Mouse::X, 1.0f);
 		ApplicationUtility::GetPlayerController()->AddAxisMapping("LookUp", Mouse::Y, 1.0f);
-		ApplicationUtility::GetPlayerController()->AddAxisMapping("Zoom2", Mouse::VerticalWheel, 1.0f);
 
 		ActionMapping actionKey = {};
 		actionKey.CrystalCode = Keyboard::Left;
@@ -289,11 +288,6 @@ namespace Crystal {
 		actionKey.bShiftDown = true;
 		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", actionKey);
 
-		actionKey.CrystalCode = Mouse::Right;
-		actionKey.bAltDown = false;
-		actionKey.bCtrlDown = false;
-		actionKey.bShiftDown = false;
-		ApplicationUtility::GetPlayerController()->AddActionMapping("Zoom", actionKey);
 
 
 		float quadVertices[] = {
@@ -488,7 +482,7 @@ namespace Crystal {
 
 		int width = atoi(widthInChar);
 		int height = atoi(heightInChar);
-		if (width == m_ResWidth && height == m_ResHeight)
+		if (width == m_ResWidth && height == m_ResHeight && m_Window->GetWidth() == m_ResWidth && m_Window->GetHeight() == m_ResHeight)
 			return;
 
 		m_RtvIndex = 0;
