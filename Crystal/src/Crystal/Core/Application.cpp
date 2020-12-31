@@ -47,20 +47,18 @@ namespace Crystal {
 		/*Process Global Window Events*/
 		switch (uMsg)
 		{
+		case WM_CLOSE:
+			m_bShouldRun = false;
+			return true;
 		case WM_QUIT:
 			DestroyWindow(hWnd);
 			return true;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return true;
-		case WM_SYSKEYDOWN:
-		case WM_CHAR:
-		case WM_KEYDOWN:
-		case WM_KEYUP:
-			ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);
-			return true;
+		default:
+			return ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);		
 		}
-
 		return false;
 	}
 }

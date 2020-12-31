@@ -2,35 +2,37 @@
 #include "CameraComponent.h"
 
 namespace Crystal {
-	void CameraComponent::Update(float deltaTime)
+	void CameraComponent::computeViewProjection()
 	{
-		TransformComponent::Update(deltaTime);
-
-		DirectX::XMVECTOR position = XMLoadFloat3(&m_Position);
-		DirectX::XMVECTOR lookAt = XMLoadFloat3(&m_LookAt);
-		if (DirectX::XMVector3Equal(position, lookAt))
+		if (Vector3::Equal(m_Position, m_LookAt))
 		{
 			CS_ERROR("카메라의 위치와 바라보는 위치가 같습니다");
 			return;
 		}
 
-		DirectX::XMMATRIX viewProjection = DirectX::XMMatrixIdentity();
+	
 		switch (m_ProjectionMode)
 		{
 		case ECameraProjectionMode::CPM_Persepective:
-			viewProjection = XMMatrixTranspose(DirectX::XMMatrixMultiply(DirectX::XMMatrixLookAtLH(position, lookAt, DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
-				DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(m_FieldOfView), (float)m_Viewport.Width / (float)m_Viewport.Height, m_NearPlane, m_FarPlane)));
+			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(m_Position, m_LookTo, m_Up), 
+				Matrix4x4::Perspective(m_FieldOfView, (float)m_Viewport.Width / (float)m_Viewport.Height, m_NearPlane, m_FarPlane));
+			m_ViewProjection = Matrix4x4::Transpose(m_ViewProjection);
+			
+			/*m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(m_Position, m_LookTo, m_Up), 
+				Matrix4x4::RotationQuaternion(Vector3::QuaternionRollPitchYaw(m_RollPitchYaw)));
+			m_ViewProjection = Matrix4x4::Multiply(m_ViewProjection, Matrix4x4::Perspective(m_FieldOfView, (float)m_Viewport.Width / (float)m_Viewport.Height, m_NearPlane, m_FarPlane));
+			m_ViewProjection = Matrix4x4::Transpose(m_ViewProjection);*/
 			break;
 		case ECameraProjectionMode::CPM_Orthographic:
-			viewProjection = XMMatrixTranspose(DirectX::XMMatrixMultiply(DirectX::XMMatrixLookAtLH(position, lookAt, DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
-				DirectX::XMMatrixOrthographicLH(m_Viewport.Width, m_Viewport.Height, m_NearPlane, m_FarPlane)));
+			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(m_Position, m_LookTo, m_Up), 
+				Matrix4x4::OrthoGraphic(m_Viewport.Width, m_Viewport.Height, m_NearPlane, m_FarPlane));
+			m_ViewProjection = Matrix4x4::Transpose(m_ViewProjection);
 			break;
 		default:
 			CS_ASSERT(false, "예상치 못한 Camera Projection Mode.");
 			break;
 		}
-
-		XMStoreFloat4x4(&m_ViewProjection, viewProjection);
-		XMStoreFloat4x4(&m_InverseViewProjection, XMMatrixTranspose(XMMatrixInverse(nullptr, viewProjection)));
+		m_InverseViewProjection = Matrix4x4::Inverse(m_ViewProjection);
 	}
+
 }

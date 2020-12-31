@@ -273,15 +273,28 @@ namespace Crystal {
 		Pawn* pawn = m_World->SpawnActor<Pawn>();
 		CameraPawn* cameraPawn = m_World->SpawnActor<CameraPawn>();
 		ApplicationUtility::GetPlayerController()->Possess(cameraPawn);
-		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", 'W', 3);
 
-		ActionKey actionKey = {};
-		actionKey.KeyCode = VK_LEFT;
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", Keyboard::W, 1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveForward", Keyboard::S, -1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveRight", Keyboard::D, 1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("MoveRight", Keyboard::A, -1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("Turn", Mouse::X, 1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("LookUp", Mouse::Y, 1.0f);
+		ApplicationUtility::GetPlayerController()->AddAxisMapping("Zoom2", Mouse::VerticalWheel, 1.0f);
+
+		ActionMapping actionKey = {};
+		actionKey.CrystalCode = Keyboard::Left;
 		actionKey.bAltDown = true;
 		actionKey.bCtrlDown = true;
 		actionKey.bShiftDown = true;
-
 		ApplicationUtility::GetPlayerController()->AddActionMapping("Jump", actionKey);
+
+		actionKey.CrystalCode = Mouse::Right;
+		actionKey.bAltDown = false;
+		actionKey.bCtrlDown = false;
+		actionKey.bShiftDown = false;
+		ApplicationUtility::GetPlayerController()->AddActionMapping("Zoom", actionKey);
+
 
 		float quadVertices[] = {
 			-1.0f, -1.0f,
@@ -323,11 +336,11 @@ namespace Crystal {
 			modelAngle[1] = 0.0f;
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
-		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
+		//XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
-		XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
-			DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
-		XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
+		//XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
+		//	DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
+		//XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
 

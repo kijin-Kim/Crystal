@@ -54,6 +54,7 @@ namespace Crystal {
 
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
+		ShowCursor(false);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -63,9 +64,9 @@ namespace Crystal {
 
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-
 		if (m_InputEventFunction)
 		{
+
 			if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
@@ -79,4 +80,5 @@ namespace Crystal {
 	{
 		m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	}
+
 }

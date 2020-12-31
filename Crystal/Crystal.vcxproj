@@ -191,8 +191,10 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\InputComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\Controller.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Controllers\KeyCodes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\PlayerController.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\World.h" />
+    <ClInclude Include="src\Crystal\Math\Math.h" />
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />

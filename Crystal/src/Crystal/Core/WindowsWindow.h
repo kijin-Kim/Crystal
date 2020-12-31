@@ -19,6 +19,7 @@ namespace Crystal {
 		LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		void SetInputEventFunction(Application* app, const std::function<bool(Application*, HWND, UINT, WPARAM, LPARAM)>& function);
+
 	private:
 		HWND m_Handle = nullptr;
 		int m_Width = 0;

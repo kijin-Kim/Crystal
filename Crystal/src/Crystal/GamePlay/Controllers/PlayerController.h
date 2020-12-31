@@ -4,9 +4,9 @@
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 
 namespace Crystal {
-	struct ActionKey
+	struct ActionMapping
 	{
-		int64_t KeyCode = 0;
+		int64_t CrystalCode = 0;
 		bool bAltDown = false;
 		bool bCtrlDown = false;
 		bool bShiftDown = false;
@@ -14,9 +14,9 @@ namespace Crystal {
 
 	struct ActionKeyCompare
 	{
-		bool operator() (const ActionKey& lhs, const ActionKey& rhs) const
+		bool operator() (const ActionMapping& lhs, const ActionMapping& rhs) const
 		{
-			if (lhs.KeyCode == rhs.KeyCode)
+			if (lhs.CrystalCode == rhs.CrystalCode)
 			{
 				if (lhs.bAltDown == rhs.bAltDown)
 				{
@@ -26,7 +26,7 @@ namespace Crystal {
 				}
 				return lhs.bAltDown < rhs.bAltDown;
 			}
-			return lhs.KeyCode < rhs.KeyCode;
+			return lhs.CrystalCode < rhs.CrystalCode;
 		}
 	};
 
@@ -42,12 +42,14 @@ namespace Crystal {
 
 		void AddAxisMapping(const std::string& axisName, int key, float scale)
 		{
-			m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
+			auto result = m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
+			CS_ASSERT(result.second, "AxisMapping에 실패하였습니다.");
 		}
 
-		void AddActionMapping(const std::string& actionName, const ActionKey& key)
+		void AddActionMapping(const std::string& actionName, const ActionMapping& key)
 		{
-			m_ActionMap.insert(std::make_pair(key, actionName));
+			auto result = m_ActionMap.insert(std::make_pair(key, actionName));
+			CS_ASSERT(result.second, "ActionMapping에 실패하였습니다.");
 		}
 
 		virtual void Possess(Pawn* pawn) override
@@ -57,28 +59,30 @@ namespace Crystal {
 			pawn->SetupInputComponent(m_InputComponents.back());
 		}
 
-		virtual void OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override
+		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override
 		{
+			bool bHandled = false;
 			for (InputComponent* inputComponent : m_InputComponents)
 			{
-				bool bHandled = inputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
+				bHandled = inputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 				if (bHandled)
 					break;
 			}
+			return bHandled;
 		}
 
 		void SetMainCamera(CameraComponent* cameraComponent) { m_MainCamera = cameraComponent; }
 		CameraComponent* GetMainCamera() const { return m_MainCamera; }
 
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
-		const std::map<ActionKey, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
+		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
 	private:
 		std::vector<InputComponent*> m_InputComponents;
 		/* KeyCode, AxisName, Scale */
 		std::map<int64_t, std::pair<std::string, float>> m_AxisMap;
 		/* KeyCode, ActionName */
-		std::map<ActionKey, std::string, ActionKeyCompare> m_ActionMap;
+		std::map<ActionMapping, std::string, ActionKeyCompare> m_ActionMap;
 
 		CameraComponent* m_MainCamera = nullptr;
 	};
