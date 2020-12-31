@@ -429,6 +429,7 @@ namespace Crystal {
 				crystalKey.first = Mouse::XButton1;
 				bXButton1Down = false;
 				crystalKey.second = EKeyEvent::KE_Released;
+				break;
 			case VK_XBUTTON2:
 				crystalKey.first = Mouse::XButton2;
 				bXButton2Down = false;

@@ -34,6 +34,7 @@ namespace Crystal {
 		virtual void Update(float deltaTime) override
 		{
 			Pawn::Update(deltaTime);
+			CS_LOG("-------");
 		}
 
 		virtual void SetupInputComponent(InputComponent* inputComponent) override
@@ -52,23 +53,23 @@ namespace Crystal {
 		{
 			auto mainCamera = ((CameraComponent*)m_MainComponent);
 			auto position = mainCamera->GetWorldPosition();
-			mainCamera->RotateYaw(value * 0.05f);
+			mainCamera->RotateRollPitchYaw({ 0.0f, 0.0f,value * 0.05f });
 		}
 
 		void AddControllerPitchInput(float value)
 		{
 			auto mainCamera = ((CameraComponent*)m_MainComponent);
 			auto position = mainCamera->GetWorldPosition();
-			mainCamera->RotatePitch(-value * 0.05f);
+			mainCamera->RotateRollPitchYaw({ 0.0f, -value * 0.05f, 0.0f });
 		}
 
 		void MoveForward(float value)
 		{
 			auto mainCamera = ((CameraComponent*)m_MainComponent);
 			auto position = mainCamera->GetWorldPosition();
-			auto lookTo = mainCamera->GetLookTo();
+			auto forward = mainCamera->GetForward();
 
-			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(lookTo, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
+			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(forward, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
 			mainCamera->SetWorldPosition(newPosition);
 		}
 
@@ -93,6 +94,5 @@ namespace Crystal {
 		void Jump()
 		{
 		}
-
 	};
 }

@@ -66,14 +66,11 @@ namespace Crystal {
 	{
 		if (m_InputEventFunction)
 		{
-
 			if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 		else
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
-
-		return 0;
 	}
 
 	void WindowsWindow::SetInputEventFunction(Application* app, const std::function<bool(Application*, HWND, UINT, WPARAM, LPARAM)>& function)

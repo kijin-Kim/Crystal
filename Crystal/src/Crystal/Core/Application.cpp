@@ -22,16 +22,23 @@ namespace Crystal {
 	{
 		while (m_bShouldRun)
 		{
+			int msgCount = 0;
 			MSG msg;
-			while (PeekMessage(&msg, m_Window->GetWindowHandle(), 0, 0, PM_REMOVE))
+			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
 					m_bShouldRun = false;
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
+
+				const int MAX_MESSAGE = 1;
+				++msgCount;
+				if (msgCount >= MAX_MESSAGE)
+					break;
 			}
 			OnUpdate();
 			Renderer::Instance().Render();
+			
 		}
 	}
 
@@ -57,7 +64,8 @@ namespace Crystal {
 			PostQuitMessage(0);
 			return true;
 		default:
-			return ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);		
+			ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);		
+			return false;
 		}
 		return false;
 	}

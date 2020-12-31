@@ -16,19 +16,10 @@ namespace Crystal {
 
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		static UCHAR pKeysBuffer[256];
-		if (GetKeyboardState(pKeysBuffer))
-		{
-			for (int i = 0; i < 256; i++)
-			{
-				if (pKeysBuffer[i] & 0xF0)
-				{
-					auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, i, lParam);
-					ProcessAxisMappedInput(keyCode, 1.0f);
-				}
-			}
-		}
+		
 		auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, wParam, lParam);
+		ProcessAxisMappedInput(keyCode, 1.0f);
+
 		ProcessActionMappedInput(uMsg, keyCode, lParam, keyStatus);
 
 		MouseCodeWithDelta mouseCodes = GetCrystalMouseCodeWithDelta(uMsg, lParam);
@@ -41,14 +32,22 @@ namespace Crystal {
 		ProcessActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.second, lParam, EKeyEvent::KE_Pressed);
 
-		
+
+		static UCHAR pKeysBuffer[256];
+		for (int i = 0; i < 256; i++)
+		{
+			if (GetAsyncKeyState(i) & 0x8000)
+			{
+				auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, i, lParam);
+				ProcessAxisMappedInput(keyCode, 1.0f);
+			}
+		}		
 		return false;
 	}
 
 	bool InputComponent::ProcessAxisMappedInput(int64_t keyCode, float axisValue)
 	{
 		auto axisMap = ApplicationUtility::GetPlayerController()->GetAxisMap();
-
 		bool bHandledOnAxis = false;
 
 		/*Process Axis*/
@@ -82,7 +81,6 @@ namespace Crystal {
 		actionKey.bCtrlDown = GetKeyState(VK_CONTROL) & 0x8000;
 		actionKey.bShiftDown = GetKeyState(VK_SHIFT) & 0x8000;
 
-	
 
 		/*Process Action*/
 		auto actionIt = actionMap.find(actionKey);
