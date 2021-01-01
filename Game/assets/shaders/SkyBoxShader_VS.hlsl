@@ -2,7 +2,7 @@
 
 struct VS_INPUT
 {
-    float3 Position : POSITION;    
+    float2 Position : POSITION;    
 };
 
 struct VS_OUTPUT
@@ -13,15 +13,14 @@ struct VS_OUTPUT
 
 cbuffer Constants : register(b0)
 {
-    float4x4 ViewProj : packoffset(c0);
+    float4x4 InverseViewProj : packoffset(c0);
 };
 
 
 VS_OUTPUT vsMain(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.TexCoord = input.Position;
-    output.Position = mul(float4(input.Position, 0.0f), ViewProj);
-    output.Position.z = output.Position.w;
+    output.Position = float4(input.Position, 1.0f, 1.0f);
+    output.TexCoord = mul(output.Position, InverseViewProj).xyz;
     return output;
 }

@@ -16,7 +16,6 @@ namespace Crystal {
 			CS_ASSERT(false, "예상치 못한 Camera Projection Mode.");
 			break;
 		}
-		m_InverseViewProjection = Matrix4x4::Inverse(m_ViewProjection);
 	}
 
 }

@@ -23,7 +23,7 @@ namespace Crystal {
 
 		Texture GetTexture(const std::string& textureAlias) const;
 
-		void Load(int depth, const std::vector<std::string>& filepaths, const std::string& textureAlias = "");
+		void Load(const std::vector<std::string>& filepaths, const std::string& textureAlias = "");
 
 	private:
 		TextureManager();

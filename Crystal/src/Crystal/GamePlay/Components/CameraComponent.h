@@ -51,7 +51,6 @@ namespace Crystal {
 
 		/*VP와 InverseVP의 값은 매 프레임마다 Update가 불린 직후 어떠한 속성도 바뀌지 않았을 때만 보장됩니다.*/
 		const DirectX::XMFLOAT4X4& GetViewProjection() const { return m_ViewProjection; }
-		const DirectX::XMFLOAT4X4& GetInverseViewProjection() { return m_InverseViewProjection; }
 
 	private:
 		void computeViewProjection();
@@ -61,7 +60,6 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_RollPitchYaw = { 0.0f, 0.0f, 0.0f };
 
 		DirectX::XMFLOAT4X4 m_ViewProjection = {};
-		DirectX::XMFLOAT4X4 m_InverseViewProjection = {};
 		D3D12_VIEWPORT m_Viewport = {};
 		D3D12_RECT m_ScissorRect = {};
 

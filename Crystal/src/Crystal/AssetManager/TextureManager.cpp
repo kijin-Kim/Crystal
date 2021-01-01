@@ -20,10 +20,8 @@ namespace Crystal {
 		m_TexturePoolCpuHandle = m_TexturesHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 
-	void TextureManager::Load(int depth, const std::vector<std::string>& filepaths, const std::string& textureAlias /*= ""*/)
+	void TextureManager::Load(const std::vector<std::string>& filepaths, const std::string& textureAlias /*= ""*/)
 	{
-		CS_ASSERT((depth == 1 || depth == 6), "올바른 깊이값을 넣어주세요");
-
 		Texture texture;
 		texture.CpuHandle = m_TexturePoolCpuHandle;
 		texture.Count = (UINT)filepaths.size();
@@ -70,7 +68,7 @@ namespace Crystal {
 			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 			textureDesc.Width = metaData.width;
 			textureDesc.Height = metaData.height;
-			textureDesc.DepthOrArraySize = depth;
+			textureDesc.DepthOrArraySize = metaData.arraySize;
 			textureDesc.MipLevels = metaData.mipLevels;
 			textureDesc.Format = metaData.format;
 			textureDesc.SampleDesc.Count = 1;
@@ -120,7 +118,7 @@ namespace Crystal {
 			
 			D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 			shaderResourceViewDesc.Format = metaData.format;
-			shaderResourceViewDesc.ViewDimension = depth == 1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+			shaderResourceViewDesc.ViewDimension = metaData.arraySize == 1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
 			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 			switch (shaderResourceViewDesc.ViewDimension)

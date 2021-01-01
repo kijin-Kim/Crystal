@@ -138,16 +138,14 @@ namespace Crystal {
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png" }, "Megaphone_Metallic");
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png" }, "Megaphone_Normal");*/
 
-		textureManager.Load(1,
+		textureManager.Load(
 			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", },
 			"MegaphoneMaterial");
 
-		//textureManager.Load(6, { "assets/textures/shanghai_bund_1k/StandardCubeMap.hdr" }, "CubemapMaterial");
-		textureManager.Load(6, { "assets/textures/shanghai_bund_1k/cubemap.dds" }, "CubemapMaterial");
-		//textureManager.Load(6, { "assets/textures/shanghai_bund_1k/AnyConv.com__DebugCubeMap.png" }, "CubemapMaterial");
+		textureManager.Load({ "assets/textures/cubemaps/cubemap.dds" }, "CubemapMaterial");
 
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
@@ -241,7 +239,7 @@ namespace Crystal {
 		m_CubemapRootSignature = std::make_unique<RootSignature>(cubemapRootsigDesc);
 
 		D3D12_INPUT_ELEMENT_DESC cubemapInputLayout[] = {
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
 		////////////////////////////////////////////////////
@@ -292,32 +290,18 @@ namespace Crystal {
 
 
 		float quadVertices[] = {
-			-1.0f, -1.0f, -1.0f,
-			-1.0f, +1.0f, -1.0f,
-			+1.0f, +1.0f, -1.0f,
-			+1.0f, -1.0f, -1.0f,
-			-1.0f, -1.0f, +1.0f,
-			-1.0f, +1.0f, +1.0f,
-			+1.0f, +1.0f, +1.0f,
-			+1.0f, -1.0f, +1.0f,
+			-1.0f, -1.0f,
+			-1.0f, +1.0f,
+			+1.0f, +1.0f,
+			+1.0f, -1.0f
 		};
 
 		uint32_t quadIndices[] = {
-			0, 2, 1,
-			0, 3, 2,
-			3, 6, 2,
-			3, 7, 6,
-			4, 1, 5,
-			4, 0, 1,
-			4, 3, 0,
-			4, 7, 3,
-			1, 6, 5,
-			1, 2, 6,
-			7, 5, 6,
-			7, 4, 5
+			0, 1, 2,
+			0, 2, 3
 		};
 
-		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 3), _countof(quadVertices));
+		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 2), _countof(quadVertices));
 		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
 	}
 
@@ -361,7 +345,10 @@ namespace Crystal {
 
 		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
 		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
-		m_CubemapCbuffer.SetData((void*)&Matrix4x4::Transpose(cameraComponent->GetViewProjection()));
+
+		auto viewProj = cameraComponent->GetViewProjection();
+		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
+		m_CubemapCbuffer.SetData((void*)&Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj)));
 	
 
 		//////////////////////////////////////////
@@ -539,7 +526,6 @@ namespace Crystal {
 		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		cameraComponent->SetScissorRect({ 0, 0, width, height });
-		cameraComponent->SetWorldPosition({ 0.0f, 0.0f, 0.0f });
 	}
 
 	Renderer::~Renderer()

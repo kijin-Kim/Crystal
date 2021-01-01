@@ -7,7 +7,6 @@ struct VS_OUTPUT
     float3 TexCoord : TEXCOORD;
 };
 
-
 float4 psMain(VS_OUTPUT input) : SV_TARGET
 {
     return cubemapTexture.Sample(NormalSampler, input.TexCoord);
