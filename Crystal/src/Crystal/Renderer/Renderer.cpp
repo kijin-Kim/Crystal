@@ -138,16 +138,17 @@ namespace Crystal {
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png" }, "Megaphone_Metallic");
 		textureManager.Load({ "assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png" }, "Megaphone_Normal");*/
 
-		textureManager.Load(
+		textureManager.Load(1,
 			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
 			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", },
-			D3D12_SRV_DIMENSION_TEXTURE2D,
 			"MegaphoneMaterial");
 
-		textureManager.Load({ "assets/textures/shanghai_bund_1k/shanghai_bund_1k.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
-		//textureManager.Load({ "assets/textures/shanghai_bund_1k/AnyConv.com__DebugCubeMap.png" }, D3D12_SRV_DIMENSION_TEXTURECUBE, "CubemapMaterial");
+		//textureManager.Load(6, { "assets/textures/shanghai_bund_1k/StandardCubeMap.hdr" }, "CubemapMaterial");
+		textureManager.Load(6, { "assets/textures/shanghai_bund_1k/cubemap.dds" }, "CubemapMaterial");
+		//textureManager.Load(6, { "assets/textures/shanghai_bund_1k/AnyConv.com__DebugCubeMap.png" }, "CubemapMaterial");
+
 
 		shaderManager.Load("assets/shaders/BlinnPhongShader", "BlinnPhongShader");
 		shaderManager.Load("assets/shaders/PBRShader", "PBRShader");
@@ -240,7 +241,7 @@ namespace Crystal {
 		m_CubemapRootSignature = std::make_unique<RootSignature>(cubemapRootsigDesc);
 
 		D3D12_INPUT_ELEMENT_DESC cubemapInputLayout[] = {
-			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
 		////////////////////////////////////////////////////
@@ -291,18 +292,32 @@ namespace Crystal {
 
 
 		float quadVertices[] = {
-			-1.0f, -1.0f,
-			-1.0f, 1.0f,
-			1.0f, 1.0f,
-			1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, +1.0f, -1.0f,
+			+1.0f, +1.0f, -1.0f,
+			+1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f, +1.0f,
+			-1.0f, +1.0f, +1.0f,
+			+1.0f, +1.0f, +1.0f,
+			+1.0f, -1.0f, +1.0f,
 		};
 
 		uint32_t quadIndices[] = {
-			0, 1, 2,
-			0, 2, 3
+			0, 2, 1,
+			0, 3, 2,
+			3, 6, 2,
+			3, 7, 6,
+			4, 1, 5,
+			4, 0, 1,
+			4, 3, 0,
+			4, 7, 3,
+			1, 6, 5,
+			1, 2, 6,
+			7, 5, 6,
+			7, 4, 5
 		};
 
-		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 2), 4);
+		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 3), _countof(quadVertices));
 		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
 	}
 
@@ -337,16 +352,17 @@ namespace Crystal {
 		//XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
 
 		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
-
-		m_PerFrameData.ViewProjection = cameraComponent->GetViewProjection();
+		
+		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(cameraComponent->GetViewProjection());
 		auto camPos = cameraComponent->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
-		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0F, 0.0F, 0.0f);
+		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0f, 0.0f, 0.0f);
 		m_PerObjectData.World = m_WorldMat;
 
 		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
 		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
-		m_CubemapCbuffer.SetData((void*)&cameraComponent->GetInverseViewProjection());
+		m_CubemapCbuffer.SetData((void*)&Matrix4x4::Transpose(cameraComponent->GetViewProjection()));
+	
 
 		//////////////////////////////////////////
 		///// RENDER /////////////////////////////
@@ -425,15 +441,15 @@ namespace Crystal {
 		}
 
 		//---------------Cubemap
-		//cmdList->SetPipelineState(m_CubemapGraphicsPipeline->GetRaw());
-		//cmdList->SetGraphicsRootSignature(m_CubemapRootSignature->GetRaw());
-		//cmdList->SetGraphicsRootConstantBufferView(0, m_CubemapCbuffer.GetGpuVirtualAddress());
-		//D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		//handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
-		//cmdList->SetGraphicsRootDescriptorTable(1, handle);
-		//cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
-		//cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
-		//cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
+		cmdList->SetPipelineState(m_CubemapGraphicsPipeline->GetRaw());
+		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature->GetRaw());
+		cmdList->SetGraphicsRootConstantBufferView(0, m_CubemapCbuffer.GetGpuVirtualAddress());
+		D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
+		cmdList->SetGraphicsRootDescriptorTable(1, handle);
+		cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
+		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
+		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
 	
 		m_RenderTargets[m_RtvIndex]->TransResourceState(cmdList.Get(), D3D12_RESOURCE_STATE_PRESENT);
 
@@ -523,6 +539,7 @@ namespace Crystal {
 		auto cameraComponent = ApplicationUtility::GetPlayerController()->GetMainCamera();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		cameraComponent->SetScissorRect({ 0, 0, width, height });
+		cameraComponent->SetWorldPosition({ 0.0f, 0.0f, 0.0f });
 	}
 
 	Renderer::~Renderer()

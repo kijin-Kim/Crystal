@@ -124,8 +124,8 @@ namespace Crystal {
 
 		inline DirectX::XMFLOAT4X4 Inverse(const DirectX::XMFLOAT4X4& m1)
 		{
-			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixInverse(nullptr, XMLoadFloat4x4(&m1));
+			DirectX::XMFLOAT4X4 result;	
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixInverse(&DirectX::XMMatrixDeterminant(XMLoadFloat4x4(&m1)), XMLoadFloat4x4(&m1));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
@@ -221,6 +221,17 @@ namespace Crystal {
 			return result;
 		}
 
+	}
+
+	namespace Matrix3x3
+	{
+		inline DirectX::XMFLOAT3X3 Transpose(const DirectX::XMFLOAT3X3& m1)
+		{
+			DirectX::XMFLOAT3X3 result;
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixTranspose(XMLoadFloat3x3(&m1));
+			XMStoreFloat3x3(&result, newMatrix);
+			return result;
+		}
 	}
 
 }

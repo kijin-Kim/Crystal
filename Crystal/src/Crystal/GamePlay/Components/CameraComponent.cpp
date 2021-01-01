@@ -9,7 +9,6 @@ namespace Crystal {
 		case ECameraProjectionMode::CPM_Persepective:
 			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(m_Position, GetForward(), GetUp()), 
 				Matrix4x4::Perspective(m_FieldOfView, (float)m_Viewport.Width / (float)m_Viewport.Height, m_NearPlane, m_FarPlane));
-			m_ViewProjection = Matrix4x4::Transpose(m_ViewProjection);
 			break;
 		case ECameraProjectionMode::CPM_Orthographic:
 			break;

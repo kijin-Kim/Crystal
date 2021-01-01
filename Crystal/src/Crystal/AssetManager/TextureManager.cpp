@@ -20,8 +20,10 @@ namespace Crystal {
 		m_TexturePoolCpuHandle = m_TexturesHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 
-	void TextureManager::Load(const std::vector<std::string>& filepaths, D3D12_SRV_DIMENSION srvDimension, const std::string& textureAlias /*= ""*/)
+	void TextureManager::Load(int depth, const std::vector<std::string>& filepaths, const std::string& textureAlias /*= ""*/)
 	{
+		CS_ASSERT((depth == 1 || depth == 6), "올바른 깊이값을 넣어주세요");
+
 		Texture texture;
 		texture.CpuHandle = m_TexturePoolCpuHandle;
 		texture.Count = (UINT)filepaths.size();
@@ -43,13 +45,40 @@ namespace Crystal {
 
 			DirectX::TexMetadata metaData;
 			DirectX::ScratchImage scratchImage;
-			HRESULT hr = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
+			HRESULT hr;
+
+			if (filePath.extension() == ".dds")
+			{
+				hr = LoadFromDDSFile(filePath.wstring().c_str(), DirectX::DDS_FLAGS_FORCE_RGB, &metaData, scratchImage);
+			}
+			else if (filePath.extension() == ".hdr")
+			{
+				hr = LoadFromHDRFile(filePath.wstring().c_str(), &metaData, scratchImage);
+			}
+			else if (filePath.extension() == ".tga")
+			{
+				hr = LoadFromTGAFile(filePath.wstring().c_str(), &metaData, scratchImage);
+			}
+			else
+			{
+				hr = LoadFromWICFile(filePath.wstring().c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
+			}
 			CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
-			metaData.format = DirectX::MakeSRGB(metaData.format);
+
+			D3D12_RESOURCE_DESC textureDesc = {};
+			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			textureDesc.Width = metaData.width;
+			textureDesc.Height = metaData.height;
+			textureDesc.DepthOrArraySize = depth;
+			textureDesc.MipLevels = metaData.mipLevels;
+			textureDesc.Format = metaData.format;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
 
 			hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Tex2D(metaData.format, (UINT64)metaData.width, (UINT)metaData.height, (UINT16)metaData.arraySize, (UINT16)metaData.mipLevels), D3D12_RESOURCE_STATE_COMMON,
+				&textureDesc, D3D12_RESOURCE_STATE_COMMON,
 				nullptr, IID_PPV_ARGS(&textureData.Buffers[i]));
 			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 
@@ -88,11 +117,26 @@ namespace Crystal {
 			commandQueue->Execute(cmdList);
 			commandQueue->Flush();
 
+			
 			D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 			shaderResourceViewDesc.Format = metaData.format;
-			shaderResourceViewDesc.ViewDimension = srvDimension;
+			shaderResourceViewDesc.ViewDimension = depth == 1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
 			shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+			switch (shaderResourceViewDesc.ViewDimension)
+			{
+			case D3D12_SRV_DIMENSION_TEXTURE2D:
+				shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+				shaderResourceViewDesc.Texture2D.MipLevels = 1;
+				break;
+			case D3D12_SRV_DIMENSION_TEXTURECUBE:
+				shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+				shaderResourceViewDesc.TextureCube.MipLevels = 1;
+			default:
+				break;
+			}
+
+			
 
 			device->CreateShaderResourceView(textureData.Buffers[i].Get(), &shaderResourceViewDesc, m_TexturePoolCpuHandle);
 			m_TexturePoolCpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
