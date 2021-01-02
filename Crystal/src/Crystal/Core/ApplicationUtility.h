@@ -14,7 +14,7 @@ namespace Crystal {
 		static void PushState(State* State);
 		static void PopState(State* State);
 
-		static PlayerController* GetPlayerController();
+		static PlayerController& GetPlayerController();
 
 	private:
 		ApplicationUtility() = delete;
@@ -22,6 +22,6 @@ namespace Crystal {
 
 	private:
 		static StateStack s_StateStack;
-		static PlayerController* s_PlayerController;
+		static PlayerController s_PlayerController;
 	};
 }

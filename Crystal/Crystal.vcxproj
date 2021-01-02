@@ -198,10 +198,11 @@
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
-    <ClInclude Include="src\Crystal\Renderer\DepthStencil.h" />
+    <ClInclude Include="src\Crystal\Renderer\DepthStencilView.h" />
     <ClInclude Include="src\Crystal\Renderer\Mesh.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pass\Pass.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\RenderTarget.h" />
+    <ClInclude Include="src\Crystal\Renderer\RenderTargetView.h" />
     <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
     <ClInclude Include="src\Crystal\Renderer\Resource.h" />
     <ClInclude Include="src\Crystal\Renderer\RootSignature.h" />
@@ -224,10 +225,10 @@
     <ClCompile Include="src\Crystal\Renderer\Buffers.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\DepthStencil.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\DepthStencilView.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\RenderTarget.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\RenderTargetView.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Resource.cpp" />
     <ClCompile Include="src\Crystal\Renderer\RootSignature.cpp" />

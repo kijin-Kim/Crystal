@@ -4,11 +4,10 @@
 
 namespace Crystal {
 	StateStack ApplicationUtility::s_StateStack;
-	PlayerController* ApplicationUtility::s_PlayerController = nullptr;
+	PlayerController ApplicationUtility::s_PlayerController;
 
 	void ApplicationUtility::Init()
 	{
-		s_PlayerController = new PlayerController();
 	}
 
 	StateStack& ApplicationUtility::GetStateStack()
@@ -26,7 +25,7 @@ namespace Crystal {
 		s_StateStack.PopState(State);
 	}
 
-	PlayerController* ApplicationUtility::GetPlayerController()
+	PlayerController& ApplicationUtility::GetPlayerController()
 	{
 		return s_PlayerController;
 	}

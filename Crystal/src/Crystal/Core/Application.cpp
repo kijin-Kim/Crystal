@@ -70,9 +70,13 @@ namespace Crystal {
 				m_bShouldRun = false;
 				DestroyWindow(hWnd);
 			}
+			if (wParam == VK_F11)
+			{
+				Renderer::Instance().ActiveFullScreenMode(!Renderer::Instance().GetIsFullScreenMode());
+			}
 			return true;
 		}
-		ApplicationUtility::GetPlayerController()->OnInputEvent(hWnd, uMsg, wParam, lParam);
+		ApplicationUtility::GetPlayerController().OnInputEvent(hWnd, uMsg, wParam, lParam);
 		return false;
 	}
 }

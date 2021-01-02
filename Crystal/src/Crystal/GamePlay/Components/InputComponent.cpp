@@ -47,7 +47,7 @@ namespace Crystal {
 
 	bool InputComponent::ProcessAxisMappedInput(int64_t keyCode, float axisValue)
 	{
-		auto axisMap = ApplicationUtility::GetPlayerController()->GetAxisMap();
+		auto axisMap = ApplicationUtility::GetPlayerController().GetAxisMap();
 		bool bHandledOnAxis = false;
 
 		/*Process Axis*/
@@ -71,7 +71,7 @@ namespace Crystal {
 
 	bool InputComponent::ProcessActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
 	{
-		auto actionMap = ApplicationUtility::GetPlayerController()->GetActionMap();
+		auto actionMap = ApplicationUtility::GetPlayerController().GetActionMap();
 
 		bool bHandledOnAction = false;
 

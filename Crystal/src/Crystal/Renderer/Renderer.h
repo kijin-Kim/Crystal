@@ -33,6 +33,9 @@ namespace Crystal {
 		void ChangeResolution(const char* formattedResolution);
 		void ChangeDisplayMode();
 
+		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
+		void ActiveFullScreenMode(bool bActive) { m_bIsFullScreen = bActive; }
+
 		/// SHOULD GET DRAWABLE //
 		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
 
@@ -40,6 +43,11 @@ namespace Crystal {
 		Renderer() = default;
 		~Renderer();
 
+		void createDeviceContext();
+		void createRenderTargetViewFromSwapChain();
+		void createDepthStencilView();
+		void createPipelineStates();
+		void loadResources();
 	private:
 		WindowsWindow* m_Window = nullptr;
 
@@ -48,17 +56,23 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
+
 		HANDLE m_FenceEvent = nullptr;
 		UINT64 m_FenceValue = 0;
 
 		UINT m_RtvIndex = 0;
 
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencilBuffer = nullptr;
+
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		std::vector<std::unique_ptr<RenderTarget>> m_RenderTargets;
-		std::unique_ptr<DepthStencil> m_DepthStencil = nullptr;
+		std::vector<std::unique_ptr<RenderTargetView>> m_RenderTargetViews;
+		std::unique_ptr<DepthStencilView> m_DepthStencil = nullptr;
 
-		std::unique_ptr<GraphicsPipeline> m_GraphicsPipeline = nullptr;
+		
 
 		DirectX::XMFLOAT4X4 m_WorldMat = {};
 
@@ -85,11 +99,11 @@ namespace Crystal {
 
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
-		int m_ResWidth = 1366;
-		int m_ResHeight = 768;
+		int m_ResWidth = 1920;
+		int m_ResHeight = 1080;
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
-		int m_CurrentResolutionIndex = 1;
+		int m_CurrentResolutionIndex = 0;
 
 		bool m_bIsFullScreen = false;
 
@@ -103,7 +117,6 @@ namespace Crystal {
 		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
 
 		std::unique_ptr<RootSignature> m_CubemapRootSignature = nullptr;
-		std::unique_ptr<GraphicsPipeline> m_CubemapGraphicsPipeline = nullptr;
 
 		PlayerController* m_PlayerController = nullptr;
 	};

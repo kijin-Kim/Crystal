@@ -6,10 +6,8 @@ namespace Crystal {
 	Shader::Shader(const std::string& fileName)
 	{
 		// assumed we have only vertex and pixel shader
-		std::string filePathVS = fileName + "_VS.hlsl";
-		std::string filePathPS = fileName + "_PS.hlsl";
-		loadFromFile(filePathVS, ShaderType::Vertex);
-		loadFromFile(filePathPS, ShaderType::Pixel);
+		loadFromFile(fileName, ShaderType::Vertex);
+		loadFromFile(fileName, ShaderType::Pixel);
 	}
 
 	void Shader::loadFromFile(const std::string& filePath, ShaderType type)
@@ -17,7 +15,7 @@ namespace Crystal {
 		std::wstring shaderPath(filePath.begin(), filePath.end());
 		std::string entryPoint = "Main";
 		std::string compilationTarget = "_5_1";
-		std::string staticShaderType = "";
+		std::string staticShaderType;
 
 		UINT compileFlag = 0;
 #ifdef CS_DEBUG

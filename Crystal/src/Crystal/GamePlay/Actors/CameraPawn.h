@@ -17,7 +17,7 @@ namespace Crystal {
 			cameraComponent->SetFarPlane(10000.0f);
 			m_MainComponent = cameraComponent;
 
-			ApplicationUtility::GetPlayerController()->SetMainCamera(cameraComponent);
+			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
 		virtual ~CameraPawn() = default;
 
@@ -34,7 +34,6 @@ namespace Crystal {
 		virtual void Update(float deltaTime) override
 		{
 			Pawn::Update(deltaTime);
-			CS_LOG("-------");
 		}
 
 		virtual void SetupInputComponent(InputComponent* inputComponent) override
