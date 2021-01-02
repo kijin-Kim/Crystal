@@ -12,8 +12,11 @@ namespace Crystal {
 		WindowsWindow(HINSTANCE hInstance, int width, int height);
 		~WindowsWindow();
 
-		int GetWidth() const { RECT rt = {}; GetClientRect(m_Handle, &rt); return rt.right - rt.left;}
-		int GetHeight() const { RECT rt = {}; GetClientRect(m_Handle, &rt); return rt.bottom - rt.top; }
+		int GetWidth() const { return m_Width; }
+		int GetHeight() const { return m_Height; }
+
+		void SetWidth(int width) { m_Width = width; }
+		void SetHeight(int height) { m_Height = height; }
 
 		const HWND GetWindowHandle() const { return m_Handle; }
 

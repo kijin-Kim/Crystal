@@ -284,7 +284,7 @@ namespace Crystal {
 		int height = atoi(heightInChar);
 		if (width == m_ResWidth && height == m_ResHeight && m_Window->GetWidth() == m_ResWidth && m_Window->GetHeight() == m_ResHeight)
 			return;
-
+		
 		m_RtvIndex = 0;
 
 		m_ResWidth = width;
@@ -323,6 +323,10 @@ namespace Crystal {
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		cameraComponent->SetScissorRect({ 0, 0, width, height });
+
+		m_Window->SetWidth(targetParam.Width);
+		m_Window->SetHeight(targetParam.Height);
+
 	}
 
 	Renderer::~Renderer()
