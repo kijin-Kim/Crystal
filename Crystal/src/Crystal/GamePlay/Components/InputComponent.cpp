@@ -28,9 +28,9 @@ namespace Crystal {
 		ProcessAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
 		ProcessAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
 		ProcessActionMappedInput(uMsg, mouseCodes.MouseX.first, lParam, EKeyEvent::KE_Pressed);
-		ProcessActionMappedInput(uMsg, mouseCodes.MouseY.second, lParam, EKeyEvent::KE_Pressed);
+		ProcessActionMappedInput(uMsg, mouseCodes.MouseY.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
-		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.second, lParam, EKeyEvent::KE_Pressed);
+		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
 
 
 		static UCHAR pKeysBuffer[256];

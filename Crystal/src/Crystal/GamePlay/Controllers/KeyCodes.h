@@ -445,11 +445,11 @@ namespace Crystal {
 			GetCursorPos(&cursorPos);
 			RECT rc = {};
 			GetClientRect(GetActiveWindow(), &rc);
-			static int prevX = (rc.right - rc.left) / 2.0f;
-			static int prevY = (rc.bottom - rc.top) / 2.0f;
-			int diffFromLastX = cursorPos.x - prevX;
-			int diffFromLastY = cursorPos.y - prevY;
-			SetCursorPos(prevX, prevY);
+			static float prevX = (rc.right - rc.left) / 2.0f;
+			static float prevY = (rc.bottom - rc.top) / 2.0f;
+			float diffFromLastX = cursorPos.x - prevX;
+			float diffFromLastY = cursorPos.y - prevY;
+			SetCursorPos((int)prevX, (int)prevY);
 
 			codes.MouseX = { Mouse::X, diffFromLastX };
 			codes.MouseY = { Mouse::Y, -diffFromLastY };

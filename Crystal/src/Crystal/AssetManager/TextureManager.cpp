@@ -66,10 +66,10 @@ namespace Crystal {
 
 			D3D12_RESOURCE_DESC textureDesc = {};
 			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			textureDesc.Width = metaData.width;
-			textureDesc.Height = metaData.height;
-			textureDesc.DepthOrArraySize = metaData.arraySize;
-			textureDesc.MipLevels = metaData.mipLevels;
+			textureDesc.Width = (UINT)metaData.width;
+			textureDesc.Height = (UINT)metaData.height;
+			textureDesc.DepthOrArraySize = (UINT)metaData.arraySize;
+			textureDesc.MipLevels = (UINT)metaData.mipLevels;
 			textureDesc.Format = metaData.format;
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -130,8 +130,9 @@ namespace Crystal {
 			case D3D12_SRV_DIMENSION_TEXTURECUBE:
 				shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
 				shaderResourceViewDesc.TextureCube.MipLevels = 1;
-			default:
 				break;
+			default:
+				CS_ASSERT(false, "지원되지 않는 SRV DIMENSION 입니다");
 			}
 
 			

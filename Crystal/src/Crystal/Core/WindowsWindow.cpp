@@ -64,11 +64,8 @@ namespace Crystal {
 
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (m_InputEventFunction)
-		{
-			if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
-				return DefWindowProc(hWnd, uMsg, wParam, lParam);
-		}
+		if (m_InputEventFunction && !m_InputEventFunction(hWnd, uMsg, wParam, lParam))
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		else
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
