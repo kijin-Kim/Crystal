@@ -235,7 +235,6 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		cmdList->ResourceBarrier(1, &resourceBarrier);
 		rtvResource->SetResourceState(D3D12_RESOURCE_STATE_PRESENT);
-
 	
 		m_CommandQueue->Execute(cmdList);
 
@@ -331,7 +330,12 @@ namespace Crystal {
 
 	Renderer::~Renderer()
 	{
-	
+#if defined CS_DEBUG
+		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
+		HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
+		CS_ASSERT(SUCCEEDED(hr), "DXGI디버그 인터페이스를 가져오는데 실패하였습니다.");
+		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+#endif
 	}
 
 	void Renderer::createDeviceContext()
@@ -344,11 +348,6 @@ namespace Crystal {
 		hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
 		CS_ASSERT(SUCCEEDED(hr), "D3D디버그 인터페이스를 가져오는데 실패하였습니다.");
 		debugController->EnableDebugLayer();
-
-		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = NULL;
-		DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
-		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
-		CS_ASSERT(SUCCEEDED(hr), "DXGI디버그 인터페이스를 가져오는데 실패하였습니다.");
 
 		createFactoryDebugFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
@@ -386,6 +385,7 @@ namespace Crystal {
 		m_FenceEvent = CreateEvent(nullptr, false, false, nullptr);
 
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+
 	}
 
 	void Renderer::createRenderTargetViewFromSwapChain()

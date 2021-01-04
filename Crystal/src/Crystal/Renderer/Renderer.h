@@ -72,14 +72,13 @@ namespace Crystal {
 		std::vector<std::unique_ptr<RenderTargetView>> m_RenderTargetViews;
 		std::unique_ptr<DepthStencilView> m_DepthStencil = nullptr;
 
-		
-
 		DirectX::XMFLOAT4X4 m_WorldMat = {};
 
 		std::unique_ptr<RootSignature> m_RootSignature = nullptr;
 
 		Timer timer;
 
+		//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 
 		struct PerObjectData
