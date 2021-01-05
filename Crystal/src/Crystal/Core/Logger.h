@@ -66,6 +66,8 @@ namespace Crystal {
 	 MessageBoxA(NULL, buffer, "Assertion Failed", MB_OK); \
 	__debugbreak();\
 }
+
 #elif defined(CS_RELEASE)
 #define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR(__VA_ARGS__);}
+#define CS_DX_REPORT(x)
 #endif

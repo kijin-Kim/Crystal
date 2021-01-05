@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <dxgidebug.h>
 
 extern Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance);
 

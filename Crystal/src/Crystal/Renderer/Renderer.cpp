@@ -11,7 +11,6 @@
 #include "Crystal/GamePlay/World/World.h"
 
 #include "Crystal/AssetManager/ShaderManager.h"
-#include "Crystal/AssetManager/TextureManager.h"
 #include "Crystal/AssetManager/ConstantBuffer.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
@@ -23,7 +22,7 @@ namespace Crystal {
 	{
 		m_Window = window;
 
-		createDeviceContext();
+		createDevice();
 		createRenderTargetViewFromSwapChain();
 		createDepthStencilView();
 		loadResources();
@@ -160,18 +159,16 @@ namespace Crystal {
 				};
 			}
 
-			//Copy Descriptors in Texture pool
-			auto& textureManager = TextureManager::Instance();
+			////Copy Descriptors in Texture pool
+			//auto& textureManager = TextureManager::Instance();
 
 			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			auto& texture = textureManager.GetTexture("MegaphoneMaterial");
-			m_Device->CopyDescriptorsSimple(texture.Count, destHeapHandle, texture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			m_Device->CopyDescriptorsSimple(4, destHeapHandle, m_DiffuseTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 4;
 
-			auto& cubemapTexture = textureManager.GetTexture("CubemapMaterial");
-			m_Device->CopyDescriptorsSimple(cubemapTexture.Count, destHeapHandle, cubemapTexture.CpuHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
 		auto cmdList = m_CommandQueue->GetCommandList();
@@ -330,15 +327,16 @@ namespace Crystal {
 
 	Renderer::~Renderer()
 	{
-#if defined CS_DEBUG
-		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
-		HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
-		CS_ASSERT(SUCCEEDED(hr), "DXGI디버그 인터페이스를 가져오는데 실패하였습니다.");
-		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-#endif
+//		Render의 오브젝트에 대한 리포트는 가짜 리포트 ( 싱글톤 )
+//#if defined CS_DEBUG
+//		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
+//		HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
+//		CS_ASSERT(SUCCEEDED(hr), "DXGI디버그 인터페이스를 가져오는데 실패하였습니다.");
+//		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+//#endif
 	}
 
-	void Renderer::createDeviceContext()
+	void Renderer::createDevice()
 	{
 		HRESULT hr = E_FAIL;
 		UINT createFactoryDebugFlags = 0;
@@ -348,7 +346,6 @@ namespace Crystal {
 		hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
 		CS_ASSERT(SUCCEEDED(hr), "D3D디버그 인터페이스를 가져오는데 실패하였습니다.");
 		debugController->EnableDebugLayer();
-
 		createFactoryDebugFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
 		// #DirectX Create DXGI factory
@@ -366,7 +363,9 @@ namespace Crystal {
 
 				// #DirectX Create Device
 				hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_Device));
-				CS_ASSERT(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다.");
+				m_Device->SetName(L"D3D12 Device");
+				CS_ASSERT(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다."); 
+				
 				break;
 			}
 		}
@@ -380,7 +379,6 @@ namespace Crystal {
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
 		}
 #endif
-
 		m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence));
 		m_FenceEvent = CreateEvent(nullptr, false, false, nullptr);
 
@@ -590,17 +588,14 @@ namespace Crystal {
 		///////////////////////////////////////////////////
 
 		auto& shaderManager = ShaderManager::Instance();
-		auto& textureManager = TextureManager::Instance();
+		/*auto& textureManager = TextureManager::Instance();*/
 		auto& constantBufferPoolManager = ConstantBufferPoolManager::Instance();
 
-		textureManager.Load(
-			{ "assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png",
-			"assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png", },
-			"MegaphoneMaterial");
 
-		textureManager.Load({ "assets/textures/cubemaps/cubemap.dds" }, "CubemapMaterial");
+		m_DiffuseTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png");
+		m_RoughnessTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png");
+		m_MetalicTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png");
+		m_CubemapTexture = std::make_unique<Texture>("assets/textures/cubemaps/cubemap.dds");
 
 		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");

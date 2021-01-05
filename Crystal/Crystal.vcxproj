@@ -173,7 +173,7 @@
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
     <ClInclude Include="src\Crystal\AssetManager\ConstantBuffer.h" />
-    <ClInclude Include="src\Crystal\AssetManager\TextureManager.h" />
+    <ClInclude Include="src\Crystal\AssetManager\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
@@ -212,7 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Crystal\AssetManager\ConstantBuffer.cpp" />
-    <ClCompile Include="src\Crystal\AssetManager\TextureManager.cpp" />
+    <ClCompile Include="src\Crystal\AssetManager\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
     <ClCompile Include="src\Crystal\Core\State.cpp" />

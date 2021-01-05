@@ -10,6 +10,7 @@
 
 #include "Crystal/Gameplay/Components/MeshComponent.h"
 #include "Crystal/AssetManager/ConstantBuffer.h"
+#include "Crystal/AssetManager/Texture.h"
 
 namespace Crystal {
 	class PlayerController;
@@ -43,7 +44,7 @@ namespace Crystal {
 		Renderer() = default;
 		~Renderer();
 
-		void createDeviceContext();
+		void createDevice();
 		void createRenderTargetViewFromSwapChain();
 		void createDepthStencilView();
 		void createPipelineStates();
@@ -118,5 +119,10 @@ namespace Crystal {
 		std::unique_ptr<RootSignature> m_CubemapRootSignature = nullptr;
 
 		PlayerController* m_PlayerController = nullptr;
+
+		std::unique_ptr<Texture> m_DiffuseTexture;
+		std::unique_ptr<Texture> m_RoughnessTexture;
+		std::unique_ptr<Texture> m_MetalicTexture;
+		std::unique_ptr<Texture> m_CubemapTexture;
 	};
 }
