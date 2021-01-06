@@ -66,12 +66,7 @@ namespace Crystal {
 
 		UINT m_RtvIndex = 0;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencilBuffer = nullptr;
-
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
-
-		std::vector<std::unique_ptr<RenderTargetView>> m_RenderTargetViews;
-		std::unique_ptr<DepthStencilView> m_DepthStencil = nullptr;
 
 		DirectX::XMFLOAT4X4 m_WorldMat = {};
 
@@ -124,5 +119,8 @@ namespace Crystal {
 		std::unique_ptr<Texture> m_RoughnessTexture;
 		std::unique_ptr<Texture> m_MetalicTexture;
 		std::unique_ptr<Texture> m_CubemapTexture;
+
+		std::unique_ptr<Texture> m_ColorBufferTextures[2];
+		std::unique_ptr<Texture> m_DepthBufferTexture;
 	};
 }

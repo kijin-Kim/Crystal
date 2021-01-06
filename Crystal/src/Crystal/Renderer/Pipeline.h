@@ -2,8 +2,6 @@
 #include <d3d12.h>
 #include <memory>
 
-#include "DepthStencilView.h"
-#include "RenderTargetView.h"
 #include "Shader.h"
 
 namespace Crystal {
