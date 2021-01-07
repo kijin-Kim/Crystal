@@ -13,6 +13,7 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "../Core/ApplicationUtility.h"
 #include "../GamePlay/Actors/CameraPawn.h"
+#include "Material.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -102,7 +103,6 @@ namespace Crystal {
 			modelAngle[1] = 0.0f;
 
 		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
-		//XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat), DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f)));
 
 		//XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
 		//	DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
@@ -124,13 +124,26 @@ namespace Crystal {
 		m_CubemapCbuffer.SetData((void*)&Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj)));
 	
 
-		//////////////////////////////////////////
-		///// RENDER /////////////////////////////
-		//////////////////////////////////////////
-
+		
 
 		{
-			
+			for (const auto& meshComponent : m_MeshComponents)
+			{
+				auto material = meshComponent->GetMesh()->GetMaterial();
+
+				auto albedoTexture = material->GetTextureInput("AlbedoTexture");
+				auto roughnessTexture = material->GetTextureInput("RoughnessTexture");
+				auto metalicTexture = material->GetTextureInput("MetalicTexture");
+				auto normalTexture = material->GetTextureInput("NormalTexture");
+
+				/*임시 : 모든 텍스쳐들이 Descriptor Heap의 연속적인 공간 안에 있다고 가정함.*/
+				D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+				destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+				m_Device->CopyDescriptorsSimple(4, destHeapHandle, albedoTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			}
+
 			/*CBV를 복사합니다.*/
 			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer.GetCpuDescriptorHandle(),
 				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -140,16 +153,21 @@ namespace Crystal {
 			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			m_Device->CopyDescriptorsSimple(4, destHeapHandle, m_DiffuseTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			//m_Device->CopyDescriptorsSimple(4, destHeapHandle, m_AlbedoTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 4;
 
 			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
+
+		//////////////////////////////////////////
+		///// RENDER /////////////////////////////
+		//////////////////////////////////////////
+
 		auto cmdList = m_CommandQueue->GetCommandList();
 
 		cmdList->SetPipelineState(m_PBRPipelineState.Get());
-		cmdList->SetGraphicsRootSignature(m_RootSignature->GetRaw());
+		cmdList->SetGraphicsRootSignature(m_NormalRootSignature.Get());
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->RSSetViewports(1, &cameraComponent->GetViewport());
@@ -191,7 +209,7 @@ namespace Crystal {
 
 		//---------------Cubemap
 		cmdList->SetPipelineState(m_CubemapPipelineState.Get());
-		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature->GetRaw());
+		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature.Get());
 		cmdList->SetGraphicsRootConstantBufferView(0, m_CubemapCbuffer.GetGpuVirtualAddress());
 		D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
@@ -298,17 +316,6 @@ namespace Crystal {
 
 	}
 
-	Renderer::~Renderer()
-	{
-//		Render의 오브젝트에 대한 리포트는 가짜 리포트 ( 싱글톤 )
-//#if defined CS_DEBUG
-//		Microsoft::WRL::ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
-//		HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
-//		CS_ASSERT(SUCCEEDED(hr), "DXGI디버그 인터페이스를 가져오는데 실패하였습니다.");
-//		hr = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-//#endif
-	}
-
 	void Renderer::createDevice()
 	{
 		HRESULT hr = E_FAIL;
@@ -411,7 +418,6 @@ namespace Crystal {
 			m_ColorBufferTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 			m_ColorBufferTextures[i]->CreateRenderTargetView(m_ColorBufferTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
-
 	}
 
 	void Renderer::createDepthStencilView()
@@ -447,12 +453,20 @@ namespace Crystal {
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;
 		rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		m_RootSignature = std::make_unique<RootSignature>(rootsigDesc);
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
+		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootsigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		hr = m_Device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_NormalRootSignature));
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 		};
 
 		struct PipelineStateStream
@@ -471,7 +485,7 @@ namespace Crystal {
 		////////PIPELINE STATE//////////////////////////////
 		////////////////////////////////////////////////////
 
-		pipelineStateStream.RootSignature = m_RootSignature->GetRaw();
+		pipelineStateStream.RootSignature = m_NormalRootSignature.Get();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
@@ -504,7 +518,7 @@ namespace Crystal {
 		pipelineStateStream.RTVFormats = rtvFormat;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
-		HRESULT hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
+		hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
 		CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 		///////////////////////////////////////////////////
@@ -514,7 +528,7 @@ namespace Crystal {
 		CD3DX12_DESCRIPTOR_RANGE1 cubemapCommonDescriptorHeapRanges[1] = {};
 		cubemapCommonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-		CD3DX12_ROOT_PARAMETER1 cubemapRootParameter[2];
+		CD3DX12_ROOT_PARAMETER1 cubemapRootParameter[2] = {};
 		cubemapRootParameter[0].InitAsConstantBufferView(0);
 		cubemapRootParameter[1].InitAsDescriptorTable(_countof(cubemapCommonDescriptorHeapRanges), cubemapCommonDescriptorHeapRanges);
 
@@ -523,7 +537,12 @@ namespace Crystal {
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC cubemapRootsigDesc(_countof(cubemapRootParameter), cubemapRootParameter, _countof(cubemapStaticSamplerDescs), cubemapStaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		m_CubemapRootSignature = std::make_unique<RootSignature>(cubemapRootsigDesc);
+		rootSignatureDataBlob = nullptr;
+		rootSignatureErrorBlob = nullptr;
+		hr = D3D12SerializeVersionedRootSignature(&cubemapRootsigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		hr = m_Device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_CubemapRootSignature));
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 		D3D12_INPUT_ELEMENT_DESC cubemapInputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
@@ -533,16 +552,13 @@ namespace Crystal {
 		////////PIPELINE STATE//////////////////////////////
 		////////////////////////////////////////////////////
 
-		cubemapPipelineStream.RootSignature = m_CubemapRootSignature->GetRaw();
+		cubemapPipelineStream.RootSignature = m_CubemapRootSignature.Get();
 		cubemapPipelineStream.InputLayout = { cubemapInputLayout, _countof(cubemapInputLayout) };
 		cubemapPipelineStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		auto& cubemapShaderDatablobs = shaderManager.GetShader("CubemapShader")->GetRaw();
 		cubemapPipelineStream.VS = { cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		cubemapPipelineStream.PS = { cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
-
-
-
 		cubemapPipelineStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
 		cubemapPipelineStream.DSVFormat = m_DepthBufferTexture->GetResource()->GetDesc().Format;
 		D3D12_RT_FORMAT_ARRAY cubemapRtvFormat = {};
@@ -567,24 +583,21 @@ namespace Crystal {
 
 
 		/*텍스쳐 리소스를 로드합니다.*/
-		m_DiffuseTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png");
-		m_RoughnessTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png");
-		m_MetalicTexture = std::make_unique<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png");
 		m_CubemapTexture = std::make_unique<Texture>("assets/textures/cubemaps/cubemap.dds");
 
 		/*각 텍스쳐 리소스에 대한 Shader Resource View를 만듭니다.*/
-		m_DiffuseTexture->CreateShaderResourceView(m_DiffuseTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		m_RoughnessTexture->CreateShaderResourceView(m_RoughnessTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		m_MetalicTexture->CreateShaderResourceView(m_MetalicTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		m_CubemapTexture->CreateShaderResourceView(m_CubemapTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURECUBE);
 		
 
 		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
-
+		
 		m_PerFrameBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerFrameBuffer));
 		m_PerObjectBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerObjectBuffer));
 		m_CubemapCbuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_CubemapCbuffer));
+
+		Material mat(shaderManager.GetShader("PBRShader"));
+		mat.Set("AlbedoTexture", std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png"));
 	}
 
 	void Renderer::ChangeDisplayMode()

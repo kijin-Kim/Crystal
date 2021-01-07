@@ -1,6 +1,5 @@
 #pragma once
 #include <wrl/client.h>
-#include "Resource.h"
 
 namespace Crystal {
 	class VertexBuffer final

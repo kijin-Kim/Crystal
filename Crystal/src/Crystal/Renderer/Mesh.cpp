@@ -19,19 +19,21 @@ namespace Crystal {
 			vertex.Position = *(DirectX::XMFLOAT3*) & mesh->mVertices[i];
 			vertex.Normal = *(DirectX::XMFLOAT3*) & mesh->mNormals[i];
 
-			/*if(HasBitangent)
+			if(mesh->HasTangentsAndBitangents())
 			{
-			}*/
+				vertex.Tangent = *(DirectX::XMFLOAT3*)&mesh->mTangents[i];
+				vertex.BiTangent = *(DirectX::XMFLOAT3*)& mesh->mBitangents[i];
+			}
 
 			if (mesh->HasTextureCoords(0))
 			{
-				vertex.TexCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+				vertex.TexCoord = *(DirectX::XMFLOAT2*)& mesh->mTextureCoords[0][i];
 			}
 
 			vertices.push_back(vertex);
 		}
 
-		m_VertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), (UINT)(sizeof(float) * 8), (UINT)vertices.size());
+		m_VertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), (UINT)(sizeof(float) * 14), (UINT)vertices.size());
 
 		std::vector<UINT> indices;
 		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -39,7 +41,7 @@ namespace Crystal {
 			indices.reserve(mesh->mFaces[i].mNumIndices);
 			for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; j++)
 			{
-				indices.emplace_back(mesh->mFaces[i].mIndices[j]);
+				indices.push_back(mesh->mFaces[i].mIndices[j]);
 			}
 		}
 
@@ -56,7 +58,7 @@ namespace Crystal {
 	Mesh::Mesh(const std::string& filePath)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+		const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace);
 		CS_ASSERT(!(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode), "모델을 로드하는데 실패하였습니다");
 		processNode(scene->mRootNode, scene);
 	}

@@ -1,18 +1,21 @@
 struct VS_INPUT
 {
     float3 Position : POSITION;
-    float3 Normal : NORMAL;
     float2 TexCoord : TEXCOORD;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 BiTangent : BITANGENT;
 };
 
 struct PS_INPUT
 {
     float4 Position : SV_POSITION;
     float4 WorldPosition : POSITION;
-    float4 WorldLightPosition : POSITION1;
-    float4 WorldCameraPosition : POSITION2;
+    float4 WorldLightPosition : WORLD_LIGHT_POSITION;
+    float4 WorldCameraPosition : WORLD_CAMERA_POSITION;
     float3 WorldNormal : NORMAL;
     float2 TexCoord : TEXCOORD;
+    float3x3 TangentToWorld : TANGENT_TO_WORLD;
 };
 
 
@@ -39,13 +42,21 @@ PS_INPUT vsMain(VS_INPUT input)
     output.WorldCameraPosition = WorldCameraPosition;
     output.WorldNormal = mul(input.Normal, (float3x3)World);
     output.TexCoord = input.TexCoord;
+    
+    float3x3 TBN = float3x3(input.Tangent, input.BiTangent, input.Normal);
+    output.TangentToWorld = mul(TBN, (float3x3)World);
+
     return output;
 }
 
 
 
 
-Texture2D textures[3] : register(t0);
+Texture2D AlbedoTexture : register(t0);
+Texture2D MetalicTexture : register(t1);
+Texture2D RoughnessTexture : register(t2);
+Texture2D NormalTexture : register(t3);
+
 SamplerState normalSampler : register(s0);
 
 static const float PI = 3.14159265359;
@@ -100,13 +111,15 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 lightColor = 10.0f;
-    float3 albedo = pow(textures[0].Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f,2.2f));
-    float roughness = textures[1].Sample(normalSampler, input.TexCoord).r;
-    float metallic = textures[2].Sample(normalSampler, input.TexCoord).r;
+    float3 albedo = pow(AlbedoTexture.Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f,2.2f));
+    float roughness = RoughnessTexture.Sample(normalSampler, input.TexCoord).r;
+    float metallic = MetalicTexture.Sample(normalSampler, input.TexCoord).r;
     int lightCount = 1;
     ////////////////
 
-    float3 N = normalize(input.WorldNormal);
+    //float3 N = normalize(input.WorldNormal);
+    float3 N = normalize(NormalTexture.Sample(normalSampler, input.TexCoord).rgb * 2.0f - 1.0f);
+    N = normalize(mul(N, input.TangentToWorld));
     float3 V = normalize(input.WorldCameraPosition - input.WorldPosition).xyz;
 
     float3 F0 = 0.04f;

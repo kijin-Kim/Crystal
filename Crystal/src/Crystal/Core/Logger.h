@@ -2,72 +2,42 @@
 #include <debugapi.h>
 #include <cstdarg>
 #include <cstdio>
+#include <memory>
+#include <string>
+#include <stdexcept>
 
-namespace Crystal {
-	class Logger
-	{
-	public:
-		static void Log(const char* fmt, ...)
-		{
-			char buffer[1000] = {};
 
-			va_list ap;
-			va_start(ap, fmt);
-			vsprintf_s(buffer, fmt, ap);
-			va_end(ap);
-
-			char output[1000] = {};
-			sprintf_s(output, "[ Crystal Log : %s ]\n", buffer);
-
-			OutputDebugStringA(output);
-		}
-
-		static void Error(const char* fmt, ...)
-		{
-			char buffer[1000] = {};
-
-			va_list ap;
-			va_start(ap, fmt);
-			vsprintf_s(buffer, fmt, ap);
-			va_end(ap);
-
-			char output[1000] = {};
-			sprintf_s(output, "[ Crystal Error : %s ]\n", buffer);
-
-			OutputDebugStringA(output);
-		}
-
-		static void FormatOutput(char* const outBuffer, const char* fmt, ...)
-		{
-			char buffer[1000] = {};
-
-			va_list ap;
-			va_start(ap, fmt);
-			vsprintf_s(buffer, fmt, ap);
-			va_end(ap);
-
-			sprintf(outBuffer, "[ Crystal Error : %s ]\n", buffer);
-		}
-
-	private:
-		Logger() {};
-	};
+//https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
+template<typename ... Args>
+std::string string_format(const std::string& format, Args ... args)
+{
+	int size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+	if (size <= 0) { throw std::runtime_error("Error during formatting."); }
+	std::unique_ptr<char[]> buf(new char[size]);
+	snprintf(buf.get(), size, format.c_str(), args ...);
+	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-#define CS_LOG(...) Crystal::Logger::Log(__VA_ARGS__)
-#define CS_ERROR(...) Crystal::Logger::Error(__VA_ARGS__)
+namespace Crystal {
+	inline void Log(const char* prefixMsg, const char* msg)
+	{
+		OutputDebugStringA(prefixMsg);
+		OutputDebugStringA(msg);
+	}
+}
+
+#define CS_FORMAT(...) string_format(__VA_ARGS__)
+#define CS_LOG(...) Crystal::Log("Crystal Log : ",__VA_ARGS__)
+#define CS_ERROR(...) Crystal::Log("Crystal Error : ", CS_FORMAT(__VA_ARGS__).c_str())
 
 #ifdef CS_DEBUG
 #define CS_ASSERT(x, ...) if(!(x)) \
 { \
-	CS_ERROR(__VA_ARGS__); \
-	char buffer[1000] = {}; \
-	Crystal::Logger::FormatOutput(buffer, __VA_ARGS__);\
-	 MessageBoxA(NULL, buffer, "Assertion Failed", MB_OK); \
+	std::string formatted = CS_FORMAT(__VA_ARGS__);\
+	Crystal::Log("Crystal Error : ", formatted.c_str());\
+	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 	__debugbreak();\
 }
-
 #elif defined(CS_RELEASE)
 #define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR(__VA_ARGS__);}
-#define CS_DX_REPORT(x)
 #endif

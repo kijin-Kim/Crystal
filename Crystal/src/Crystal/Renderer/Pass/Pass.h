@@ -3,23 +3,20 @@
 
 namespace Crystal {
 
-	struct PassParams
-	{
-		
-	};
-
 	class Pass
 	{
 	public:
 		Pass() = default;
 		virtual ~Pass() = default;
 
-		void Begin(const PassParams& params) {}
-		void Excute() {}
-		void End() {}
+		
+		virtual void Excute() {}
+
+	
+		void RegisterMesh(std::shared_ptr<MeshComponent>& meshComponent);
+		void UnRegisterMesh(MeshComponent* meshComponent);
 
 	protected:
-		std::vector<MeshComponent*> m_MeshComponents;
+		std::vector<std::shared_ptr<MeshComponent>> m_MeshComponents;
 	};
-
 }

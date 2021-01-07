@@ -8,7 +8,6 @@
 #include "WindowsWindow.h"
 #include "Crystal/Renderer/Shader.h"
 #include "Crystal/Renderer/Buffers.h"
-#include "Crystal/Renderer/Pipeline.h"
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/Core/State.h"

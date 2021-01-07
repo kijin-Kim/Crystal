@@ -198,12 +198,10 @@
     <ClInclude Include="src\Crystal\Renderer\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
+    <ClInclude Include="src\Crystal\Renderer\Material.h" />
     <ClInclude Include="src\Crystal\Renderer\Mesh.h" />
     <ClInclude Include="src\Crystal\Renderer\Pass\Pass.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
-    <ClInclude Include="src\Crystal\Renderer\Resource.h" />
-    <ClInclude Include="src\Crystal\Renderer\RootSignature.h" />
     <ClInclude Include="src\Crystal\Renderer\Shader.h" />
     <ClInclude Include="src\Crystal\AssetManager\ShaderManager.h" />
     <ClInclude Include="src\cspch.h" />
@@ -223,11 +221,10 @@
     <ClCompile Include="src\Crystal\Renderer\Buffers.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Material.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Mesh.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pass\Pass.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Resource.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\RootSignature.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Shader.cpp" />
     <ClCompile Include="src\Crystal\AssetManager\ShaderManager.cpp" />
     <ClCompile Include="src\cspch.cpp">

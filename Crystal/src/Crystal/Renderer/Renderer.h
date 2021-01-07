@@ -5,7 +5,6 @@
 #include "CommandQueue.h"
 #include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
-#include "Pipeline.h"
 #include "Crystal/AssetManager/ShaderManager.h"
 
 #include "Crystal/Gameplay/Components/MeshComponent.h"
@@ -42,7 +41,7 @@ namespace Crystal {
 
 	private:
 		Renderer() = default;
-		~Renderer();
+		~Renderer() = default;
 
 		void createDevice();
 		void createRenderTargetViewFromSwapChain();
@@ -70,7 +69,8 @@ namespace Crystal {
 
 		DirectX::XMFLOAT4X4 m_WorldMat = {};
 
-		std::unique_ptr<RootSignature> m_RootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
 
 		Timer timer;
 
@@ -111,13 +111,8 @@ namespace Crystal {
 		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
 		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
 
-		std::unique_ptr<RootSignature> m_CubemapRootSignature = nullptr;
-
 		PlayerController* m_PlayerController = nullptr;
 
-		std::unique_ptr<Texture> m_DiffuseTexture;
-		std::unique_ptr<Texture> m_RoughnessTexture;
-		std::unique_ptr<Texture> m_MetalicTexture;
 		std::unique_ptr<Texture> m_CubemapTexture;
 
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
