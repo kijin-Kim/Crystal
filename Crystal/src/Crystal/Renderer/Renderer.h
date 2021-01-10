@@ -5,11 +5,11 @@
 #include "CommandQueue.h"
 #include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
-#include "Crystal/AssetManager/ShaderManager.h"
+#include "Crystal/Resources/ShaderManager.h"
 
 #include "Crystal/Gameplay/Components/MeshComponent.h"
-#include "Crystal/AssetManager/ConstantBuffer.h"
-#include "Crystal/AssetManager/Texture.h"
+#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Texture.h"
 
 namespace Crystal {
 	class PlayerController;
@@ -58,6 +58,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRAnimatedPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
 
 		HANDLE m_FenceEvent = nullptr;
@@ -67,7 +68,7 @@ namespace Crystal {
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		DirectX::XMFLOAT4X4 m_WorldMat = {};
+		DirectX::XMFLOAT4X4 m_WorldMat = Matrix4x4::Identity();
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
@@ -80,8 +81,11 @@ namespace Crystal {
 		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
+			int bToggleAlbedoTexture = true;
+			int bToggleMetalicTexture = true;
+			int bToggleRoughnessTexture = true;
+			int bToggleNormalTexture = true;
 		};
-
 		PerObjectData m_PerObjectData = {};
 		struct PerFrameData
 		{
@@ -90,6 +94,14 @@ namespace Crystal {
 			DirectX::XMFLOAT4 CameraPositionInWorld;
 		};
 		PerFrameData m_PerFrameData = {};
+
+		struct PerFrameDataCubemap
+		{
+			DirectX::XMFLOAT4X4 InverseViewProjection;
+		};
+		PerFrameDataCubemap m_PerFrameDataCubemap = {};
+		
+
 		std::vector<MeshComponent*> m_MeshComponents;
 
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
@@ -102,9 +114,9 @@ namespace Crystal {
 
 		bool m_bIsFullScreen = false;
 
-		ConstantBuffer m_PerFrameBuffer;
-		ConstantBuffer m_PerObjectBuffer;
-		ConstantBuffer m_CubemapCbuffer;
+		std::unique_ptr<ConstantBuffer> m_PerFrameBuffer;
+		std::unique_ptr<ConstantBuffer> m_PerObjectBuffer;
+		std::unique_ptr<ConstantBuffer> m_PerFrameBufferCubemap;
 
 		class World* m_World;
 
@@ -117,5 +129,10 @@ namespace Crystal {
 
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
 		std::unique_ptr<Texture> m_DepthBufferTexture;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
+
+
+
 	};
 }

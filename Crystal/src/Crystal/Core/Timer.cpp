@@ -32,5 +32,13 @@ namespace Crystal {
 		{
 			m_DeltaTime = 0.0;
 		}
+
+		m_ElapsedTime += m_DeltaTime;
 	}
+
+	void Timer::Reset()
+	{
+		m_ElapsedTime = 0.0f;
+	}
+
 }

@@ -2,7 +2,7 @@
 #include "Actor.h"
 #include "Crystal/GamePlay/Components/MeshComponent.h"
 #include "Crystal/GamePlay/Components/InputComponent.h"
-#include "Crystal/AssetManager/ShaderManager.h"
+#include "Crystal/Resources/ShaderManager.h"
 
 namespace Crystal {
 	class Pawn : public Actor
@@ -13,10 +13,17 @@ namespace Crystal {
 			////// TEMPORARY ////
 
 			/*텍스쳐를 만듭니다.*/
-			std::shared_ptr<Texture> albedoTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png");
+
+			/*std::shared_ptr<Texture> albedoTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png");
 			std::shared_ptr<Texture> roughnessTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Roughness.png");
 			std::shared_ptr<Texture> metalicTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Metallic.png");
-			std::shared_ptr<Texture> normalTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png");
+			std::shared_ptr<Texture> normalTexture = std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Normal.png");*/
+
+			std::shared_ptr<Texture> albedoTexture = std::make_shared<Texture>("assets/textures/Stormtrooper/Stormtrooper_D.png");
+			std::shared_ptr<Texture> roughnessTexture = std::make_shared<Texture>("assets/textures/22-rp_manuel_animated_001_dancing/rp_manuel_animated_001_rough.jpg");
+			std::shared_ptr<Texture> metalicTexture = std::make_shared<Texture>("assets/textures/22-rp_manuel_animated_001_dancing/rp_manuel_animated_001_mask01.jpg");
+			std::shared_ptr<Texture> normalTexture = std::make_shared<Texture>("assets/textures/22-rp_manuel_animated_001_dancing/rp_manuel_animated_001_norm.jpg");
+
 			/*각 텍스쳐 리소스에 대한 Shader Resource View를 만듭니다.*/
 			albedoTexture->CreateShaderResourceView(albedoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 			metalicTexture->CreateShaderResourceView(metalicTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
@@ -25,7 +32,9 @@ namespace Crystal {
 
 
 			/*텍스쳐들을 모아 하나의 머터리얼로 만듭니다.*/
-			std::shared_ptr<Material> pbrMaterial = std::make_shared<Material>(ShaderManager::Instance().GetShader("PBRShader"));
+			auto& shaderManager = ShaderManager::Instance();
+			std::shared_ptr<Material> pbrMaterial = std::make_shared<Material>(shaderManager.GetShader("PBRShader"));
+
 			pbrMaterial->Set("AlbedoTexture", albedoTexture);
 			pbrMaterial->Set("MetalicTexture", metalicTexture);
 			pbrMaterial->Set("RoughnessTexture", roughnessTexture);
@@ -33,7 +42,8 @@ namespace Crystal {
 
 
 			/*메쉬를 만들고 머터리얼을 지정합니다.*/
-			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>("assets/models/Megaphone_01.fbx");
+			//std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>("assets/models/Megaphone_01.fbx");
+			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>("assets/models/silly_dancing.fbx");
 			mesh->SetMaterial(pbrMaterial);
 		
 

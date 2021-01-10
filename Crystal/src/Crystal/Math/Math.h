@@ -108,7 +108,15 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 Translation(const DirectX::XMFLOAT3& translation)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixTranslation(translation.x, translation.y, translation.z);
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixTranslationFromVector(XMLoadFloat3(&translation));
+			XMStoreFloat4x4(&result, newMatrix);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT4X4 Scale(const DirectX::XMFLOAT3& scale)
+		{
+			DirectX::XMFLOAT4X4 result;
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixScalingFromVector(XMLoadFloat3(&scale));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}

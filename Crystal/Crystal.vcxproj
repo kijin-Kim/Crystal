@@ -172,8 +172,9 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
-    <ClInclude Include="src\Crystal\AssetManager\ConstantBuffer.h" />
-    <ClInclude Include="src\Crystal\AssetManager\Texture.h" />
+    <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
+    <ClInclude Include="src\Crystal\Resources\Descriptor.h" />
+    <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
@@ -203,12 +204,13 @@
     <ClInclude Include="src\Crystal\Renderer\Pass\Pass.h" />
     <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
     <ClInclude Include="src\Crystal\Renderer\Shader.h" />
-    <ClInclude Include="src\Crystal\AssetManager\ShaderManager.h" />
+    <ClInclude Include="src\Crystal\Resources\ShaderManager.h" />
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Crystal\AssetManager\ConstantBuffer.cpp" />
-    <ClCompile Include="src\Crystal\AssetManager\Texture.cpp" />
+    <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
     <ClCompile Include="src\Crystal\Core\State.cpp" />
@@ -226,7 +228,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pass\Pass.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Crystal\AssetManager\ShaderManager.cpp" />
+    <ClCompile Include="src\Crystal\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\cspch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

@@ -7,8 +7,8 @@
 
 #include "Crystal/GamePlay/World/World.h"
 
-#include "Crystal/AssetManager/ShaderManager.h"
-#include "Crystal/AssetManager/ConstantBuffer.h"
+#include "Crystal/Resources/ShaderManager.h"
+#include "Crystal/Resources/ConstantBuffer.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "../Core/ApplicationUtility.h"
@@ -77,6 +77,34 @@ namespace Crystal {
 
 		m_QuadVertexBuffer = std::make_unique<VertexBuffer>((void*)quadVertices, (UINT)(sizeof(float) * 2), (UINT)_countof(quadVertices));
 		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
+
+		m_WorldMat = Matrix4x4::Multiply(m_WorldMat, Matrix4x4::Scale({ 40.0f, 40.0f, 40.0f }));
+
+
+		//////////////////////////////////////////////////////////////////////////
+		{
+			auto boneMatrices = m_MeshComponents[0]->GetMesh()->GetBoneTransfroms();
+
+			auto size = boneMatrices.size() * sizeof(DirectX::XMFLOAT4X4);
+			size = (size + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
+			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr, IID_PPV_ARGS(&textureUploadBuffer));
+			CS_ASSERT(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
+
+
+			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+			cbvDesc.BufferLocation = textureUploadBuffer->GetGPUVirtualAddress();
+			cbvDesc.SizeInBytes = size;
+			m_Device->CreateConstantBufferView(&cbvDesc, destHeapHandle);
+
+			
+		}
+		//////////////////////////////////////////////////////////////////////////
+
 	}
 
 	void Renderer::Render()
@@ -102,59 +130,71 @@ namespace Crystal {
 		if (modelAngle[1] > 359.0f)
 			modelAngle[1] = 0.0f;
 
-		XMStoreFloat4x4(&m_WorldMat, DirectX::XMMatrixIdentity());
-
-		//XMStoreFloat4x4(&m_WorldMat, XMMatrixMultiply(XMLoadFloat4x4(&m_WorldMat),
-		//	DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(modelAngle[0]), DirectX::XMConvertToRadians(modelAngle[1]), DirectX::XMConvertToRadians(modelAngle[2]))));
-		//XMStoreFloat4x4(&m_WorldMat, XMMatrixTranspose(XMLoadFloat4x4(&m_WorldMat)));
-
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
 		
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(cameraComponent->GetViewProjection());
 		auto camPos = cameraComponent->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0f, 0.0f, 0.0f);
-		m_PerObjectData.World = m_WorldMat;
-
-		m_PerFrameBuffer.SetData((void*)&m_PerFrameData);
-		m_PerObjectBuffer.SetData((void*)&m_PerObjectData);
-
+		m_PerObjectData.World = Matrix4x4::Transpose(m_WorldMat);
+		//m_PerObjectData.World = m_MeshComponents[0]->GetMesh()->GetGlobalTransform();
+		m_PerObjectData.bToggleMetalicTexture = false;
+		m_PerObjectData.bToggleNormalTexture = false;
+		m_PerObjectData.bToggleRoughnessTexture = false;
+		
 		auto viewProj = cameraComponent->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
-		m_CubemapCbuffer.SetData((void*)&Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj)));
-	
+		m_PerFrameDataCubemap.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
 
-		
+		m_PerFrameBuffer->SetData((void*)&m_PerFrameData);
+		m_PerObjectBuffer->SetData((void*)&m_PerObjectData);
+		m_PerFrameBufferCubemap->SetData((void*)&m_PerFrameDataCubemap);
+
+
+		auto boneMatrices = m_MeshComponents[0]->GetMesh()->GetBoneTransfroms();
+		UINT8* bufferPointer = nullptr;
+		textureUploadBuffer->Map(0, nullptr, (void**)&bufferPointer);
+		memcpy(bufferPointer, boneMatrices.data(), boneMatrices.size() * sizeof(DirectX::XMFLOAT4X4));
 
 		{
-			for (const auto& meshComponent : m_MeshComponents)
+			/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
+			for (const auto meshComponent : m_MeshComponents)
 			{
-				auto material = meshComponent->GetMesh()->GetMaterial();
+				meshComponent->Update(timer.DeltaTime());
+				CS_LOG("%f", timer.ElapsedTime());
+				meshComponent->GetTransform();
 
+
+				auto material = meshComponent->GetMesh()->GetMaterial();
 				auto albedoTexture = material->GetTextureInput("AlbedoTexture");
 				auto roughnessTexture = material->GetTextureInput("RoughnessTexture");
 				auto metalicTexture = material->GetTextureInput("MetalicTexture");
 				auto normalTexture = material->GetTextureInput("NormalTexture");
 
-				/*임시 : 모든 텍스쳐들이 Descriptor Heap의 연속적인 공간 안에 있다고 가정함.*/
 				D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-				destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
+				D3D12_CPU_DESCRIPTOR_HANDLE destRangeStart[1] = { 
+					destHeapHandle
+				};
+				D3D12_CPU_DESCRIPTOR_HANDLE srcRangeStart[1] = {
+					albedoTexture->GetShaderResourceView(),
+				};
+				UINT destRangeSize[] = { 4 };
+				UINT srcRangeSize[] = { 4 };
+				m_Device->CopyDescriptors(1, destRangeStart, destRangeSize, 1, srcRangeStart, srcRangeSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-				m_Device->CopyDescriptorsSimple(4, destHeapHandle, albedoTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			}
 
 			/*CBV를 복사합니다.*/
-			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer.GetCpuDescriptorHandle(),
+			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer->GetCPUDescriptorHandle(),
 				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 			/*SRV를 복사합니다.*/
 			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			//m_Device->CopyDescriptorsSimple(4, destHeapHandle, m_AlbedoTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 4;
+			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 
 			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
@@ -166,7 +206,11 @@ namespace Crystal {
 
 		auto cmdList = m_CommandQueue->GetCommandList();
 
-		cmdList->SetPipelineState(m_PBRPipelineState.Get());
+		if(!m_MeshComponents[0]->GetMesh()->IsAnimated())
+			cmdList->SetPipelineState(m_PBRPipelineState.Get());
+		else
+			cmdList->SetPipelineState(m_PBRAnimatedPipelineState.Get());
+
 		cmdList->SetGraphicsRootSignature(m_NormalRootSignature.Get());
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -191,7 +235,7 @@ namespace Crystal {
 		//cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 		cmdList->ClearDepthStencilView(m_DepthBufferTexture->GetDepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer.GetGpuVirtualAddress());
+		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer->GetGPUVirtualAddress());
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
 		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootDescriptorTable(1, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
@@ -200,19 +244,19 @@ namespace Crystal {
 		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cmdList->SetGraphicsRootDescriptorTable(0, hCommon);*/
 
-		for (const auto& meshComponent : m_MeshComponents)
+		//for (const auto& meshComponent : m_MeshComponents)
 		{
-			DirectX::XMFLOAT4X4 world = meshComponent->GetTransform();
+			DirectX::XMFLOAT4X4 world = m_MeshComponents[0]->GetTransform();
 			m_PerObjectData.World = world;
-			meshComponent->GetMesh()->Render(cmdList);
+			m_MeshComponents[0]->GetMesh()->Render(cmdList);
 		}
 
 		//---------------Cubemap
 		cmdList->SetPipelineState(m_CubemapPipelineState.Get());
 		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature.Get());
-		cmdList->SetGraphicsRootConstantBufferView(0, m_CubemapCbuffer.GetGpuVirtualAddress());
+		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBufferCubemap->GetGPUVirtualAddress());
 		D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
+		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 		cmdList->SetGraphicsRootDescriptorTable(1, handle);
 		cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
 		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
@@ -399,7 +443,7 @@ namespace Crystal {
 
 		// #DirectX Swap Chain FullScreen Description
 		DXGI_SWAP_CHAIN_FULLSCREEN_DESC  swapChainFullscreenDesc;
-		swapChainFullscreenDesc.RefreshRate.Numerator = 0;
+		swapChainFullscreenDesc.RefreshRate.Numerator = 60;
 		swapChainFullscreenDesc.RefreshRate.Denominator = 1;
 		swapChainFullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -439,7 +483,7 @@ namespace Crystal {
 		rootParameter[0].InitAsConstantBufferView(0);
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
-		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 1);
 		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0);
 		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
 		// [0] Root Constant Buffer View     Per Frame Data ( CameraPosition, LightPosition etc.)
@@ -461,7 +505,7 @@ namespace Crystal {
 		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
-		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
+		D3D12_INPUT_ELEMENT_DESC staticInputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -486,7 +530,7 @@ namespace Crystal {
 		////////////////////////////////////////////////////
 
 		pipelineStateStream.RootSignature = m_NormalRootSignature.Get();
-		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
+		pipelineStateStream.InputLayout = { staticInputLayout, _countof(staticInputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		auto& shaderManager = ShaderManager::Instance();
@@ -518,8 +562,8 @@ namespace Crystal {
 		pipelineStateStream.RTVFormats = rtvFormat;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
-		hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
-		CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+		//hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
+		//CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 		///////////////////////////////////////////////////
 		//////////////ROOT SIGNATURE /////////////////////
@@ -569,6 +613,27 @@ namespace Crystal {
 
 		hr = m_Device->CreatePipelineState(&cubemapPipelineStreamDesc, IID_PPV_ARGS(&m_CubemapPipelineState));
 		CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+
+
+		////////////////////////////////////////////////////
+		////////PIPELINE STATE//////////////////////////////
+		////////////////////////////////////////////////////
+
+		D3D12_INPUT_ELEMENT_DESC animatedInputLayout[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"BONEIDS", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		};
+
+		pipelineStateStream.InputLayout = { animatedInputLayout, _countof(animatedInputLayout) };
+		hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRAnimatedPipelineState));
+		CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+
+
 	}
 
 	void Renderer::loadResources()
@@ -579,8 +644,6 @@ namespace Crystal {
 
 		auto& shaderManager = ShaderManager::Instance();
 		/*auto& textureManager = TextureManager::Instance();*/
-		auto& constantBufferPoolManager = ConstantBufferPoolManager::Instance();
-
 
 		/*텍스쳐 리소스를 로드합니다.*/
 		m_CubemapTexture = std::make_unique<Texture>("assets/textures/cubemaps/cubemap.dds");
@@ -592,12 +655,9 @@ namespace Crystal {
 		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
 		
-		m_PerFrameBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerFrameBuffer));
-		m_PerObjectBuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_PerObjectBuffer));
-		m_CubemapCbuffer = constantBufferPoolManager.GetConstantBuffer(sizeof(m_CubemapCbuffer));
-
-		Material mat(shaderManager.GetShader("PBRShader"));
-		mat.Set("AlbedoTexture", std::make_shared<Texture>("assets/textures/Megaphone/Megaphone_01_16-bit_Diffuse.png"));
+		m_PerFrameBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerFrameData));
+		m_PerObjectBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerObjectData));
+		m_PerFrameBufferCubemap= std::make_unique<ConstantBuffer>(sizeof(m_PerFrameDataCubemap));
 	}
 
 	void Renderer::ChangeDisplayMode()

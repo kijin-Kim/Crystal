@@ -23,11 +23,12 @@ namespace Crystal {
 	{
 		OutputDebugStringA(prefixMsg);
 		OutputDebugStringA(msg);
+		OutputDebugStringA("\n");
 	}
 }
 
 #define CS_FORMAT(...) string_format(__VA_ARGS__)
-#define CS_LOG(...) Crystal::Log("Crystal Log : ",__VA_ARGS__)
+#define CS_LOG(...) Crystal::Log("Crystal Log : ", CS_FORMAT(__VA_ARGS__).c_str())
 #define CS_ERROR(...) Crystal::Log("Crystal Error : ", CS_FORMAT(__VA_ARGS__).c_str())
 
 #ifdef CS_DEBUG

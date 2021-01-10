@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "Crystal/AssetManager/Texture.h"
+#include "Crystal/Resources/Texture.h"
 #include "Shader.h"
 
 namespace Crystal {
@@ -17,6 +17,7 @@ namespace Crystal {
 		/*void Set(const std::string& inputBindName, const DirectX::XMFLOAT3& value) {}*/
 
 		Texture* GetTextureInput(const std::string& inputBindName);
+		Shader* GetShader() const { return m_Shader.get(); }
 
 	private:
 		using TextureInputs = std::map<std::string, std::shared_ptr<Texture>>;

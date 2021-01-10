@@ -1,7 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Crystal/AssetManager/ConstantBuffer.h"
+#include "Crystal/Resources/ConstantBuffer.h"
 #include "Component.h"
+#include "Crystal/Math/Math.h"
 
 namespace Crystal {
 	class TransformComponent : public Component
@@ -27,10 +28,10 @@ namespace Crystal {
 		void AttachToComponent(TransformComponent* parentComponent) { m_Parent = parentComponent; }
 		TransformComponent* GetParent() const { return m_Parent; }
 
-		DirectX::XMFLOAT4X4 GetTransform() { return m_Transform; }
+		const DirectX::XMFLOAT4X4& GetTransform() { return m_Transform; }
 
 	private:
 		TransformComponent* m_Parent = nullptr;
-		DirectX::XMFLOAT4X4 m_Transform;
+		DirectX::XMFLOAT4X4 m_Transform = Matrix4x4::Identity();
 	};
 }

@@ -19,7 +19,7 @@ namespace Crystal {
 
 		UINT compileFlag = 0;
 #ifdef CS_DEBUG
-		compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+		compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_ENABLE_STRICTNESS;
 #endif
 
 		switch (type)
@@ -66,8 +66,7 @@ namespace Crystal {
 			hr = shaderReflection->GetResourceBindingDesc(i, &shaderInputBindDesc);
 			if (FAILED(hr))
 				break;
-			auto it = m_ShaderInputInfos.emplace(shaderInputBindDesc.Name, shaderInputBindDesc.Type);
-			CS_ASSERT(it.second, "셰이더 리플렉션 실패!");
+			m_ShaderInputInfos.emplace(shaderInputBindDesc.Name, shaderInputBindDesc.Type);
 		}
 		
 		

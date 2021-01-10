@@ -5,6 +5,8 @@ struct VS_INPUT
     float3 Normal : NORMAL;
     float3 Tangent : TANGENT;
     float3 BiTangent : BITANGENT;
+    uint4 BoneIDs : BONEIDS;
+    float4 BoneWeights : BONEWEIGHTS;
 };
 
 struct PS_INPUT
@@ -21,22 +23,37 @@ struct PS_INPUT
 
 cbuffer PerFrameData : register(b0)
 {
-    float4x4 ViewProjection;
-    float4 WorldCameraPosition;
-    float4 WorldLightPosition;
+    float4x4 ViewProjection : packoffset(c0);
+    float4 WorldCameraPosition : packoffset(c4);
+    float4 WorldLightPosition : packoffset(c5);
 }
 
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
+    bool bToggleAlbedoTexture;
+    bool bToggleMetalicTexture;
+    bool bToggleRoughnessTexture;
+    bool bToggleNormalTexture;
+}
+cbuffer MatrixPalette : register(b2)
+{
+    float4x4 Bones[52];
 }
 
 
 PS_INPUT vsMain(VS_INPUT input)
 {
+    float4x4 boneTransform = Bones[input.BoneIDs[0]] * input.BoneWeights[0];
+    boneTransform += Bones[input.BoneIDs[1]] * input.BoneWeights[1];
+    boneTransform += Bones[input.BoneIDs[2]] * input.BoneWeights[2];
+    boneTransform += Bones[input.BoneIDs[3]] * (1.0f - (input.BoneWeights[2] + input.BoneWeights[1] + input.BoneWeights[0]));
+    
+    float3 localPosition = mul(float4(input.Position, 1.0f), boneTransform);
+    
     PS_INPUT output;
-    output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
-    output.WorldPosition = mul(float4(input.Position, 1.0f), World);
+    output.Position = mul(mul(float4(localPosition, 1.0f), World), ViewProjection);
+    output.WorldPosition = mul(float4(localPosition, 1.0f), World);
 
     output.WorldLightPosition = WorldLightPosition;
     output.WorldCameraPosition = WorldCameraPosition;
@@ -111,14 +128,13 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 lightColor = 10.0f;
-    float3 albedo = pow(AlbedoTexture.Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f,2.2f));
-    float roughness = RoughnessTexture.Sample(normalSampler, input.TexCoord).r;
-    float metallic = MetalicTexture.Sample(normalSampler, input.TexCoord).r;
+    float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : float3(0.0f, 0.0f, 0.0f);
+    float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(normalSampler, input.TexCoord).r : 0.0f;
+    float metallic = bToggleMetalicTexture ? MetalicTexture.Sample(normalSampler, input.TexCoord).r : 0.0f;
     int lightCount = 1;
     ////////////////
 
-    //float3 N = normalize(input.WorldNormal);
-    float3 N = normalize(NormalTexture.Sample(normalSampler, input.TexCoord).rgb * 2.0f - 1.0f);
+    float3 N = bToggleNormalTexture ? normalize(NormalTexture.Sample(normalSampler, input.TexCoord).rgb * 2.0f - 1.0f) : normalize(input.WorldNormal);
     N = normalize(mul(N, input.TangentToWorld));
     float3 V = normalize(input.WorldCameraPosition - input.WorldPosition).xyz;
 
