@@ -179,7 +179,7 @@
     <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
     <ClInclude Include="src\Crystal\Core\Logger.h" />
-    <ClInclude Include="src\Crystal\Core\State.h" />
+    <ClInclude Include="src\Crystal\Core\Layer.h" />
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Actor.h" />
@@ -213,7 +213,7 @@
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
-    <ClCompile Include="src\Crystal\Core\State.cpp" />
+    <ClCompile Include="src\Crystal\Core\Layer.cpp" />
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />
@@ -236,6 +236,9 @@
   <ItemGroup>
     <ProjectReference Include="external\DirectXTex\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
+    </ProjectReference>
+    <ProjectReference Include="external\imgui\ImGui.vcxproj">
+      <Project>{ffabe88a-f7c7-4134-b287-54119e3d0ef4}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

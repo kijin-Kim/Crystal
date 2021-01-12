@@ -34,10 +34,10 @@ namespace Crystal {
 		wndClass.cbClsExtra = 0;
 		wndClass.cbWndExtra = 0;
 		wndClass.hInstance = hInstance;
-		wndClass.hIcon = NULL;
-		wndClass.hCursor = NULL;
+		wndClass.hIcon = nullptr;
+		wndClass.hCursor = nullptr;
 		wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		wndClass.lpszMenuName = NULL;
+		wndClass.lpszMenuName = nullptr;
 		wndClass.lpszClassName = L"Hello Direct3d 12!";
 
 		RegisterClass(&wndClass);
@@ -48,13 +48,20 @@ namespace Crystal {
 			L"Hello Application!",
 			WS_OVERLAPPEDWINDOW,
 			0, 0, width, height,
-			NULL, NULL, hInstance, this);
+			nullptr, nullptr, hInstance, this);
 
 		CS_ASSERT(m_Handle, "윈도우를 생성하는데 실패하였습니다");
-
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
 		ShowCursor(false);
+
+		/*임시 : 더 좋은 방법이 있을것*/
+		RECT windowRect = {};
+		GetClientRect(m_Handle, &windowRect);
+		POINT windowPos = { windowRect.left, windowRect.top };
+		ScreenToClient(m_Handle, &windowPos);
+		SetWindowPos(m_Handle, nullptr, windowPos.x, 0, width, height, SWP_SHOWWINDOW);
+
 	}
 
 	WindowsWindow::~WindowsWindow()

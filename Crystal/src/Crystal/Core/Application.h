@@ -10,7 +10,7 @@
 #include "Crystal/Renderer/Buffers.h"
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"
-#include "Crystal/Core/State.h"
+#include "Crystal/Core/Layer.h"
 
 //----
 #include "Timer.h"
@@ -40,6 +40,5 @@ namespace Crystal {
 
 #define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
 {\
-	Crystal::ApplicationUtility::Init();\
 	return new x(hInstance, width, height);\
 }

@@ -1,6 +1,6 @@
 #include <Crystal.h>
 #include <Crystal/Core/EntryPoint.h>
-#include "MainState.h"
+#include "MainLayer.h"
 
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
@@ -11,7 +11,7 @@ class GameApplication : public Crystal::Application
 public:
 	GameApplication(HINSTANCE hIsntance, int width, int height) : Crystal::Application(hIsntance, width, height)
 	{
-		Crystal::ApplicationUtility::PushState(new MainState());
+		Crystal::ApplicationUtility::PushLayer(new MainLayer());
 	}
 
 	/*virtual void OnUpdate() {}

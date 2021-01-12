@@ -45,7 +45,7 @@ namespace Crystal {
 	void Application::OnUpdate()
 	{
 		m_MainTimer.Tick();
-		for (State* state : ApplicationUtility::GetStateStack())
+		for (Layer* state : ApplicationUtility::GetLayerStack())
 			state->Update(m_MainTimer.DeltaTime());
 	}
 

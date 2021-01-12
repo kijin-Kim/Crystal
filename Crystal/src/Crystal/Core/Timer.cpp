@@ -8,6 +8,7 @@ namespace Crystal {
 		QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
 
 		m_SecondsPerCount = 1.0 / (double)countsPerSec;
+		
 	}
 
 	void Timer::Tick()
@@ -17,7 +18,7 @@ namespace Crystal {
 			m_DeltaTime = 0.0;
 			return;
 		}
-
+		
 		UINT64 currentTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 		m_CurrentTime = (double)currentTime;

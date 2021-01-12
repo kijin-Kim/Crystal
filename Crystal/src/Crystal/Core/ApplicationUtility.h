@@ -1,5 +1,5 @@
 #pragma once
-#include "State.h"
+#include "Layer.h"
 
 namespace Crystal {
 	/*전역 유틸리티 제공 클래스*/
@@ -9,10 +9,9 @@ namespace Crystal {
 	class ApplicationUtility
 	{
 	public:
-		static void Init();
-		static StateStack& GetStateStack();
-		static void PushState(State* State);
-		static void PopState(State* State);
+		static LayerStack& GetLayerStack();
+		static void PushLayer(Layer* layer);
+		static void PopLayer(Layer* layer);
 
 		static PlayerController& GetPlayerController();
 
@@ -21,7 +20,7 @@ namespace Crystal {
 		~ApplicationUtility() = delete;
 
 	private:
-		static StateStack s_StateStack;
+		static LayerStack s_LayerStack;
 		static PlayerController s_PlayerController;
 	};
 }

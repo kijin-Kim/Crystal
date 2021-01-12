@@ -3,26 +3,23 @@
 #include "Crystal/Gameplay/Controllers/PlayerController.h"
 
 namespace Crystal {
-	StateStack ApplicationUtility::s_StateStack;
+	LayerStack ApplicationUtility::s_LayerStack;
 	PlayerController ApplicationUtility::s_PlayerController;
 
-	void ApplicationUtility::Init()
+
+	LayerStack& ApplicationUtility::GetLayerStack()
 	{
+		return s_LayerStack;
 	}
 
-	StateStack& ApplicationUtility::GetStateStack()
+	void ApplicationUtility::PushLayer(Layer* layer)
 	{
-		return s_StateStack;
+		s_LayerStack.PushLayer(layer);
 	}
 
-	void ApplicationUtility::PushState(State* State)
+	void ApplicationUtility::PopLayer(Layer* layer)
 	{
-		s_StateStack.PushState(State);
-	}
-
-	void ApplicationUtility::PopState(State* State)
-	{
-		s_StateStack.PopState(State);
+		s_LayerStack.PopLayer(layer);
 	}
 
 	PlayerController& ApplicationUtility::GetPlayerController()

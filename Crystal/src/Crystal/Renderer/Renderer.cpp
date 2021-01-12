@@ -15,6 +15,7 @@
 #include "../GamePlay/Actors/CameraPawn.h"
 #include "Material.h"
 
+
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
 	{
@@ -25,6 +26,8 @@ namespace Crystal {
 		createDepthStencilView();
 		loadResources();
 		createPipelineStates();
+
+		ImGui::CreateContext();
 
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
@@ -160,10 +163,12 @@ namespace Crystal {
 			/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 			for (const auto meshComponent : m_MeshComponents)
 			{
-				meshComponent->Update(timer.DeltaTime());
-				CS_LOG("%f", timer.ElapsedTime());
+				if (timer.ElapsedTime() >= 1 / 30.0f)
+				{
+					meshComponent->Update(timer.DeltaTime());
+					timer.Reset();
+				}
 				meshComponent->GetTransform();
-
 
 				auto material = meshComponent->GetMesh()->GetMaterial();
 				auto albedoTexture = material->GetTextureInput("AlbedoTexture");

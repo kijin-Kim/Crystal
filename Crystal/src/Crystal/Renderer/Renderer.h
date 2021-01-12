@@ -42,7 +42,7 @@ namespace Crystal {
 	private:
 		Renderer() = default;
 		~Renderer() = default;
-
+		
 		void createDevice();
 		void createRenderTargetViewFromSwapChain();
 		void createDepthStencilView();

@@ -17,22 +17,20 @@ namespace Crystal {
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		
-		auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, wParam, lParam);
-		ProcessAxisMappedInput(keyCode, 1.0f);
 
+		/*액션 매핑을 처리합니다.*/
+		auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, wParam, lParam);
 		ProcessActionMappedInput(uMsg, keyCode, lParam, keyStatus);
 
 		MouseCodeWithDelta mouseCodes = GetCrystalMouseCodeWithDelta(uMsg, lParam);
-		ProcessAxisMappedInput(mouseCodes.MouseX.first, mouseCodes.MouseX.second);
-		ProcessAxisMappedInput(mouseCodes.MouseY.first, mouseCodes.MouseY.second);
-		ProcessAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
-		ProcessAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
 		ProcessActionMappedInput(uMsg, mouseCodes.MouseX.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.MouseY.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
 
 
+
+		/*액시스 매핑을 처리합니다.*/
 		static UCHAR pKeysBuffer[256];
 		for (int i = 0; i < 256; i++)
 		{
@@ -41,7 +39,13 @@ namespace Crystal {
 				auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, i, lParam);
 				ProcessAxisMappedInput(keyCode, 1.0f);
 			}
-		}		
+		}
+		ProcessAxisMappedInput(mouseCodes.MouseX.first, mouseCodes.MouseX.second);
+		ProcessAxisMappedInput(mouseCodes.MouseY.first, mouseCodes.MouseY.second);
+		ProcessAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
+		ProcessAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
+
+
 		return false;
 	}
 

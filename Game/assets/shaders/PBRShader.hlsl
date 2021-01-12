@@ -57,7 +57,7 @@ PS_INPUT vsMain(VS_INPUT input)
 
     output.WorldLightPosition = WorldLightPosition;
     output.WorldCameraPosition = WorldCameraPosition;
-    output.WorldNormal = mul(input.Normal, (float3x3)World);
+    output.WorldNormal = mul(mul(float4(input.Normal, 1.0f), boneTransform), World).xyz;
     output.TexCoord = input.TexCoord;
     
     float3x3 TBN = float3x3(input.Tangent, input.BiTangent, input.Normal);
