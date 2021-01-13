@@ -1,2 +1,0 @@
-D:\dev\Crystal\x64\Debug\ImGui.pdb
-D:\dev\Crystal\Crystal\external\imgui\x64\Debug\ImGui.pdb

@@ -30,60 +30,53 @@ namespace Crystal {
 		}
 	};
 
+	enum class EInputMode
+	{
+		IM_Game, // 게임 만
+		IM_UI, // UI 만
+	};
+
 	class PlayerController : public Controller
 	{
 	public:
-		PlayerController() = default;
-		virtual ~PlayerController()
-		{
-			for (InputComponent* inputComponent : m_InputComponents)
-				delete inputComponent;
-		}
+		PlayerController();
+		virtual ~PlayerController() = default;
 
-		void AddAxisMapping(const std::string& axisName, int key, float scale)
-		{
-			auto result = m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
-			CS_ASSERT(result.second, "AxisMapping에 실패하였습니다.");
-		}
+		void AddAxisMapping(const std::string& axisName, int key, float scale);
+		void AddActionMapping(const std::string& actionName, const ActionMapping& key);
 
-		void AddActionMapping(const std::string& actionName, const ActionMapping& key)
-		{
-			auto result = m_ActionMap.insert(std::make_pair(key, actionName));
-			CS_ASSERT(result.second, "ActionMapping에 실패하였습니다.");
-		}
+		/*게임컨트롤러가 특정 폰의 입력을 받게합니다*/
+		virtual void Possess(Pawn* pawn) override;
+		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-		virtual void Possess(Pawn* pawn) override
-		{
-			Controller::Possess(pawn);
-			m_InputComponents.push_back(new InputComponent());
-			pawn->SetupInputComponent(m_InputComponents.back());
-		}
+		void ProcessPitchInput(float value);
+		void ProcessYawInput(float value);
 
-		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override
-		{
-			bool bHandled = false;
-			for (InputComponent* inputComponent : m_InputComponents)
-			{
-				bHandled = inputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
-				if (bHandled)
-					break;
-			}
-			return bHandled;
-		}
 
-		void SetMainCamera(CameraComponent* cameraComponent) { m_MainCamera = cameraComponent; }
-		CameraComponent* GetMainCamera() const { return m_MainCamera; }
+		void SetInputMode(EInputMode inputMode) { m_InputMode = inputMode; }
+		/*UI모드와 Game모드를 특정 키를 통하여 스위치 할 수 있게 합니다. 디폴트 오른쪽 마우스 키*/
+		void EnableModeSwitching(bool bEnable, int64_t keyCode = Crystal::Mouse::Right);
+
+		void SetMainCamera(std::shared_ptr<CameraComponent> cameraComponent) { m_MainCamera = std::move(cameraComponent); }
+		CameraComponent* GetMainCamera() const { return m_MainCamera.get(); }
 
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
+
+
 	private:
-		std::vector<InputComponent*> m_InputComponents;
+		/*유저 인터페이스 인풋*/
+		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
+		/*게임모드 인풋*/
+		std::unique_ptr<InputComponent> m_GameInputComponent;
 		/* KeyCode, AxisName, Scale */
 		std::map<int64_t, std::pair<std::string, float>> m_AxisMap;
 		/* KeyCode, ActionName */
 		std::map<ActionMapping, std::string, ActionKeyCompare> m_ActionMap;
+		std::shared_ptr<CameraComponent> m_MainCamera = nullptr;
 
-		CameraComponent* m_MainCamera = nullptr;
+		EInputMode m_InputMode = EInputMode::IM_UI;
+		bool m_bIsSwitchableMode = false;
 	};
 }

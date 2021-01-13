@@ -20,6 +20,7 @@ namespace Crystal {
 
 	void Application::Run()
 	{
+		Start();
 		while (m_bShouldRun)
 		{
 			int msgCount = 0;
@@ -40,13 +41,6 @@ namespace Crystal {
 			Renderer::Instance().Render();
 			
 		}
-	}
-
-	void Application::OnUpdate()
-	{
-		m_MainTimer.Tick();
-		for (Layer* state : ApplicationUtility::GetLayerStack())
-			state->Update(m_MainTimer.DeltaTime());
 	}
 
 	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

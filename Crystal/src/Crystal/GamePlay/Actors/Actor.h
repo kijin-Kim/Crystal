@@ -17,9 +17,8 @@ namespace Crystal {
 		void UpdateTransfromData();
 
 	protected:
-		TransformComponent* m_MainComponent = nullptr;
-
+		std::shared_ptr<TransformComponent> m_MainComponent = nullptr;
 	private:
-		std::vector<TransformComponent*> m_TransformComponents;
+		std::vector<std::shared_ptr<TransformComponent>> m_TransformComponents;
 	};
 }

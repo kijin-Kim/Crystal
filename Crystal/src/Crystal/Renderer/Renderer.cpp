@@ -4,9 +4,6 @@
 #include "DirectXTex/DirectXTex.h"
 #include <iostream>
 
-
-#include "Crystal/GamePlay/World/World.h"
-
 #include "Crystal/Resources/ShaderManager.h"
 #include "Crystal/Resources/ConstantBuffer.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
@@ -15,6 +12,8 @@
 #include "../GamePlay/Actors/CameraPawn.h"
 #include "Material.h"
 
+#include "imgui/backends/imgui_impl_dx12.h"
+#include "imgui/backends/imgui_impl_win32.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -26,8 +25,9 @@ namespace Crystal {
 		createDepthStencilView();
 		loadResources();
 		createPipelineStates();
+		
+		
 
-		ImGui::CreateContext();
 
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
@@ -39,31 +39,47 @@ namespace Crystal {
 		HRESULT hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
 		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
+
+		/*ImGui 구현*/
+		{
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+			//io.ConfigViewportsNoAutoMerge = true;
+			//io.ConfigViewportsNoTaskBarIcon = true;
+
+			// Setup Dear ImGui style
+			ImGui::StyleColorsDark();
+			//ImGui::StyleColorsClassic();
+
+			// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+			ImGuiStyle& style = ImGui::GetStyle();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				style.WindowRounding = 0.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			}
+
+
+			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			descriptorHeapDesc.NumDescriptors = 1;
+			descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+			descriptorHeapDesc.NodeMask = 0;
+
+			HRESULT hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_ImGuiHeap));
+			CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+			// Setup Platform/Renderer backends
+			ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
+			ImGui_ImplDX12_Init(m_Device.Get(), 2,
+				DXGI_FORMAT_R8G8B8A8_UNORM, m_ImGuiHeap.Get(),
+				m_ImGuiHeap->GetCPUDescriptorHandleForHeapStart(),
+				m_ImGuiHeap->GetGPUDescriptorHandleForHeapStart());
+		}
 		
-
-		////////////////////////////////////////////////////
-		////////TEST OBJECTS///////////////////////////////
-		///////////////////////////////////////////////////
-
-		m_World = new World();
-		Pawn* pawn = m_World->SpawnActor<Pawn>();
-		CameraPawn* cameraPawn = m_World->SpawnActor<CameraPawn>();
-		ApplicationUtility::GetPlayerController().Possess(cameraPawn);
-
-		ApplicationUtility::GetPlayerController().AddAxisMapping("MoveForward", Keyboard::W, 1.0f);
-		ApplicationUtility::GetPlayerController().AddAxisMapping("MoveForward", Keyboard::S, -1.0f);
-		ApplicationUtility::GetPlayerController().AddAxisMapping("MoveRight", Keyboard::D, 1.0f);
-		ApplicationUtility::GetPlayerController().AddAxisMapping("MoveRight", Keyboard::A, -1.0f);
-		ApplicationUtility::GetPlayerController().AddAxisMapping("Turn", Mouse::X, 1.0f);
-		ApplicationUtility::GetPlayerController().AddAxisMapping("LookUp", Mouse::Y, 1.0f);
-
-		ActionMapping actionKey = {};
-		actionKey.CrystalCode = Keyboard::Left;
-		actionKey.bAltDown = true;
-		actionKey.bCtrlDown = true;
-		actionKey.bShiftDown = true;
-		ApplicationUtility::GetPlayerController().AddActionMapping("Jump", actionKey);
-
 
 
 		float quadVertices[] = {
@@ -86,9 +102,9 @@ namespace Crystal {
 
 		//////////////////////////////////////////////////////////////////////////
 		{
-			auto boneMatrices = m_MeshComponents[0]->GetMesh()->GetBoneTransfroms();
 
-			auto size = boneMatrices.size() * sizeof(DirectX::XMFLOAT4X4);
+			auto bioneMatricesSize = 100;
+			auto size = bioneMatricesSize * sizeof(DirectX::XMFLOAT4X4);
 			size = (size + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
 			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -112,26 +128,10 @@ namespace Crystal {
 
 	void Renderer::Render()
 	{
-		//////////////////////////////////////////
-		///// UPDATE /////////////////////////////
-		//////////////////////////////////////////
-
-		static float angle = 0.0f;
-		angle += timer.DeltaTime();
-		//m_Camera->SetLookAt(DirectX::XMFLOAT3(0.0f, 0.0f, 0 + cos(angle)));
-
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 		ChangeDisplayMode();
 
-		//TEMP///
-		////////////
 
-		timer.Tick();
-		m_World->Update(timer.DeltaTime());
-		static float modelAngle[] = { 0.0f, 90.0f, 0.0f };
-		modelAngle[1] += 10.0f * timer.DeltaTime();
-		if (modelAngle[1] > 359.0f)
-			modelAngle[1] = 0.0f;
 
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
 		
@@ -163,11 +163,7 @@ namespace Crystal {
 			/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 			for (const auto meshComponent : m_MeshComponents)
 			{
-				if (timer.ElapsedTime() >= 1 / 30.0f)
-				{
-					meshComponent->Update(timer.DeltaTime());
-					timer.Reset();
-				}
+
 				meshComponent->GetTransform();
 
 				auto material = meshComponent->GetMesh()->GetMaterial();
@@ -202,6 +198,61 @@ namespace Crystal {
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 
 			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		}
+
+
+		{
+
+			// Start the Dear ImGui frame
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+
+			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+			bool show_another_window = false;
+			bool show_demo_window = false;
+			float clear_color[3] = { 0.0f, 0.0f, 0.0f };
+			if (show_demo_window)
+				ImGui::ShowDemoWindow(&show_demo_window);
+
+			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+			{
+				static float f = 0.0f;
+				static int counter = 0;
+
+				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+				ImGui::Checkbox("Another Window", &show_another_window);
+
+				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+					counter++;
+				ImGui::SameLine();
+				ImGui::Text("counter = %d", counter);
+
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::End();
+			}
+
+			// 3. Show another simple window.
+			if (show_another_window)
+			{
+				ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+				ImGui::Text("Hello from another window!");
+				if (ImGui::Button("Close Me"))
+					show_another_window = false;
+				ImGui::End();
+			}
+
+			// Rendering
+			ImGui::Render();
+
+
+
 		}
 
 
@@ -267,6 +318,14 @@ namespace Crystal {
 		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
 
+
+		// IMGUI RENDER
+		{
+			ID3D12DescriptorHeap* descriptorHeaps[] = { m_ImGuiHeap.Get() };
+			cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
+		}
+
 		resourceBarrier.Transition.pResource = m_ColorBufferTextures[m_RtvIndex]->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -274,6 +333,16 @@ namespace Crystal {
 		cmdList->ResourceBarrier(1, &resourceBarrier);
 	
 		m_CommandQueue->Execute(cmdList);
+
+		{
+			// Update and Render additional Platform Windows
+			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault(nullptr, (void*)cmdList.Get());
+			}
+		}
+
 
 		DXGI_PRESENT_PARAMETERS presentParameters;
 		presentParameters.DirtyRectsCount = 0;

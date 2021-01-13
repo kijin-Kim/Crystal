@@ -11,10 +11,8 @@
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/Core/Layer.h"
-
-//----
-#include "Timer.h"
-//----
+#include "Crystal/GamePlay/World/World.h"
+#include "Crystal/Core/Timer.h"
 
 namespace Crystal {
 	class Application
@@ -23,16 +21,18 @@ namespace Crystal {
 		Application(HINSTANCE hInstance, int width, int height);
 		virtual ~Application() = default;
 
+		virtual void Start() {}
+
 		void Run();
 
-		virtual void OnUpdate();
+		virtual void OnUpdate() {}
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	private:
 		bool m_bShouldRun = true;
 		WindowsWindow* m_Window;
-		Timer m_MainTimer;
+		
 	};
 
 	Application* CreateApplication(HINSTANCE hInstance);

@@ -9,13 +9,22 @@
 
 //https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template<typename ... Args>
-std::string string_format(const std::string& format, Args ... args)
-{
-	int size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-	if (size <= 0) { throw std::runtime_error("Error during formatting."); }
-	std::unique_ptr<char[]> buf(new char[size]);
-	snprintf(buf.get(), size, format.c_str(), args ...);
-	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+std::string string_format(const std::string fmt_str, ...) {
+	int final_n, n = ((int)fmt_str.size()) * 2; /* Reserve two times as much as the length of the fmt_str */
+	std::unique_ptr<char[]> formatted;
+	va_list ap;
+	while (true) {
+		formatted = std::make_unique<char[]>(n); /* Wrap the plain char array into the unique_ptr */
+		strcpy(&formatted[0], fmt_str.c_str());
+		va_start(ap, fmt_str);
+		final_n = vsnprintf(&formatted[0], n, fmt_str.c_str(), ap);
+		va_end(ap);
+		if (final_n < 0 || final_n >= n)
+			n += abs(final_n - n + 1);
+		else
+			break;
+	}
+	return std::string(formatted.get());
 }
 
 namespace Crystal {

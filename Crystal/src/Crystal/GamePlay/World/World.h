@@ -11,19 +11,19 @@ namespace Crystal {
 		Level() = default;
 		~Level() = default;
 
-		void AddActor(Actor* actor) { m_Actors.push_back(actor); }
+		void AddActor(Actor* actor) { m_Actors.emplace_back(actor); }
 		//void RemoveActor() {}
 
 		void Update(float deltaTime)
 		{
-			for (const auto actor : m_Actors)
+			for (const auto& actor : m_Actors)
 				actor->Update(deltaTime);
-			for (const auto actor : m_Actors)
+			for (const auto& actor : m_Actors)
 				actor->UpdateTransfromData();
 		}
 
 	private:
-		std::vector<Actor*> m_Actors;
+		std::vector<std::unique_ptr<Actor>> m_Actors;
 	};
 
 	class World final

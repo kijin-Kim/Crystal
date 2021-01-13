@@ -1,7 +1,9 @@
 #pragma once
 #include "Pawn.h"
 #include "Crystal/GamePlay/Components/CameraComponent.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/Math/Math.h"
+#include "Crystal/Core/ApplicationUtility.h"
 
 namespace Crystal {
 	class CameraPawn : public Pawn
@@ -9,7 +11,7 @@ namespace Crystal {
 	public:
 		CameraPawn()
 		{
-			CameraComponent* cameraComponent = new CameraComponent();
+			auto cameraComponent = std::make_shared<CameraComponent>();
 			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
 			cameraComponent->SetFieldOfView(60.0f);
 			cameraComponent->SetNearPlane(0.1f);
@@ -43,25 +45,24 @@ namespace Crystal {
 			inputComponent->BindAxis("MoveRight", CS_AXIS_FN(CameraPawn::MoveRight));
 			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::AddControllerPitchInput));
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::AddControllerYawInput));
+
+			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginMouseLock));
+			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Released, CS_ACTION_FN(CameraPawn::EndMouseLock));
 		}
 
 		void AddControllerYawInput(float value)
 		{
-			auto mainCamera = ((CameraComponent*)m_MainComponent);
-			auto position = mainCamera->GetWorldPosition();
-			mainCamera->RotateRollPitchYaw({ 0.0f, 0.0f,value * 0.05f });
+			ApplicationUtility::GetPlayerController().ProcessYawInput(value);
 		}
 
 		void AddControllerPitchInput(float value)
 		{
-			auto mainCamera = ((CameraComponent*)m_MainComponent);
-			auto position = mainCamera->GetWorldPosition();
-			mainCamera->RotateRollPitchYaw({ 0.0f, -value * 0.05f, 0.0f });
+			ApplicationUtility::GetPlayerController().ProcessPitchInput(value);
 		}
 
 		void MoveForward(float value)
 		{
-			auto mainCamera = ((CameraComponent*)m_MainComponent);
+			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
 			auto position = mainCamera->GetWorldPosition();
 			auto forward = mainCamera->GetForward();
 
@@ -71,7 +72,7 @@ namespace Crystal {
 
 		void MoveRight(float value)
 		{
-			auto mainCamera = ((CameraComponent*)m_MainComponent);
+			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
 			auto position = mainCamera->GetWorldPosition();
 			auto right = mainCamera->GetRight();
 
@@ -79,5 +80,18 @@ namespace Crystal {
 			mainCamera->SetWorldPosition(newPosition);
 		}
 
+		void BeginMouseLock()
+		{
+			m_bMouseIsLocked = true;
+			//ApplicationUtility::GetPlayerController()->LockMouseCursor();
+		}
+
+		void EndMouseLock()
+		{
+			m_bMouseIsLocked = false;
+		}
+
+	private:
+		bool m_bMouseIsLocked = false;
 	};
 }

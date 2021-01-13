@@ -2,6 +2,11 @@
 #include "WindowsWindow.h"
 #include "Application.h"
 
+#include "imgui/backends/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
 
 namespace Crystal {
 	LRESULT CALLBACK WndProcProxy(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -53,7 +58,6 @@ namespace Crystal {
 		CS_ASSERT(m_Handle, "윈도우를 생성하는데 실패하였습니다");
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
-		ShowCursor(false);
 
 		/*임시 : 더 좋은 방법이 있을것*/
 		RECT windowRect = {};
@@ -61,7 +65,6 @@ namespace Crystal {
 		POINT windowPos = { windowRect.left, windowRect.top };
 		ScreenToClient(m_Handle, &windowPos);
 		SetWindowPos(m_Handle, nullptr, windowPos.x, 0, width, height, SWP_SHOWWINDOW);
-
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -71,6 +74,8 @@ namespace Crystal {
 
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+			return true;
 		if (m_InputEventFunction && !m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		else

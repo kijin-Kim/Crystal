@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "CommandQueue.h"
-#include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
 #include "Crystal/Resources/ShaderManager.h"
 
@@ -73,9 +72,6 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
 
-		Timer timer;
-
-		//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 
 		struct PerObjectData
@@ -106,19 +102,17 @@ namespace Crystal {
 
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
-		int m_ResWidth = 1920;
-		int m_ResHeight = 1080;
+		int m_ResWidth = 1024;
+		int m_ResHeight = 768;
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
-		int m_CurrentResolutionIndex = 0;
+		int m_CurrentResolutionIndex = 2;
 
 		bool m_bIsFullScreen = false;
 
 		std::unique_ptr<ConstantBuffer> m_PerFrameBuffer;
 		std::unique_ptr<ConstantBuffer> m_PerObjectBuffer;
 		std::unique_ptr<ConstantBuffer> m_PerFrameBufferCubemap;
-
-		class World* m_World;
 
 		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
 		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
@@ -133,6 +127,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
 
 
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiHeap = nullptr;
 
 	};
 }
