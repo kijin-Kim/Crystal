@@ -4,6 +4,7 @@
 #include "DirectXTex/DirectXTex.h"
 #include "ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
+#include "imgui.h"
 
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
@@ -46,7 +47,8 @@ namespace Crystal {
 	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		/*Process Global Window Events*/
-
+		
+		
 		switch (uMsg)
 		{
 		case WM_CLOSE:
@@ -70,7 +72,11 @@ namespace Crystal {
 			}
 			return true;
 		}
-		ApplicationUtility::GetPlayerController().OnInputEvent(hWnd, uMsg, wParam, lParam);
+
+		/*IMGUI가 처리하지 않는 일부 데이터만 Application이 처리합니다.*/
+		ImGuiIO& io = ImGui::GetIO();
+		if(!io.WantCaptureKeyboard && !io.WantCaptureMouse)
+			return ApplicationUtility::GetPlayerController().OnInputEvent(hWnd, uMsg, wParam, lParam);
 		return false;
 	}
 }

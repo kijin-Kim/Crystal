@@ -42,28 +42,6 @@ namespace Crystal {
 
 		/*ImGui 구현*/
 		{
-			IMGUI_CHECKVERSION();
-			ImGui::CreateContext();
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-			//io.ConfigViewportsNoAutoMerge = true;
-			//io.ConfigViewportsNoTaskBarIcon = true;
-
-			// Setup Dear ImGui style
-			ImGui::StyleColorsDark();
-			//ImGui::StyleColorsClassic();
-
-			// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-			ImGuiStyle& style = ImGui::GetStyle();
-			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				style.WindowRounding = 0.0f;
-				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-			}
-
 
 			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			descriptorHeapDesc.NumDescriptors = 1;
@@ -73,7 +51,6 @@ namespace Crystal {
 			HRESULT hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_ImGuiHeap));
 			CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 			// Setup Platform/Renderer backends
-			ImGui_ImplWin32_Init(m_Window->GetWindowHandle());
 			ImGui_ImplDX12_Init(m_Device.Get(), 2,
 				DXGI_FORMAT_R8G8B8A8_UNORM, m_ImGuiHeap.Get(),
 				m_ImGuiHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -209,8 +186,8 @@ namespace Crystal {
 			ImGui::NewFrame();
 
 			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-			bool show_another_window = false;
-			bool show_demo_window = false;
+			static bool show_another_window = false;
+			static bool show_demo_window = false;
 			float clear_color[3] = { 0.0f, 0.0f, 0.0f };
 			if (show_demo_window)
 				ImGui::ShowDemoWindow(&show_demo_window);
@@ -336,7 +313,8 @@ namespace Crystal {
 
 		{
 			// Update and Render additional Platform Windows
-			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			auto io =  ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				ImGui::UpdatePlatformWindows();
 				ImGui::RenderPlatformWindowsDefault(nullptr, (void*)cmdList.Get());

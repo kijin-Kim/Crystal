@@ -18,6 +18,28 @@ namespace Crystal {
 		{
 			const CREATESTRUCT* createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
 			windowsWindow = reinterpret_cast<WindowsWindow*>(createStruct->lpCreateParams);
+
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+			//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+			//io.ConfigViewportsNoAutoMerge = true;
+			//io.ConfigViewportsNoTaskBarIcon = true;
+
+			// Setup Dear ImGui style
+			ImGui::StyleColorsDark();
+			//ImGui::StyleColorsClassic();
+
+			// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+			ImGuiStyle& style = ImGui::GetStyle();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				style.WindowRounding = 0.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			}
 			break;
 		}
 		default:
@@ -65,6 +87,8 @@ namespace Crystal {
 		POINT windowPos = { windowRect.left, windowRect.top };
 		ScreenToClient(m_Handle, &windowPos);
 		SetWindowPos(m_Handle, nullptr, windowPos.x, 0, width, height, SWP_SHOWWINDOW);
+
+		ImGui_ImplWin32_Init(m_Handle);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -75,10 +99,10 @@ namespace Crystal {
 	LRESULT WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-			return true;
-		if (m_InputEventFunction && !m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
-		else
+		if (!m_InputEventFunction)
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		if (!m_InputEventFunction(hWnd, uMsg, wParam, lParam))
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 

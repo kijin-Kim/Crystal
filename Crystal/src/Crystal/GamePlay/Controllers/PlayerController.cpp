@@ -7,7 +7,6 @@ namespace Crystal {
 	{
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
 		m_UserInterfaceInputComponent = std::make_unique<InputComponent>();
-		m_UserInterfaceInputComponent->ShowCursor(true);
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
@@ -26,15 +25,13 @@ namespace Crystal {
 	{
 		Controller::Possess(pawn);
 		m_GameInputComponent = std::make_unique<InputComponent>();
-		m_GameInputComponent->BindCursor(true); // 커서를 화면 중앙에 고정시킵니다.
-		m_GameInputComponent->ShowCursor(true);
+		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
+		m_GameInputComponent->ShowCursor(false);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
 	}
 
 	bool PlayerController::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		bool bHandled = false;
-
 		switch (m_InputMode)
 		{
 		case Crystal::EInputMode::IM_Game:
@@ -93,8 +90,8 @@ namespace Crystal {
 			if (!m_GameInputComponent)
 				CS_ASSERT(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
 
-			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [=]() { SetInputMode(EInputMode::IM_Game); m_GameInputComponent->ReadyCursorBinding(); });
-			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Released, [=]() { SetInputMode(EInputMode::IM_UI); });
+			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); m_GameInputComponent->ReadyCursorBinding(); });
+			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Released, [this]() { SetInputMode(EInputMode::IM_UI); });
 		}
 		/*만약 원래 Switchable Mode였고, 이번에 Switchable 모드가 된다면,*/
 		else if (bWasSwitchableMode && !bIsSwitchableMode)
