@@ -8,7 +8,7 @@ namespace Crystal {
 
 	enum class ShaderType
 	{
-		None, Vertex, Pixel
+		None, Vertex, Hull, Domain, Geometry, Pixel, Compute
 	};
 
 	struct ShaderInputInfo
@@ -42,7 +42,9 @@ namespace Crystal {
 
 		bool CheckInputValidation(const ShaderInputInfo& Info) { return m_ShaderInputInfos.find(Info) != m_ShaderInputInfos.end(); }
 	private:
-		void loadFromFile(const std::string& filePath, ShaderType type);
+		Microsoft::WRL::ComPtr<ID3DBlob> loadSourceFromFile(const std::string& filePath);
+		void compileShader(Microsoft::WRL::ComPtr<ID3DBlob>& srcblob, ShaderType type);
+		bool hasShader(ShaderType type, const std::string& src);
 
 	private:
 		mutable std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>> m_ShaderDataBlobs;

@@ -25,11 +25,8 @@ namespace Crystal {
 		createDepthStencilView();
 		loadResources();
 		createPipelineStates();
+		createComputePipelineStates();
 		
-		
-
-
-
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		descriptorHeapDesc.NumDescriptors = 1 + 4 + 5 + 1000;
@@ -37,6 +34,11 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CommonDescriptorHeap));
+		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+
+
+		descriptorHeapDesc.NumDescriptors = 2;
+		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_ComputeDescriptorHeap));
 		CS_ASSERT(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
@@ -178,6 +180,13 @@ namespace Crystal {
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 
 			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			
+			/*Compute Pipeline Resource를 복사합니다.*/
+			D3D12_CPU_DESCRIPTOR_HANDLE computeDestHandle = m_ComputeDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			m_Device->CopyDescriptorsSimple(1, computeDestHandle, m_EquirectangularTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			computeDestHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			m_Device->CopyDescriptorsSimple(1, computeDestHandle, m_OutputTexture->GetUnorderedAccessView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
 
@@ -246,7 +255,6 @@ namespace Crystal {
 			cmdList->SetPipelineState(m_PBRAnimatedPipelineState.Get());
 
 		cmdList->SetGraphicsRootSignature(m_NormalRootSignature.Get());
-
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->RSSetViewports(1, &cameraComponent->GetViewport());
 		cmdList->RSSetScissorRects(1, &cameraComponent->GetScissorRect());
@@ -285,6 +293,10 @@ namespace Crystal {
 			m_MeshComponents[0]->GetMesh()->Render(cmdList);
 		}
 
+
+
+
+
 		//---------------Cubemap
 		cmdList->SetPipelineState(m_CubemapPipelineState.Get());
 		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature.Get());
@@ -295,6 +307,18 @@ namespace Crystal {
 		cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
 		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
+
+
+		/// COMPUTE
+		{
+			cmdList->SetPipelineState(m_ComputePipelineState.Get());
+			cmdList->SetComputeRootSignature(m_ComputePipelineRootSignature.Get());
+			ID3D12DescriptorHeap* computeDescHeaps[] = { m_ComputeDescriptorHeap.Get() };
+			cmdList->SetDescriptorHeaps(_countof(computeDescHeaps), computeDescHeaps);
+			cmdList->SetComputeRootDescriptorTable(0, m_ComputeDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+			auto desc = m_EquirectangularTexture->GetResource()->GetDesc();
+			cmdList->Dispatch(desc.Width / 32, desc.Height / 32, 6);
+		}
 
 
 		// IMGUI RENDER
@@ -689,6 +713,39 @@ namespace Crystal {
 
 	}
 
+	void Renderer::createComputePipelineStates()
+	{
+
+		CD3DX12_DESCRIPTOR_RANGE1 descHeapRange[2] = {};
+		descHeapRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		descHeapRange[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+		CD3DX12_ROOT_PARAMETER1 rootParameters[1] = {};
+		rootParameters[0].InitAsDescriptorTable(_countof(descHeapRange), descHeapRange);
+
+
+		CD3DX12_STATIC_SAMPLER_DESC computeStaticSampler[1] = {};
+		computeStaticSampler[0].Init(0);
+
+		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC computeRootSig(_countof(rootParameters), rootParameters, _countof(computeStaticSampler), computeStaticSampler, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
+		HRESULT hr = D3D12SerializeVersionedRootSignature(&computeRootSig, &rootSignatureDataBlob, &rootSignatureErrorBlob);
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		hr = m_Device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_ComputePipelineRootSignature));
+		CS_ASSERT(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+	
+		auto& shaderManager = ShaderManager::Instance();
+		auto& shaderDatablobs = shaderManager.GetShader("EquiToCube")->GetRaw();
+		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
+		computePipelineStateDesc.pRootSignature = m_ComputePipelineRootSignature.Get();
+		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };
+
+		hr = m_Device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&m_ComputePipelineState));
+		CS_ASSERT(SUCCEEDED(hr), "PipelineState를 생성하는데 실패하였습니다.");
+	}
+
 	void Renderer::loadResources()
 	{
 		///////////////////////////////////////////////////
@@ -700,13 +757,17 @@ namespace Crystal {
 
 		/*텍스쳐 리소스를 로드합니다.*/
 		m_CubemapTexture = std::make_unique<Texture>("assets/textures/cubemaps/cubemap.dds");
+		m_EquirectangularTexture = std::make_unique<Texture>("assets/textures/cubemaps/chinese_garden_1k.hdr");
+		m_OutputTexture = std::make_unique<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		/*각 텍스쳐 리소스에 대한 Shader Resource View를 만듭니다.*/
 		m_CubemapTexture->CreateShaderResourceView(m_CubemapTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURECUBE);
-		
+		m_EquirectangularTexture->CreateShaderResourceView(m_EquirectangularTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		m_OutputTexture->CreateUnorderedAccessView(m_OutputTexture->GetResource()->GetDesc().Format, D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
 
 		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
+		shaderManager.Load("assets/shaders/EquirectangularToCube.hlsl", "EquiToCube");
 		
 		m_PerFrameBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerFrameData));
 		m_PerObjectBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerObjectData));

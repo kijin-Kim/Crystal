@@ -17,7 +17,7 @@ namespace Crystal {
 		virtual ~Texture() = default;
 
 		void CreateShaderResourceView(DXGI_FORMAT format, D3D12_SRV_DIMENSION srvDimension);
-		void CreateUnorderedAccessView() {}
+		void CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension);
 		void CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension);
 		void CreateDepthStencilView(DXGI_FORMAT format, D3D12_DSV_DIMENSION dsvDimension);
 
@@ -41,6 +41,14 @@ namespace Crystal {
 				CS_ASSERT(false, "Depth Stencil View甫 刚历 积己秦林技夸");
 			return m_DepthStencilView.GetDescriptorHandle();
 		}
+
+		D3D12_CPU_DESCRIPTOR_HANDLE GetUnorderedAccessView() const
+		{
+			if (m_UnorderedAccessView.IsNull())
+				CS_ASSERT(false, "Unordered Access View甫 刚历 积己秦林技夸");
+			return m_UnorderedAccessView.GetDescriptorHandle();
+		}
+
 
 		ID3D12Resource* GetResource() { return m_Resource.Get(); }
 

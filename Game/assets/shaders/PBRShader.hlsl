@@ -1,3 +1,7 @@
+//this code is based on tutorial 
+//https://learnopengl.com/PBR/Lighting, 
+//https://learnopengl.com/PBR/IBL/Diffuse-irradiance
+
 struct VS_INPUT
 {
     float3 Position : POSITION;
@@ -75,7 +79,7 @@ Texture2D MetalicTexture : register(t1);
 Texture2D RoughnessTexture : register(t2);
 Texture2D NormalTexture : register(t3);
 
-SamplerState normalSampler : register(s0);
+SamplerState DefaultSampler : register(s0);
 
 static const float PI = 3.14159265359;
 
@@ -116,15 +120,15 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 lightColor = 10.0f;
-    float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(normalSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
-    float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(normalSampler, input.TexCoord).r : RoughnessConstant;
-    float metallic = bToggleMetalicTexture ? MetalicTexture.Sample(normalSampler, input.TexCoord).r : MetalicConstant;
+    float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
+    float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
+    float metallic = bToggleMetalicTexture ? MetalicTexture.Sample(DefaultSampler, input.TexCoord).r : MetalicConstant;
     
     
     const int lightCount = 1; // ¿”Ω√
 
     /*≥Î∏ª*/
-    float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(normalSampler, input.TexCoord).rgb * 2.0f - 1.0f), input.TangentToWorld) : input.WorldNormal;
+    float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f), input.TangentToWorld) : input.WorldNormal;
     N = normalize(N);
     
     /*∫‰ ∫§≈Õ*/

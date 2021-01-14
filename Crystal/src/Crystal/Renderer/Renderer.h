@@ -46,6 +46,7 @@ namespace Crystal {
 		void createRenderTargetViewFromSwapChain();
 		void createDepthStencilView();
 		void createPipelineStates();
+		void createComputePipelineStates();
 		void loadResources();
 	private:
 		WindowsWindow* m_Window = nullptr;
@@ -59,6 +60,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRAnimatedPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_ComputePipelineState = nullptr;
 
 		HANDLE m_FenceEvent = nullptr;
 		UINT64 m_FenceValue = 0;
@@ -71,8 +73,10 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_ComputePipelineRootSignature = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ComputeDescriptorHeap = nullptr;
 
 		struct PerObjectData
 		{
@@ -123,9 +127,10 @@ namespace Crystal {
 		PlayerController* m_PlayerController = nullptr;
 
 		std::unique_ptr<Texture> m_CubemapTexture;
-
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
 		std::unique_ptr<Texture> m_DepthBufferTexture;
+		std::unique_ptr<Texture> m_EquirectangularTexture;
+		std::unique_ptr<Texture> m_OutputTexture;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
 

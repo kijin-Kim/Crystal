@@ -24,10 +24,10 @@ PS_INPUT vsMain(VS_INPUT input)
 }
 
 
-TextureCube cubemapTexture : register(t0);
-SamplerState NormalSampler : register(s0);
+TextureCube CubemapTexture : register(t0);
+SamplerState DefaultSampler : register(s0);
 
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
-    return cubemapTexture.Sample(NormalSampler, input.TexCoord);
+    return CubemapTexture.Sample(DefaultSampler, input.TexCoord);
 }

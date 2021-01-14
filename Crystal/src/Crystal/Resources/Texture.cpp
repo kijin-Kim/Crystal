@@ -132,11 +132,11 @@ namespace Crystal {
 		{
 		case D3D12_SRV_DIMENSION_TEXTURE2D:
 			shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-			shaderResourceViewDesc.Texture2D.MipLevels = 1;
+			shaderResourceViewDesc.Texture2D.MipLevels = m_Resource->GetDesc().MipLevels;
 			break;
 		case D3D12_SRV_DIMENSION_TEXTURECUBE:
 			shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
-			shaderResourceViewDesc.TextureCube.MipLevels = 1;
+			shaderResourceViewDesc.TextureCube.MipLevels = m_Resource->GetDesc().MipLevels;
 			break;
 		default:
 			CS_ASSERT(false, "지원되지 않는 SRV DIMENSION 입니다");
@@ -147,6 +147,34 @@ namespace Crystal {
 		device->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
 	}
 
+
+	void Texture::CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension)
+	{
+		if (!m_UnorderedAccessView.IsNull())
+			return;
+		auto device = Renderer::Instance().GetDevice();
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.ViewDimension = uavDimension;
+		switch (uavDimension)
+		{
+		case D3D12_UAV_DIMENSION_TEXTURE2D:
+			uavDesc.Texture2D.MipSlice = m_Resource->GetDesc().MipLevels;
+			break;
+		case D3D12_UAV_DIMENSION_TEXTURE2DARRAY:
+			uavDesc.Texture2DArray.ArraySize = m_Resource->GetDesc().DepthOrArraySize;
+			uavDesc.Texture2DArray.FirstArraySlice = 0;
+			uavDesc.Texture2DArray.MipSlice = 0;
+			uavDesc.Texture2DArray.PlaneSlice = 0;
+			break;
+		default:
+			break;
+		}
+
+		m_UnorderedAccessView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		device->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
+
+	}
 
 	void Texture::CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension)
 	{
