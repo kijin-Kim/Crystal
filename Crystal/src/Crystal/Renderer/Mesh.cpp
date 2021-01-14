@@ -348,8 +348,8 @@ namespace Crystal {
 		if (m_BoneMap.find(nodeName) != m_BoneMap.end())
 		{
 			uint32_t boneIndex = m_BoneMap[nodeName];
-			//m_BoneTransforms[boneIndex] = Matrix4x4::Transpose(Matrix4x4::Multiply(Matrix4x4::Multiply(m_BoneOffsets[boneIndex], transform), m_InverseGlobalTransform));
-			m_BoneTransforms[boneIndex] = Matrix4x4::Transpose(Matrix4x4::Multiply(m_BoneOffsets[boneIndex], transform));
+			m_BoneTransforms[boneIndex] = Matrix4x4::Transpose(Matrix4x4::Multiply(Matrix4x4::Multiply(m_BoneOffsets[boneIndex], transform), m_InverseGlobalTransform));
+			//m_BoneTransforms[boneIndex] = Matrix4x4::Transpose(Matrix4x4::Multiply(m_BoneOffsets[boneIndex], transform));
 		}
 
 

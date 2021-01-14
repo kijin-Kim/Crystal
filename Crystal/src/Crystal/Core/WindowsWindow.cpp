@@ -25,7 +25,7 @@ namespace Crystal {
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-			//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 			//io.ConfigViewportsNoAutoMerge = true;
 			//io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -69,11 +69,17 @@ namespace Crystal {
 
 		RegisterClass(&wndClass);
 
+		/*윈도우 리사이징을 제한합니다.*/
+		auto windowStyle = WS_OVERLAPPED |
+			WS_CAPTION |
+			WS_SYSMENU |
+			WS_THICKFRAME;
+
 		m_Handle = CreateWindowEx(
 			NULL,
 			L"Hello Direct3d 12!",
 			L"Hello Application!",
-			WS_OVERLAPPEDWINDOW,
+			windowStyle,
 			0, 0, width, height,
 			nullptr, nullptr, hInstance, this);
 

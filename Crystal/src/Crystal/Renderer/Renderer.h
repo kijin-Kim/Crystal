@@ -77,10 +77,13 @@ namespace Crystal {
 		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
-			int bToggleAlbedoTexture = true;
-			int bToggleMetalicTexture = true;
-			int bToggleRoughnessTexture = true;
-			int bToggleNormalTexture = true;
+			int bToggleAlbedoTexture = false;
+			int bToggleMetalicTexture = false;
+			int bToggleRoughnessTexture = false;
+			int bToggleNormalTexture = false;
+			DirectX::XMFLOAT4 AlbedoColor = { 1.0f, 1.0f, 1.0f, 0.0f };
+			float Roughness = 0.0f;
+			float Metalic = 0.0f;
 		};
 		PerObjectData m_PerObjectData = {};
 		struct PerFrameData
@@ -102,11 +105,11 @@ namespace Crystal {
 
 		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
 
-		int m_ResWidth = 1024;
-		int m_ResHeight = 768;
+		int m_ResWidth = 1920;
+		int m_ResHeight = 1080;
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
-		int m_CurrentResolutionIndex = 2;
+		int m_CurrentResolutionIndex = 0;
 
 		bool m_bIsFullScreen = false;
 

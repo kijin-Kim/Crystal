@@ -47,8 +47,7 @@ namespace Crystal {
 	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		/*Process Global Window Events*/
-		
-		
+
 		switch (uMsg)
 		{
 		case WM_CLOSE:

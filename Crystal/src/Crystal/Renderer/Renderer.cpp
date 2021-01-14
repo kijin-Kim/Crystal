@@ -109,7 +109,6 @@ namespace Crystal {
 		ChangeDisplayMode();
 
 
-
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
 		
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(cameraComponent->GetViewProjection());
@@ -117,11 +116,14 @@ namespace Crystal {
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0f, 0.0f, 0.0f);
 		m_PerObjectData.World = Matrix4x4::Transpose(m_WorldMat);
-		//m_PerObjectData.World = m_MeshComponents[0]->GetMesh()->GetGlobalTransform();
+		/*m_PerObjectData.World = m_MeshComponents[0]->GetMesh()->GetGlobalTransform();*/
+		/*m_PerObjectData.bToggleAlbedoTexture = false;
 		m_PerObjectData.bToggleMetalicTexture = false;
 		m_PerObjectData.bToggleNormalTexture = false;
-		m_PerObjectData.bToggleRoughnessTexture = false;
-		
+		m_PerObjectData.bToggleRoughnessTexture = false;*/
+		static float albedoColor[3] = { 1.0f, 1.0f, 1.0f };
+		m_PerObjectData.AlbedoColor = {albedoColor[0], albedoColor[1], albedoColor[2], 0.0f };
+
 		auto viewProj = cameraComponent->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		m_PerFrameDataCubemap.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
@@ -134,6 +136,7 @@ namespace Crystal {
 		auto boneMatrices = m_MeshComponents[0]->GetMesh()->GetBoneTransfroms();
 		UINT8* bufferPointer = nullptr;
 		textureUploadBuffer->Map(0, nullptr, (void**)&bufferPointer);
+
 		memcpy(bufferPointer, boneMatrices.data(), boneMatrices.size() * sizeof(DirectX::XMFLOAT4X4));
 
 		{
@@ -186,42 +189,40 @@ namespace Crystal {
 			ImGui::NewFrame();
 
 			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-			static bool show_another_window = false;
 			static bool show_demo_window = false;
-			float clear_color[3] = { 0.0f, 0.0f, 0.0f };
 			if (show_demo_window)
 				ImGui::ShowDemoWindow(&show_demo_window);
 
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 			{
 				static float f = 0.0f;
-				static int counter = 0;
+				
 
 				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-				ImGui::Checkbox("Another Window", &show_another_window);
 
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
 
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-				ImGui::End();
-			}
+				ImGui::Checkbox("Use Albedo Texture", (bool*)&m_PerObjectData.bToggleAlbedoTexture);
+				ImGui::ColorEdit3("Albedo Color", albedoColor); // Edit 3 floats representing a color
 
-			// 3. Show another simple window.
-			if (show_another_window)
-			{
-				ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-				ImGui::Text("Hello from another window!");
-				if (ImGui::Button("Close Me"))
-					show_another_window = false;
+				ImGui::Checkbox("Use Roughness Texture", (bool*)&m_PerObjectData.bToggleRoughnessTexture);
+				ImGui::SliderFloat("Roughness", &m_PerObjectData.Roughness, 0.0f, 1.0f); // Edit 3 floats representing a color
+
+				ImGui::Checkbox("Use Metalic Texture", (bool*)&m_PerObjectData.bToggleMetalicTexture);
+				ImGui::SliderFloat("Metalic", &m_PerObjectData.Metalic, 0.0f, 1.0f);// Edit 3 floats representing a color
+
+				ImGui::Checkbox("Use Normal Texture", (bool*)&m_PerObjectData.bToggleNormalTexture);
+
+				
+				//static int counter = 0;
+				//if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+				//	counter++;
+				//ImGui::SameLine();
+				//ImGui::Text("counter = %d", counter);
+
+				//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 				ImGui::End();
 			}
 
@@ -239,9 +240,9 @@ namespace Crystal {
 
 		auto cmdList = m_CommandQueue->GetCommandList();
 
-		if(!m_MeshComponents[0]->GetMesh()->IsAnimated())
+		/*if(!m_MeshComponents[0]->GetMesh()->IsAnimated())
 			cmdList->SetPipelineState(m_PBRPipelineState.Get());
-		else
+		else*/
 			cmdList->SetPipelineState(m_PBRAnimatedPipelineState.Get());
 
 		cmdList->SetGraphicsRootSignature(m_NormalRootSignature.Get());
@@ -614,7 +615,7 @@ namespace Crystal {
 		pipelineStateStream.RTVFormats = rtvFormat;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
-		//hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
+//		hr = m_Device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PBRPipelineState));
 		//CS_ASSERT(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 		///////////////////////////////////////////////////
