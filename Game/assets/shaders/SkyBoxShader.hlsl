@@ -29,5 +29,13 @@ SamplerState DefaultSampler : register(s0);
 
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
-    return CubemapTexture.Sample(DefaultSampler, input.TexCoord);
+    float3 color = CubemapTexture.Sample(DefaultSampler, input.TexCoord).rgb;
+    //HDR
+    float3 hdrDenom = color + 1.0f;
+    color = color / hdrDenom;
+    //Gamma Correction
+    float3 gammaFactor = 1.0f / 2.2f;
+    color = pow(color, gammaFactor);
+    
+    return float4(color, 1.0f);
 }

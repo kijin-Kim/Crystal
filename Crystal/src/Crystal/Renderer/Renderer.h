@@ -126,7 +126,6 @@ namespace Crystal {
 
 		PlayerController* m_PlayerController = nullptr;
 
-		std::unique_ptr<Texture> m_CubemapTexture;
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
 		std::unique_ptr<Texture> m_DepthBufferTexture;
 		std::unique_ptr<Texture> m_EquirectangularTexture;

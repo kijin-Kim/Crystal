@@ -26,14 +26,18 @@ namespace Crystal {
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		/*윈도우 커서 카운팅 시스템에 따라 처리*/
-		int currentCursorCount = ::ShowCursor(true);
-		if (m_bIsCursorVisible)
+	
+		CURSORINFO cursorInfo = {};
+		cursorInfo.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&cursorInfo);
+
+		if (m_bIsCursorVisible && cursorInfo.flags != CURSOR_SHOWING)
 		{
-			while (currentCursorCount = ::ShowCursor(true) < 0);
+			while (::ShowCursor(true) < 0);
 		}
-		else if (!m_bIsCursorVisible)
+		else if (!m_bIsCursorVisible && cursorInfo.flags == CURSOR_SHOWING)
 		{
-			while (currentCursorCount = ::ShowCursor(false) >= 0);
+			while (::ShowCursor(false) >= 0);
 		}
 		
 
@@ -398,13 +402,8 @@ namespace Crystal {
 			POINT cursorPos = {};
 			GetCursorPos(&cursorPos);
 			
-
 			if (m_bShouldBindCursor)
 			{
-				/*RECT rc = {};
-				GetWindowRect(GetActiveWindow(), &rc);*/
-				/*m_LastPosition.x = (rc.right - rc.left) / 2;
-				m_LastPosition.y = (rc.bottom - rc.top) / 2;*/
 				m_LastPosition.x = m_BindPosition.x;
 				m_LastPosition.y = m_BindPosition.y;
 				SetCursorPos(m_LastPosition.x, m_LastPosition.y);

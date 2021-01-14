@@ -56,7 +56,6 @@ PS_INPUT vsMain(VS_INPUT input)
     
     float3 localPosition = mul(float4(input.Position, 1.0f), boneTransform);
     //float3 localPosition = input.Position;
-    
     PS_INPUT output;
     output.Position = mul(mul(float4(localPosition, 1.0f), World), ViewProjection);
     output.WorldPosition = mul(float4(localPosition, 1.0f), World);

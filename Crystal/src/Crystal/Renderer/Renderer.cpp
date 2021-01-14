@@ -179,7 +179,8 @@ namespace Crystal {
 
 			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 
-			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			//m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_OutputTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			
 			/*Compute Pipeline Resource를 복사합니다.*/
@@ -293,13 +294,38 @@ namespace Crystal {
 			m_MeshComponents[0]->GetMesh()->Render(cmdList);
 		}
 
+		/// COMPUTE
+		{
+			D3D12_RESOURCE_BARRIER resourceBarrier = {};
+			resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			resourceBarrier.Transition.pResource = m_OutputTexture->GetResource();
+			resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE; 
+			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+			resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			cmdList->ResourceBarrier(1, &resourceBarrier);
 
+
+			cmdList->SetPipelineState(m_ComputePipelineState.Get());
+			cmdList->SetComputeRootSignature(m_ComputePipelineRootSignature.Get());
+			ID3D12DescriptorHeap* computeDescHeaps[] = { m_ComputeDescriptorHeap.Get() };
+			cmdList->SetDescriptorHeaps(_countof(computeDescHeaps), computeDescHeaps);
+			cmdList->SetComputeRootDescriptorTable(0, m_ComputeDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+			auto desc = m_OutputTexture->GetResource()->GetDesc();
+			cmdList->Dispatch(desc.Width / 32, desc.Height / 32, 6);
+
+			resourceBarrier.Transition.StateBefore= D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+			cmdList->ResourceBarrier(1, &resourceBarrier);
+			
+		}
 
 
 
 		//---------------Cubemap
 		cmdList->SetPipelineState(m_CubemapPipelineState.Get());
 		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature.Get());
+		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBufferCubemap->GetGPUVirtualAddress());
 		D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
@@ -309,16 +335,7 @@ namespace Crystal {
 		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
 
 
-		/// COMPUTE
-		{
-			cmdList->SetPipelineState(m_ComputePipelineState.Get());
-			cmdList->SetComputeRootSignature(m_ComputePipelineRootSignature.Get());
-			ID3D12DescriptorHeap* computeDescHeaps[] = { m_ComputeDescriptorHeap.Get() };
-			cmdList->SetDescriptorHeaps(_countof(computeDescHeaps), computeDescHeaps);
-			cmdList->SetComputeRootDescriptorTable(0, m_ComputeDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			auto desc = m_EquirectangularTexture->GetResource()->GetDesc();
-			cmdList->Dispatch(desc.Width / 32, desc.Height / 32, 6);
-		}
+
 
 
 		// IMGUI RENDER
@@ -756,14 +773,14 @@ namespace Crystal {
 		/*auto& textureManager = TextureManager::Instance();*/
 
 		/*텍스쳐 리소스를 로드합니다.*/
-		m_CubemapTexture = std::make_unique<Texture>("assets/textures/cubemaps/cubemap.dds");
-		m_EquirectangularTexture = std::make_unique<Texture>("assets/textures/cubemaps/chinese_garden_1k.hdr");
-		m_OutputTexture = std::make_unique<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		m_EquirectangularTexture = std::make_unique<Texture>("assets/textures/cubemaps/signal_hill_sunrise_4k.hdr");
+		m_OutputTexture = std::make_unique<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, 
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 		/*각 텍스쳐 리소스에 대한 Shader Resource View를 만듭니다.*/
-		m_CubemapTexture->CreateShaderResourceView(m_CubemapTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURECUBE);
 		m_EquirectangularTexture->CreateShaderResourceView(m_EquirectangularTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		m_OutputTexture->CreateUnorderedAccessView(m_OutputTexture->GetResource()->GetDesc().Format, D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
+		m_OutputTexture->CreateShaderResourceView(DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
@@ -780,6 +797,7 @@ namespace Crystal {
 		m_SwapChain->GetFullscreenState(&bIsFullScreen, nullptr);
 		if (m_bIsFullScreen == (bool)bIsFullScreen)
 			return;
+
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_ASSERT(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
