@@ -3,8 +3,6 @@
 #include "Renderer.h"
 
 namespace Crystal {
-
-
 	CommandQueue::CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type) :
 		m_d3d12CommandListType(type)
 	{
@@ -20,7 +18,6 @@ namespace Crystal {
 		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
 		CS_ASSERT(SUCCEEDED(hr), "Fence를 생성하는데 실패하였습니다.");
 
-
 		m_FenceEvent = ::CreateEvent(NULL, false, false, NULL);
 		CS_ASSERT(m_FenceEvent, "Fence Event를 생성하는데 실패하였습니다");
 	}
@@ -29,7 +26,7 @@ namespace Crystal {
 	{
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> d3d12CommandAllcator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> d3d12CommandList = nullptr;
-
+		
 		if (!m_CommandAllocatorQueue.empty() && IsExecutionCompleted(m_CommandAllocatorQueue.front().FenceValue))
 		{
 			d3d12CommandAllcator = m_CommandAllocatorQueue.front().CommandAlloctor;
@@ -40,7 +37,8 @@ namespace Crystal {
 		{
 			auto device = Renderer::Instance().GetDevice();
 			HRESULT hr = device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&d3d12CommandAllcator));
-			CS_ASSERT(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
+			CS_ASSERT(SUCCEEDED(hr), "CommandAllocator를 생성하는데 실패하였습니다.");
+			d3d12CommandAllcator->SetName(L"Command Allocator");
 		}
 
 		if (!m_CommandListQueue.empty())
@@ -54,6 +52,7 @@ namespace Crystal {
 			auto device = Renderer::Instance().GetDevice();
 			HRESULT hr = device->CreateCommandList(0, m_d3d12CommandListType, d3d12CommandAllcator.Get(), nullptr, IID_PPV_ARGS(&d3d12CommandList));
 			CS_ASSERT(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
+			d3d12CommandList->SetName(L"Command List");
 		}
 
 		d3d12CommandList->SetPrivateDataInterface(__uuidof(ID3D12CommandAllocator), d3d12CommandAllcator.Get());
@@ -67,7 +66,6 @@ namespace Crystal {
 		ID3D12CommandList* const commandLists[] = { commandList.Get() };
 		m_d3d12CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
 		uint64_t fenceValue = SignalFence();
-
 
 		ID3D12CommandAllocator* d3d12CommandAllocator = nullptr;
 		UINT dataSize = sizeof(d3d12CommandAllocator);
@@ -106,5 +104,4 @@ namespace Crystal {
 			::WaitForSingleObject(m_FenceEvent, INFINITE);
 		}
 	}
-
 }

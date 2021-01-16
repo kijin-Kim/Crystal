@@ -59,13 +59,12 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>CS_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CS_DEBUG;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Crystal\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <CallingConvention>VectorCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,7 +80,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>CS_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CS_RELEASE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Crystal\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -90,7 +89,6 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <CallingConvention>VectorCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -103,12 +101,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Crystal\Crystal.vcxproj">
       <Project>{873AF83B-F319-77D7-FC31-02AE6890DD38}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\actors\TestPawn.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\EquirectangularToCube.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\IrradianceSampling.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\PBRShader.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\SkyBoxShader.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

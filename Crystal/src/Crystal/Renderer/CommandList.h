@@ -3,7 +3,6 @@
 #include <wrl/client.h>
 
 namespace Crystal {
-
 	class CommandList final
 	{
 	public:
@@ -12,7 +11,7 @@ namespace Crystal {
 
 		ID3D12GraphicsCommandList2* GetRaw() const { return m_CommandList.Get(); }
 
-		void Reset() const { m_CommandAllocator->Reset(); m_CommandList->Reset(m_CommandAllocator.Get(), nullptr);}
+		void Reset() const { m_CommandAllocator->Reset(); m_CommandList->Reset(m_CommandAllocator.Get(), nullptr); }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_CommandAllocator = nullptr;

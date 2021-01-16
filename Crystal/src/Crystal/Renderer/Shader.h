@@ -1,16 +1,33 @@
 #pragma once
 #include <map>
 #include <wrl/client.h>
+#include <set>
 
-#include "RootSignature.h"
 
 namespace Crystal {
 
-	class RenderComponent;
-
 	enum class ShaderType
 	{
-		None, Vertex, Pixel
+		None, Vertex, Hull, Domain, Geometry, Pixel, Compute
+	};
+
+	struct ShaderInputInfo
+	{
+		ShaderInputInfo(const std::string& name, D3D_SHADER_INPUT_TYPE type) : Name(std::move(name)), Type(type) {}
+		std::string Name;
+		D3D_SHADER_INPUT_TYPE Type;
+	};
+
+	struct ShaderInputInfoCompare
+	{
+		bool operator() (const ShaderInputInfo& lhs, const ShaderInputInfo& rhs) const
+		{
+			if (lhs.Name == rhs.Name)
+			{
+				return lhs.Type < rhs.Type;
+			}
+			return lhs.Name < rhs.Name;
+		}
 	};
 
 	class Shader final
@@ -21,20 +38,18 @@ namespace Crystal {
 		Shader(const Shader&) = delete;
 		Shader& operator=(const Shader&) = delete;
 
-		std::map< ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>>& GetRaw() const { return m_ShaderDataBlobs; }
-		const std::vector<RenderComponent*>& GetRenderComponents() const { return m_RenderComponents; }
-	private:
-		void loadFromFile(const std::string& filePath, ShaderType type);
+		std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>>& GetRaw() const { return m_ShaderDataBlobs; }
 
+		bool CheckInputValidation(const ShaderInputInfo& Info) { return m_ShaderInputInfos.find(Info) != m_ShaderInputInfos.end(); }
+	private:
+		Microsoft::WRL::ComPtr<ID3DBlob> loadSourceFromFile(const std::string& filePath);
+		void compileShader(Microsoft::WRL::ComPtr<ID3DBlob>& srcblob, ShaderType type);
+		bool hasShader(ShaderType type, const std::string& src);
 
 	private:
 		mutable std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>> m_ShaderDataBlobs;
+		std::set<ShaderInputInfo, ShaderInputInfoCompare> m_ShaderInputInfos;
 		std::string m_Name;
 		ShaderType m_Type = ShaderType::None;
-
-		std::vector<RenderComponent*> m_RenderComponents;
 	};
-
 }
-
-

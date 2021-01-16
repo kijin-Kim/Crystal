@@ -4,7 +4,6 @@
 #include "CommandList.h"
 
 namespace Crystal {
-
 	VertexBuffer::VertexBuffer(void* data, UINT strideInByte, UINT count)
 	{
 		auto device = Renderer::Instance().GetDevice();
@@ -22,7 +21,7 @@ namespace Crystal {
 		bufferResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		bufferResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc, 
+		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_DestinationBuffer));
 		CS_ASSERT(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
 
@@ -95,5 +94,4 @@ namespace Crystal {
 		m_IndexBufferView.SizeInBytes = sizeInbyte;
 		m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	}
-
 }

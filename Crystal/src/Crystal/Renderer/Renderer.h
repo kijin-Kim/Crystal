@@ -2,22 +2,21 @@
 #include <wrl/client.h>
 #include <vector>
 
-#include "Camera.h"
 #include "CommandQueue.h"
-#include "Crystal/Core/Timer.h"
 #include "Crystal/Core/WindowsWindow.h"
-#include "Pipeline.h"
-#include "Crystal/AssetManager/ShaderManager.h"
+#include "Crystal/Resources/ShaderManager.h"
 
 #include "Crystal/Gameplay/Components/MeshComponent.h"
-#include "Crystal/AssetManager/ConstantBufferManager.h"
+#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Texture.h"
 
 namespace Crystal {
+	class PlayerController;
 
 	class Renderer final
 	{
 	public:
-		void Init(const std::shared_ptr<WindowsWindow>& window);
+		void Init(WindowsWindow* window);
 		Renderer(const Renderer&) = delete;
 		static Renderer& Instance() { static Renderer instance; return instance; }
 
@@ -27,29 +26,43 @@ namespace Crystal {
 		IDXGIFactory4* GetFactory() const { return m_Factory.Get(); }
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
 
-
-
 		/////////////////////////////////////////////////////////////////////////////////
 		//TEMP//////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////
 		void ChangeResolution(const char* formattedResolution);
 		void ChangeDisplayMode();
 
+		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
+		void ActiveFullScreenMode(bool bActive) { m_bIsFullScreen = bActive; }
+
 		/// SHOULD GET DRAWABLE //
-		void RegisterMesh(MeshComponent* mesh) { m_Meshes.push_back(mesh); }
-		
-	private:
-		Renderer() {};
-		~Renderer();
+		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
 
 	private:
-		std::shared_ptr<WindowsWindow> m_Window = nullptr;
+		Renderer() = default;
+		~Renderer() = default;
+		
+		void createDevice();
+		void createRenderTargetViewFromSwapChain();
+		void createDepthStencilView();
+		void createPipelineStates();
+		void createComputePipelineStates();
+		void loadResources();
+	private:
+		WindowsWindow* m_Window = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Device2> m_Device = nullptr;
 		Microsoft::WRL::ComPtr<IDXGIFactory4> m_Factory = nullptr;
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
+
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRAnimatedPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_EquiToCubePipeline = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_IrradianceSamplingPipeline = nullptr;
+
 		HANDLE m_FenceEvent = nullptr;
 		UINT64 m_FenceValue = 0;
 
@@ -57,50 +70,77 @@ namespace Crystal {
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		std::vector<std::unique_ptr<RenderTarget>> m_RenderTargets;
-		std::unique_ptr<DepthStencil> m_DepthStencil = nullptr;
+		DirectX::XMFLOAT4X4 m_WorldMat = Matrix4x4::Identity();
 
-		std::unique_ptr<GraphicsPipeline> m_GraphicsPipeline = nullptr;
-
-		std::unique_ptr<Camera> m_Camera = nullptr;
-
-		DirectX::XMFLOAT4X4 m_WorldMat = {};
-
-		std::unique_ptr<RootSignature> m_RootSignature = nullptr;
-
-		Timer timer;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_EquiToCubeRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_IrradianceSamplingRootSignature = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
-
-
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_EquiToCubeDescriptorHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_IrradianceSamplingDescriptorHeap = nullptr;
 
 		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
-		}m_PerObjectData;
-
+			DirectX::XMFLOAT4 AlbedoColor = { 1.0f, 1.0f, 1.0f, 0.0f };
+			int bToggleAlbedoTexture = false;
+			int bToggleMetalicTexture = false;
+			int bToggleRoughnessTexture = false;
+			int bToggleNormalTexture = false;
+			int bToggleIrradianceTexture = false;
+			float RoughnessConstant = 0.0f;
+			float MetalicConstant = 0.0f;
+		};
+		PerObjectData m_PerObjectData = {};
 		struct PerFrameData
 		{
-			DirectX::XMFLOAT4X4 View;
-			DirectX::XMFLOAT4X4 Projection;
+			DirectX::XMFLOAT4X4 ViewProjection;
 			DirectX::XMFLOAT4 LightPositionInWorld;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
-		}m_PerFrameData;
+		};
+		PerFrameData m_PerFrameData = {};
 
-		std::vector<MeshComponent*> m_Meshes;
-
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiDescriptorHeap = nullptr;
-		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
+		struct PerFrameDataCubemap
+		{
+			DirectX::XMFLOAT4X4 InverseViewProjection;
+		};
+		PerFrameDataCubemap m_PerFrameDataCubemap = {};
 		
-		int m_ResWidth = 1366;
-		int m_ResHeight = 768;
+
+		std::vector<MeshComponent*> m_MeshComponents;
+
+		float m_ClearColor[3] = { 0.0f, 0.0f, 0.0f };
+
+		int m_ResWidth = 1920;
+		int m_ResHeight = 1080;
 
 		const char* m_ResolutionItems[4] = { "1920x1080", "1366x768", "1024x768", "800x600" };
 		int m_CurrentResolutionIndex = 0;
 
 		bool m_bIsFullScreen = false;
 
-		ConstantBuffer m_PerFrameBuffer;
-		ConstantBuffer m_PerObjectBuffer;
+		std::unique_ptr<ConstantBuffer> m_PerFrameBuffer;
+		std::unique_ptr<ConstantBuffer> m_PerObjectBuffer;
+		std::unique_ptr<ConstantBuffer> m_PerFrameBufferCubemap;
+
+		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
+		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
+
+		PlayerController* m_PlayerController = nullptr;
+
+		std::unique_ptr<Texture> m_ColorBufferTextures[2];
+		std::unique_ptr<Texture> m_DepthBufferTexture;
+		std::unique_ptr<Texture> m_EquirectangularTexture;
+		std::unique_ptr<Texture> m_CubemapTexture;
+		std::unique_ptr<Texture> m_IrradiancemapTexture;
+		
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
+
+
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiHeap = nullptr;
+
 	};
 }
