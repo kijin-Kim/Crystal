@@ -66,7 +66,7 @@ namespace Crystal {
 		float m_FieldOfView = 60.0f;
 		float m_NearPlane = 0.1f;
 		float m_FarPlane = 1000.0f;
-		float m_MaxPitch = 45.0f;
+		float m_MaxPitch = 90.0f;
 
 		ECameraProjectionMode m_ProjectionMode = ECameraProjectionMode::CPM_Persepective;
 	};

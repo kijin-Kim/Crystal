@@ -1,5 +1,5 @@
 
-// EquiToCube is based on https://github.com/Nadrin/PBR
+////// EquiToCube is based on https://github.com/Nadrin/PBR
 
 Texture2D EquiTexture : register(t0);
 RWTexture2DArray<float4> OutputTexture : register(u0);
@@ -26,8 +26,7 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
     
     float3 cubeUV;
     
-    /*UV 좌표계에서 Cubemap Texcoord 좌표계(?)로 변환*/
-    /*+x , -x , +y , -y, +z, -z*/
+    /*UV 좌표계에서 Cubemap Texcoord 좌표계(?)로 변환  ( 더 이해가 필요 ) */
     switch (dispatchThreadID.z) 
     {
     case 0: cubeUV = float3(+1.0f, -uv3D.y, -uv3D.x); break;
@@ -42,8 +41,8 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
     
     
     /*레퍼런스 https://ko.wikipedia.org/wiki/%EA%B5%AC%EB%A9%B4%EC%A2%8C%ED%91%9C%EA%B3%84 */
-    /*카테시안 좌표계에서 구면좌표계로 변환 및 0과 1사이로 매핑*/
-    float2 finalUV = float2(atan2(cubeUV.z, cubeUV.x) / TwoPI, acos(cubeUV.y) / PI);
+    /*카테시안 좌표계에서 구면좌표계로 변환 및 0과 1사이로 매핑 (Noramlize)*/
+    float2 finalUV = float2(atan2(-cubeUV.x, -cubeUV.z) / TwoPI, acos(cubeUV.y) / PI);
     float4 finalColor = EquiTexture.SampleLevel(DefaultSampler, finalUV, 0.0f);
     
     OutputTexture[dispatchThreadID] = finalColor;

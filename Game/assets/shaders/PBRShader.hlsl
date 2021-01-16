@@ -33,11 +33,12 @@ cbuffer PerFrameData : register(b0)
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
+    float4 AlbedoColor;
     bool bToggleAlbedoTexture;
     bool bToggleMetalicTexture;
     bool bToggleRoughnessTexture;
     bool bToggleNormalTexture;
-    float4 AlbedoColor;
+    bool bToggleIrradianceTexture;
     float RoughnessConstant;
     float MetalicConstant;
 }
@@ -77,6 +78,7 @@ Texture2D AlbedoTexture : register(t0);
 Texture2D MetalicTexture : register(t1);
 Texture2D RoughnessTexture : register(t2);
 Texture2D NormalTexture : register(t3);
+TextureCube IrradianceTexture : register(t4);
 
 SamplerState DefaultSampler : register(s0);
 
@@ -111,7 +113,13 @@ float GeometrySmith(float dotNV, float dotNL, float roughness)
 
 float3 FresnelSchlick(float cosTheta, float3 F0)
 {
-    return F0 + (1.0f - F0) * pow(1.0 - cosTheta, 5.0f);
+    return F0 + (1.0f - F0) * pow(max(1.0f - cosTheta, 0.0f), 5.0f);
+}
+
+
+float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
+{
+    return F0 + (max(1.0f - roughness, F0) - F0) * pow(max(1.0f - cosTheta, 0.0f), 5.0f);
 }
 
 
@@ -163,16 +171,23 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         float3 specularBRDF = numerator / max(denominator, 0.001f);
 
         //Energy Conservation
-        float3 specularEnergy = fresnel;
-        float3 diffuseEnergy = float3(1.0f, 1.0f, 1.0f) - specularEnergy;
-        //No Diffuse for Conductor
-        diffuseEnergy *= 1.0f - metallic;
+        float3 kS = fresnel;
+        float3 kD = 1.0f - kS;
         
-        Lo += (diffuseEnergy * albedo / PI + specularBRDF) * radiance * dotNL;
+        //No Diffuse for Conductor
+        kD *= 1.0f - metallic;
+        
+        Lo += (kD * albedo / PI + specularBRDF) * radiance * dotNL;
         //Lo += (diffuseEnergy * albedo + specularBRDF) * radiance * dotNL;
     }
 
-    float3 ambient = float3(0.03f,0.03f,0.03f) * albedo;
+    
+    // AMBIENT
+    float3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0f), F0, roughness);
+    float3 kD = 1.0f - kS;
+    float3 irradiance = bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb : 1.0f;
+    float3 diffuse = irradiance * albedo;
+    float3 ambient = kD * diffuse;
     float3 finalColor = Lo + ambient;
 
     //HDR

@@ -111,6 +111,20 @@
   <ItemGroup>
     <ClInclude Include="src\actors\TestPawn.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\EquirectangularToCube.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\IrradianceSampling.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\PBRShader.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="assets\shaders\SkyBoxShader.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

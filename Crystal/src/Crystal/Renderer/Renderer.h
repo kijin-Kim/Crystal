@@ -60,7 +60,8 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRAnimatedPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_ComputePipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_EquiToCubePipeline = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_IrradianceSamplingPipeline = nullptr;
 
 		HANDLE m_FenceEvent = nullptr;
 		UINT64 m_FenceValue = 0;
@@ -73,21 +74,24 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_ComputePipelineRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_EquiToCubeRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_IrradianceSamplingRootSignature = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ComputeDescriptorHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_EquiToCubeDescriptorHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_IrradianceSamplingDescriptorHeap = nullptr;
 
 		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
+			DirectX::XMFLOAT4 AlbedoColor = { 1.0f, 1.0f, 1.0f, 0.0f };
 			int bToggleAlbedoTexture = false;
 			int bToggleMetalicTexture = false;
 			int bToggleRoughnessTexture = false;
 			int bToggleNormalTexture = false;
-			DirectX::XMFLOAT4 AlbedoColor = { 1.0f, 1.0f, 1.0f, 0.0f };
-			float Roughness = 0.0f;
-			float Metalic = 0.0f;
+			int bToggleIrradianceTexture = false;
+			float RoughnessConstant = 0.0f;
+			float MetalicConstant = 0.0f;
 		};
 		PerObjectData m_PerObjectData = {};
 		struct PerFrameData
@@ -129,7 +133,9 @@ namespace Crystal {
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
 		std::unique_ptr<Texture> m_DepthBufferTexture;
 		std::unique_ptr<Texture> m_EquirectangularTexture;
-		std::unique_ptr<Texture> m_OutputTexture;
+		std::unique_ptr<Texture> m_CubemapTexture;
+		std::unique_ptr<Texture> m_IrradiancemapTexture;
+		
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
 
