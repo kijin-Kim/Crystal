@@ -83,7 +83,7 @@ namespace Crystal {
 			0, 0, width, height,
 			nullptr, nullptr, hInstance, this);
 
-		CS_ASSERT(m_Handle, "윈도우를 생성하는데 실패하였습니다");
+		CS_FATAL(m_Handle, "윈도우를 생성하는데 실패하였습니다");
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
 

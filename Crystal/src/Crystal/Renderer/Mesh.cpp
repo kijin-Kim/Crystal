@@ -84,6 +84,8 @@ namespace Crystal {
 
 	Mesh::Mesh(const std::string& filePath)
 	{
+		CS_INFO("%s 메쉬 불러오는 중 ...", filePath.c_str());
+
 		m_Importer = new Assimp::Importer();
 		m_Scene = m_Importer->ReadFile(filePath, 
 			aiProcess_ConvertToLeftHanded |
@@ -94,7 +96,7 @@ namespace Crystal {
 			aiProcess_GenUVCoords |
 			aiProcess_OptimizeMeshes |
 			aiProcess_ValidateDataStructure);
-		CS_ASSERT(!(!m_Scene || m_Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_Scene->mRootNode), "모델을 로드하는데 실패하였습니다");
+		CS_FATAL(!(!m_Scene || m_Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_Scene->mRootNode), "메쉬를 로드하는데 실패하였습니다");
 		m_bIsAnimated = m_Scene->HasAnimations();
 		processNode(m_Scene->mRootNode, m_Scene);
 
@@ -165,6 +167,8 @@ namespace Crystal {
 				}
 			}
 		}
+
+		CS_INFO("%s 메쉬 불러오기 완료", filePath.c_str());
 	}
 
 	Mesh::~Mesh()

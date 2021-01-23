@@ -202,9 +202,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CameraComponent.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Components\Component.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\BaseComponents.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\InputComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\Controller.h" />

@@ -13,7 +13,7 @@ namespace Crystal {
 		case ECameraProjectionMode::CPM_Orthographic:
 			break;
 		default:
-			CS_ASSERT(false, "예상치 못한 Camera Projection Mode.");
+			CS_FATAL(false, "예상치 못한 Camera Projection Mode.");
 			break;
 		}
 	}

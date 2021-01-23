@@ -19,10 +19,4 @@ namespace Crystal {
 		for (auto& component : m_TransformComponents)
 			component->Update(DeltaTime);
 	}
-
-	void Actor::UpdateTransfromData()
-	{
-		for (auto& component : m_TransformComponents)
-			component->UpdateTransform();
-	}
 }

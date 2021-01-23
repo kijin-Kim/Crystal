@@ -52,7 +52,7 @@ namespace Crystal {
 					return;
 				}
 			}
-			CS_ERROR("최대 정점의 영향을 주는 본의 갯수를 초과하였습니다. 갯수를 초과하는 본의 Weight는 삭제 됩니다");
+			CS_DEBUG_INFO("최대 정점의 영향을 주는 본의 갯수를 초과하였습니다. 갯수를 초과하는 본의 Weight는 삭제 됩니다");
 		}
 	};
 

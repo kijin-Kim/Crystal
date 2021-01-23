@@ -6,7 +6,7 @@ namespace Crystal {
 	{
 		if (m_Shaders.find(shaderName) != m_Shaders.end())
 		{
-			CS_ASSERT(false, "%s이 이미 존재합니다", shaderName);
+			CS_FATAL(false, "%s이 이미 존재합니다", shaderName);
 			return;
 		}
 
@@ -17,7 +17,7 @@ namespace Crystal {
 	{
 		if (m_Shaders.find(shaderName) != m_Shaders.end())
 		{
-			CS_ASSERT(false, "%s이 이미 존재합니다", shaderName);
+			CS_FATAL(false, "%s이 이미 존재합니다", shaderName);
 			return;
 		}
 		m_Shaders[shaderName] = shader;

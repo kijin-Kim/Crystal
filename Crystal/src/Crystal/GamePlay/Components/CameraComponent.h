@@ -1,5 +1,5 @@
 #pragma once
-#include "TransformComponent.h"
+#include "BaseComponents.h"
 #include "Crystal/Math/Math.h"
 
 namespace Crystal {

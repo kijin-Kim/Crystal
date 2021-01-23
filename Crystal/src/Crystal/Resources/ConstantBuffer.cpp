@@ -21,13 +21,13 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CbvHeap));
-		CS_ASSERT(SUCCEEDED(hr), "CBV Pool을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "CBV Pool을 생성하는데 실패하였습니다.");
 
 		m_CbvHeapCpuHandle = m_CbvHeap->GetCPUDescriptorHandleForHeapStart();
 
 		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(m_BufferAlignedSize * m_MaxCbvCount),
 			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_ConstantBufferData));
-		CS_ASSERT(SUCCEEDED(hr), "Constant Buffer Data Pool을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "Constant Buffer Data Pool을 생성하는데 실패하였습니다.");
 
 		m_ConstantBufferData->Map(0, nullptr, (void**)&m_CpuBasePtr);
 
@@ -87,7 +87,7 @@ namespace Crystal {
 			cBuffer = m_1024AlignedBufferPool.CreateConstantBuffer();
 			break;
 		default:
-			CS_ASSERT(false, "%d사이즈의 ConstantBuffer는 현재 지원하지 않습니다.", size);
+			CS_FATAL(false, "%d사이즈의 ConstantBuffer는 현재 지원하지 않습니다.", size);
 			break;
 		}
 

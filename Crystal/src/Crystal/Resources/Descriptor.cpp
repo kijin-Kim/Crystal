@@ -17,7 +17,7 @@ namespace Crystal {
 		cbvSrvUavDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		cbvSrvUavDesc.NodeMask = 0;
 		HRESULT hr = device->CreateDescriptorHeap(&cbvSrvUavDesc, IID_PPV_ARGS(&m_CBVSRVUAVHeap));
-		CS_ASSERT(SUCCEEDED(hr), "CBV,SRV,UAV Descriptor Heap을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "CBV,SRV,UAV Descriptor Heap을 생성하는데 실패하였습니다.");
 		m_CBVSRVUAVHeapIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		D3D12_DESCRIPTOR_HEAP_DESC rtvDesc = {};
@@ -26,7 +26,7 @@ namespace Crystal {
 		rtvDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		rtvDesc.NodeMask = 0;
 		hr = device->CreateDescriptorHeap(&rtvDesc, IID_PPV_ARGS(&m_RTVHeap));
-		CS_ASSERT(SUCCEEDED(hr), "RTV Descriptor Heap을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "RTV Descriptor Heap을 생성하는데 실패하였습니다.");
 		m_RTVHeapIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 		D3D12_DESCRIPTOR_HEAP_DESC dsvDesc = {};
@@ -35,7 +35,7 @@ namespace Crystal {
 		dsvDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		dsvDesc.NodeMask = 0;
 		hr = device->CreateDescriptorHeap(&dsvDesc, IID_PPV_ARGS(&m_DSVHeap));
-		CS_ASSERT(SUCCEEDED(hr), "RTV Descriptor Heap을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "RTV Descriptor Heap을 생성하는데 실패하였습니다.");
 		m_DSVHeapIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	}
@@ -65,7 +65,7 @@ namespace Crystal {
 			return Descriptor(cpuHandle);
 		}
 		default:
-			CS_ASSERT(false, "아직 지원하지 않는 타입입니다.");
+			CS_FATAL(false, "아직 지원하지 않는 타입입니다.");
 			return Descriptor();
 		}
 	}

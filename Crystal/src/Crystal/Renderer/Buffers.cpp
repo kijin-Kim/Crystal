@@ -23,13 +23,13 @@ namespace Crystal {
 
 		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_DestinationBuffer));
-		CS_ASSERT(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
+		CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
 
 		if (data)
 		{
 			HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IntermediateBuffer));
-			CS_ASSERT(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
+			CS_FATAL(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
 			auto commandQueue = Renderer::Instance().GetCommandQueue();
 			auto cmdList = commandQueue->GetCommandList();
@@ -69,13 +69,13 @@ namespace Crystal {
 
 		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_DestinationBuffer));
-		CS_ASSERT(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
+		CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
 
 		if (data)
 		{
 			HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IntermediateBuffer));
-			CS_ASSERT(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
+			CS_FATAL(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
 			auto commandQueue = Renderer::Instance().GetCommandQueue();
 			auto cmdList = commandQueue->GetCommandList();

@@ -2,6 +2,7 @@
 #include <map>
 #include <wrl/client.h>
 #include <set>
+#include <d3d12shader.h>
 
 
 namespace Crystal {
@@ -9,25 +10,6 @@ namespace Crystal {
 	enum class ShaderType
 	{
 		None, Vertex, Hull, Domain, Geometry, Pixel, Compute
-	};
-
-	struct ShaderInputInfo
-	{
-		ShaderInputInfo(const std::string& name, D3D_SHADER_INPUT_TYPE type) : Name(std::move(name)), Type(type) {}
-		std::string Name;
-		D3D_SHADER_INPUT_TYPE Type;
-	};
-
-	struct ShaderInputInfoCompare
-	{
-		bool operator() (const ShaderInputInfo& lhs, const ShaderInputInfo& rhs) const
-		{
-			if (lhs.Name == rhs.Name)
-			{
-				return lhs.Type < rhs.Type;
-			}
-			return lhs.Name < rhs.Name;
-		}
 	};
 
 	class Shader final
@@ -40,7 +22,8 @@ namespace Crystal {
 
 		std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>>& GetRaw() const { return m_ShaderDataBlobs; }
 
-		bool CheckInputValidation(const ShaderInputInfo& Info) { return m_ShaderInputInfos.find(Info) != m_ShaderInputInfos.end(); }
+		bool CheckInputValidation(const std::string& inputName, D3D_SHADER_INPUT_TYPE shaderInputType);
+		bool CheckInputValidation(const std::string& inputName, const std::string& typeName);
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> loadSourceFromFile(const std::string& filePath);
 		void compileShader(Microsoft::WRL::ComPtr<ID3DBlob>& srcblob, ShaderType type);
@@ -48,8 +31,9 @@ namespace Crystal {
 
 	private:
 		mutable std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>> m_ShaderDataBlobs;
-		std::set<ShaderInputInfo, ShaderInputInfoCompare> m_ShaderInputInfos;
 		std::string m_Name;
 		ShaderType m_Type = ShaderType::None;
+
+		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_ShaderReflection = nullptr;
 	};
 }

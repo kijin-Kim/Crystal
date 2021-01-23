@@ -11,15 +11,17 @@ namespace Crystal {
 		Level() = default;
 		~Level() = default;
 
-		void AddActor(Actor* actor) { m_Actors.emplace_back(actor); }
+		void AddActor(Actor* actor) 
+		{ 
+			actor->Start();  
+			m_Actors.emplace_back(actor); 
+		}
 		//void RemoveActor() {}
 
 		void Update(float deltaTime)
 		{
 			for (const auto& actor : m_Actors)
 				actor->Update(deltaTime);
-			for (const auto& actor : m_Actors)
-				actor->UpdateTransfromData();
 		}
 
 	private:
@@ -41,7 +43,6 @@ namespace Crystal {
 			// Need some validation like type checking...
 
 			T* newActor = new T();
-
 			if (level == nullptr)
 				m_Levels[0]->AddActor(newActor);
 

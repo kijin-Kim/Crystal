@@ -6,7 +6,7 @@
 #include "Crystal/Core/WindowsWindow.h"
 #include "Crystal/Resources/ShaderManager.h"
 
-#include "Crystal/Gameplay/Components/MeshComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponent.h"
 #include "Crystal/Resources/ConstantBuffer.h"
 #include "Crystal/Resources/Texture.h"
 
@@ -33,7 +33,7 @@ namespace Crystal {
 		void ChangeDisplayMode();
 
 		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
-		void ActiveFullScreenMode(bool bActive) { m_bIsFullScreen = bActive; }
+		void ActiveFullScreenMode(const bool bActive) { m_bIsFullScreen = bActive; }
 
 		/// SHOULD GET DRAWABLE //
 		void RegisterMeshComponent(MeshComponent* meshComponent) { m_MeshComponents.push_back(meshComponent); }
@@ -42,29 +42,28 @@ namespace Crystal {
 		Renderer() = default;
 		~Renderer() = default;
 		
-		void createDevice();
-		void createRenderTargetViewFromSwapChain();
-		void createDepthStencilView();
-		void createPipelineStates();
-		void createComputePipelineStates();
-		void loadResources();
+		void CreateDevice();
+		void CreateRenderTargetViewFromSwapChain();
+		void CreateDepthStencilView();
+		void CreatePipelineStates();
+		void CreateComputePipelineStates();
+		void LoadResources();
 	private:
 		WindowsWindow* m_Window = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Device2> m_Device = nullptr;
 		Microsoft::WRL::ComPtr<IDXGIFactory4> m_Factory = nullptr;
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_d3d12CommandQueue = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3d12CommandQueue = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
 
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRPipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PBRAnimatedPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PbrPipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PbrAnimatedPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_CubemapPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_EquiToCubePipeline = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_IrradianceSamplingPipeline = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_DiffuseIrradianceSamplingPipeline = nullptr;
 
 		HANDLE m_FenceEvent = nullptr;
-		UINT64 m_FenceValue = 0;
 
 		UINT m_RtvIndex = 0;
 
@@ -75,11 +74,11 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_NormalRootSignature = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_CubemapRootSignature  = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_EquiToCubeRootSignature = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_IrradianceSamplingRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_DiffuseIrradianceSamplingRootSignature = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CommonDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_EquiToCubeDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_IrradianceSamplingDescriptorHeap = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DiffuseIrradianceSamplingDescriptorHeap = nullptr;
 
 		struct PerObjectData
 		{
@@ -107,7 +106,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 InverseViewProjection;
 		};
 		PerFrameDataCubemap m_PerFrameDataCubemap = {};
-		
 
 		std::vector<MeshComponent*> m_MeshComponents;
 
@@ -127,8 +125,6 @@ namespace Crystal {
 
 		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer;
 		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer;
-
-		PlayerController* m_PlayerController = nullptr;
 
 		std::unique_ptr<Texture> m_ColorBufferTextures[2];
 		std::unique_ptr<Texture> m_DepthBufferTexture;
