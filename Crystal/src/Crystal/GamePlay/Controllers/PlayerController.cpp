@@ -6,7 +6,7 @@ namespace Crystal {
 	PlayerController::PlayerController()
 	{
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
-		m_UserInterfaceInputComponent = std::make_unique<InputComponent>();
+		m_UserInterfaceInputComponent = std::make_unique<InputComponent>("");
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
@@ -24,7 +24,7 @@ namespace Crystal {
 	void PlayerController::Possess(Pawn* pawn)
 	{
 		Controller::Possess(pawn);
-		m_GameInputComponent = std::make_unique<InputComponent>();
+		m_GameInputComponent = std::make_unique<InputComponent>("");
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
@@ -48,7 +48,7 @@ namespace Crystal {
 			CS_FATAL(false, "유효하지 않은 게임 모드입니다.");
 			break;
 		}
-
+		return false;
 	}
 
 	void PlayerController::ProcessPitchInput(float value)

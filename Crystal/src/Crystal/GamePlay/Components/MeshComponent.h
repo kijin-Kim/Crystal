@@ -6,7 +6,7 @@ namespace Crystal {
 	class MeshComponent : public RenderComponent
 	{
 	public:
-		MeshComponent();
+		MeshComponent(const std::string& name);
 		virtual ~MeshComponent() = default;
 
 		virtual void Update(float deltaTime) override { RenderComponent::Update(deltaTime); m_Mesh->Update(deltaTime); }

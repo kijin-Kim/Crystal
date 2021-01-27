@@ -22,32 +22,43 @@ public:
 		normalTexture->CreateShaderResourceView(normalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);*/
 
 
-		/*텍스쳐들을 모아 하나의 머터리얼로 만듭니다.*/
+		/*Material을 생성합니다.*/
 		auto& shaderManager = Crystal::ShaderManager::Instance();
 		std::shared_ptr<Crystal::Material> pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader"));
 
 		pbrMaterial->Set("AlbedoTexture", albedoTexture);
 		pbrMaterial->Set("RoughnessConstant", 0.3f);
 		pbrMaterial->Set("MetalicConstant", 1.0f);
+
 		
 		/*pbrMaterial->Set("MetalicTexture", metalicTexture);
 		pbrMaterial->Set("RoughnessTexture", roughnessTexture);
 		pbrMaterial->Set("NormalTexture", normalTexture);*/
 
 
-		/*메쉬를 만들고 머터리얼을 지정합니다.*/
+		/*메쉬를 만들고 Material을 지정합니다.*/
 		std::shared_ptr<Crystal::Mesh> mesh = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
 		mesh->SetMaterial(pbrMaterial);
 
+		std::shared_ptr<Crystal::Mesh> mesh2 = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		mesh2->SetMaterial(pbrMaterial);
+
+		
 
 
 		/*최종 메쉬를 메쉬컴포넌트에 Set합니다.*/
-		m_MeshComponent = std::make_shared<Crystal::MeshComponent>();
+		m_MeshComponent = CreateComponent<Crystal::MeshComponent>("MeshComponent");
 		m_MeshComponent->SetMesh(mesh);
 
+		m_TempFollowMeshComponent = CreateComponent<Crystal::MeshComponent>("FollowTempMeshComponent");
+		m_TempFollowMeshComponent->SetMesh(mesh2);
+
+		/* TEMP */
+		m_TempFollowMeshComponent->SetLocalTransform(Crystal::Matrix4x4::Translation({ 0.0f, 2.0f, 0.0f }));
 
 		m_MainComponent = m_MeshComponent;
-		
+
+		m_TempFollowMeshComponent->AttachToComponent(m_MainComponent);
 		
 	}
 
@@ -55,10 +66,10 @@ public:
 	{
 	}
 
-	virtual void Start() override
+	virtual void Begin() override
 	{
-		Pawn::Start();
-		CS_DEBUG_INFO("Test Pawn Start");
+		Pawn::Begin();
+		CS_DEBUG_INFO("Test Pawn Begin");
 	}
 
 	virtual void End() override
@@ -77,5 +88,5 @@ public:
 	}
 
 private:
-	std::shared_ptr<Crystal::MeshComponent> m_TempFollowMeshComponent = nullptr;
+	Crystal::MeshComponent* m_TempFollowMeshComponent = nullptr;
 };

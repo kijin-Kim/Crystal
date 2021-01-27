@@ -109,10 +109,10 @@ namespace Crystal {
 		{
 			m_BoneTransforms.resize(m_Scene->mMeshes[0]->mNumBones);
 			m_BoneOffsets.resize(m_Scene->mMeshes[0]->mNumBones);
-			for (size_t m = 0; m < m_Scene->mNumMeshes; m++)
+			for (unsigned int m = 0; m < m_Scene->mNumMeshes; m++)
 			{
 				aiMesh* mesh = m_Scene->mMeshes[m];
-				for (size_t i = 0; i < mesh->mNumBones; i++)
+				for (unsigned int i = 0; i < mesh->mNumBones; i++)
 				{
 					aiBone* bone = mesh->mBones[i];
 					std::string boneName = bone->mName.C_Str();
@@ -127,7 +127,7 @@ namespace Crystal {
 						boneIndex = m_BoneMap[boneName];
 					}
 
-					for (size_t j = 0; j < bone->mNumWeights; j++)
+					for (unsigned int j = 0; j < bone->mNumWeights; j++)
 					{
 						int vertexID = bone->mWeights[j].mVertexId;
 						float weight = bone->mWeights[j].mWeight;
@@ -141,16 +141,16 @@ namespace Crystal {
 		{
 			for (const auto& submesh : m_Submeshes)
 			{
-				m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(submesh->AnimatedVertices.data(), sizeof(AnimatedVertex), submesh->AnimatedVertices.size()));
-				m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), sizeof(UINT) * submesh->Indices.size(), submesh->Indices.size()));
+				m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(submesh->AnimatedVertices.data(), (UINT)sizeof(AnimatedVertex), (UINT)submesh->AnimatedVertices.size()));
+				m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), (UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
 			}
 		}
 		else
 		{
 			for (const auto& submesh : m_Submeshes)
 			{
-				m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(submesh->StaticVertices.data(), sizeof(StaticVertex), submesh->StaticVertices.size()));
-				m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), sizeof(UINT) * submesh->Indices.size(), submesh->Indices.size()));
+				m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(submesh->StaticVertices.data(), (UINT)sizeof(StaticVertex), (UINT)submesh->StaticVertices.size()));
+				m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), (UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
 			}
 		}
 
@@ -180,7 +180,7 @@ namespace Crystal {
 	{
 		if (m_bIsAnimated)
 		{
-			float ticksPerSecond = m_Scene->mAnimations[0]->mTicksPerSecond != 0 ? m_Scene->mAnimations[0]->mTicksPerSecond : 25.0f;
+			float ticksPerSecond = m_Scene->mAnimations[0]->mTicksPerSecond != 0 ? (float)m_Scene->mAnimations[0]->mTicksPerSecond : 25.0f;
 			m_AnimationTime += deltaTime * ticksPerSecond;
 			m_AnimationTime = fmod(m_AnimationTime, (float)m_Scene->mAnimations[0]->mDuration);
 			boneTransform(m_AnimationTime);
@@ -234,8 +234,8 @@ namespace Crystal {
 
 		uint32_t index = findScale(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
-		float deltaTime = nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].mTime;
-		float factor = (animationTime - nodeAnim->mScalingKeys[index].mTime) / deltaTime;
+		float deltaTime = (float)(nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].mTime);
+		float factor = (float)(animationTime - nodeAnim->mScalingKeys[index].mTime) / (float)deltaTime;
 		factor = max(factor, 0.0f);
 		
 		// interpolate
@@ -254,8 +254,8 @@ namespace Crystal {
 
 		uint32_t index = findRotation(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
-		float deltaTime = nodeAnim->mRotationKeys[nextIndex].mTime - nodeAnim->mRotationKeys[index].mTime;
-		float factor = (animationTime - nodeAnim->mRotationKeys[index].mTime) / deltaTime;
+		float deltaTime = (float)(nodeAnim->mRotationKeys[nextIndex].mTime - nodeAnim->mRotationKeys[index].mTime);
+		float factor = (float)((animationTime - nodeAnim->mRotationKeys[index].mTime) / deltaTime);
 		factor = max(factor, 0.0f);
 
 		// Slerp
@@ -276,8 +276,8 @@ namespace Crystal {
 
 		uint32_t index = findTranslation(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
-		float deltaTime = nodeAnim->mPositionKeys[nextIndex].mTime - nodeAnim->mPositionKeys[index].mTime;
-		float factor = (animationTime - nodeAnim->mPositionKeys[index].mTime) / deltaTime;
+		float deltaTime = (float)(nodeAnim->mPositionKeys[nextIndex].mTime - nodeAnim->mPositionKeys[index].mTime);
+		float factor = (float)((animationTime - nodeAnim->mPositionKeys[index].mTime) / deltaTime);
 		factor = max(factor, 0.0f);
 
 		// interpolate
@@ -291,7 +291,7 @@ namespace Crystal {
 
 	uint32_t Mesh::findScale(float animationTime, aiNodeAnim* nodeAnim)
 	{
-		for (int i = 0; i < nodeAnim->mNumScalingKeys - 1; i++)
+		for (unsigned int i = 0; i < nodeAnim->mNumScalingKeys - 1; i++)
 		{
 			if (animationTime < nodeAnim->mScalingKeys[i + 1].mTime)
 				return i;
@@ -302,7 +302,7 @@ namespace Crystal {
 
 	uint32_t Mesh::findRotation(float animationTime, aiNodeAnim* nodeAnim)
 	{
-		for (int i = 0; i < nodeAnim->mNumRotationKeys - 1; i++)
+		for (unsigned int i = 0; i < nodeAnim->mNumRotationKeys - 1; i++)
 		{
 			if (animationTime < nodeAnim->mRotationKeys[i + 1].mTime)
 				return i;
@@ -313,7 +313,7 @@ namespace Crystal {
 
 	uint32_t Mesh::findTranslation(float animationTime, aiNodeAnim* nodeAnim)
 	{
-		for (int i = 0; i < nodeAnim->mNumPositionKeys - 1; i++)
+		for (unsigned int i = 0; i < nodeAnim->mNumPositionKeys - 1; i++)
 		{
 			if (animationTime < nodeAnim->mPositionKeys[i + 1].mTime)
 				return i;

@@ -16,9 +16,9 @@ namespace Crystal {
 		{
 		}
 
-		virtual void Start() override
+		virtual void Begin() override
 		{
-			Actor::Start();
+			Actor::Begin();
 		}
 		virtual void Update(float deltaTime) override
 		{
@@ -31,6 +31,6 @@ namespace Crystal {
 
 
 	protected:
-		std::shared_ptr<MeshComponent> m_MeshComponent = nullptr;
+		MeshComponent* m_MeshComponent = nullptr;
 	};
 }

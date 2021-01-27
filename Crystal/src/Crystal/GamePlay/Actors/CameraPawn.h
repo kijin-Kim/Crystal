@@ -11,8 +11,8 @@ namespace Crystal {
 	public:
 		CameraPawn()
 		{
-			auto cameraComponent = std::make_shared<CameraComponent>();
-			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
+			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 0.0f, -10.0f));
 			cameraComponent->SetFieldOfView(60.0f);
 			cameraComponent->SetNearPlane(0.1f);
 			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f });
@@ -23,9 +23,9 @@ namespace Crystal {
 		}
 		virtual ~CameraPawn() = default;
 
-		virtual void Start() override
+		virtual void Begin() override
 		{
-			Pawn::Start();
+			Pawn::Begin();
 		}
 
 		virtual void End() override
@@ -62,21 +62,21 @@ namespace Crystal {
 
 		void MoveForward(float value)
 		{
-			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
+			auto mainCamera = (CameraComponent*)m_MainComponent;
 			auto position = mainCamera->GetWorldPosition();
 			auto forward = mainCamera->GetForward();
 
-			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(forward, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
+			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(forward, DirectX::XMFLOAT3(value, value, value)));
 			mainCamera->SetWorldPosition(newPosition);
 		}
 
 		void MoveRight(float value)
 		{
-			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
+			auto mainCamera = (CameraComponent*)m_MainComponent;
 			auto position = mainCamera->GetWorldPosition();
 			auto right = mainCamera->GetRight();
 
-			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(right, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
+			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(right, DirectX::XMFLOAT3(value, value, value)));
 			mainCamera->SetWorldPosition(newPosition);
 		}
 

@@ -48,7 +48,6 @@ namespace Crystal {
 
 		/*ImGui 구현*/
 		{
-
 			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			descriptorHeapDesc.NumDescriptors = 1;
 			descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -99,7 +98,7 @@ namespace Crystal {
 
 			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 			cbvDesc.BufferLocation = textureUploadBuffer->GetGPUVirtualAddress();
-			cbvDesc.SizeInBytes = size;
+			cbvDesc.SizeInBytes = (UINT)size;
 			m_Device->CreateConstantBufferView(&cbvDesc, destHeapHandle);
 
 			
@@ -113,7 +112,7 @@ namespace Crystal {
 		equiToCubeDestHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		m_Device->CopyDescriptorsSimple(1, equiToCubeDestHandle, m_CubemapTexture->GetUnorderedAccessView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-
+		
 		D3D12_CPU_DESCRIPTOR_HANDLE irradianceSampling = m_DiffuseIrradianceSamplingDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		m_Device->CopyDescriptorsSimple(1, irradianceSampling, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		irradianceSampling.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -140,7 +139,7 @@ namespace Crystal {
 			cmdList->SetDescriptorHeaps(_countof(equiToCubeHeaps), equiToCubeHeaps);
 			cmdList->SetComputeRootDescriptorTable(0, m_EquiToCubeDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 			auto desc = m_CubemapTexture->GetResource()->GetDesc();
-			cmdList->Dispatch(desc.Width / 32, desc.Height / 32, 6);
+			cmdList->Dispatch((UINT)(desc.Width / 32), (UINT)(desc.Height / 32), 6);
 
 			resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
@@ -152,14 +151,13 @@ namespace Crystal {
 			resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 			cmdList->ResourceBarrier(1, &resourceBarrier);
 
-
 			/*DiffuseIrradiance Sample*/
 			cmdList->SetPipelineState(m_DiffuseIrradianceSamplingPipeline.Get());
 			cmdList->SetComputeRootSignature(m_DiffuseIrradianceSamplingRootSignature.Get());
 			ID3D12DescriptorHeap* irradianceSamplingHeaps[] = { m_DiffuseIrradianceSamplingDescriptorHeap.Get() };
 			cmdList->SetDescriptorHeaps(_countof(irradianceSamplingHeaps), irradianceSamplingHeaps);
 			cmdList->SetComputeRootDescriptorTable(0, m_DiffuseIrradianceSamplingDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			cmdList->Dispatch(m_IrradiancemapTexture->GetResource()->GetDesc().Width / 32, m_IrradiancemapTexture->GetResource()->GetDesc().Height / 32, 6);
+			cmdList->Dispatch((UINT)(m_IrradiancemapTexture->GetResource()->GetDesc().Width / 32), (UINT)(m_IrradiancemapTexture->GetResource()->GetDesc().Height / 32), 6);
 
 			resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 			resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
@@ -219,12 +217,12 @@ namespace Crystal {
 
 		{
 			/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-			for (const auto meshComponent : m_MeshComponents)
+			for (int i =0; i<m_MeshComponents.size(); i++)
 			{
 
-				meshComponent->GetTransform();
+				m_PerObjectData.World = Matrix4x4::Transpose(m_MeshComponents[i]->GetWorldTransform());
 
-				auto material = meshComponent->GetMesh()->GetMaterial();
+				auto material = m_MeshComponents[i]->GetMesh()->GetMaterial();
 
 				// 아주 간단한 프로토 타입 디자인, 추 후에 매 패스(셰이더)마다 이 정보를 가지고 있게 할 것임.
 				enum EPBRInputType
@@ -313,7 +311,7 @@ namespace Crystal {
 			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
-
+		
 		{
 
 			// Start the Dear ImGui frame
@@ -348,9 +346,9 @@ namespace Crystal {
 
 				//ImGui::Checkbox("Use Normal Texture", (bool*)&m_PerObjectData.bToggleNormalTexture);
 
-				//ImGui::Checkbox("Use Irradiance Texture ", (bool*)&m_PerObjectData.bToggleIrradianceTexture);
+				ImGui::Checkbox("Use Irradiance Texture ", (bool*)&m_PerObjectData.bToggleIrradianceTexture);
 
-				//ImGui::SliderFloat3("Rotation", rotationAngle, 0.0f, 360.0f);
+				ImGui::SliderFloat3("Rotation", rotationAngle, 0.0f, 360.0f);
 
 				
 				//static int counter = 0;
@@ -393,7 +391,7 @@ namespace Crystal {
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		cmdList->ResourceBarrier(1, &resourceBarrier);
-
+		
 		
 		cmdList->ClearRenderTargetView(m_ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(), m_ClearColor, 0, nullptr);
 		//cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -412,9 +410,9 @@ namespace Crystal {
 		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cmdList->SetGraphicsRootDescriptorTable(0, hCommon);*/
 
-		//for (const auto& meshComponent : m_MeshComponents)
+		for (const auto& meshComponent : m_MeshComponents)
 		{
-			m_MeshComponents[0]->GetMesh()->Render(cmdList);
+			meshComponent->GetMesh()->Render(cmdList);
 		}
 
 		//---------------Cubemap
@@ -428,8 +426,6 @@ namespace Crystal {
 		cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
 		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
-
-
 
 
 		// IMGUI RENDER
@@ -670,7 +666,7 @@ namespace Crystal {
 		//////////////ROOT SIGNATURE /////////////////////
 		///////////////////////////////////////////////////
 		
-		CD3DX12_ROOT_PARAMETER1 rootParameter[2];
+		CD3DX12_ROOT_PARAMETER1 rootParameter[2] = {};
 		rootParameter[0].InitAsConstantBufferView(0);
 
 		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
@@ -925,9 +921,9 @@ namespace Crystal {
 		shaderManager.Load("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
 		shaderManager.Load("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
 		
-		m_PerFrameBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerFrameData));
-		m_PerObjectBuffer = std::make_unique<ConstantBuffer>(sizeof(m_PerObjectData));
-		m_PerFrameBufferCubemap= std::make_unique<ConstantBuffer>(sizeof(m_PerFrameDataCubemap));
+		m_PerFrameBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
+		m_PerObjectBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerObjectData));
+		m_PerFrameBufferCubemap= std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameDataCubemap));
 	}
 
 	void Renderer::ChangeDisplayMode()

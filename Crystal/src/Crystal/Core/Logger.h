@@ -48,14 +48,14 @@ namespace Crystal {
 
 
 
-#define CS_INFO(...) Crystal::Log("[ Crystal Info ] : ", CS_FORMAT(__VA_ARGS__).c_str())
-#define CS_WARN(...) Crystal::Log("[ Crystal Warn ] : ", CS_FORMAT(__VA_ARGS__).c_str())
+#define CS_INFO(...) Crystal::Log("[Crystal Info] : ", CS_FORMAT(__VA_ARGS__).c_str())
+#define CS_WARN(...) Crystal::Log("[Crystal Warn] : ", CS_FORMAT(__VA_ARGS__).c_str())
 
 #ifdef CS_DEBUG
-#define CS_DEBUG_INFO(...) Crystal::Log("[ Crystal Debug ] : ", CS_FORMAT(__VA_ARGS__).c_str())
+#define CS_DEBUG_INFO(...) Crystal::Log("[Crystal Debug] : ", CS_FORMAT(__VA_ARGS__).c_str())
 #define CS_FATAL(x, ...) if(!(x)) { \
 	std::string formatted = CS_FORMAT(__VA_ARGS__);\
-	Crystal::Log("[ Crystal Fatal ]: ", formatted.c_str());\
+	Crystal::Log("[Crystal Fatal]: ", formatted.c_str());\
 	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 	__debugbreak();\
 }
@@ -63,7 +63,7 @@ namespace Crystal {
 #define CS_DEBUG_INFO(...)
 #define CS_FATAL(x, ...) if(!(x)) { \
 	std::string formatted = CS_FORMAT(__VA_ARGS__);\
-	Crystal::Log("[ Crystal Fatal ] : ", formatted.c_str());\
+	Crystal::Log("[Crystal Fatal] : ", formatted.c_str());\
 	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 }
 #endif

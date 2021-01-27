@@ -13,7 +13,7 @@ namespace Crystal {
 	class CameraComponent : public TransformComponent
 	{
 	public:
-		CameraComponent() = default;
+		CameraComponent(const std::string& name) : TransformComponent(name) {}
 		virtual ~CameraComponent() = default;
 
 		virtual void Update(float deltaTime) override
