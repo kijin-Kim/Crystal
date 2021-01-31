@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "Crystal/Resources/ShaderManager.h"
-#include "Crystal/Resources/ConstantBuffer.h"
 #include "Crystal/GamePlay/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "../Core/ApplicationUtility.h"
@@ -37,6 +36,10 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
+		descriptorHeapDesc.NumDescriptors = 1;
+		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_CubemapDescriptorHeap));
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+
 		descriptorHeapDesc.NumDescriptors = 2;
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_EquiToCubeDescriptorHeap));
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
@@ -44,6 +47,7 @@ namespace Crystal {
 		descriptorHeapDesc.NumDescriptors = 2;
 		hr = m_Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DiffuseIrradianceSamplingDescriptorHeap));
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+
 
 
 		/*ImGui 구현*/
@@ -80,33 +84,8 @@ namespace Crystal {
 		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
 
 
-
-		//////////////////////////////////////////////////////////////////////////
-		{
-
-			auto bioneMatricesSize = 100;
-			auto size = bioneMatricesSize * sizeof(DirectX::XMFLOAT4X4);
-			size = (size + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
-			hr = m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr, IID_PPV_ARGS(&textureUploadBuffer));
-			CS_FATAL(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
-
-
-			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-			cbvDesc.BufferLocation = textureUploadBuffer->GetGPUVirtualAddress();
-			cbvDesc.SizeInBytes = (UINT)size;
-			m_Device->CreateConstantBufferView(&cbvDesc, destHeapHandle);
-
-			
-		}
-		//////////////////////////////////////////////////////////////////////////
-
 		
-					/*Compute Pipeline Resource를 복사합니다.*/
+		/*Compute Pipeline Resource를 복사합니다.*/
 		D3D12_CPU_DESCRIPTOR_HANDLE equiToCubeDestHandle = m_EquiToCubeDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		m_Device->CopyDescriptorsSimple(1, equiToCubeDestHandle, m_EquirectangularTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		equiToCubeDestHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -171,6 +150,10 @@ namespace Crystal {
 		}
 
 
+		m_LightingPipeline = std::make_unique<LightingPipeline>("PBRLightingPipeline");
+		m_CubemapPipeline = std::make_unique<CubemapPipeline>("CubemapPipeline");
+		m_ClearPipeline = std::make_unique<ClearPipeline>("ClearPipeline");
+
 	}
 
 	void Renderer::Render()
@@ -179,288 +162,68 @@ namespace Crystal {
 		ChangeDisplayMode();
 
 
-		static float rotationAngle[3] = {};
-
-		
-		DirectX::XMFLOAT4X4 scaleMat = Matrix4x4::Scale({ 40.0f, 40.0f, 40.0f });
-		DirectX::XMFLOAT4X4 rotationMat = Matrix4x4::RotationQuaternion(Vector4::QuaternionRollPitchYaw({ rotationAngle[2], rotationAngle[0], rotationAngle[1] }));
-		
-		m_WorldMat = Matrix4x4::Multiply(Matrix4x4::Multiply(Matrix4x4::Identity(), scaleMat), rotationMat);
-
-		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
-		
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(cameraComponent->GetViewProjection());
-		auto camPos = cameraComponent->GetWorldPosition();
-		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
-		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0f, 0.0f, 0.0f);
-		m_PerObjectData.World = Matrix4x4::Transpose(m_WorldMat);
-		/*m_PerObjectData.World = m_MeshComponents[0]->GetMesh()->GetGlobalTransform();*/
-		/*m_PerObjectData.bToggleAlbedoTexture = false;
-		m_PerObjectData.bToggleMetalicTexture = false;
-		m_PerObjectData.bToggleNormalTexture = false;
-		m_PerObjectData.bToggleRoughnessTexture = false;*/
-		static float albedoColor[3] = { 1.0f, 1.0f, 1.0f };
-		m_PerObjectData.AlbedoColor = {albedoColor[0], albedoColor[1], albedoColor[2], 0.0f };
-
-		auto viewProj = cameraComponent->GetViewProjection();
-		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
-		m_PerFrameDataCubemap.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
-
-		
-
-
-		auto boneMatrices = m_MeshComponents[0]->GetMesh()->GetBoneTransfroms();
-		UINT8* bufferPointer = nullptr;
-		textureUploadBuffer->Map(0, nullptr, (void**)&bufferPointer);
-
-		memcpy(bufferPointer, boneMatrices.data(), boneMatrices.size() * sizeof(DirectX::XMFLOAT4X4));
-
-		{
-			/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-			for (int i =0; i<m_MeshComponents.size(); i++)
-			{
-
-				m_PerObjectData.World = Matrix4x4::Transpose(m_MeshComponents[i]->GetWorldTransform());
-
-				auto material = m_MeshComponents[i]->GetMesh()->GetMaterial();
-
-				// 아주 간단한 프로토 타입 디자인, 추 후에 매 패스(셰이더)마다 이 정보를 가지고 있게 할 것임.
-				enum EPBRInputType
-				{
-					AlbedoTexture = 0,
-					RoughnessTexture,
-					MetalicTexture,
-					NormalTexture,
-					PBR_INPUT_COUNT
-				};
-				
-				Texture* pbrTextureInputs[PBR_INPUT_COUNT] = {};
-
-				if (material->HasTextureInput("AlbedoTexture"))
-				{
-					m_PerObjectData.bToggleAlbedoTexture = true;
-					pbrTextureInputs[AlbedoTexture] = material->GetTextureInput("AlbedoTexture");
-				}
-				else if(material->HasFloatInput("AlbedoColor"))
-				{
-					m_PerObjectData.bToggleAlbedoTexture = false;
-					m_PerObjectData.AlbedoColor = material->GetFloatInput("AlbedoColor");
-				}
-
-				if (material->HasTextureInput("RoughnessTexture"))
-				{
-					m_PerObjectData.bToggleRoughnessTexture = true;
-					pbrTextureInputs[RoughnessTexture] = material->GetTextureInput("RoughnessTexture");
-				}
-				else if(material->HasFloatInput("RoughnessConstant"))
-				{
-					m_PerObjectData.bToggleRoughnessTexture = false;
-					m_PerObjectData.RoughnessConstant = material->GetFloatInput("RoughnessConstant").x;
-				}
-
-				if (material->HasTextureInput("MetalicTexture"))
-				{
-					m_PerObjectData.bToggleMetalicTexture = true;
-					pbrTextureInputs[MetalicTexture]= material->GetTextureInput("MetalicTexture");
-				}
-				else if(material->HasFloatInput("MetalicConstant"))
-				{
-					m_PerObjectData.bToggleMetalicTexture = false;
-					m_PerObjectData.MetalicConstant = material->GetFloatInput("MetalicConstant").x;
-				}
-
-				if (material->HasTextureInput("NormalTexture"))
-				{
-					m_PerObjectData.bToggleNormalTexture = true;
-					pbrTextureInputs[NormalTexture] = material->GetTextureInput("NormalTexture");
-				}
-				else
-					m_PerObjectData.bToggleNormalTexture = false;
-
-				D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-				destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
-
-				for (auto& ti : pbrTextureInputs)
-				{
-					if (ti)
-					{
-						m_Device->CopyDescriptorsSimple(1, destHeapHandle, ti->GetShaderResourceView(), 
-							D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-					}
-					destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				}
-
-				m_PerFrameBuffer->SetData((void*)&m_PerFrameData);
-				m_PerObjectBuffer->SetData((void*)&m_PerObjectData);
-				m_PerFrameBufferCubemap->SetData((void*)&m_PerFrameDataCubemap);
-			}
-
-			/*CBV를 복사합니다.*/
-			m_Device->CopyDescriptorsSimple(1, m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_PerObjectBuffer->GetCPUDescriptorHandle(),
-				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-
-			/*SRV를 복사합니다.*/
-			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_CommonDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
-			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_IrradiancemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			
-			destHeapHandle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			m_Device->CopyDescriptorsSimple(1, destHeapHandle, m_CubemapTexture->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		}
-
-		
-		{
-
-			// Start the Dear ImGui frame
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-
-			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-			static bool show_demo_window = false;
-			if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-			{
-				static float f = 0.0f;
-				
-
-				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-
-
-
-				//ImGui::Checkbox("Use Albedo Texture", (bool*)&m_PerObjectData.bToggleAlbedoTexture);
-				//ImGui::ColorEdit3("Albedo Color", albedoColor); // Edit 3 floats representing a color
-
-				//ImGui::Checkbox("Use Roughness Texture", (bool*)&m_PerObjectData.bToggleRoughnessTexture);
-				//ImGui::SliderFloat("Roughness", &m_PerObjectData.RoughnessConstant, 0.0f, 1.0f); // Edit 3 floats representing a color
-
-				//ImGui::Checkbox("Use Metalic Texture", (bool*)&m_PerObjectData.bToggleMetalicTexture);
-				//ImGui::SliderFloat("Metalic", &m_PerObjectData.MetalicConstant, 0.0f, 1.0f);// Edit 3 floats representing a color
-
-				//ImGui::Checkbox("Use Normal Texture", (bool*)&m_PerObjectData.bToggleNormalTexture);
-
-				ImGui::Checkbox("Use Irradiance Texture ", (bool*)&m_PerObjectData.bToggleIrradianceTexture);
-
-				ImGui::SliderFloat3("Rotation", rotationAngle, 0.0f, 360.0f);
-
-				
-				//static int counter = 0;
-				//if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				//	counter++;
-				//ImGui::SameLine();
-				//ImGui::Text("counter = %d", counter);
-
-				//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-				ImGui::End();
-			}
-
-			// Rendering
-			ImGui::Render();
-
-
-
-		}
-
-
-		//////////////////////////////////////////
-		///// RENDER /////////////////////////////
-		//////////////////////////////////////////
-
-		auto cmdList = m_CommandQueue->GetCommandList();
-
-		
-		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		cmdList->RSSetViewports(1, &cameraComponent->GetViewport());
-		cmdList->RSSetScissorRects(1, &cameraComponent->GetScissorRect());
-		//cmdList->OMSetRenderTargets(1, &m_RenderTargetViews[m_RtvIndex]->GetCpuHandle(), TRUE, &m_DepthStencil->GetCpuHandle());
-		cmdList->OMSetRenderTargets(1, &m_ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(), TRUE, &m_DepthBufferTexture->GetDepthStencilView());
-		
+		auto commandList = m_CommandQueue->GetCommandList();
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		resourceBarrier.Transition.pResource = m_ColorBufferTextures[m_RtvIndex]->GetResource();
+		resourceBarrier.Transition.pResource = m_RenderTargetTextures[m_RtvIndex]->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		cmdList->ResourceBarrier(1, &resourceBarrier);
-		
-		
-		cmdList->ClearRenderTargetView(m_ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(), m_ClearColor, 0, nullptr);
-		//cmdList->ClearDepthStencilView(m_DepthStencil->GetCpuHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-		cmdList->ClearDepthStencilView(m_DepthBufferTexture->GetDepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		cmdList->SetPipelineState(m_PbrAnimatedPipelineState.Get());
+		ClearPipeline::ClearPipelineInputs clearPipelineInputs = {};
+		clearPipelineInputs.RenderTargets[0] = m_RenderTargetTextures[m_RtvIndex].get();
+		clearPipelineInputs.ClearColorValue = { 1.0f, 0.0f, 1.0f, 0.0f };
+		clearPipelineInputs.DepthStencilBuffer = m_DepthStencilBufferTexture.get();
+		clearPipelineInputs.bClearDepth = true;
+		clearPipelineInputs.ClearDepthValue = 1.0f;
+		clearPipelineInputs.bClearStencil = true;
+		clearPipelineInputs.ClearStencilValue = 0.0f;
+		m_ClearPipeline->Begin(&clearPipelineInputs);
+		m_ClearPipeline->Record(commandList);
+		m_ClearPipeline->End();
 
-		cmdList->SetGraphicsRootSignature(m_NormalRootSignature.Get());
-
-		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBuffer->GetGPUVirtualAddress());
-		ID3D12DescriptorHeap* descriptorHeaps[] = { m_CommonDescriptorHeap.Get() };
-		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-		cmdList->SetGraphicsRootDescriptorTable(1, m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-		/*D3D12_GPU_DESCRIPTOR_HANDLE hCommon = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		hCommon.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		cmdList->SetGraphicsRootDescriptorTable(0, hCommon);*/
-
-		for (const auto& meshComponent : m_MeshComponents)
-		{
-			meshComponent->GetMesh()->Render(cmdList);
-		}
-
-		//---------------Cubemap
-		cmdList->SetPipelineState(m_CubemapPipelineState.Get());
-		cmdList->SetGraphicsRootSignature(m_CubemapRootSignature.Get());
-		cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-		cmdList->SetGraphicsRootConstantBufferView(0, m_PerFrameBufferCubemap->GetGPUVirtualAddress());
-		D3D12_GPU_DESCRIPTOR_HANDLE handle = m_CommonDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		handle.ptr += m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 7;
-		cmdList->SetGraphicsRootDescriptorTable(1, handle);
-		cmdList->IASetVertexBuffers(0, 1, &m_QuadVertexBuffer->GetView());
-		cmdList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
-		cmdList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
+		LightingPipeline::LightingPipelineInputs lightingPipelineInputs = {};
+		lightingPipelineInputs.RenderComponents = &m_RenderComponents;
+		lightingPipelineInputs.Camera = ApplicationUtility::GetPlayerController().GetMainCamera();
+		lightingPipelineInputs.RenderTargets[0] = clearPipelineInputs.RenderTargets[0];
+		lightingPipelineInputs.DepthStencilBuffer = clearPipelineInputs.DepthStencilBuffer;
+		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
+		m_LightingPipeline->Begin(&lightingPipelineInputs);
+		m_LightingPipeline->Record(commandList);
+		m_LightingPipeline->End();
 
 
-		// IMGUI RENDER
-		{
-			ID3D12DescriptorHeap* descriptorHeaps[] = { m_ImGuiHeap.Get() };
-			cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-		}
+		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
+		cubemapPipelineInputs.Camera = ApplicationUtility::GetPlayerController().GetMainCamera();
+		cubemapPipelineInputs.RenderTargets[0] = lightingPipelineInputs.RenderTargets[0];
+		cubemapPipelineInputs.DepthStencilBuffer = lightingPipelineInputs.DepthStencilBuffer;
+		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
+		m_CubemapPipeline->Begin(&cubemapPipelineInputs);
+		m_CubemapPipeline->Record(commandList);
+		m_CubemapPipeline->End();
 
-		resourceBarrier.Transition.pResource = m_ColorBufferTextures[m_RtvIndex]->GetResource();
+		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		resourceBarrier.Transition.pResource = m_RenderTargetTextures[m_RtvIndex]->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		cmdList->ResourceBarrier(1, &resourceBarrier);
-	
-		m_CommandQueue->Execute(cmdList);
-
-		{
-			// Update and Render additional Platform Windows
-			auto io =  ImGui::GetIO();
-			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				ImGui::UpdatePlatformWindows();
-				ImGui::RenderPlatformWindowsDefault(nullptr, (void*)cmdList.Get());
-			}
-		}
+		commandList->ResourceBarrier(1, &resourceBarrier);
 
 
+		m_CommandQueue->Execute(commandList);
+
+		
 		DXGI_PRESENT_PARAMETERS presentParameters;
 		presentParameters.DirtyRectsCount = 0;
 		presentParameters.pDirtyRects = nullptr;
 		presentParameters.pScrollRect = nullptr;
 		presentParameters.pScrollOffset = nullptr;
 		m_SwapChain->Present1(1, 0, &presentParameters);
-
+		
 		m_CommandQueue->Flush();
 
 		m_RtvIndex++;
@@ -519,7 +282,7 @@ namespace Crystal {
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
-		for (auto& rt : m_ColorBufferTextures)
+		for (auto& rt : m_RenderTargetTextures)
 		{
 			rt.reset();
 		}
@@ -531,11 +294,11 @@ namespace Crystal {
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_ColorBufferTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_ColorBufferTextures[i]->CreateRenderTargetView(m_ColorBufferTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
-		m_DepthBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		m_DepthBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
+		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
@@ -646,16 +409,16 @@ namespace Crystal {
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_ColorBufferTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_ColorBufferTextures[i]->CreateRenderTargetView(m_ColorBufferTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
 	}
 
 	void Renderer::CreateDepthStencilView()
 	{
-		m_DepthBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, 
+		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, 
 			D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		m_DepthBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
+		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 	}
 
 	
@@ -666,17 +429,17 @@ namespace Crystal {
 		//////////////ROOT SIGNATURE /////////////////////
 		///////////////////////////////////////////////////
 		
-		CD3DX12_ROOT_PARAMETER1 rootParameter[2] = {};
+		CD3DX12_ROOT_PARAMETER1 rootParameter[3] = {};
 		rootParameter[0].InitAsConstantBufferView(0);
 
-		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[2] = {};
-		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 1);
-		commonDescriptorHeapRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
-		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges), commonDescriptorHeapRanges);
-		// [0] Root Constant Buffer View     Per Frame Data ( CameraPosition, LightPosition etc.)
-		// [1] Root Descriptor Table          [1] Object1 ( Transform, Material )
-		//								          [2] Object2 ( Transform, Material )
-		//								          [3] Object3 ( Transform, Material )
+		CD3DX12_DESCRIPTOR_RANGE1 globalRootParamRanges[1] = {};
+		globalRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		rootParameter[1].InitAsDescriptorTable(_countof(globalRootParamRanges), globalRootParamRanges);
+
+		CD3DX12_DESCRIPTOR_RANGE1 perObjectRootParamRanges[2] = {};
+		perObjectRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+		perObjectRootParamRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
+		rootParameter[2].InitAsDescriptorTable(_countof(perObjectRootParamRanges), perObjectRootParamRanges);
 
 		CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 		StaticSamplerDescs[0].Init(0);
@@ -687,7 +450,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootsigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다 %s", rootSignatureErrorBlob->GetBufferPointer());
 		hr = m_Device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_NormalRootSignature));
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
@@ -742,7 +505,7 @@ namespace Crystal {
 		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
 
 		pipelineStateStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		pipelineStateStream.DSVFormat = m_DepthBufferTexture->GetResource()->GetDesc().Format;
+		pipelineStateStream.DSVFormat = m_DepthStencilBufferTexture->GetResource()->GetDesc().Format;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 		rtvFormat.NumRenderTargets = 1;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -791,7 +554,7 @@ namespace Crystal {
 		cubemapPipelineStream.VS = { cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		cubemapPipelineStream.PS = { cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 		cubemapPipelineStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		cubemapPipelineStream.DSVFormat = m_DepthBufferTexture->GetResource()->GetDesc().Format;
+		cubemapPipelineStream.DSVFormat = m_DepthStencilBufferTexture->GetResource()->GetDesc().Format;
 		D3D12_RT_FORMAT_ARRAY cubemapRtvFormat = {};
 		cubemapRtvFormat.NumRenderTargets = 1;
 		cubemapRtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -899,7 +662,6 @@ namespace Crystal {
 		///////////////////////////////////////////////////
 
 		auto& shaderManager = ShaderManager::Instance();
-		/*auto& textureManager = TextureManager::Instance();*/
 
 		/*텍스쳐 리소스를 로드합니다.*/
 		m_EquirectangularTexture = std::make_unique<Texture>("assets/textures/cubemaps/pink_sunrise_4k.hdr");
@@ -921,9 +683,6 @@ namespace Crystal {
 		shaderManager.Load("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
 		shaderManager.Load("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
 		
-		m_PerFrameBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
-		m_PerObjectBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerObjectData));
-		m_PerFrameBufferCubemap= std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameDataCubemap));
 	}
 
 	void Renderer::ChangeDisplayMode()
@@ -938,7 +697,7 @@ namespace Crystal {
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
-		for (auto& rt : m_ColorBufferTextures)
+		for (auto& rt : m_RenderTargetTextures)
 		{
 			rt.reset();
 		}
@@ -949,8 +708,8 @@ namespace Crystal {
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_ColorBufferTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_ColorBufferTextures[i]->CreateRenderTargetView(m_ColorBufferTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
 
 		DXGI_MODE_DESC targetParam = {};

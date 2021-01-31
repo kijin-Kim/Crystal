@@ -3,6 +3,7 @@
 #include "Crystal/Math/Math.h"
 #include "Crystal/GamePlay/Actors/Actor.h"
 #include "../../Core/Logger.h"
+#include "../../Renderer/Renderable.h"
 
 namespace Crystal {
 	class Component
@@ -96,6 +97,15 @@ namespace Crystal {
 		virtual void Update(float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
+			for (const auto renderable : m_Renderables)
+			{
+				renderable->Update(deltaTime);
+			}
 		}
+
+		const std::vector<Renderable*>& GetRenderables() const { return m_Renderables; }
+
+	protected:
+		std::vector<Renderable*> m_Renderables;
 	};
 }

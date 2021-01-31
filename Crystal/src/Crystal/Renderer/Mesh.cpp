@@ -178,6 +178,8 @@ namespace Crystal {
 
 	void Mesh::Update(float deltaTime)
 	{
+		Renderable::Update(deltaTime);
+
 		if (m_bIsAnimated)
 		{
 			float ticksPerSecond = m_Scene->mAnimations[0]->mTicksPerSecond != 0 ? (float)m_Scene->mAnimations[0]->mTicksPerSecond : 25.0f;

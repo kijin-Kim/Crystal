@@ -33,6 +33,7 @@ cbuffer PerFrameData : register(b0)
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
+    float4x4 Bones[100];
     float4 AlbedoColor;
     bool bToggleAlbedoTexture;
     bool bToggleMetalicTexture;
@@ -42,11 +43,6 @@ cbuffer PerObjectData : register(b1)
     float RoughnessConstant;
     float MetalicConstant;
 }
-cbuffer MatrixPalette : register(b2)
-{
-    float4x4 Bones[52];
-}
-
 
 PS_INPUT vsMain(VS_INPUT input)
 {
@@ -73,12 +69,15 @@ PS_INPUT vsMain(VS_INPUT input)
 
 
 
+/*Always*/
+TextureCube IrradianceTexture : register(t0);
 
-Texture2D AlbedoTexture : register(t0);
-Texture2D MetalicTexture : register(t1);
-Texture2D RoughnessTexture : register(t2);
-Texture2D NormalTexture : register(t3);
-TextureCube IrradianceTexture : register(t4);
+/*PerObject*/
+Texture2D AlbedoTexture : register(t1);
+Texture2D MetalicTexture : register(t2);
+Texture2D RoughnessTexture : register(t3);
+Texture2D NormalTexture : register(t4);
+
 
 SamplerState DefaultSampler : register(s0);
 

@@ -37,10 +37,12 @@ public:
 
 
 		/*메쉬를 만들고 Material을 지정합니다.*/
-		std::shared_ptr<Crystal::Mesh> mesh = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		//std::shared_ptr<Crystal::Mesh> mesh = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		Crystal::Mesh* mesh = new Crystal::Mesh("assets/models/silly_dancing.fbx");
 		mesh->SetMaterial(pbrMaterial);
 
-		std::shared_ptr<Crystal::Mesh> mesh2 = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		//std::shared_ptr<Crystal::Mesh> mesh2 = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		Crystal::Mesh* mesh2 = new Crystal::Mesh("assets/models/silly_dancing.fbx");
 		mesh2->SetMaterial(pbrMaterial);
 
 		
@@ -54,6 +56,7 @@ public:
 		m_TempFollowMeshComponent->SetMesh(mesh2);
 
 		/* TEMP */
+
 		m_TempFollowMeshComponent->SetLocalTransform(Crystal::Matrix4x4::Translation({ 0.0f, 2.0f, 0.0f }));
 
 		m_MainComponent = m_MeshComponent;

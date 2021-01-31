@@ -4,9 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "Buffers.h"
+#include "Crystal/Resources/Buffers.h"
 #include "Material.h"
 #include "Crystal/Math/Math.h"
+#include "Renderable.h"
 
 struct aiNode;
 struct aiScene;
@@ -70,12 +71,12 @@ namespace Crystal {
 	};
 
 	/*SubMesh들의 컨테이너 입니다.*/
-	class Mesh final
+	class Mesh final : public Renderable
 	{
 	public:
 		Mesh(const std::string& filePath);
 		virtual ~Mesh();
-		void Update(float deltaTime);
+		virtual void Update(float deltaTime) override;
 		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList);
 		void SetMaterial(std::shared_ptr<Material> material) { m_Material = std::move(material); }
 		Material* GetMaterial() const { return m_Material.get(); }
@@ -84,7 +85,7 @@ namespace Crystal {
 		//TEMP//
 		const DirectX::XMFLOAT4X4& GetGlobalTransform() const { return m_InverseGlobalTransform; }
 		bool IsAnimated() const { return m_bIsAnimated; }
-		const std::vector<DirectX::XMFLOAT4X4>& GetBoneTransfroms() const { return m_BoneTransforms; }
+		const std::vector<DirectX::XMFLOAT4X4>& GetBoneTransforms() const { return m_BoneTransforms; }
 	private:
 		void processNode(aiNode* node, const aiScene* scene);
 		void boneTransform(float deltaTime);

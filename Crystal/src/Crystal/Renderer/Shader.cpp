@@ -60,6 +60,8 @@ namespace Crystal {
 		D3D12_SHADER_INPUT_BIND_DESC shaderInputBindDesc = {};
 		HRESULT hr = m_ShaderReflection->GetResourceBindingDescByName(inputName.c_str(),&shaderInputBindDesc);
 		return SUCCEEDED(hr) && shaderInputBindDesc.Type == shaderInputType;
+
+		return true;
 	}
 
 	bool Shader::CheckInputValidation(const std::string& inputName, const std::string& typeName)
@@ -70,6 +72,8 @@ namespace Crystal {
 		shaderReflectionType->GetDesc(&shaderTypeDesc);
 
 		return shaderTypeDesc.Name && shaderTypeDesc.Name == typeName;
+
+		return true;
 	}
 
 	Microsoft::WRL::ComPtr<ID3DBlob> Shader::loadSourceFromFile(const std::string& filePath)

@@ -9,12 +9,8 @@ namespace Crystal {
 		MeshComponent(const std::string& name);
 		virtual ~MeshComponent() = default;
 
-		virtual void Update(float deltaTime) override { RenderComponent::Update(deltaTime); m_Mesh->Update(deltaTime); }
+		virtual void Update(float deltaTime) override { RenderComponent::Update(deltaTime);}
 		/////// TEMPORARY //////
-		void SetMesh(std::shared_ptr<Mesh> modelMesh) { m_Mesh = std::move(modelMesh); }
-		Mesh* GetMesh() const { return m_Mesh.get(); }
-
-	private:
-		std::shared_ptr<Mesh> m_Mesh = nullptr;
+		void SetMesh(Renderable* modelMesh) { m_Renderables.push_back(modelMesh); }
 	};
 }

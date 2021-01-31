@@ -1,7 +1,7 @@
 #include "cspch.h"
 #include "Buffers.h"
-#include "Renderer.h"
-#include "CommandList.h"
+#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Renderer/CommandList.h"
 
 namespace Crystal {
 	VertexBuffer::VertexBuffer(void* data, UINT strideInByte, UINT count)

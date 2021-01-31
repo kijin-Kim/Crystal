@@ -54,7 +54,7 @@ namespace Crystal {
 #ifdef CS_DEBUG
 #define CS_DEBUG_INFO(...) Crystal::Log("[Crystal Debug] : ", CS_FORMAT(__VA_ARGS__).c_str())
 #define CS_FATAL(x, ...) if(!(x)) { \
-	std::string formatted = CS_FORMAT(__VA_ARGS__);\
+	std::string formatted = CS_FORMAT(__VA_ARGS__).c_str();\
 	Crystal::Log("[Crystal Fatal]: ", formatted.c_str());\
 	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 	__debugbreak();\
