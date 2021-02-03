@@ -20,6 +20,8 @@ DirectX12기반의 졸업작품 프레임워크를 개발합니다.
   * ImGUI라이브러리를 추가.
 ### 3주차 (2021-01-17 ~ 2021-01-23)
   * 런타임에 Equirectangular image를 Cubemap(Texture array)으로 변환(추출)하는 Compute Shader를 구현.
+  * 기본적인 Input System 구현.
+  * 마우스와 키보드를 사용한 FPS 카메라 구현(Quaternion) 구현.
 ### 4주차 (2021-01-24 ~ 2021-01-30)
   * 기본적인 Material System 및 Actor - Component시스템 구현.
   * 런타임에 Cubemap으로부터 Diffuse Irradiance map을 샘플링하는 Compute Shader를 구현.
