@@ -26,5 +26,5 @@ DirectX12기반의 졸업작품 프레임워크를 개발합니다.
   * 기본적인 Material System 및 Actor - Component시스템 구현.
   * 런타임에 Cubemap으로부터 Diffuse Irradiance map을 샘플링하는 Compute Shader를 구현.
 ### 5주차 (2021-01-31 ~ 2021-02-06)
-  * 멀티스레드를 사용하여 Rendering work를 submit할 수 있도록 리팩토링.
+  * PipelineState를 재사용 할 수 있도록 API를 설계 및 작성.
   * Specular Irradiance map에 대한 이론 조사 및 학습.
