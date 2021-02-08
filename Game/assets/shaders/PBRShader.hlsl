@@ -51,6 +51,7 @@ PS_INPUT vsMain(VS_INPUT input)
     boneTransform += Bones[input.BoneIDs[2]] * input.BoneWeights[2];
     boneTransform += Bones[input.BoneIDs[3]] * (1.0f - (input.BoneWeights[2] + input.BoneWeights[1] + input.BoneWeights[0]));
     
+    
     float3 localPosition = mul(float4(input.Position, 1.0f), boneTransform);
     //float3 localPosition = input.Position;
     PS_INPUT output;

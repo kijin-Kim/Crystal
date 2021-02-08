@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Crystal/Renderer/Shader.h"
+#include "Shader.h"
 
 namespace Crystal {
 	class ShaderManager final

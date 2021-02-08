@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "Crystal/GamePlay/Actors/Actor.h"
-#include "Crystal/GamePlay/Components/MeshComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
 	class Level final

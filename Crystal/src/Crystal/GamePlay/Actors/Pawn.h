@@ -1,6 +1,6 @@
 #pragma once
 #include "Actor.h"
-#include "Crystal/GamePlay/Components/MeshComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/InputComponent.h"
 #include "Crystal/Resources/ShaderManager.h"
 

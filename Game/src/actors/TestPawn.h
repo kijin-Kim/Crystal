@@ -1,5 +1,7 @@
 #pragma once
 #include "Crystal/GamePlay/Actors/Pawn.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/Resources/Animation.h"
 
 class TestPawn : public Crystal::Pawn
 {
@@ -38,22 +40,31 @@ public:
 
 		/*메쉬를 만들고 Material을 지정합니다.*/
 		//std::shared_ptr<Crystal::Mesh> mesh = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
-		Crystal::Mesh* mesh = new Crystal::Mesh("assets/models/silly_dancing.fbx");
+		//Crystal::Mesh* mesh = new Crystal::Mesh("assets/models/silly_dancing.fbx");
+		//Crystal::SkeletalMesh* mesh = new Crystal::SkeletalMesh("assets/models/silly_dancing.fbx");
+		Crystal::SkeletalMesh* mesh = new Crystal::SkeletalMesh("assets/models/silly_dancing.fbx");
+		//Crystal::Mesh* mesh = new Crystal::Mesh("assets/models/HeroTPP.fbx");
 		mesh->SetMaterial(pbrMaterial);
 
-		//std::shared_ptr<Crystal::Mesh> mesh2 = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
-		Crystal::Mesh* mesh2 = new Crystal::Mesh("assets/models/silly_dancing.fbx");
-		mesh2->SetMaterial(pbrMaterial);
-
 		
+		//std::shared_ptr<Crystal::Mesh> mesh2 = std::make_shared<Crystal::Mesh>("assets/models/silly_dancing.fbx");
+		//Crystal::Mesh* mesh2 = new Crystal::Mesh("assets/models/silly_dancing.fbx");
+		//Crystal::Animation* animation = new Crystal::Animation("assets/models/Run_Rt.FBX");
+		
+
+		Crystal::SkeletalMesh* skeletalMesh = new Crystal::SkeletalMesh("assets/models/HeroTPP.fbx", "assets/models/Run_Rt.FBX");
+		skeletalMesh->SetMaterial(pbrMaterial);
+
 
 
 		/*최종 메쉬를 메쉬컴포넌트에 Set합니다.*/
-		m_MeshComponent = CreateComponent<Crystal::MeshComponent>("MeshComponent");
+		m_MeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		m_MeshComponent->SetMesh(mesh);
 
-		m_TempFollowMeshComponent = CreateComponent<Crystal::MeshComponent>("FollowTempMeshComponent");
-		m_TempFollowMeshComponent->SetMesh(mesh2);
+		
+
+		m_TempFollowMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("FollowTempMeshComponent");
+		m_TempFollowMeshComponent->SetMesh(skeletalMesh);
 
 		/* TEMP */
 
@@ -91,5 +102,5 @@ public:
 	}
 
 private:
-	Crystal::MeshComponent* m_TempFollowMeshComponent = nullptr;
+	Crystal::SkeletalMeshComponent* m_TempFollowMeshComponent = nullptr;
 };

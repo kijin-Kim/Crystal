@@ -17,12 +17,12 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
   
     OutputTexture.GetDimensions(outputWidth, outputHeight, outputDepth);
 
-    float2 uv2D = dispatchThreadID.xy / float2(outputWidth, outputHeight);
+    const float2 uv2D = dispatchThreadID.xy / float2(outputWidth, outputHeight);
     
     /*TexCube를 반대로 진행합니다.*/
     
     /*-1.0f ~ 1.0f인 좌표계로 변환 후*/
-    float2 uv3D = 2.0f * uv2D - 1.0f;
+    const float2 uv3D = 2.0f * uv2D - 1.0f;
     
     float3 cubeUV;
     
@@ -42,8 +42,8 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
     
     /*레퍼런스 https://ko.wikipedia.org/wiki/%EA%B5%AC%EB%A9%B4%EC%A2%8C%ED%91%9C%EA%B3%84 */
     /*카테시안 좌표계에서 구면좌표계로 변환 및 0과 1사이로 매핑 (Noramlize)*/
-    float2 finalUV = float2(atan2(-cubeUV.x, -cubeUV.z) / TwoPI, acos(cubeUV.y) / PI);
-    float4 finalColor = EquiTexture.SampleLevel(DefaultSampler, finalUV, 0.0f);
+    const float2 finalUV = float2(atan2(-cubeUV.x, -cubeUV.z) / TwoPI, acos(cubeUV.y) / PI);
+    const float4 finalColor = EquiTexture.SampleLevel(DefaultSampler, finalUV, 0.0f);
     
     OutputTexture[dispatchThreadID] = finalColor;
     

@@ -4,7 +4,7 @@
 
 namespace Crystal {
 
-	LightingPipeline::LightingPipeline(const std::string& name) : Pipeline(name)
+	LightingPipeline::LightingPipeline(const std::string& name) : RenderPipeline(name)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
@@ -114,16 +114,16 @@ namespace Crystal {
 
 	}
 
-	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
 	{
 
-		Pipeline::Record(commandList);
+		RenderPipeline::Record(commandList, pipelineInputs);
 
 
 		auto device = Renderer::Instance().GetDevice();
 
 
-		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)m_PipelineInputs;
+		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
 		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
@@ -132,11 +132,9 @@ namespace Crystal {
 		m_PerObjectData.AlbedoColor = {};
 
 
-		auto renderComponent = *lightPipelineInputs->RenderComponents;
+		auto meshComponents = *lightPipelineInputs->RenderComponents;
 
-		auto boneMatrices = ((Mesh*)(renderComponent[0]->GetRenderables()[0]))->GetBoneTransforms();
-		// TODO : 최적화 매우매우매우매우 비효율적
-		std::copy(boneMatrices.begin(), boneMatrices.end(), m_PerObjectData.Bones);
+		
 
 
 		// 아주 간단한 프로토 타입 디자인, 추 후에 매 패스(셰이더)마다 이 정보를 가지고 있게 할 것임.
@@ -149,17 +147,24 @@ namespace Crystal {
 
 
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-		for (int i = 0; i < renderComponent.size(); i++)
+		for (int i = 0; i < meshComponents.size(); i++)
 		{
+			m_PerObjectData.World = Matrix4x4::Transpose(meshComponents[i]->GetWorldTransform());
 
-			m_PerObjectData.World = Matrix4x4::Transpose(renderComponent[i]->GetWorldTransform());
+			auto boneMatrices = ((SkeletalMesh*)(meshComponents[i]->GetRenderable()))->GetBoneTransforms();
+			// TODO : 최적화 매우매우매우매우 비효율적
+			std::copy(boneMatrices.begin(), boneMatrices.end(), m_PerObjectData.Bones);
+
+			
+				
+
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
 
 
 			pbrInputCpuHandles[PerObjectConstants] = m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
 
 
-			auto material = ((Mesh*)(renderComponent[i]->GetRenderables()[0]))->GetMaterial();
+			auto material = ((StaticMesh*)(meshComponents[i]->GetRenderables()[0]))->GetMaterial();
 
 			if (material->HasTextureInput("AlbedoTexture"))
 			{
@@ -221,31 +226,21 @@ namespace Crystal {
 
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
-
-
-		// CommandList를 Record 합니다.
-
-		commandList->IASetPrimitiveTopology(lightPipelineInputs->PrimitiveTopology);
-		commandList->RSSetViewports(1, &lightPipelineInputs->Camera->GetViewport());
-		commandList->RSSetScissorRects(1, &lightPipelineInputs->Camera->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &lightPipelineInputs->RenderTargets[0]->GetRenderTargetView(), TRUE, &lightPipelineInputs->DepthStencilBuffer->GetDepthStencilView());
-
 		
 		commandList->SetPipelineState(m_AnimatedPipelineState.Get());
 		commandList->SetGraphicsRootSignature(m_AnimatedRootSignature.Get());
-
 		commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		commandList->SetGraphicsRootDescriptorTable(1, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		for (int i = 0; i < renderComponent.size(); i++)
+		for (int i = 0; i < meshComponents.size(); i++)
 		{
 			D3D12_GPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (i * 5);
 			commandList->SetGraphicsRootDescriptorTable(2, handle);
-			((Mesh*)renderComponent[i]->GetRenderables()[0])->Render(commandList);
+			((StaticMesh*)meshComponents[i]->GetRenderables()[0])->Render(commandList);
 		}
 
 

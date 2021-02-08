@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "WindowsWindow.h"
-#include "Crystal/Renderer/Shader.h"
+#include "Crystal/Resources/Shader.h"
 #include "Crystal/Resources/Buffers.h"
 #include "Crystal/Renderer/CommandList.h"
 #include "Crystal/Renderer/CommandQueue.h"

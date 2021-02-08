@@ -5,13 +5,13 @@
 
 namespace Crystal {
 
-	CubemapPipeline::CubemapPipeline(const std::string& name) : Pipeline(name)
+	CubemapPipeline::CubemapPipeline(const std::string& name) : RenderPipeline(name)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 100;
+		descriptorHeapDesc.NumDescriptors = 3;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -114,11 +114,11 @@ namespace Crystal {
 
 	}
 
-	void CubemapPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void CubemapPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
 	{
-		Pipeline::Record(commandList);
+		RenderPipeline::Record(commandList, pipelineInputs);
 
-		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)m_PipelineInputs;
+		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)pipelineInputs;
 
 
 		auto viewProj = cubemapPipelineInputs->Camera->GetViewProjection();
@@ -136,12 +136,6 @@ namespace Crystal {
 			device->CopyDescriptorsSimple(1, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), cubemapDescriptorInputs[i],
 				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
-
-
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->RSSetViewports(1, &cubemapPipelineInputs->Camera->GetViewport());
-		commandList->RSSetScissorRects(1, &cubemapPipelineInputs->Camera->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &cubemapPipelineInputs->RenderTargets[0]->GetRenderTargetView(), TRUE, &cubemapPipelineInputs->DepthStencilBuffer->GetDepthStencilView());
 
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);

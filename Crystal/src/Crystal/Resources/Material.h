@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "Crystal/Resources/Texture.h"
-#include "Shader.h"
+#include "Crystal/Resources/Shader.h"
 
 namespace Crystal {
 

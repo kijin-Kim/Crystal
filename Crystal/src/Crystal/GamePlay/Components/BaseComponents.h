@@ -104,6 +104,7 @@ namespace Crystal {
 		}
 
 		const std::vector<Renderable*>& GetRenderables() const { return m_Renderables; }
+		const Renderable* GetRenderable() const { return m_Renderables[0]; }
 
 	protected:
 		std::vector<Renderable*> m_Renderables;

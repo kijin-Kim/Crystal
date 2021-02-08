@@ -1,10 +1,10 @@
 #pragma once
-#include "Pipeline.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/ConstantBuffer.h"
 
 namespace Crystal {
 
-	class LightingPipeline final : public Pipeline
+	class LightingPipeline final : public RenderPipeline
 	{
 	public:
 		struct PerObjectData
@@ -39,7 +39,7 @@ namespace Crystal {
 			PBR_INPUT_COUNT
 		};
 
-		struct LightingPipelineInputs : public PipelineInputs
+		struct LightingPipelineInputs : public RenderPipelineInputs
 		{
 			Texture* IrradiancemapTexture = nullptr;
 		};
@@ -49,7 +49,7 @@ namespace Crystal {
 		LightingPipeline(const std::string& name);
 		virtual ~LightingPipeline() = default;
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
 
 	private:
 		PerObjectData m_PerObjectData = {};

@@ -1,11 +1,11 @@
 #pragma once
-#include "Pipeline.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/ConstantBuffer.h"
 #include "Crystal/Resources/Buffers.h"
 
 namespace Crystal {
 
-	class CubemapPipeline final : public Pipeline
+	class CubemapPipeline final : public RenderPipeline
 	{
 	public:
 
@@ -15,7 +15,7 @@ namespace Crystal {
 			CUBEMAP_INPUT_COUNT
 		};
 
-		struct CubemapPipelineInputs : public PipelineInputs
+		struct CubemapPipelineInputs : public RenderPipelineInputs
 		{
 			Texture* CubemapTexture = nullptr;
 		};
@@ -29,7 +29,7 @@ namespace Crystal {
 		CubemapPipeline(const std::string& name);
 		virtual ~CubemapPipeline() = default;
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;

@@ -188,11 +188,13 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\ClearPipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\CubemapPipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\LightingPipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipelines.h" />
     <ClInclude Include="src\Crystal\Renderer\Renderable.h" />
+    <ClInclude Include="src\Crystal\Resources\Animation.h" />
     <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
     <ClInclude Include="src\Crystal\Resources\Descriptor.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
@@ -209,7 +211,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\CameraComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\BaseComponents.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\InputComponent.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\MeshComponents.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\Controller.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\KeyCodes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\PlayerController.h" />
@@ -218,19 +220,20 @@
     <ClInclude Include="src\Crystal\Resources\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
-    <ClInclude Include="src\Crystal\Renderer\Material.h" />
-    <ClInclude Include="src\Crystal\Renderer\Mesh.h" />
+    <ClInclude Include="src\Crystal\Resources\Material.h" />
+    <ClInclude Include="src\Crystal\Resources\Meshes.h" />
     <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
-    <ClInclude Include="src\Crystal\Renderer\Shader.h" />
+    <ClInclude Include="src\Crystal\Resources\Shader.h" />
     <ClInclude Include="src\Crystal\Resources\ShaderManager.h" />
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\ClearPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\CubemapPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\LightingPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
@@ -242,14 +245,14 @@
     <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CameraComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\InputComponent.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponents.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffers.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Material.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Mesh.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Material.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Meshes.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Shader.cpp" />
     <ClCompile Include="src\Crystal\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\cspch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
