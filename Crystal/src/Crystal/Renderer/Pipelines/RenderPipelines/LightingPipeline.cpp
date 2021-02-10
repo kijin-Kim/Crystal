@@ -132,7 +132,7 @@ namespace Crystal {
 		m_PerObjectData.AlbedoColor = {};
 
 
-		auto meshComponents = *lightPipelineInputs->RenderComponents;
+		auto meshComponents = *lightPipelineInputs->SkeletalMeshComponents;
 
 		
 
@@ -149,14 +149,15 @@ namespace Crystal {
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 		for (int i = 0; i < meshComponents.size(); i++)
 		{
-			m_PerObjectData.World = Matrix4x4::Transpose(meshComponents[i]->GetWorldTransform());
+			SkeletalMesh* skeletalMesh = (SkeletalMesh*)meshComponents[i]->GetRenderable();
 
-			auto boneMatrices = ((SkeletalMesh*)(meshComponents[i]->GetRenderable()))->GetBoneTransforms();
+			m_PerObjectData.World = Matrix4x4::Transpose(meshComponents[i]->GetWorldTransform());
+			auto boneMatrices = skeletalMesh->GetBoneTransforms();
 			// TODO : 최적화 매우매우매우매우 비효율적
 			std::copy(boneMatrices.begin(), boneMatrices.end(), m_PerObjectData.Bones);
 
 			
-				
+					
 
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
 
@@ -164,7 +165,7 @@ namespace Crystal {
 			pbrInputCpuHandles[PerObjectConstants] = m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
 
 
-			auto material = ((StaticMesh*)(meshComponents[i]->GetRenderables()[0]))->GetMaterial();
+			auto material = skeletalMesh->GetMaterial();
 
 			if (material->HasTextureInput("AlbedoTexture"))
 			{
@@ -207,6 +208,8 @@ namespace Crystal {
 			else
 				m_PerObjectData.bToggleNormalTexture = false;
 
+			m_PerObjectData.bToggleIrradianceTexture = true;
+
 			D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (i * 5);
@@ -240,7 +243,9 @@ namespace Crystal {
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (i * 5);
 			commandList->SetGraphicsRootDescriptorTable(2, handle);
-			((StaticMesh*)meshComponents[i]->GetRenderables()[0])->Render(commandList);
+
+			SkeletalMesh* skeletalMesh = (SkeletalMesh*)meshComponents[i]->GetRenderable();
+			skeletalMesh->Render(commandList);
 		}
 
 

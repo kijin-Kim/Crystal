@@ -24,10 +24,6 @@ namespace Crystal {
 
 	protected:
 		std::string m_Name;
-	private:
-		bool m_bBeginIsCalled = false;
-		bool m_bRecordIsCalled = false;
-		bool m_bEndIsCalled = true;
 	};
 
 	class RenderPipeline : public Pipeline
@@ -35,7 +31,6 @@ namespace Crystal {
 	public:
 		struct RenderPipelineInputs : public PipelineInputs
 		{
-			std::vector<RenderComponent*>* RenderComponents = nullptr;
 			CameraComponent* Camera = nullptr;
 			Texture* RenderTargets[8] = {};
 			Texture* DepthStencilBuffer = nullptr;

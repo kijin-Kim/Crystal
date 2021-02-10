@@ -228,6 +228,7 @@
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Crystal\GamePlay\Components\BaseComponents.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />

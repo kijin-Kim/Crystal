@@ -40,10 +40,7 @@ namespace Crystal {
 
 		/// SHOULD GET DRAWABLE //
 		
-		void RegisterRenderComponent(RenderComponent* renderComponent) { m_RenderComponents.push_back(renderComponent); }
-
-		
-
+		void RegisterRenderComponent(RenderComponent* renderComponent) { m_RegisteredComponents.push_back(renderComponent); }
 
 	private:
 		Renderer() = default;
@@ -53,6 +50,7 @@ namespace Crystal {
 		void CreateRenderTargetViewFromSwapChain();
 		void CreateDepthStencilView();
 	private:
+
 		WindowsWindow* m_Window = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12Device2> m_Device = nullptr;
@@ -68,8 +66,11 @@ namespace Crystal {
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		std::vector<RenderComponent*> m_RenderComponents;
+		std::vector<RenderComponent*> m_RegisteredComponents;
 
+		std::vector<StaticMeshComponent*> m_StaticMeshComponents;
+		std::vector<SkeletalMeshComponent*> m_SkeletalMeshComponents;
+		
 
 		int m_ResWidth = 800;
 		int m_ResHeight = 600;

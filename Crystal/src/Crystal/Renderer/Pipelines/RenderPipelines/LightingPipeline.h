@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
 
@@ -41,6 +42,7 @@ namespace Crystal {
 
 		struct LightingPipelineInputs : public RenderPipelineInputs
 		{
+			std::vector<SkeletalMeshComponent*>* SkeletalMeshComponents = nullptr;
 			Texture* IrradiancemapTexture = nullptr;
 		};
 

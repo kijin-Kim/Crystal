@@ -121,6 +121,27 @@ namespace Crystal {
 
 	void Renderer::Render()
 	{
+		/*등록된 컴포넌트가 있으면 각각의 컨테이너에 재분배 합니다.*/
+		for (auto component : m_RegisteredComponents)
+		{
+			auto rcType = component->GetRenderComponentType();
+			switch (rcType)
+			{
+			case RenderComponent::ERenderComponentType::StaticMesh:
+				m_StaticMeshComponents.push_back((StaticMeshComponent*)component);
+				break;
+			case RenderComponent::ERenderComponentType::SkeletalMesh:
+				m_SkeletalMeshComponents.push_back((SkeletalMeshComponent*)component);
+				break;
+			default:
+				CS_FATAL(false, "잘못된 RenderComponent Type입니다.");
+				break;
+			}
+		}
+		m_RegisteredComponents.clear();
+
+
+
 		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
 		ChangeDisplayMode();
 
@@ -152,7 +173,7 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue, clearStencilValue, 0, nullptr);
 
 		LightingPipeline::LightingPipelineInputs lightingPipelineInputs = {};
-		lightingPipelineInputs.RenderComponents = &m_RenderComponents;
+		lightingPipelineInputs.SkeletalMeshComponents = &m_SkeletalMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera;
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 		m_LightingPipeline->Record(commandList, &lightingPipelineInputs);

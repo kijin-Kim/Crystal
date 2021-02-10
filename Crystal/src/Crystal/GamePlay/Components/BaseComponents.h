@@ -91,22 +91,32 @@ namespace Crystal {
 	class RenderComponent : public TransformComponent
 	{
 	public:
-		RenderComponent(const std::string& name) : TransformComponent(name) {}
+		enum class ERenderComponentType
+		{
+			None,
+			Mesh,
+			StaticMesh,
+			SkeletalMesh,
+		};
+
+	public:
+		RenderComponent(const std::string& name);
 		virtual ~RenderComponent() = default;
 
 		virtual void Update(float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
-			for (const auto renderable : m_Renderables)
-			{
-				renderable->Update(deltaTime);
-			}
-		}
 
-		const std::vector<Renderable*>& GetRenderables() const { return m_Renderables; }
-		const Renderable* GetRenderable() const { return m_Renderables[0]; }
+			m_Renderable->Update(deltaTime);
+		}
+		
+		ERenderComponentType GetRenderComponentType() const { return m_RenderComponentType; }
+
+		void SetRenderable(Renderable* renderable) { m_Renderable = renderable; }
+		const Renderable* GetRenderable() const { return m_Renderable; }
 
 	protected:
-		std::vector<Renderable*> m_Renderables;
+		Renderable* m_Renderable = nullptr;
+		ERenderComponentType m_RenderComponentType = ERenderComponentType::None;
 	};
 }
