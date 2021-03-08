@@ -22,22 +22,22 @@ namespace Crystal {
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			StaticVertex vertex = {};
-			vertex.Position = *(DirectX::XMFLOAT3*) & mesh->mVertices[i];
+			vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 
 			if (mesh->HasNormals())
 			{
-				vertex.Normal = *(DirectX::XMFLOAT3*) & mesh->mNormals[i];
+				vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 			}
 
 			if (mesh->HasTangentsAndBitangents())
 			{
-				vertex.Tangent = *(DirectX::XMFLOAT3*) & mesh->mTangents[i];
-				vertex.BiTangent = *(DirectX::XMFLOAT3*) & mesh->mBitangents[i];
+				vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z};
+				vertex.BiTangent = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
 			}
 
 			if (mesh->HasTextureCoords(0))
 			{
-				vertex.TexCoord = *(DirectX::XMFLOAT2*) & mesh->mTextureCoords[0][i];
+				vertex.TexCoord = { mesh->mTextureCoords[0][i][0], mesh->mTextureCoords[0][i][1] };
 			}
 			StaticVertices.push_back(vertex);
 		}
@@ -58,22 +58,22 @@ namespace Crystal {
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			SkeletalVertex vertex = {};
-			vertex.Position = *(DirectX::XMFLOAT3*) & mesh->mVertices[i];
+			vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 
 			if (mesh->HasNormals())
 			{
-				vertex.Normal = *(DirectX::XMFLOAT3*) & mesh->mNormals[i];
+				vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 			}
 
 			if (mesh->HasTangentsAndBitangents())
 			{
-				vertex.Tangent = *(DirectX::XMFLOAT3*) & mesh->mTangents[i];
-				vertex.BiTangent = *(DirectX::XMFLOAT3*) & mesh->mBitangents[i];
+				vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+				vertex.BiTangent = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
 			}
 
 			if (mesh->HasTextureCoords(0))
 			{
-				vertex.TexCoord = *(DirectX::XMFLOAT2*) & mesh->mTextureCoords[0][i];
+				vertex.TexCoord = { mesh->mTextureCoords[0][i][0], mesh->mTextureCoords[0][i][1] };
 			}
 			SkeletalVertices.push_back(vertex);
 		}
@@ -97,11 +97,9 @@ namespace Crystal {
 			aiProcess_CalcTangentSpace |
 			aiProcess_Triangulate |
 			aiProcess_SortByPType |
-			aiProcess_GenNormals |
-			aiProcess_GenUVCoords |
 			aiProcess_OptimizeMeshes |
 			aiProcess_ValidateDataStructure);
-		CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode), "메쉬를 로드하는데 실패하였습니다");
+		CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode), "%s 메쉬를 로드하는데 실패하였습니다", filePath.c_str());
 	}
 
 	Mesh::~Mesh()

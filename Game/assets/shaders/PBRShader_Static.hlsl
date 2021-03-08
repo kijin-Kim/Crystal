@@ -9,8 +9,6 @@ struct VS_INPUT
     float3 Normal : NORMAL;
     float3 Tangent : TANGENT;
     float3 BiTangent : BITANGENT;
-    uint4 BoneIDs : BONEIDS;
-    float4 BoneWeights : BONEWEIGHTS;
 };
 
 struct PS_INPUT
@@ -19,7 +17,8 @@ struct PS_INPUT
     float4 WorldPosition : POSITION;
     float3 WorldNormal : WORLD_NORMAL;
     float2 TexCoord : TEXCOORD;
-    float3x3 TangentToWorld : TANGENT_TO_WORLD;
+    float3 WorldTangent : WORLD_TANGENT;
+    float3 WorldBiTangent : WORLD_BITANGENT;
 };
 
 
@@ -33,7 +32,6 @@ cbuffer PerFrameData : register(b0)
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
-    float4x4 Bones[100];
     float4 AlbedoColor;
     bool bToggleAlbedoTexture;
     bool bToggleMetalicTexture;
@@ -46,24 +44,15 @@ cbuffer PerObjectData : register(b1)
 
 PS_INPUT vsMain(VS_INPUT input)
 {
-    float4x4 boneTransform = Bones[input.BoneIDs[0]] * input.BoneWeights[0];
-    boneTransform += Bones[input.BoneIDs[1]] * input.BoneWeights[1];
-    boneTransform += Bones[input.BoneIDs[2]] * input.BoneWeights[2];
-    boneTransform += Bones[input.BoneIDs[3]] * (1.0f - (input.BoneWeights[2] + input.BoneWeights[1] + input.BoneWeights[0]));
-    
-    
-    float3 localPosition = mul(float4(input.Position, 1.0f), boneTransform);
-    //float3 localPosition = input.Position;
     PS_INPUT output;
-    output.Position = mul(mul(float4(localPosition, 1.0f), World), ViewProjection);
-    output.WorldPosition = mul(float4(localPosition, 1.0f), World);
+    output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
+    output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
     output.TexCoord = input.TexCoord;
-    output.WorldNormal = mul(mul(input.Normal, (float3x3) boneTransform), (float3x3)World);
-    //output.WorldNormal = mul(input.Normal, (float3x3)World);
+    output.WorldNormal = mul(input.Normal, (float3x3) World);
     
-    float3x3 TBN = float3x3(input.Tangent, input.BiTangent, input.Normal);
-    output.TangentToWorld = mul(TBN, (float3x3)World);
+    output.WorldTangent = mul(input.Tangent, (float3x3) World);
+    output.WorldBiTangent = mul(input.BiTangent, (float3x3) World);
 
     return output;
 }
@@ -135,7 +124,8 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     const int lightCount = 1; // ¿”Ω√
 
     /*≥Î∏ª*/
-    float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f), input.TangentToWorld) : input.WorldNormal;
+    float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
+    float3x3(normalize(input.WorldTangent), normalize(input.WorldBiTangent), normalize(input.WorldNormal))) : input.WorldNormal;
     N = normalize(N);
     
     /*∫‰ ∫§≈Õ*/
@@ -143,12 +133,12 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     
 
     /*Base Reflectivity*/
-    float3 F0 = 0.04f; 
+    float3 F0 = 0.04f;
     F0 = lerp(F0, albedo, metallic);
 
     
     float3 Lo = 0.0f;
-    for(int i= 0; i < lightCount; i++)
+    for (int i = 0; i < lightCount; i++)
     {
         // L()
         float3 L = normalize(WorldLightPosition - input.WorldPosition).xyz;
@@ -158,7 +148,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         
         float dotNV = max(dot(N, V), 0.0f); // Dot ( Normal, View )
         float dotNL = max(dot(N, L), 0.0f); // Dot ( Normal, OutgoingLight )
-        float dotNH = max(dot(N,H), 0.0f); // Dot ( Normal, Halfway )
+        float dotNH = max(dot(N, H), 0.0f); // Dot ( Normal, Halfway )
         
         //Cook-Torrance BRDF
         float normalDistribution = NormalDistributionGGX(dotNH, roughness);
@@ -178,7 +168,6 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         kD *= 1.0f - metallic;
         
         Lo += (kD * albedo / PI + specularBRDF) * radiance * dotNL;
-        //Lo += (diffuseEnergy * albedo + specularBRDF) * radiance * dotNL;
     }
 
     

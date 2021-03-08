@@ -1,6 +1,6 @@
 #include "cspch.h"
 #include "Shader.h"
-#include "Renderer.h"
+#include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
 	Shader::Shader(const std::string& fileName)

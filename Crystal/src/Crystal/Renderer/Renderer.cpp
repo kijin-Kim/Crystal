@@ -25,7 +25,8 @@ namespace Crystal {
 		
 
 		/*텍스쳐 리소스를 로드합니다.*/
-		m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/pink_sunrise_4k.hdr");
+		//m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/pink_sunrise_4k.hdr");
+		m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/T_Cube_Skybox_1.hdr");
 		//m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/debughdri.png");
 		m_CubemapTexture = std::make_unique<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
@@ -40,7 +41,8 @@ namespace Crystal {
 
 		/*Shader를 로드합니다.*/
 		auto& shaderManager = ShaderManager::Instance();
-		shaderManager.Load("assets/shaders/PBRShader.hlsl", "PBRShader");
+		shaderManager.Load("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
+		shaderManager.Load("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
 		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
 		shaderManager.Load("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
 		shaderManager.Load("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
@@ -141,8 +143,7 @@ namespace Crystal {
 		m_RegisteredComponents.clear();
 
 
-
-		ChangeResolution(m_ResolutionItems[m_CurrentResolutionIndex]);
+		ChangeResolution(1920, 1080);
 		ChangeDisplayMode();
 
 		auto commandList = m_CommandQueue->GetCommandList();
@@ -155,7 +156,6 @@ namespace Crystal {
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
-
 
 
 		auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera();
@@ -174,6 +174,7 @@ namespace Crystal {
 
 		LightingPipeline::LightingPipelineInputs lightingPipelineInputs = {};
 		lightingPipelineInputs.SkeletalMeshComponents = &m_SkeletalMeshComponents;
+		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera;
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 		m_LightingPipeline->Record(commandList, &lightingPipelineInputs);
@@ -211,37 +212,14 @@ namespace Crystal {
 		CS_DEBUG_INFO("End Frame");
 	}
 
-	void Renderer::ChangeResolution(const char* formattedResolution)
+	void Renderer::ChangeResolution(int width, int height)
 	{
-		// 0. Parse String
 		// 1. Clear Reference of RenderTarget
 		// 2. Destruct DepthStencil
 		// 3. Resize
 		// 4. Set Camera's Viewport And ScissorRect
 		// 5. Make Sure Current Index of RenderTarget is BackBuffer
-		bool bCompleteGetWidth = false;
-		char widthInChar[100] = {};
-		int widthIndex = 0;
-		char heightInChar[100] = {};
-		int heightIndex = 0;
-
-		for (int i = 0; formattedResolution[i]; i++)
-		{
-			if (formattedResolution[i] == 'x')
-			{
-				bCompleteGetWidth = true;
-				continue;
-			}
-
-			if (!bCompleteGetWidth)
-				widthInChar[widthIndex++] = formattedResolution[i];
-			else
-				heightInChar[heightIndex++] = formattedResolution[i];
-		}
-
-		const int width = atoi(widthInChar);
-		const int height = atoi(heightInChar);
-		if (width == m_ResWidth && height == m_ResHeight && m_Window->GetWidth() == m_ResWidth && m_Window->GetHeight() == m_ResHeight)
+		if (m_ResWidth == width && m_ResHeight == height)
 			return;
 
 		CS_INFO("해상도를 변경하는 중...");

@@ -12,11 +12,11 @@ namespace Crystal {
 		CameraPawn()
 		{
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
-			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 0.0f, -10.0f));
+			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 0.0f, -8000.0f));
 			cameraComponent->SetFieldOfView(60.0f);
-			cameraComponent->SetNearPlane(0.1f);
-			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f });
-			cameraComponent->SetFarPlane(10000.0f);
+			cameraComponent->SetNearPlane(1.0f);
+			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
+			cameraComponent->SetFarPlane(100000.0f);
 			m_MainComponent = cameraComponent;
 
 			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
@@ -62,6 +62,7 @@ namespace Crystal {
 
 		void MoveForward(float value)
 		{
+			value *= 100.0f;
 			auto mainCamera = (CameraComponent*)m_MainComponent;
 			auto position = mainCamera->GetWorldPosition();
 			auto forward = mainCamera->GetForward();
@@ -72,6 +73,7 @@ namespace Crystal {
 
 		void MoveRight(float value)
 		{
+			value *= 100.0f;
 			auto mainCamera = (CameraComponent*)m_MainComponent;
 			auto position = mainCamera->GetWorldPosition();
 			auto right = mainCamera->GetRight();

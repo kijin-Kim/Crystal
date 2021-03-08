@@ -57,12 +57,17 @@ namespace Crystal {
 		}
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
+
+		DirectX::ScratchImage mipChain;
+		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
+		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐의 밉 체인을 생성하는데 실패하였습니다.", filePath.string().c_str());
+
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		textureDesc.Width = (UINT)metaData.width;
 		textureDesc.Height = (UINT)metaData.height;
 		textureDesc.DepthOrArraySize = (UINT)metaData.arraySize;
-		textureDesc.MipLevels = (UINT)metaData.mipLevels;
+		textureDesc.MipLevels = (UINT)mipChain.GetMetadata().mipLevels;
 		textureDesc.Format = metaData.format;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -73,15 +78,17 @@ namespace Crystal {
 			nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 
-		std::vector<D3D12_SUBRESOURCE_DATA> subResources(scratchImage.GetImageCount());
-		const DirectX::Image* image = scratchImage.GetImages();
-		for (int i = 0; i < scratchImage.GetImageCount(); i++)
+
+		std::vector<D3D12_SUBRESOURCE_DATA> subResources(mipChain.GetImageCount());
+		const DirectX::Image* image = mipChain.GetImages();
+		for (int i = 0; i < mipChain.GetImageCount(); i++)
 		{
 			auto& subResource = subResources[i];
 			subResource.RowPitch = image[i].rowPitch;
 			subResource.SlicePitch = image[i].slicePitch;
 			subResource.pData = image[i].pixels;
 		}
+
 
 		UINT64 requiredSize = 0;
 		device->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);

@@ -7,8 +7,8 @@
 
 #include "actors/TestPawn.h"
 
-#define WINDOW_WIDTH 1366
-#define WINDOW_HEIGHT 768
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 
 class GameApplication : public Crystal::Application

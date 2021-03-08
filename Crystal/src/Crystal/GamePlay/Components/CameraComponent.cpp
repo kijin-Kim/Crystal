@@ -1,7 +1,18 @@
 #include "cspch.h"
 #include "CameraComponent.h"
+#include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
+
+	CameraComponent::CameraComponent(const std::string& name) : TransformComponent(name)
+	{
+		Renderer& renderer = Renderer::Instance();
+		int resolutionWidth = renderer.GetResolutionWidth();
+		int resolutionHeight = renderer.GetResolutionHeight();
+		m_ScissorRect = { 0, 0, resolutionWidth, resolutionHeight };
+		m_Viewport = { 0.0f, 0.0f, (float)resolutionWidth, (float)resolutionHeight, 0.0f, 1.0f };
+	}
+
 	void CameraComponent::computeViewProjection()
 	{
 		switch (m_ProjectionMode)
