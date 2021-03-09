@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <array>
 
 #include "Crystal/Resources/Buffers.h"
 #include "Crystal/Resources/Material.h"
@@ -89,9 +90,17 @@ namespace Crystal {
 		virtual ~Mesh();
 
 		virtual void Update(float deltaTime) override;
-		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList);
-		void SetMaterial(std::shared_ptr<Material> material) { m_Material = std::move(material); }
-		Material* GetMaterial() const { return m_Material.get(); }
+		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, int submeshIndex);
+		void SetMaterial(std::shared_ptr<Material> material, int index = 0) { m_Materials[index] = std::move(material); }
+		size_t GetSubmeshCount() const { return m_Submeshes.size(); }
+		Material* GetMaterial(int index = 0) const 
+		{ 
+			if (!m_Materials[index])
+				CS_FATAL(false, "%s번째 Material이 존재 하지 않습니다.", index);
+			return m_Materials[index].get(); 
+		}
+
+		const std::array<std::shared_ptr<Material>, 5>& GetMaterials() const { return m_Materials; }
 
 	protected:
 		void processNode(aiNode* rootNode, const aiScene* scene, bool bIsSkeletal = false);
@@ -102,7 +111,7 @@ namespace Crystal {
 		std::vector <std::unique_ptr<IndexBuffer>> m_IndexBuffers;
 
 		std::shared_ptr <Material> m_Material = nullptr;
-
+		std::array<std::shared_ptr<Material>, 5> m_Materials;
 
 		const aiScene* m_MeshScene = nullptr;
 

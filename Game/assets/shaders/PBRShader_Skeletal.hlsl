@@ -33,7 +33,7 @@ cbuffer PerFrameData : register(b0)
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
-    float4x4 Bones[100];
+    float4x4 Bones[200];
     float4 AlbedoColor;
     bool bToggleAlbedoTexture;
     bool bToggleMetalicTexture;

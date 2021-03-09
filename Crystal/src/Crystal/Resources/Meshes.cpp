@@ -114,14 +114,11 @@ namespace Crystal {
 		Renderable::Update(deltaTime);
 	}
 
-	void Mesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void Mesh::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, int submeshIndex)
 	{
-		for (int i = 0; i < m_VertexBuffers.size(); i++)
-		{
-			commandList->IASetVertexBuffers(0, 1, &m_VertexBuffers[i]->GetView());
-			commandList->IASetIndexBuffer(&m_IndexBuffers[i]->GetView());
-			commandList->DrawIndexedInstanced(m_IndexBuffers[i]->GetCount(), 1, 0, 0, 0);
-		}
+		commandList->IASetVertexBuffers(0, 1, &m_VertexBuffers[submeshIndex]->GetView());
+		commandList->IASetIndexBuffer(&m_IndexBuffers[submeshIndex]->GetView());
+		commandList->DrawIndexedInstanced(m_IndexBuffers[submeshIndex]->GetCount(), 1, 0, 0, 0);
 	}
 
 	void Mesh::processNode(aiNode* rootNode, const aiScene* scene, bool bIsSkeletal /*= false*/)

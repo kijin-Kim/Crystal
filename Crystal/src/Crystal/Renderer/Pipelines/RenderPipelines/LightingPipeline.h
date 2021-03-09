@@ -11,7 +11,7 @@ namespace Crystal {
 		struct SkeletalMeshPerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
-			DirectX::XMFLOAT4X4 Bones[100];
+			DirectX::XMFLOAT4X4 Bones[200];
 			DirectX::XMFLOAT4 AlbedoColor = { 1.0f, 1.0f, 1.0f, 0.0f };
 			int bToggleAlbedoTexture = false;
 			int bToggleMetalicTexture = false;
@@ -40,17 +40,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 ViewProjection;
 			DirectX::XMFLOAT4 LightPositionInWorld;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
-		};
-
-		enum EPBRDescriptorInputType
-		{
-			IrradianceTexture = 0,
-			PerObjectConstants,
-			AlbedoTexture,
-			RoughnessTexture,
-			MetalicTexture,
-			NormalTexture,
-			PBR_INPUT_COUNT
 		};
 
 		struct LightingPipelineInputs : public RenderPipelineInputs

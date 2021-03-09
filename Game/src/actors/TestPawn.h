@@ -28,7 +28,7 @@ public:
 
 		/*Material을 생성합니다.*/
 		auto& shaderManager = Crystal::ShaderManager::Instance();
-		std::shared_ptr<Crystal::Material> pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Skeletal"));
+		std::shared_ptr<Crystal::Material> pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Static"));
 
 		pbrMaterial->Set("AlbedoTexture", albedoTexture);
 		pbrMaterial->Set("NormalTexture", normalTexture);

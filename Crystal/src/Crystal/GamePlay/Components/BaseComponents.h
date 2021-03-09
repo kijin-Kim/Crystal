@@ -34,7 +34,7 @@ namespace Crystal {
 	public:
 		TransformComponent(const std::string& name) : Component(name)
 		{
-			DirectX::XMStoreFloat4x4(&m_WorldTransform, DirectX::XMMatrixIdentity());
+			DirectX::XMStoreFloat4x4(&m_Transform, DirectX::XMMatrixIdentity());
 		}
 		virtual ~TransformComponent()
 		{
@@ -46,9 +46,7 @@ namespace Crystal {
 
 			/*Parent부터 자식 순으로 계산하여야 함*/
 			if (m_Parent)
-				m_WorldTransform = Matrix4x4::Multiply(m_Parent->GetWorldTransform(), m_LocalTransform);
-			else
-				m_WorldTransform = m_LocalTransform;
+				m_Transform = Matrix4x4::Multiply(m_Parent->GetTransform(), m_Transform);
 		}
 
 		/*Component의 Transform이 다른 특정 Component에 종속되도록 합니다.*/
@@ -72,18 +70,14 @@ namespace Crystal {
 
 		TransformComponent* GetParent() const { return m_Parent; }
 
-		void SetLocalTransform(const DirectX::XMFLOAT4X4& transform) { m_LocalTransform = transform; }
-		void SetWorldTransform(const DirectX::XMFLOAT4X4& transform) { m_WorldTransform = transform; }
-
-		const DirectX::XMFLOAT4X4& GetLocalTransform() const { return m_LocalTransform; }
-		const DirectX::XMFLOAT4X4& GetWorldTransform() const { return m_WorldTransform; }
+		void SetTransform(const DirectX::XMFLOAT4X4& transform) { m_Transform = transform; }
+		const DirectX::XMFLOAT4X4& GetTransform() const { return m_Transform; }
 
 
 	private:
 		/*OwnerShip을 가지고 있지 않음*/
 		TransformComponent* m_Parent = nullptr;
-		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
-		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
+		DirectX::XMFLOAT4X4 m_Transform = Matrix4x4::Identity();
 	};
 
 
