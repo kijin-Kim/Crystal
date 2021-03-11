@@ -110,7 +110,6 @@ namespace Crystal {
 		std::vector <std::unique_ptr<VertexBuffer>> m_VertexBuffers;
 		std::vector <std::unique_ptr<IndexBuffer>> m_IndexBuffers;
 
-		std::shared_ptr <Material> m_Material = nullptr;
 		std::array<std::shared_ptr<Material>, 5> m_Materials;
 
 		const aiScene* m_MeshScene = nullptr;

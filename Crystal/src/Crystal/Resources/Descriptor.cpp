@@ -13,7 +13,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC cbvSrvUavDesc = {};
 		cbvSrvUavDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		cbvSrvUavDesc.NumDescriptors = 100;
+		cbvSrvUavDesc.NumDescriptors = 200;
 		cbvSrvUavDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		cbvSrvUavDesc.NodeMask = 0;
 		HRESULT hr = device->CreateDescriptorHeap(&cbvSrvUavDesc, IID_PPV_ARGS(&m_CBVSRVUAVHeap));

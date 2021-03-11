@@ -33,9 +33,9 @@ namespace Crystal {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 
-				const int MAX_MESSAGE = 1;
+				const int maxMessageCount = 5;
 				++msgCount;
-				if (msgCount >= MAX_MESSAGE)
+				if (msgCount >= maxMessageCount)
 					break;
 			}
 			OnUpdate();

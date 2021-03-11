@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/InputComponent.h"
+#include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/Resources/ShaderManager.h"
 
 namespace Crystal {
@@ -32,5 +33,6 @@ namespace Crystal {
 
 	protected:
 		MeshComponent* m_MeshComponent = nullptr;
+		MovementComponent* m_MovementComponent = nullptr;
 	};
 }

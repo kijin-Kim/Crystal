@@ -22,16 +22,17 @@ namespace Crystal {
 			CD3DX12_ROOT_PARAMETER1 rootParameter[4] = {}; // per frame
 			rootParameter[0].InitAsConstantBufferView(0);
 
-			CD3DX12_DESCRIPTOR_RANGE1 globalRootParamRanges[1] = {}; // irradiance
-			globalRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-			rootParameter[1].InitAsDescriptorTable(_countof(globalRootParamRanges), globalRootParamRanges);
+			CD3DX12_DESCRIPTOR_RANGE1 perFrameRootParameterRanges[1] = {}; // irradiance
+			perFrameRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+			rootParameter[1].InitAsDescriptorTable(_countof(perFrameRootParameterRanges), perFrameRootParameterRanges);
 
 			CD3DX12_DESCRIPTOR_RANGE1 perObjectRootParamRanges[1] = {};
 			perObjectRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 			rootParameter[2].InitAsDescriptorTable(_countof(perObjectRootParamRanges), perObjectRootParamRanges);
 
-			CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[1] = {};
-			perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
+			CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[2] = {};
+			perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
+			perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
 			rootParameter[3].InitAsDescriptorTable(_countof(perMeshRootParameterRanges), perMeshRootParameterRanges);
 
 			CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
@@ -111,8 +112,18 @@ namespace Crystal {
 
 
 			// 임시로 10개의 오브젝트 까지 받을 수 있게함.
-			for (int i = 0; i < 10; i++)
-				m_StaticMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(m_StaticMeshPerObjectData)));
+			const int maxObjectCount = 10;
+			const int maxMaterialCount = 5;
+
+			m_StaticMeshPerMaterialConstantBufferLists.resize(maxObjectCount);
+			for (int i = 0; i < maxObjectCount; i++)
+			{
+				m_StaticMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(StaticMeshPerObjectData)));
+				for (int j = 0; j < maxMaterialCount; j++)
+				{
+					m_StaticMeshPerMaterialConstantBufferLists[i][j] = std::make_unique<ConstantBuffer>((int)sizeof(StaticMeshPerObjectData));
+				}
+			}
 		}
 
 
@@ -141,8 +152,9 @@ namespace Crystal {
 			perObjectRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 			rootParameter[2].InitAsDescriptorTable(_countof(perObjectRootParamRanges), perObjectRootParamRanges);
 
-			CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[1] = {};
-			perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
+			CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[2] = {};
+			perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
+			perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
 			rootParameter[3].InitAsDescriptorTable(_countof(perMeshRootParameterRanges), perMeshRootParameterRanges);
 
 			CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
@@ -225,11 +237,22 @@ namespace Crystal {
 
 
 			// 임시로 10개의 오브젝트 까지 받을 수 있게함.
-			for (int i = 0; i < 10; i++)
-				m_SkeletalMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(m_SkeletalMeshPerObjectData)));
+			const int maxObjectCount = 10;
+			const int maxMaterialCount = 5;
+
+			m_SkeletalMeshPerMaterialConstantBufferLists.resize(maxObjectCount);
+			for (int i = 0; i < maxObjectCount; i++)
+			{
+				m_SkeletalMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(SkeletalMeshPerObjectData)));
+				for (int j = 0; j < maxMaterialCount; j++)
+				{
+					m_SkeletalMeshPerMaterialConstantBufferLists[i][j] = std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
+				}
+			}
 		}
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
+		m_PerMaterialConstantBuffer= std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
 
 	}
 
@@ -245,15 +268,14 @@ namespace Crystal {
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
-		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
+		auto camPos = lightPipelineInputs->Camera->GetPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
-		m_PerFrameData.LightPositionInWorld = DirectX::XMFLOAT4(1000.0f, 1000.0f, 0.0f, 0.0f);
+		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
+		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 
 
-
-		m_SkeletalMeshPerObjectData.AlbedoColor = {};
 
 
 		auto skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
@@ -273,12 +295,12 @@ namespace Crystal {
 		for (int i = 0; i < staticMeshComponents.size(); i++) // PerObject
 		{
 			
+			StaticMeshPerObjectData staticMeshPerObjectData = {};
 
-			m_StaticMeshPerObjectData.World = Matrix4x4::Transpose(staticMeshComponents[i]->GetTransform());
-			m_StaticMeshPerObjectConstantBuffers[i]->SetData((void*)&m_StaticMeshPerObjectData);
+			staticMeshPerObjectData.World = Matrix4x4::Transpose(staticMeshComponents[i]->GetTransform());
+			m_StaticMeshPerObjectConstantBuffers[i]->SetData((void*)&staticMeshPerObjectData);
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_StaticMeshPerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
-			
 			device->CopyDescriptorsSimple(1, destHeapHandle, perObjectConstantBufferHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			
@@ -290,68 +312,75 @@ namespace Crystal {
 			for (int j = 0; j < staticMesh->GetSubmeshCount(); j++)
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
-				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
+				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
+
+				PerMaterialData perMaterialData = {};
 
 
 				if (materials[j]->HasTextureInput("AlbedoTexture"))
 				{
-					m_StaticMeshPerObjectData.bToggleAlbedoTexture = true;
+					perMaterialData.bToggleAlbedoTexture = true;
 					albedoTextureHandle = materials[j]->GetTextureInput("AlbedoTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("AlbedoColor"))
 				{
-					m_StaticMeshPerObjectData.bToggleAlbedoTexture = false;
-					m_StaticMeshPerObjectData.AlbedoColor = materials[j]->GetFloatInput("AlbedoColor");
+					perMaterialData.bToggleAlbedoTexture = false;
+					const DirectX::XMFLOAT4& floatInput = materials[j]->GetFloatInput("AlbedoColor");
+					perMaterialData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
+				}
+
+				if (materials[j]->HasTextureInput("MetallicTexture"))
+				{
+					perMaterialData.bToggleMetallicTexture = true;
+					metallicTextureHandle = materials[j]->GetTextureInput("MetallicTexture")->GetShaderResourceView();
+				}
+				else if (materials[j]->HasFloatInput("MetallicConstant"))
+				{
+					perMaterialData.bToggleMetallicTexture = false;
+					perMaterialData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("RoughnessTexture"))
 				{
-					m_StaticMeshPerObjectData.bToggleRoughnessTexture = true;
+					perMaterialData.bToggleRoughnessTexture = true;
 					roughnessTextureHandle = materials[j]->GetTextureInput("RoughnessTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("RoughnessConstant"))
 				{
-					m_StaticMeshPerObjectData.bToggleRoughnessTexture = false;
-					m_StaticMeshPerObjectData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
-				}
-
-				if (materials[j]->HasTextureInput("MetalicTexture"))
-				{
-					m_StaticMeshPerObjectData.bToggleMetalicTexture = true;
-					metallicTextureHandle = materials[j]->GetTextureInput("MetalicTexture")->GetShaderResourceView();
-				}
-				else if (materials[j]->HasFloatInput("MetalicConstant"))
-				{
-					m_StaticMeshPerObjectData.bToggleMetalicTexture = false;
-					m_StaticMeshPerObjectData.MetalicConstant = materials[j]->GetFloatInput("MetalicConstant").x;
+					perMaterialData.bToggleRoughnessTexture = false;
+					perMaterialData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("NormalTexture"))
 				{
-					m_StaticMeshPerObjectData.bToggleNormalTexture = true;
+					perMaterialData.bToggleNormalTexture = true;
 					normalTextureHandle = materials[j]->GetTextureInput("NormalTexture")->GetShaderResourceView();
 				}
 				else
-					m_StaticMeshPerObjectData.bToggleNormalTexture = false;
+					perMaterialData.bToggleNormalTexture = false;
 
-				m_StaticMeshPerObjectData.bToggleIrradianceTexture = true;
+				perMaterialData.bToggleIrradianceTexture = true;
 
-				
-				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (i * 5 + j * 5);
+				m_StaticMeshPerMaterialConstantBufferLists[i][j]->SetData((void*)&perMaterialData);
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_StaticMeshPerMaterialConstantBufferLists[i][j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if(albedoTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, albedoTextureHandle,D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				if(roughnessTextureHandle.ptr)
-					device->CopyDescriptorsSimple(1, destHeapHandle, roughnessTextureHandle,D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				if(metallicTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, metallicTextureHandle,D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				if(roughnessTextureHandle.ptr)
+					device->CopyDescriptorsSimple(1, destHeapHandle, roughnessTextureHandle,D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				if(normalTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, normalTextureHandle,D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
 			}
 			
 
@@ -365,12 +394,14 @@ namespace Crystal {
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 		for (int i = 0; i < skeletalMeshComponents.size(); i++)
 		{
+			SkeletalMeshPerObjectData skeletalMeshPerObjectData = {};
+
 			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
 
-			m_SkeletalMeshPerObjectData.World = Matrix4x4::Transpose(skeletalMeshComponents[i]->GetTransform());
+			skeletalMeshPerObjectData.World = Matrix4x4::Transpose(skeletalMeshComponents[i]->GetTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
-			std::copy(boneMatrices.begin(), boneMatrices.end(), m_SkeletalMeshPerObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
-			m_SkeletalMeshPerObjectConstantBuffers[i]->SetData((void*)&m_SkeletalMeshPerObjectData);
+			std::copy(boneMatrices.begin(), boneMatrices.end(), skeletalMeshPerObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
+			m_SkeletalMeshPerObjectConstantBuffers[i]->SetData((void*)&skeletalMeshPerObjectData);
 
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_SkeletalMeshPerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
@@ -382,69 +413,77 @@ namespace Crystal {
 			for (int j = 0; j < skeletalMesh->GetSubmeshCount(); j++)
 			{
 
+				PerMaterialData perMaterialData = {};
+
+
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
-				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
+				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
 
 				if (materials[j]->HasTextureInput("AlbedoTexture"))
 				{
-					m_SkeletalMeshPerObjectData.bToggleAlbedoTexture = true;
+					perMaterialData.bToggleAlbedoTexture = true;
 					albedoTextureHandle = materials[j]->GetTextureInput("AlbedoTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("AlbedoColor"))
 				{
-					m_SkeletalMeshPerObjectData.bToggleAlbedoTexture = false;
-					m_SkeletalMeshPerObjectData.AlbedoColor = materials[j]->GetFloatInput("AlbedoColor");
+					perMaterialData.bToggleAlbedoTexture = false;
+					const DirectX::XMFLOAT4& floatInput = materials[j]->GetFloatInput("AlbedoColor");
+					perMaterialData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
+				}
+
+				if (materials[j]->HasTextureInput("MetallicTexture"))
+				{
+					perMaterialData.bToggleMetallicTexture = true;
+					metallicTextureHandle = materials[j]->GetTextureInput("MetallicTexture")->GetShaderResourceView();
+				}
+				else if (materials[j]->HasFloatInput("MetallicConstant"))
+				{
+					perMaterialData.bToggleMetallicTexture = false;
+					perMaterialData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("RoughnessTexture"))
 				{
-					m_SkeletalMeshPerObjectData.bToggleRoughnessTexture = true;
+					perMaterialData.bToggleRoughnessTexture = true;
 					roughnessTextureHandle = materials[j]->GetTextureInput("RoughnessTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("RoughnessConstant"))
 				{
-					m_SkeletalMeshPerObjectData.bToggleRoughnessTexture = false;
-					m_SkeletalMeshPerObjectData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
-				}
-
-				if (materials[j]->HasTextureInput("MetalicTexture"))
-				{
-					m_SkeletalMeshPerObjectData.bToggleMetalicTexture = true;
-					metallicTextureHandle = materials[j]->GetTextureInput("MetalicTexture")->GetShaderResourceView();
-				}
-				else if (materials[j]->HasFloatInput("MetalicConstant"))
-				{
-					m_SkeletalMeshPerObjectData.bToggleMetalicTexture = false;
-					m_SkeletalMeshPerObjectData.MetalicConstant = materials[j]->GetFloatInput("MetalicConstant").x;
+					perMaterialData.bToggleRoughnessTexture = false;
+					perMaterialData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("NormalTexture"))
 				{
-					m_SkeletalMeshPerObjectData.bToggleNormalTexture = true;
+					perMaterialData.bToggleNormalTexture = true;
 					normalTextureHandle = materials[j]->GetTextureInput("NormalTexture")->GetShaderResourceView();
 				}
 				else
-					m_SkeletalMeshPerObjectData.bToggleNormalTexture = false;
+					perMaterialData.bToggleNormalTexture = false;
 
-				m_SkeletalMeshPerObjectData.bToggleIrradianceTexture = true;
+				perMaterialData.bToggleIrradianceTexture = true;
 
-
-				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (i * 5 + j * 5);
+				m_StaticMeshPerMaterialConstantBufferLists[i][j]->SetData((void*)&perMaterialData);
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_StaticMeshPerMaterialConstantBufferLists[i][j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 				if (albedoTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, albedoTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				if (roughnessTextureHandle.ptr)
-					device->CopyDescriptorsSimple(1, destHeapHandle, roughnessTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				if (metallicTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, metallicTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				if (roughnessTextureHandle.ptr)
+					device->CopyDescriptorsSimple(1, destHeapHandle, roughnessTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				if (normalTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, normalTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
 			}
 
 			
@@ -460,12 +499,11 @@ namespace Crystal {
 
 
 		D3D12_GPU_DESCRIPTOR_HANDLE staticMeshDescriptorHeapHandle = m_StaticMeshDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		commandList->SetGraphicsRootDescriptorTable(1, staticMeshDescriptorHeapHandle); // PerFrame
+		commandList->SetGraphicsRootDescriptorTable(1, staticMeshDescriptorHeapHandle); // Irradiance
 		staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		for (int i = 0; i < staticMeshComponents.size(); i++) 
 		{
-			
 			commandList->SetGraphicsRootDescriptorTable(2, staticMeshDescriptorHeapHandle); // PerObject
 			staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -473,7 +511,7 @@ namespace Crystal {
 			for (int j = 0; j < staticMesh->GetSubmeshCount(); j++)
 			{
 				commandList->SetGraphicsRootDescriptorTable(3, staticMeshDescriptorHeapHandle); // PerMaterial
-				staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (j * 4);
+				staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
 				staticMesh->Render(commandList, j);
 			}
 		}
@@ -490,7 +528,7 @@ namespace Crystal {
 		commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
 		
 		D3D12_GPU_DESCRIPTOR_HANDLE skeletalMeshDescriptorHeapHandle = m_SkeletalMeshDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		commandList->SetGraphicsRootDescriptorTable(1, skeletalMeshDescriptorHeapHandle); // PerFrame
+		commandList->SetGraphicsRootDescriptorTable(1, skeletalMeshDescriptorHeapHandle); // Irradiance
 		skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		for (int i = 0; i < skeletalMeshComponents.size(); i++)
@@ -502,7 +540,7 @@ namespace Crystal {
 			for (int j = 0; j < skeletalMesh->GetSubmeshCount(); j++)
 			{
 				commandList->SetGraphicsRootDescriptorTable(3, skeletalMeshDescriptorHeapHandle); // PerMaterial
-				skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (j * 4);
+				skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
 				skeletalMesh->Render(commandList, j);
 			}
 		}

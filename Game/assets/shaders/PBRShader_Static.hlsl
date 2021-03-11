@@ -26,20 +26,24 @@ cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
     float4 WorldCameraPosition : packoffset(c4);
-    float4 WorldLightPosition : packoffset(c5);
+    float4 WorldLightPosition[2] : packoffset(c5);
 }
 
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
-    float4 AlbedoColor;
+}
+
+cbuffer PerMeshData : register(b2)
+{
+    float3 AlbedoColor;
     bool bToggleAlbedoTexture;
-    bool bToggleMetalicTexture;
+    bool bToggleMetallicTexture;
     bool bToggleRoughnessTexture;
     bool bToggleNormalTexture;
     bool bToggleIrradianceTexture;
     float RoughnessConstant;
-    float MetalicConstant;
+    float MetallicConstant;
 }
 
 PS_INPUT vsMain(VS_INPUT input)
@@ -64,7 +68,7 @@ TextureCube IrradianceTexture : register(t0);
 
 /*PerObject*/
 Texture2D AlbedoTexture : register(t1);
-Texture2D MetalicTexture : register(t2);
+Texture2D MetallicTexture : register(t2);
 Texture2D RoughnessTexture : register(t3);
 Texture2D NormalTexture : register(t4);
 
@@ -115,13 +119,12 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 lightColor = 10.0f;
+    float3 lightColor = 6.0f;
     float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
-    float metallic = bToggleMetalicTexture ? MetalicTexture.Sample(DefaultSampler, input.TexCoord).r : MetalicConstant;
+    float metallic = bToggleMetallicTexture ? MetallicTexture.Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
     
-    
-    const int lightCount = 1; // ¿”Ω√
+    const int lightCount = 2; // ¿”Ω√
 
     /*≥Î∏ª*/
     float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
@@ -131,7 +134,6 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     /*∫‰ ∫§≈Õ*/
     float3 V = normalize(WorldCameraPosition - input.WorldPosition).xyz;
     
-
     /*Base Reflectivity*/
     float3 F0 = 0.04f;
     F0 = lerp(F0, albedo, metallic);
@@ -141,7 +143,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     for (int i = 0; i < lightCount; i++)
     {
         // L()
-        float3 L = normalize(WorldLightPosition - input.WorldPosition).xyz;
+        float3 L = normalize(WorldLightPosition[i] - input.WorldPosition).xyz;
         float3 H = normalize(V + L);
         float attenuation = 1.0f; // Directional Light
         float3 radiance = lightColor * attenuation;
@@ -155,7 +157,6 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         float geometry = GeometrySmith(dotNV, dotNL, roughness);
         float3 fresnel = FresnelSchlick(max(dot(H, V), 0.0f), F0);
 
-
         float3 numerator = normalDistribution * geometry * fresnel;
         float denominator = 4 * dotNV * dotNL;
         float3 specularBRDF = numerator / max(denominator, 0.001f);
@@ -163,6 +164,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         //Energy Conservation
         float3 kS = fresnel;
         float3 kD = 1.0f - kS;
+        
         
         //No Diffuse for Conductor
         kD *= 1.0f - metallic;
