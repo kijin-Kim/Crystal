@@ -47,22 +47,6 @@ public:
 		m_MeshComponent->SetRenderable(mesh);
 
 		m_MainComponent = m_MeshComponent;
-
-
-
-		Crystal::StaticMesh* megaphoneMesh = new Crystal::StaticMesh("assets/models/Megaphone_01.fbx");
-		std::shared_ptr<Crystal::Material> megaphoneMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Static"));
-
-		megaphoneMaterial->Set("AlbedoColor", DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f));
-		megaphoneMaterial->Set("MetallicConstant", 1.0f);
-		megaphoneMaterial->Set("RoughnessConstant", 0.5f);
-		
-		megaphoneMesh->SetMaterial(megaphoneMaterial, 0);
-
-		megaphoneMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("FollowTempMeshComponent");
-		megaphoneMeshComponent->SetRenderable(megaphoneMesh);
-		megaphoneMeshComponent->SetPosition({ 0.0f, 3500.0f, 0.0f });
-		megaphoneMeshComponent->AttachToComponent(m_MainComponent);
 	}
 
 	virtual ~TestPawn()
