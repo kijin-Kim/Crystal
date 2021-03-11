@@ -7,7 +7,6 @@ namespace Crystal {
 
 	Texture::Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS resourceFlags, D3D12_RESOURCE_STATES initialStates)
 	{
-
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		textureDesc.Width = (UINT)width;
@@ -22,18 +21,19 @@ namespace Crystal {
 		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&textureDesc, initialStates,
 			nullptr, IID_PPV_ARGS(&m_Resource));
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 			
 	}
 
 	Texture::Texture(const std::string& fileName, D3D12_RESOURCE_FLAGS resourceFlags)
 	{
+		CS_INFO("%s 텍스쳐 불러오는 중...", fileName.c_str());
 		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
 		auto commandQueue = renderer.GetCommandQueue();
 
 		std::filesystem::path filePath(fileName.c_str());
-		CS_ASSERT(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
+		CS_FATAL(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
 
 		DirectX::TexMetadata metaData;
 		DirectX::ScratchImage scratchImage;
@@ -55,15 +55,19 @@ namespace Crystal {
 		{
 			hr = LoadFromWICFile(filePath.wstring().c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
 		}
-		CS_ASSERT(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
+		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
+
+		DirectX::ScratchImage mipChain;
+		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
+		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐의 밉 체인을 생성하는데 실패하였습니다.", filePath.string().c_str());
 
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		textureDesc.Width = (UINT)metaData.width;
 		textureDesc.Height = (UINT)metaData.height;
 		textureDesc.DepthOrArraySize = (UINT)metaData.arraySize;
-		textureDesc.MipLevels = (UINT)metaData.mipLevels;
+		textureDesc.MipLevels = (UINT)mipChain.GetMetadata().mipLevels;
 		textureDesc.Format = metaData.format;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -72,17 +76,19 @@ namespace Crystal {
 		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&textureDesc, D3D12_RESOURCE_STATE_COMMON,
 			nullptr, IID_PPV_ARGS(&m_Resource));
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 
-		std::vector<D3D12_SUBRESOURCE_DATA> subResources(scratchImage.GetImageCount());
-		const DirectX::Image* image = scratchImage.GetImages();
-		for (int i = 0; i < scratchImage.GetImageCount(); i++)
+
+		std::vector<D3D12_SUBRESOURCE_DATA> subResources(mipChain.GetImageCount());
+		const DirectX::Image* image = mipChain.GetImages();
+		for (int i = 0; i < mipChain.GetImageCount(); i++)
 		{
 			auto& subResource = subResources[i];
 			subResource.RowPitch = image[i].rowPitch;
 			subResource.SlicePitch = image[i].slicePitch;
 			subResource.pData = image[i].pixels;
 		}
+
 
 		UINT64 requiredSize = 0;
 		device->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
@@ -91,7 +97,7 @@ namespace Crystal {
 		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr, IID_PPV_ARGS(&textureUploadBuffer));
-		CS_ASSERT(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
 
 		auto cmdList = commandQueue->GetCommandList();
 		UpdateSubresources(cmdList.Get(), m_Resource.Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(), subResources.data());
@@ -108,6 +114,8 @@ namespace Crystal {
 
 		commandQueue->Execute(cmdList);
 		commandQueue->Flush();
+
+		CS_INFO("%s 텍스쳐 불러오기 완료", fileName.c_str());
 	}
 
 	Texture::Texture(ID3D12Resource* resource, D3D12_RESOURCE_FLAGS resourceFlags /*= D3D12_RESOURCE_FLAG_NONE*/) :
@@ -139,7 +147,7 @@ namespace Crystal {
 			shaderResourceViewDesc.TextureCube.MipLevels = m_Resource->GetDesc().MipLevels;
 			break;
 		default:
-			CS_ASSERT(false, "지원되지 않는 SRV DIMENSION 입니다");
+			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
 		}
 
 

@@ -24,13 +24,13 @@ namespace Crystal {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetShaderResourceView() const
 		{
 			if (m_ShaderResourceView.IsNull())
-				CS_ASSERT(false, "Shader Resource View甫 刚历 积己秦林技夸");
+				CS_FATAL(false, "Shader Resource View甫 刚历 积己秦林技夸");
 			return m_ShaderResourceView.GetDescriptorHandle();
 		}
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTargetView() const
 		{
 			if (m_RenderTargetView.IsNull())
-				CS_ASSERT(false, "Render Target View甫 刚历 积己秦林技夸");
+				CS_FATAL(false, "Render Target View甫 刚历 积己秦林技夸");
 			return m_RenderTargetView.GetDescriptorHandle();
 		}
 
@@ -38,14 +38,14 @@ namespace Crystal {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilView() const
 		{
 			if (m_DepthStencilView.IsNull())
-				CS_ASSERT(false, "Depth Stencil View甫 刚历 积己秦林技夸");
+				CS_FATAL(false, "Depth Stencil View甫 刚历 积己秦林技夸");
 			return m_DepthStencilView.GetDescriptorHandle();
 		}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetUnorderedAccessView() const
 		{
 			if (m_UnorderedAccessView.IsNull())
-				CS_ASSERT(false, "Unordered Access View甫 刚历 积己秦林技夸");
+				CS_FATAL(false, "Unordered Access View甫 刚历 积己秦林技夸");
 			return m_UnorderedAccessView.GetDescriptorHandle();
 		}
 

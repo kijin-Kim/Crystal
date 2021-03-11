@@ -29,6 +29,14 @@ namespace Crystal {
 			return result;
 		}
 
+		inline DirectX::XMFLOAT3 Divide(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorDivide(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
+			XMStoreFloat3(&result, newVector);
+			return result;
+		}
+
 		inline bool Equal(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
 			return DirectX::XMVector3Equal(XMLoadFloat3(&v1), XMLoadFloat3(&v2));

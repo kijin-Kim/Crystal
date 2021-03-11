@@ -6,25 +6,25 @@ namespace Crystal {
 	PlayerController::PlayerController()
 	{
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
-		m_UserInterfaceInputComponent = std::make_unique<InputComponent>();
+		m_UserInterfaceInputComponent = std::make_unique<InputComponent>("");
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
 	{
 		auto result = m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
-		CS_ASSERT(result.second, "AxisMapping에 실패하였습니다.");
+		CS_FATAL(result.second, "AxisMapping에 실패하였습니다.");
 	}
 
 	void PlayerController::AddActionMapping(const std::string& actionName, const ActionMapping& key)
 	{
 		auto result = m_ActionMap.insert(std::make_pair(key, actionName));
-		CS_ASSERT(result.second, "ActionMapping에 실패하였습니다.");
+		CS_FATAL(result.second, "ActionMapping에 실패하였습니다.");
 	}
 
 	void PlayerController::Possess(Pawn* pawn)
 	{
 		Controller::Possess(pawn);
-		m_GameInputComponent = std::make_unique<InputComponent>();
+		m_GameInputComponent = std::make_unique<InputComponent>("");
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
@@ -45,21 +45,21 @@ namespace Crystal {
 		case Crystal::EInputMode::IM_UI:
 			return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 		default:
-			CS_ASSERT(false, "유효하지 않은 게임 모드입니다.");
+			CS_FATAL(false, "유효하지 않은 게임 모드입니다.");
 			break;
 		}
-
+		return false;
 	}
 
 	void PlayerController::ProcessPitchInput(float value)
 	{
-		auto position = m_MainCamera->GetWorldPosition();
+		auto position = m_MainCamera->GetPosition();
 		m_MainCamera->RotateRollPitchYaw({ 0.0f, -value * 0.05f, 0.0f });
 	}
 
 	void PlayerController::ProcessYawInput(float value)
 	{
-		auto position = m_MainCamera->GetWorldPosition();
+		auto position = m_MainCamera->GetPosition();
 		m_MainCamera->RotateRollPitchYaw({ 0.0f, 0.0f, value * 0.05f });
 	}
 
@@ -88,7 +88,7 @@ namespace Crystal {
 		if (!bWasSwitchableMode && bIsSwitchableMode) 
 		{
 			if (!m_GameInputComponent)
-				CS_ASSERT(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
+				CS_FATAL(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
 
 			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); m_GameInputComponent->ReadyCursorBinding(); });
 			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Released, [this]() { SetInputMode(EInputMode::IM_UI); });

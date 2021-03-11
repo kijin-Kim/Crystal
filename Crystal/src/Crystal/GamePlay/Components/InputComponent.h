@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "Component.h"
+#include "BaseComponents.h"
 #include "Crystal/GamePlay/Controllers/KeyCodes.h"
 
 namespace Crystal {
@@ -12,7 +12,7 @@ namespace Crystal {
 	class InputComponent : public Component
 	{
 	public:
-		InputComponent() = default;
+		InputComponent(const std::string& name) : Component(name) {};
 		virtual ~InputComponent() = default;
 
 		void BindAxis(const std::string& axisName, const std::function<void(float value)>& function);

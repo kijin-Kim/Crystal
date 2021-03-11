@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Crystal/Renderer/Shader.h"
+#include "Shader.h"
 
 namespace Crystal {
 	class ShaderManager final
@@ -14,7 +14,13 @@ namespace Crystal {
 		void Load(const std::string& fileName, const std::string& shaderName);
 		void Add(const std::shared_ptr<Shader>& shader, const std::string& shaderName);
 
-		std::shared_ptr<Shader> GetShader(const std::string& fileName) { return m_Shaders[fileName]; }
+		std::shared_ptr<Shader> GetShader(const std::string& fileName) 
+		{ 
+			auto it = m_Shaders.find(fileName);
+			if (it == m_Shaders.end())
+				CS_FATAL(false, "Shader : %s를 찾을 수 없습니다.", fileName.c_str());
+			return m_Shaders[fileName]; 
+		}
 
 	private:
 		ShaderManager() = default;

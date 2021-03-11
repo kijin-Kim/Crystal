@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "Crystal/GamePlay/Actors/Actor.h"
-#include "Crystal/GamePlay/Components/MeshComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
 	class Level final
@@ -11,19 +11,24 @@ namespace Crystal {
 		Level() = default;
 		~Level() = default;
 
-		void AddActor(Actor* actor) { m_Actors.emplace_back(actor); }
+		void AddActor(const std::shared_ptr<Actor>& actor) 
+		{ 
+			actor->Begin();  
+			m_Actors.push_back(actor); 
+		}
 		//void RemoveActor() {}
 
 		void Update(float deltaTime)
 		{
 			for (const auto& actor : m_Actors)
+			{
 				actor->Update(deltaTime);
-			for (const auto& actor : m_Actors)
-				actor->UpdateTransfromData();
+				actor->UpdateComponents(deltaTime);
+			}
 		}
 
 	private:
-		std::vector<std::unique_ptr<Actor>> m_Actors;
+		std::vector<std::shared_ptr<Actor>> m_Actors;
 	};
 
 	class World final
@@ -39,13 +44,11 @@ namespace Crystal {
 		T* SpawnActor(Level* level = nullptr)
 		{
 			// Need some validation like type checking...
-
-			T* newActor = new T();
-
+			std::shared_ptr<T> newActor = std::make_shared<T>();
 			if (level == nullptr)
 				m_Levels[0]->AddActor(newActor);
 
-			return newActor;
+			return newActor.get();
 		}
 
 		void Update(float deltaTime)

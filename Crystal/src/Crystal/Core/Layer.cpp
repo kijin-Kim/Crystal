@@ -27,6 +27,6 @@ namespace Crystal {
 				m_Layers.back()->Enter();
 		}
 		else
-			CS_ERROR("레이어가 존재하지 않습니다");
+			CS_WARN("레이어가 존재하지 않습니다");
 	}
 }

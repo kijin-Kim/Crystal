@@ -4,6 +4,8 @@
 # **.vcxproj
 # **.vcxproj.filters
 **.vcxproj.user
+Game/assets/models/
+Game/assets/textures/
 
 # Binaries
 bin/

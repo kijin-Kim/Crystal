@@ -6,9 +6,10 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 #include "actors/TestPawn.h"
+#include "actors/Kraken.h"
 
-#define WINDOW_WIDTH 1366
-#define WINDOW_HEIGHT 768
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 
 class GameApplication : public Crystal::Application
@@ -24,6 +25,8 @@ public:
 	{
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
+		Kraken* kraken = m_World->SpawnActor<Kraken>();
+
 		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
 
 

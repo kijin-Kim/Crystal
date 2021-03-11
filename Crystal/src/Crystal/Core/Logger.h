@@ -36,18 +36,34 @@ namespace Crystal {
 	}
 }
 
+
+/*
+* DEBUG_INFO : Debug 모드에서 출력되는 메시지
+* INFO : Debug, Release 모드에서 출력되는 메시지
+* WARN : Debug, Relase 모드에서 출력되는 메시지. 프로그램이 동작될 순 있으나 잠재적인 위험이 있음.
+* FATAL : Debug, Relase 모드에서 출력되는 메시지. 프로그램에 심각한 오류로 프로그램이 정상적으로 동작될 수 없음. (Assertion)
+*/
+
 #define CS_FORMAT(...) string_format(__VA_ARGS__)
-#define CS_LOG(...) Crystal::Log("Crystal Log : ", CS_FORMAT(__VA_ARGS__).c_str())
-#define CS_ERROR(...) Crystal::Log("Crystal Error : ", CS_FORMAT(__VA_ARGS__).c_str())
+
+
+
+#define CS_INFO(...) Crystal::Log("[Crystal Info] : ", CS_FORMAT(__VA_ARGS__).c_str())
+#define CS_WARN(...) Crystal::Log("[Crystal Warn] : ", CS_FORMAT(__VA_ARGS__).c_str())
 
 #ifdef CS_DEBUG
-#define CS_ASSERT(x, ...) if(!(x)) \
-{ \
-	std::string formatted = CS_FORMAT(__VA_ARGS__);\
-	Crystal::Log("Crystal Error : ", formatted.c_str());\
+#define CS_DEBUG_INFO(...) Crystal::Log("[Crystal Debug] : ", CS_FORMAT(__VA_ARGS__).c_str())
+#define CS_FATAL(x, ...) if(!(x)) { \
+	std::string formatted = CS_FORMAT(__VA_ARGS__).c_str();\
+	Crystal::Log("[Crystal Fatal]: ", formatted.c_str());\
 	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 	__debugbreak();\
 }
 #elif defined(CS_RELEASE)
-#define CS_ASSERT(x, ...) if(!(x)) { CS_ERROR(__VA_ARGS__);}
+#define CS_DEBUG_INFO(...)
+#define CS_FATAL(x, ...) if(!(x)) { \
+	std::string formatted = CS_FORMAT(__VA_ARGS__);\
+	Crystal::Log("[Crystal Fatal] : ", formatted.c_str());\
+	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
+}
 #endif

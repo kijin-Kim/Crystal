@@ -1,6 +1,7 @@
 #pragma once
 #include "Pawn.h"
 #include "Crystal/GamePlay/Components/CameraComponent.h"
+#include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/Math/Math.h"
 #include "Crystal/Core/ApplicationUtility.h"
@@ -11,21 +12,25 @@ namespace Crystal {
 	public:
 		CameraPawn()
 		{
-			auto cameraComponent = std::make_shared<CameraComponent>();
-			cameraComponent->SetWorldPosition(DirectX::XMFLOAT3(0, 100.0f, -500.0f));
+			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
+			cameraComponent->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -8000.0f));
 			cameraComponent->SetFieldOfView(60.0f);
-			cameraComponent->SetNearPlane(0.1f);
-			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f });
-			cameraComponent->SetFarPlane(10000.0f);
+			cameraComponent->SetNearPlane(1.0f);
+			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
+			cameraComponent->SetFarPlane(100000.0f);
 			m_MainComponent = cameraComponent;
+
+			m_MovementComponent = CreateComponent<MovementComponent>("MovementComponent");
+			m_MovementComponent->SetTargetComponent(m_MainComponent);
+
 
 			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
 		virtual ~CameraPawn() = default;
 
-		virtual void Start() override
+		virtual void Begin() override
 		{
-			Pawn::Start();
+			Pawn::Begin();
 		}
 
 		virtual void End() override
@@ -43,47 +48,40 @@ namespace Crystal {
 			Pawn::SetupInputComponent(inputComponent);
 			inputComponent->BindAxis("MoveForward", CS_AXIS_FN(CameraPawn::MoveForward));
 			inputComponent->BindAxis("MoveRight", CS_AXIS_FN(CameraPawn::MoveRight));
-			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::AddControllerPitchInput));
-			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::AddControllerYawInput));
+			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::RotatePitch));
+			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
 			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginMouseLock));
 			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Released, CS_ACTION_FN(CameraPawn::EndMouseLock));
 		}
 
-		void AddControllerYawInput(float value)
+		void RotateYaw(float value)
 		{
 			ApplicationUtility::GetPlayerController().ProcessYawInput(value);
 		}
 
-		void AddControllerPitchInput(float value)
+		void RotatePitch(float value)
 		{
 			ApplicationUtility::GetPlayerController().ProcessPitchInput(value);
 		}
 
 		void MoveForward(float value)
 		{
-			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
-			auto position = mainCamera->GetWorldPosition();
-			auto forward = mainCamera->GetForward();
-
-			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(forward, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
-			mainCamera->SetWorldPosition(newPosition);
+			value *= 10000.0f;
+			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetForward(), { value, value, value });
+			m_MovementComponent->AddMovementInput(force);
 		}
 
 		void MoveRight(float value)
 		{
-			auto mainCamera = std::static_pointer_cast<CameraComponent>(m_MainComponent);
-			auto position = mainCamera->GetWorldPosition();
-			auto right = mainCamera->GetRight();
-
-			DirectX::XMFLOAT3 newPosition = Vector3::Add(position, Vector3::Multiply(right, DirectX::XMFLOAT3(value * 10.0f, value * 10.0f, value * 10.0f)));
-			mainCamera->SetWorldPosition(newPosition);
+			value *= 10000.0f;
+			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetRight(), { value, value, value });
+			m_MovementComponent->AddMovementInput(force);
 		}
 
 		void BeginMouseLock()
 		{
 			m_bMouseIsLocked = true;
-			//ApplicationUtility::GetPlayerController()->LockMouseCursor();
 		}
 
 		void EndMouseLock()

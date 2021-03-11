@@ -1,7 +1,8 @@
 #pragma once
 #include "Actor.h"
-#include "Crystal/GamePlay/Components/MeshComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/InputComponent.h"
+#include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/Resources/ShaderManager.h"
 
 namespace Crystal {
@@ -16,9 +17,9 @@ namespace Crystal {
 		{
 		}
 
-		virtual void Start() override
+		virtual void Begin() override
 		{
-			Actor::Start();
+			Actor::Begin();
 		}
 		virtual void Update(float deltaTime) override
 		{
@@ -31,6 +32,7 @@ namespace Crystal {
 
 
 	protected:
-		std::shared_ptr<MeshComponent> m_MeshComponent = nullptr;
+		MeshComponent* m_MeshComponent = nullptr;
+		MovementComponent* m_MovementComponent = nullptr;
 	};
 }
