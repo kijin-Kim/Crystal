@@ -38,7 +38,7 @@ namespace Crystal {
 			Pawn::End();
 		}
 
-		virtual void Update(float deltaTime) override
+		virtual void Update(const float deltaTime) override
 		{
 			Pawn::Update(deltaTime);
 		}

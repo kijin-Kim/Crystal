@@ -16,7 +16,7 @@ namespace Crystal {
 		CameraComponent(const std::string& name);
 		virtual ~CameraComponent() = default;
 
-		virtual void Update(float deltaTime) override
+		void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
 

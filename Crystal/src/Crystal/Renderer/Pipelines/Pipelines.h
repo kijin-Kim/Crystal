@@ -39,9 +39,9 @@ namespace Crystal {
 
 	public:
 		RenderPipeline(const std::string& name) : Pipeline(name) {}
-		virtual ~RenderPipeline() = default;
+		~RenderPipeline() override = default;
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
 	};
 
 	class ComputePipeline : public Pipeline
@@ -53,9 +53,9 @@ namespace Crystal {
 
 	public:
 		ComputePipeline(const std::string& name) : Pipeline(name) {}
-		virtual ~ComputePipeline() = default;
+		~ComputePipeline() override = default;
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override { Pipeline::Record(commandList, pipelineInputs); }
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override { Pipeline::Record(commandList, pipelineInputs); }
 	};
 
 }

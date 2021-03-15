@@ -12,7 +12,7 @@ public:
 		////// TEMPORARY ////
 
 
-		/*ÅØ½ºÃÄ¸¦ ¸¸µì´Ï´Ù.*/
+		/*ï¿½Ø½ï¿½ï¿½Ä¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.*/
 		std::shared_ptr<Crystal::Texture> bodyAlbedoTexture = std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga");
 		std::shared_ptr<Crystal::Texture> bodyRoughnessTexture = std::make_shared<Crystal::Texture>("assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga");
 		std::shared_ptr<Crystal::Texture> bodyNormalTexture = std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga");
@@ -29,7 +29,7 @@ public:
 		tentacleNormalTexture->CreateShaderResourceView(tentacleNormalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
 
-		/*MaterialÀ» »ý¼ºÇÕ´Ï´Ù.*/
+		/*Materialï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		auto& shaderManager = Crystal::ShaderManager::Instance();
 
 		std::shared_ptr<Crystal::Material> bodyMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Skeletal"));
@@ -72,7 +72,7 @@ public:
 		Pawn::End();
 	}
 
-	virtual void Update(float deltaTime) override
+	virtual void Update(const float deltaTime) override
 	{
 		Pawn::Update(deltaTime); // Updating All Component
 	}

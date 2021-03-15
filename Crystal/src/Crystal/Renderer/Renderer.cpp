@@ -124,16 +124,16 @@ namespace Crystal {
 	void Renderer::Render()
 	{
 		/*등록된 컴포넌트가 있으면 각각의 컨테이너에 재분배 합니다.*/
-		for (auto component : m_RegisteredComponents)
+		for (auto* component : m_RegisteredComponents)
 		{
-			auto rcType = component->GetRenderComponentType();
+			const auto rcType = component->GetRenderComponentType();
 			switch (rcType)
 			{
 			case RenderComponent::ERenderComponentType::StaticMesh:
-				m_StaticMeshComponents.push_back((StaticMeshComponent*)component);
+				m_StaticMeshComponents.push_back(static_cast<StaticMeshComponent*>(component));
 				break;
 			case RenderComponent::ERenderComponentType::SkeletalMesh:
-				m_SkeletalMeshComponents.push_back((SkeletalMeshComponent*)component);
+				m_SkeletalMeshComponents.push_back(static_cast<SkeletalMeshComponent*>(component));
 				break;
 			default:
 				CS_FATAL(false, "잘못된 RenderComponent Type입니다.");
@@ -158,7 +158,7 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 
-		auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera();
+		const auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera();
 		
 		commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
@@ -166,8 +166,8 @@ namespace Crystal {
 		commandList->OMSetRenderTargets(1, &m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), TRUE, &m_DepthStencilBufferTexture->GetDepthStencilView());
 
 		float clearColorValue[4] = { 1.0f, 0.0f, 1.0f, 0.0f };
-		float clearDepthValue = 1.0f;
-		float clearStencilValue = 0.0f;
+		const auto clearDepthValue = 1.0f;
+		const auto clearStencilValue = 0.0f;
 		commandList->ClearRenderTargetView(m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), clearColorValue, 0, nullptr);
 		commandList->ClearDepthStencilView(m_DepthStencilBufferTexture->GetDepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue, clearStencilValue, 0, nullptr);
@@ -318,12 +318,12 @@ namespace Crystal {
 				D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE
 			};
 
-			D3D12_INFO_QUEUE_FILTER NewFilter = {};
-			NewFilter.DenyList.NumSeverities = _countof(severities);
-			NewFilter.DenyList.pSeverityList = severities;
-			NewFilter.DenyList.NumIDs = _countof(denyIDs);
-			NewFilter.DenyList.pIDList = denyIDs;
-			infoQueue->PushStorageFilter(&NewFilter);
+			D3D12_INFO_QUEUE_FILTER newFilter = {};
+			newFilter.DenyList.NumSeverities = _countof(severities);
+			newFilter.DenyList.pSeverityList = severities;
+			newFilter.DenyList.NumIDs = _countof(denyIDs);
+			newFilter.DenyList.pIDList = denyIDs;
+			infoQueue->PushStorageFilter(&newFilter);
 		}
 #endif
 		m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence));

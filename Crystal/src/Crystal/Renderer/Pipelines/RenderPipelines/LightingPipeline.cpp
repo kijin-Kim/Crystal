@@ -297,7 +297,7 @@ namespace Crystal {
 			
 			StaticMeshPerObjectData staticMeshPerObjectData = {};
 
-			staticMeshPerObjectData.World = Matrix4x4::Transpose(staticMeshComponents[i]->GetTransform());
+			staticMeshPerObjectData.World = Matrix4x4::Transpose(staticMeshComponents[i]->GetWorldTransform());
 			m_StaticMeshPerObjectConstantBuffers[i]->SetData((void*)&staticMeshPerObjectData);
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_StaticMeshPerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
@@ -398,7 +398,7 @@ namespace Crystal {
 
 			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
 
-			skeletalMeshPerObjectData.World = Matrix4x4::Transpose(skeletalMeshComponents[i]->GetTransform());
+			skeletalMeshPerObjectData.World = Matrix4x4::Transpose(skeletalMeshComponents[i]->GetWorldTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
 			std::copy(boneMatrices.begin(), boneMatrices.end(), skeletalMeshPerObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
 			m_SkeletalMeshPerObjectConstantBuffers[i]->SetData((void*)&skeletalMeshPerObjectData);

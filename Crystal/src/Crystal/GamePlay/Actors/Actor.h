@@ -12,7 +12,7 @@ namespace Crystal {
 
 		virtual void Begin() {}
 		virtual void End() {}
-		virtual void Update(float deltaTime) {}
+		virtual void Update(const float deltaTime) {}
 		void UpdateComponents(float deltaTime);
 
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/

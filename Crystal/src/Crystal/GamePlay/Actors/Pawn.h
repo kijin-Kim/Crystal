@@ -17,11 +17,11 @@ namespace Crystal {
 		{
 		}
 
-		virtual void Begin() override
+		void Begin() override
 		{
 			Actor::Begin();
 		}
-		virtual void Update(float deltaTime) override
+		void Update(const float deltaTime) override
 		{
 			Actor::Update(deltaTime); // Updating All Component
 		}

@@ -42,7 +42,7 @@ public:
 		playerController.EnableModeSwitching(true);
 	}
 	
-	virtual void OnUpdate() override
+	void OnUpdate() override
 	{
 		m_MainTimer.Tick();
 		m_World->Update(m_MainTimer.DeltaTime());

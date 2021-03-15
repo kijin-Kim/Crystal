@@ -9,15 +9,14 @@ namespace Crystal {
 	class Component
 	{
 	public:
-		Component(const std::string& name) : m_Name(name) {}
+		explicit Component(const std::string& name) : m_Name(name) {}
 		virtual ~Component() = default;
 
-		virtual void Update(float deltaTime) {}
+		virtual void Update(const float deltaTime) {}
 
 		void SetOwner(Actor* owner) { m_Owner = owner; }
+		
 		Actor* GetOwner() const { if (!m_Owner) CS_WARN("Owner가 nullptr입니다"); return m_Owner; }
-
-
 		const std::string& GetName() const { return m_Name; }
 
 	private:
@@ -34,36 +33,39 @@ namespace Crystal {
 	public:
 		TransformComponent(const std::string& name) : Component(name)
 		{
-			DirectX::XMStoreFloat4x4(&m_Transform, DirectX::XMMatrixIdentity());
+			DirectX::XMStoreFloat4x4(&m_WorldTransform, DirectX::XMMatrixIdentity());
 		}
-		virtual ~TransformComponent()
-		{
-		}
+		~TransformComponent() override = default;
 
-		virtual void Update(float deltaTime) override
+		void Update(const float deltaTime) override
 		{
 			Component::Update(deltaTime);
 			
-			auto right = GetRight();
-			auto up = GetUp();
-			auto forward = GetForward();
-			auto position = GetPosition();
+			const auto right = GetRight();
+			const auto up = GetUp();
+			const auto forward = GetForward();
+			const auto position = GetPosition();
 
-			m_Transform = {
+			const auto scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
+
+			const DirectX::XMFLOAT4X4 rotation = {
 				right.x, right.y , right.z, 0.0f,
 				up.x, up.y, up.z, 0.0f,
 				forward.x, forward.y, forward.z, 0.0f,
-				position.x, position.y, position.z, 1.0f
+				0.0f, 0.0f, 0.0f, 1.0f
 			};
 
-			DirectX::XMFLOAT4X4 scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
-			m_Transform = Matrix4x4::Multiply(scale, m_Transform);
+			const auto translation = Matrix4x4::Translation(position);
+			m_LocalTransform = Matrix4x4::Multiply(scale, rotation);
+			m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, translation);
 		
 
 
 			/*Parent부터 자식 순으로 계산하여야 함*/
 			if (m_Parent)
-				m_Transform = Matrix4x4::Multiply(m_Parent->GetTransform(), m_Transform);
+				m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_Parent->GetWorldTransform());
+			else
+				m_WorldTransform = m_LocalTransform;
 		}
 
 		/*Component의 Transform이 다른 특정 Component에 종속되도록 합니다.*/
@@ -85,40 +87,42 @@ namespace Crystal {
 			
 		}
 
-		void SetPosition(const DirectX::XMFLOAT3& position) { m_Position = position; }
-		void SetScale(float scale) { m_Scale = scale; }
+		void SetPosition(const DirectX::XMFLOAT3& position)
+		{
+			m_LocalTransform._41 = position.x;
+			m_LocalTransform._42 = position.y;
+			m_LocalTransform._43 = position.z;
+		}
+		void SetScale(const float scale) { m_Scale = scale; }
 		void SetVelocity(const DirectX::XMFLOAT3& velocity) { m_Velocity = velocity; }
-		void SetMass(float mass) { m_Mass = mass; }
+		void SetMass(const float mass) { m_Mass = mass; }
 
-		void RotateRoll(float roll) { m_RollPitchYaw.x += roll; }
-		void RotatePitch(float pitch) { m_RollPitchYaw.y += pitch; }
-		void RotateYaw(float yaw) { m_RollPitchYaw.z += yaw; }
+		void RotateRoll(const float roll) { m_RollPitchYaw.x += roll; }
+		void RotatePitch(const float pitch) { m_RollPitchYaw.y += pitch; }
+		void RotateYaw(const float yaw) { m_RollPitchYaw.z += yaw; }
 		void RotateRollPitchYaw(const DirectX::XMFLOAT3& rollPitchYaw)
 		{
 			m_RollPitchYaw = Vector3::Add(m_RollPitchYaw, rollPitchYaw);
 		}
 
-		const DirectX::XMFLOAT3 GetPosition() const { return m_Position; }
-		const DirectX::XMFLOAT3 GetVelocity() const { return m_Velocity; }
+		DirectX::XMFLOAT3 GetPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43}; }
+		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
 		float GetMass() const { return m_Mass; }
-		const DirectX::XMFLOAT3 GetRight() const { return Vector3::RotateQuaternion({ 1.0f, 0.0f, 0.0f }, GetOrientation()); }
-		const DirectX::XMFLOAT3 GetUp() const { return Vector3::RotateQuaternion({ 0.0f, 1.0f, 0.0f }, GetOrientation()); }
-		const DirectX::XMFLOAT3 GetForward() const { return Vector3::RotateQuaternion({ 0.0f, 0.0f, 1.0f }, GetOrientation()); }
-		const DirectX::XMFLOAT4 GetOrientation() const { return Vector4::QuaternionRollPitchYaw(m_RollPitchYaw); }
-
-
+		DirectX::XMFLOAT3 GetRight() const { return Vector3::RotateQuaternion({ 1.0f, 0.0f, 0.0f }, GetOrientation()); }
+		DirectX::XMFLOAT3 GetUp() const { return Vector3::RotateQuaternion({ 0.0f, 1.0f, 0.0f }, GetOrientation()); }
+		DirectX::XMFLOAT3 GetForward() const { return Vector3::RotateQuaternion({ 0.0f, 0.0f, 1.0f }, GetOrientation()); }
+		DirectX::XMFLOAT4 GetOrientation() const { return Vector4::QuaternionRollPitchYaw(m_RollPitchYaw); }
 
 
 		TransformComponent* GetParent() const { return m_Parent; }
-
-		const DirectX::XMFLOAT4X4& GetTransform() const { return m_Transform; }
+		const DirectX::XMFLOAT4X4& GetWorldTransform() const { return m_WorldTransform; }
 
 
 	private:
 		/*OwnerShip을 가지고 있지 않음*/
 		TransformComponent* m_Parent = nullptr;
-		DirectX::XMFLOAT4X4 m_Transform = Matrix4x4::Identity();
-		DirectX::XMFLOAT3 m_Position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
+		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
 		float m_Scale = 1.0f;
 		DirectX::XMFLOAT3 m_Velocity = { 0.0f, 0.0f,0.0f };
 		float m_Mass = 10.0f;
@@ -140,10 +144,10 @@ namespace Crystal {
 		};
 
 	public:
-		RenderComponent(const std::string& name);
-		virtual ~RenderComponent() = default;
+		explicit RenderComponent(const std::string& name);
+		~RenderComponent() override = default;
 
-		virtual void Update(float deltaTime) override
+	void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
 
