@@ -353,6 +353,7 @@ namespace Crystal {
 			m_SkeletalMeshComponents.push_back(static_cast<SkeletalMeshComponent*>(component));
 			break;
 		case PrimitiveComponent::EPrimitiveComponentType::Collision: [[Fallthrough]]
+		case PrimitiveComponent::EPrimitiveComponentType::Line : [[Fallthrough]]
 		case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
 			m_CollisionComponents.push_back(static_cast<CollisionComponent*>(component));
 			break;

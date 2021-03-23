@@ -50,10 +50,26 @@ namespace Crystal {
 			return result.x;
 		}
 
+		inline float Length(const DirectX::XMFLOAT3& v1)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector3Length(XMLoadFloat3(&v1));
+			XMStoreFloat3(&result, newVector);
+			return result.x;
+		}
+
 		inline float LengthSquared(const DirectX::XMFLOAT3& v1)
 		{
 			DirectX::XMFLOAT3 result;
 			DirectX::XMVECTOR newVector = DirectX::XMVector3LengthSq(XMLoadFloat3(&v1));
+			XMStoreFloat3(&result, newVector);
+			return result.x;
+		}
+
+		inline float Dot(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector3Dot(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
 			XMStoreFloat3(&result, newVector);
 			return result.x;
 		}
@@ -88,7 +104,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4 QuternionRotationAxis(const DirectX::XMFLOAT3& axis, float angle)
 		{
 			DirectX::XMFLOAT4 result;
-			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationAxis(XMLoadFloat3(&axis), DirectX::XMConvertToRadians(angle));
+			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationAxis(XMLoadFloat3(&axis), (angle));
 			XMStoreFloat4(&result, newVector);
 			return result;
 		}
@@ -96,8 +112,8 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4 QuaternionRollPitchYaw(const DirectX::XMFLOAT3& rollPitchYaw)
 		{
 			DirectX::XMFLOAT4 result;
-			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(rollPitchYaw.y),
-				DirectX::XMConvertToRadians(rollPitchYaw.z), DirectX::XMConvertToRadians(rollPitchYaw.x));
+			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationRollPitchYaw((rollPitchYaw.y),
+				(rollPitchYaw.z), (rollPitchYaw.x));
 			XMStoreFloat4(&result, newVector);
 			return result;
 		}
@@ -175,7 +191,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 RotationRollPitchYaw(const DirectX::XMFLOAT3& r1)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(r1.x), DirectX::XMConvertToRadians(r1.y), DirectX::XMConvertToRadians(r1.z));
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationRollPitchYaw((r1.x), (r1.y), (r1.z));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
@@ -210,7 +226,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 Perspective(float fovY, float aspect, float nearPlane, float farPlane)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fovY), aspect, nearPlane, farPlane);
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixPerspectiveFovLH((fovY), aspect, nearPlane, farPlane);
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
@@ -226,7 +242,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 RotationX(float angle)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(angle));
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationX((angle));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
@@ -234,7 +250,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 RotationY(float angle)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(angle));
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationY((angle));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
@@ -242,7 +258,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 RotationZ(float angle)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(angle));
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationZ((angle));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}

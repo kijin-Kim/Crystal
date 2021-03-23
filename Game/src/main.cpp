@@ -24,7 +24,12 @@ public:
 	void Start() override
 	{
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
+		for (int i = 0; i < 5; i++)
+		{
+			TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
+			testPawn->SetPosition({ 5.0f * i, 0.0f, 0.0f });
+		}
+			
 //		Kraken* kraken = m_World->SpawnActor<Kraken>();
 
 		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();

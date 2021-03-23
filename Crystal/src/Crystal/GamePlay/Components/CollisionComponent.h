@@ -15,6 +15,7 @@ namespace Crystal {
 		}
 	};
 
+
 	class BoundingSphereComponent : public CollisionComponent
 	{
 	public:
@@ -29,5 +30,25 @@ namespace Crystal {
 
 	private:
 		DirectX::BoundingSphere m_BoundingSphere;
+	};
+
+	class LineComponent : public CollisionComponent
+	{
+	public:
+		LineComponent(const std::string& name) : CollisionComponent(name)
+		{
+			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::Line);
+			SetRenderable(new Line());
+		}
+
+		void SetStartPoint(const DirectX::XMFLOAT3& point) { m_StartPoint = point; }
+		void SetEndPoint(const DirectX::XMFLOAT3& point) { m_EndPoint = point; }
+
+		const DirectX::XMFLOAT3& GetStartPoint() const { return m_StartPoint; }
+		const DirectX::XMFLOAT3& GetEndPoint() const { return m_EndPoint; }
+
+	private:
+		DirectX::XMFLOAT3 m_StartPoint = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_EndPoint = { 1.0f, 0.0f, 0.0f };
 	};
 }

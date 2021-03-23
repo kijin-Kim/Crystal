@@ -59,12 +59,12 @@ namespace Crystal {
 
 		void RotateYaw(float value)
 		{
-			ApplicationUtility::GetPlayerController().ProcessYawInput(value);
+			ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
 		}
 
 		void RotatePitch(float value)
 		{
-			ApplicationUtility::GetPlayerController().ProcessPitchInput(value);
+			ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
 		}
 
 		void MoveForward(float value)

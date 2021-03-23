@@ -13,40 +13,41 @@ public:
 
 
 		/*텍스쳐를 만듭니다.*/
-		auto albedoTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-		auto metallicTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-		auto roughnessTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-		auto normalTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
-		
-		albedoTexture->CreateShaderResourceView(albedoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		metallicTexture->CreateShaderResourceView(metallicTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		roughnessTexture->CreateShaderResourceView(roughnessTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		normalTexture->CreateShaderResourceView(normalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		//auto albedoTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
+		//auto metallicTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
+		//auto roughnessTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
+		//auto normalTexture = std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
+		//
+		//albedoTexture->CreateShaderResourceView(albedoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		//metallicTexture->CreateShaderResourceView(metallicTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		//roughnessTexture->CreateShaderResourceView(roughnessTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		//normalTexture->CreateShaderResourceView(normalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
 
-		/*Material을 생성합니다.*/
-		auto& shaderManager = Crystal::ShaderManager::Instance();
-		auto pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Static"));
+		///*Material을 생성합니다.*/
+		//auto& shaderManager = Crystal::ShaderManager::Instance();
+		//auto pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Static"));
 
-		pbrMaterial->Set("AlbedoTexture", albedoTexture);
-		pbrMaterial->Set("MetallicTexture", metallicTexture);
-		pbrMaterial->Set("RoughnessTexture", roughnessTexture);
-		pbrMaterial->Set("NormalTexture", normalTexture);
+		//pbrMaterial->Set("AlbedoTexture", albedoTexture);
+		//pbrMaterial->Set("MetallicTexture", metallicTexture);
+		//pbrMaterial->Set("RoughnessTexture", roughnessTexture);
+		//pbrMaterial->Set("NormalTexture", normalTexture);
 
-		auto* mesh = new Crystal::StaticMesh("assets/models/SM_Frigate_BE2.fbx");	
-		mesh->SetMaterial(pbrMaterial, 0);
-
+		/*auto* mesh = new Crystal::StaticMesh("assets/models/SM_Frigate_BE2.fbx");	
+		mesh->SetMaterial(pbrMaterial, 0);*/
 		// ========================================================================
 
 		auto* boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-		boundingSphereComponent->SetRadius(5000.0f);
+		//boundingSphereComponent->SetRadius(5000.0f);
+		boundingSphereComponent->SetRadius(100.0f);
+
 
 		m_MainComponent = boundingSphereComponent;
 		
-		m_MeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
+		/*m_MeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 		m_MeshComponent->SetRenderable(mesh);
 		m_MeshComponent->SetPosition({0.0f, 0.0f, 596.0f});
-		m_MeshComponent->AttachToComponent(m_MainComponent);
+		m_MeshComponent->AttachToComponent(m_MainComponent);*/
 	
 		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		m_CameraComponent->SetPosition(DirectX::XMFLOAT3(0, 4500.0f, -15000.0f));

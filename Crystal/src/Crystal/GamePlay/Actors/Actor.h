@@ -25,6 +25,8 @@ namespace Crystal {
 
 		TransformComponent* GetMainComponent() const { return m_MainComponent; }
 
+		void SetPosition(const DirectX::XMFLOAT3& position);
+
 	protected:
 		/*Component를 생성하고 Register합니다.*/
 		template <class T>

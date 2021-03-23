@@ -15,7 +15,7 @@ namespace Crystal {
 
 	void CameraComponent::computeViewProjection()
 	{
-		const auto worldTransform = GetWorldTransform();
+		const auto& worldTransform = GetWorldTransform();
 		const DirectX::XMFLOAT3 worldPosition = { worldTransform._41, worldTransform._42, worldTransform._43 };
 		const DirectX::XMFLOAT3 worldForward = { worldTransform._31, worldTransform._32, worldTransform._33 };
 		const DirectX::XMFLOAT3 worldUp = { worldTransform._21, worldTransform._22, worldTransform._23 };
@@ -26,7 +26,8 @@ namespace Crystal {
 		{
 		case ECameraProjectionMode::CPM_Persepective:
 			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(worldPosition, worldForward, worldUp), 
-				Matrix4x4::Perspective(m_FieldOfView, static_cast<float>(m_Viewport.Width) / static_cast<float>(m_Viewport.Height), m_NearPlane, m_FarPlane));
+				Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView), 
+					static_cast<float>(m_Viewport.Width) / static_cast<float>(m_Viewport.Height), m_NearPlane, m_FarPlane));
 			break;
 		case ECameraProjectionMode::CPM_Orthographic:
 			break;

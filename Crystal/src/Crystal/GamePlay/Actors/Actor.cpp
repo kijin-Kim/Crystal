@@ -94,4 +94,9 @@ namespace Crystal {
 		CS_DEBUG_INFO("Component : %s Moved", component->GetName().c_str());
 	}
 
+	void Actor::SetPosition(const DirectX::XMFLOAT3& position)
+	{
+		m_MainComponent->SetPosition(position);
+	}
+
 }

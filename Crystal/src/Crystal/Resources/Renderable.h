@@ -32,7 +32,8 @@ namespace Crystal {
 		Line()
 		{
 			float unitLineVertices[] = {
-				0.0f, 1.0f
+				0.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f,
 			};
 
 			int indices[] = {
@@ -40,7 +41,7 @@ namespace Crystal {
 			};
 
 			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)unitLineVertices,
-				sizeof(float) * _countof(unitLineVertices), _countof(unitLineVertices)));
+				sizeof(float) * 3, _countof(unitLineVertices)));
 			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)indices,
 				sizeof(int) * _countof(indices), _countof(indices)));
 		}
@@ -133,9 +134,9 @@ namespace Crystal {
 			}
 
 			int circleIndices[_countof(circleVertices) * 2];
+			int j = 0;
 			for (int i = 0; i < _countof(circleIndices) - 1; i++)
 			{
-				static int j = 0;
 				circleIndices[i] = j;
 				circleIndices[i + 1] = j + 1;
 				if (i % 2 == 0)
@@ -183,9 +184,9 @@ namespace Crystal {
 
 
 			int circleIndices[_countof(circleVertices) * 2];
+			int j = 0;
 			for (int i = 0; i < _countof(circleIndices) - 1; i++)
 			{
-				static int j = 0;
 				circleIndices[i] = j;
 				circleIndices[i + 1] = j + 1;
 				if (i % 2 == 0)

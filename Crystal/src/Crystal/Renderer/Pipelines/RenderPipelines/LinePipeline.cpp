@@ -87,7 +87,7 @@ namespace Crystal {
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
 		
 
-		const int maxObjectCount = 10;
+		const int maxObjectCount = 300;
 		for (int i = 0; i < maxObjectCount; i++)
 			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
 	}
@@ -99,32 +99,57 @@ namespace Crystal {
 
 		auto device = Renderer::Instance().GetDevice();
 
-		LinePipelineInputs* wireframePipelineInputs = (LinePipelineInputs*)pipelineInputs;
-		auto& collisionComponents = *wireframePipelineInputs->CollisionComponents;
+		LinePipelineInputs* linePipelineInputs = (LinePipelineInputs*)pipelineInputs;
+		auto& collisionComponents = *linePipelineInputs->CollisionComponents;
 
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(wireframePipelineInputs->Camera->GetViewProjection());
+		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(linePipelineInputs->Camera->GetViewProjection());
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
-			DirectX::XMFLOAT4X4 postScale = Matrix4x4::Identity();
+			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
 
-			auto collisionComponentType = collisionComponents[i]->GetPrimitiveComponentType();
+			const auto collisionComponentType = collisionComponents[i]->GetPrimitiveComponentType();
 			switch (collisionComponentType)
 			{
+			case Crystal::PrimitiveComponent::EPrimitiveComponentType::Line:
+			{
+				auto lineComponent = (LineComponent*)collisionComponents[i];
+
+				const auto startPoint = lineComponent->GetStartPoint();
+				const auto endPoint = lineComponent->GetEndPoint();
+				const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
+
+				const auto length = Vector3::Length(endSubStart);
+
+				const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
+				const auto newDirection = Vector3::Normalize(endSubStart);
+
+				const auto rotationAxis = Vector3::Normalize(Vector3::Cross(newDirection, currentDirection));
+				const auto rotationAngle = acosf(Vector3::Dot(newDirection, currentDirection));
+
+				const auto scaleMatrix = Matrix4x4::Scale(length);
+				const auto quternion = 
+					Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
+				const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
+				const auto translationMatrix = Matrix4x4::Translation(endPoint);
+				postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+				postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
+			}
+				break;
 			case Crystal::PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
 			{
-				auto radius = ((BoundingSphereComponent*)collisionComponents[i])->GetRadius();
-				postScale = Matrix4x4::Scale(radius);
+				const auto radius = ((BoundingSphereComponent*)collisionComponents[i])->GetRadius();
+				postTransform = Matrix4x4::Scale(radius);
 			}
 				break;
 			default:
 				break;
 			}
 			
-			DirectX::XMFLOAT4X4 postScaledWorld = Matrix4x4::Multiply(collisionComponents[i]->GetWorldTransform(), postScale);
+			DirectX::XMFLOAT4X4 postScaledWorld = Matrix4x4::Multiply(collisionComponents[i]->GetWorldTransform(), postTransform);
 			m_PerObjectData.World = Matrix4x4::Transpose(postScaledWorld);
 			m_PerObjectData.Color = { 1.0f, 1.0f, 0.0f };
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
@@ -148,7 +173,7 @@ namespace Crystal {
 		{
 			commandList->SetGraphicsRootDescriptorTable(1, gpuHandle);
 			auto* renderable = collisionComponents[i]->GetRenderable();
-			for(int j =0; j< renderable->GetVertexbufferCount(); j++)
+			for(int j = 0; j < renderable->GetVertexbufferCount(); j++)
 				renderable->Render(commandList, j);
 
 			gpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
