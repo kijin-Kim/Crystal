@@ -8,7 +8,7 @@
 #include "Crystal/Resources/Buffers.h"
 #include "Crystal/Resources/Material.h"
 #include "Crystal/Math/Math.h"
-#include "Crystal/Renderer/Renderable.h"
+#include "Crystal/Resources/Renderable.h"
 
 struct aiNode;
 struct aiScene;
@@ -20,6 +20,12 @@ namespace Assimp { class Importer; }
 
 
 namespace Crystal {
+	
+	struct PositionVertex
+	{
+		PositionVertex() = default;
+		DirectX::XMFLOAT3 Position = {};
+	};
 
 	struct StaticVertex
 	{
@@ -67,6 +73,14 @@ namespace Crystal {
 		std::vector<UINT> Indices;
 	};
 
+	struct PositionSubMesh : public SubMesh
+	{
+		PositionSubMesh(aiMesh* mesh);
+		virtual ~PositionSubMesh() = default;
+
+		std::vector<PositionVertex> PositionVertices;
+	};
+
 	struct StaticSubMesh : public SubMesh
 	{
 		StaticSubMesh(aiMesh* mesh);
@@ -89,10 +103,7 @@ namespace Crystal {
 		Mesh(const std::string& filePath);
 		virtual ~Mesh();
 
-		virtual void Update(float deltaTime) override;
-		void Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, int submeshIndex);
 		void SetMaterial(std::shared_ptr<Material> material, int index = 0) { m_Materials[index] = std::move(material); }
-		size_t GetSubmeshCount() const { return m_Submeshes.size(); }
 		Material* GetMaterial(int index = 0) const 
 		{ 
 			if (!m_Materials[index])
@@ -102,14 +113,11 @@ namespace Crystal {
 
 		const std::array<std::shared_ptr<Material>, 5>& GetMaterials() const { return m_Materials; }
 
-	protected:
-		void processNode(aiNode* rootNode, const aiScene* scene, bool bIsSkeletal = false);
+	private:
+		virtual void ProcessNode(aiNode* rootNode, const aiScene* scene) = 0;
 
 	protected:
 		std::vector <std::unique_ptr<SubMesh>> m_Submeshes;
-		std::vector <std::unique_ptr<VertexBuffer>> m_VertexBuffers;
-		std::vector <std::unique_ptr<IndexBuffer>> m_IndexBuffers;
-
 		std::array<std::shared_ptr<Material>, 5> m_Materials;
 
 		const aiScene* m_MeshScene = nullptr;
@@ -119,24 +127,38 @@ namespace Crystal {
 
 	};
 
+
+	class PositionMesh : public Mesh
+	{
+	public:
+		PositionMesh(const std::string& filePath);
+		~PositionMesh() override = default;
+
+		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
+	};
+
 	/*SubMesh들의 컨테이너 입니다.*/
 	class StaticMesh : public Mesh
 	{
 	public:
 		StaticMesh(const std::string& filePath);
-		virtual ~StaticMesh() = default;
+		~StaticMesh() override = default;
+	private:
+		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
 	};
 
 	class SkeletalMesh : public Mesh 
 	{
 	public:
 		SkeletalMesh(const std::string& meshFilePath, const std::string& animationFilePath = "");
-		virtual ~SkeletalMesh();
+		~SkeletalMesh() override;
 
-		virtual void Update(float deltaTime) override;
+		void Update(float deltaTime) override;
 		//TEMP//
 		const std::vector<DirectX::XMFLOAT4X4>& GetBoneTransforms() const { return m_BoneTransforms; }
 	private:
+		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
+
 		void boneTransform(float deltaTime);
 		void readNodeHierarchy(float animationTime, const aiNode* pNode, const DirectX::XMFLOAT4X4& parentTransform);
 		int findNodeAnimIndex(unsigned int animationIndex, const std::string& nodeName);
@@ -165,7 +187,5 @@ namespace Crystal {
 
 
 		Assimp::Importer* m_AnimationFileImporter = nullptr;
-
-
 	};
 }

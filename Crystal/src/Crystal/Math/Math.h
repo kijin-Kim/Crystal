@@ -129,6 +129,16 @@ namespace Crystal {
 			return result;
 		}
 
+		inline DirectX::XMFLOAT4X4 Scale(const float scale)
+		{
+			DirectX::XMFLOAT4X4 result;
+			DirectX::XMFLOAT3 scaleVector = { scale , scale , scale };
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixScalingFromVector(XMLoadFloat3(&scaleVector));
+			XMStoreFloat4x4(&result, newMatrix);
+			return result;
+		}
+		
+
 
 		inline DirectX::XMFLOAT4X4 Transpose(const DirectX::XMFLOAT4X4& m1)
 		{

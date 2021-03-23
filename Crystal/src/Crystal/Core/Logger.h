@@ -14,6 +14,7 @@ std::string string_format(const std::string fmt_str, ...) {
 	std::unique_ptr<char[]> formatted;
 	va_list ap;
 	while (true) {
+		if (fmt_str.empty()) return std::string();
 		formatted = std::make_unique<char[]>(n); /* Wrap the plain char array into the unique_ptr */
 		strcpy(&formatted[0], fmt_str.c_str());
 		va_start(ap, fmt_str);

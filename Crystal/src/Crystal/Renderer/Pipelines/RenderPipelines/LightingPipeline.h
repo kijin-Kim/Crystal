@@ -15,7 +15,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4 LightPositionInWorld[2];
 		};
 
-
 		struct StaticMeshPerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
@@ -51,7 +50,8 @@ namespace Crystal {
 		LightingPipeline(const std::string& name);
 		virtual ~LightingPipeline() = default;
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+			const PipelineInputs* const pipelineInputs) override;
 
 	private:
 		PerFrameData m_PerFrameData = {};

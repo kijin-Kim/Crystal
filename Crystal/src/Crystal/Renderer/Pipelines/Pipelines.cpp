@@ -14,7 +14,5 @@ namespace Crystal {
 	void RenderPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
 	{
 		Pipeline::Record(commandList, pipelineInputs);
-
-		RenderPipelineInputs* renderPipelineInputs = (RenderPipelineInputs*)pipelineInputs;
 	}
 }

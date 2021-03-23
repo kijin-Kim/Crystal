@@ -12,6 +12,8 @@
 #include "Crystal/Renderer/Pipelines/RenderPipelines/CubemapPipeline.h"
 #include "Crystal/Renderer/Pipelines/ComputePipelines/PanoToCubemapPipeline.h"
 #include "Crystal/Renderer/Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Pipelines/RenderPipelines/LinePipeline.h"
 
 namespace Crystal {
 	class PlayerController;
@@ -38,9 +40,8 @@ namespace Crystal {
 		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
 		void ActiveFullScreenMode(const bool bActive) { m_bIsFullScreen = bActive; }
 
-		/// SHOULD GET DRAWABLE //
+		void RegisterRenderComponent(PrimitiveComponent* component);
 		
-		void RegisterRenderComponent(RenderComponent* renderComponent) { m_RegisteredComponents.push_back(renderComponent); }
 		
 
 		int GetResolutionWidth() const { return m_ResWidth; }
@@ -70,10 +71,9 @@ namespace Crystal {
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		std::vector<RenderComponent*> m_RegisteredComponents;
-
 		std::vector<StaticMeshComponent*> m_StaticMeshComponents;
 		std::vector<SkeletalMeshComponent*> m_SkeletalMeshComponents;
+		std::vector<CollisionComponent*> m_CollisionComponents;
 		
 
 		int m_ResWidth = 1920;
@@ -90,8 +90,9 @@ namespace Crystal {
 
 
 		std::unique_ptr<LightingPipeline> m_LightingPipeline = nullptr;
+		std::unique_ptr<LinePipeline> m_WireframePipeline = nullptr;
 		std::unique_ptr<CubemapPipeline> m_CubemapPipeline = nullptr;
-
+		
 		std::unique_ptr<PanoToCubemapPipeline> m_PanoToCubemapPipeline = nullptr;
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
 		

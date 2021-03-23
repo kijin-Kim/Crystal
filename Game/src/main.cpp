@@ -21,11 +21,11 @@ public:
 		m_World = std::make_unique<Crystal::World>();
 	}
 
-	virtual void Start() override
+	void Start() override
 	{
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
-		Kraken* kraken = m_World->SpawnActor<Kraken>();
+//		Kraken* kraken = m_World->SpawnActor<Kraken>();
 
 		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
 

@@ -64,7 +64,6 @@ namespace Crystal {
 				CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
 				CD3DX12_PIPELINE_STATE_STREAM_VS VS;
 				CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DSV;
 				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 				CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 			} pipelineStateStream;
@@ -77,28 +76,15 @@ namespace Crystal {
 			pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
+
 			auto& shaderManager = ShaderManager::Instance();
 			auto& shaderDatablobs = shaderManager.GetShader("PBRShader_Static")->GetRaw();
-			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
-			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
+			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), 
+				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
+			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), 
+				shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
-			D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-			depthStencilDesc.DepthEnable = true;
-			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-			depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-			depthStencilDesc.StencilEnable = false;
-			depthStencilDesc.StencilReadMask = 0x00;
-			depthStencilDesc.StencilWriteMask = 0x00;
-			depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-			depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
 
-			pipelineStateStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
 			pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 			D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 			rtvFormat.NumRenderTargets = 1;
@@ -121,7 +107,8 @@ namespace Crystal {
 				m_StaticMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(StaticMeshPerObjectData)));
 				for (int j = 0; j < maxMaterialCount; j++)
 				{
-					m_StaticMeshPerMaterialConstantBufferLists[i][j] = std::make_unique<ConstantBuffer>((int)sizeof(StaticMeshPerObjectData));
+					m_StaticMeshPerMaterialConstantBufferLists[i][j] 
+						= std::make_unique<ConstantBuffer>((int)sizeof(StaticMeshPerObjectData));
 				}
 			}
 		}
@@ -154,20 +141,23 @@ namespace Crystal {
 
 			CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[2] = {};
 			perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
-			perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
+			perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, 
+				D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
 			rootParameter[3].InitAsDescriptorTable(_countof(perMeshRootParameterRanges), perMeshRootParameterRanges);
 
 			CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
 			StaticSamplerDescs[0].Init(0);
 
 			CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;
-			rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+			rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), 
+				StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 			Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 			Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 			hr = D3D12SerializeVersionedRootSignature(&rootsigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
 			CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다 %s", rootSignatureErrorBlob->GetBufferPointer());
-			hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_SkeletalMeshRootSignature));
+			hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), 
+				rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_SkeletalMeshRootSignature));
 			CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
@@ -188,7 +178,6 @@ namespace Crystal {
 				CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
 				CD3DX12_PIPELINE_STATE_STREAM_VS VS;
 				CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DSV;
 				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 				CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 			} pipelineStateStream;
@@ -201,28 +190,14 @@ namespace Crystal {
 			pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
+
 			auto& shaderManager = ShaderManager::Instance();
 			auto& shaderDatablobs = shaderManager.GetShader("PBRShader_Skeletal")->GetRaw();
-			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
-			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
+			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), 
+				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
+			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), 
+				shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
-			D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-			depthStencilDesc.DepthEnable = true;
-			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-			depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-			depthStencilDesc.StencilEnable = false;
-			depthStencilDesc.StencilReadMask = 0x00;
-			depthStencilDesc.StencilWriteMask = 0x00;
-			depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-			depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-			depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-
-			pipelineStateStream.DSV = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
 			pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 			D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 			rtvFormat.NumRenderTargets = 1;
@@ -246,7 +221,8 @@ namespace Crystal {
 				m_SkeletalMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(SkeletalMeshPerObjectData)));
 				for (int j = 0; j < maxMaterialCount; j++)
 				{
-					m_SkeletalMeshPerMaterialConstantBufferLists[i][j] = std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
+					m_SkeletalMeshPerMaterialConstantBufferLists[i][j] 
+						= std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
 				}
 			}
 		}
@@ -256,7 +232,8 @@ namespace Crystal {
 
 	}
 
-	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+		const PipelineInputs* const pipelineInputs)
 	{
 
 		RenderPipeline::Record(commandList, pipelineInputs);
@@ -278,8 +255,8 @@ namespace Crystal {
 
 
 
-		auto skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
-		auto staticMeshComponents = *lightPipelineInputs->StaticMeshComponents;
+		auto& skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
+		auto& staticMeshComponents = *lightPipelineInputs->StaticMeshComponents;
 
 		
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_StaticMeshDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -309,7 +286,7 @@ namespace Crystal {
 			const StaticMesh* staticMesh = (StaticMesh*)staticMeshComponents[i]->GetRenderable();
 
 			auto materials = staticMesh->GetMaterials();
-			for (int j = 0; j < staticMesh->GetSubmeshCount(); j++)
+			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
@@ -410,7 +387,7 @@ namespace Crystal {
 
 
 			auto materials = skeletalMesh->GetMaterials();
-			for (int j = 0; j < skeletalMesh->GetSubmeshCount(); j++)
+			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
 
 				PerMaterialData perMaterialData = {};
@@ -508,7 +485,7 @@ namespace Crystal {
 			staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			StaticMesh* staticMesh = (StaticMesh*)staticMeshComponents[i]->GetRenderable();
-			for (int j = 0; j < staticMesh->GetSubmeshCount(); j++)
+			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
 				commandList->SetGraphicsRootDescriptorTable(3, staticMeshDescriptorHeapHandle); // PerMaterial
 				staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
@@ -537,7 +514,7 @@ namespace Crystal {
 			skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
-			for (int j = 0; j < skeletalMesh->GetSubmeshCount(); j++)
+			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
 				commandList->SetGraphicsRootDescriptorTable(3, skeletalMeshDescriptorHeapHandle); // PerMaterial
 				skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;

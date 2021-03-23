@@ -53,13 +53,11 @@ namespace Crystal {
 
 	void PlayerController::ProcessPitchInput(float value)
 	{
-		auto position = m_MainCamera->GetPosition();
 		m_MainCamera->RotateRollPitchYaw({ 0.0f, -value * 0.05f, 0.0f });
 	}
 
 	void PlayerController::ProcessYawInput(float value)
 	{
-		auto position = m_MainCamera->GetPosition();
 		m_MainCamera->RotateRollPitchYaw({ 0.0f, 0.0f, value * 0.05f });
 	}
 

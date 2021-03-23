@@ -32,6 +32,7 @@ namespace Crystal {
 		{
 			/*TODO : Component만 받게 체크...*/
 			T* newComponent = new T(name);
+			newComponent->OnCreate();
 			RegisterComponent(newComponent);
 			return newComponent;
 		}

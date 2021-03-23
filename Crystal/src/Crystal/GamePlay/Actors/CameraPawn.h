@@ -19,31 +19,33 @@ namespace Crystal {
 			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 			cameraComponent->SetFarPlane(100000.0f);
 			m_MainComponent = cameraComponent;
+			m_MainComponent->SetMass(60.0f);
 
 			m_MovementComponent = CreateComponent<MovementComponent>("MovementComponent");
 			m_MovementComponent->SetTargetComponent(m_MainComponent);
+
 
 
 			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
 		virtual ~CameraPawn() = default;
 
-		virtual void Begin() override
+		void Begin() override
 		{
 			Pawn::Begin();
 		}
 
-		virtual void End() override
+		void End() override
 		{
 			Pawn::End();
 		}
 
-		virtual void Update(const float deltaTime) override
+		void Update(const float deltaTime) override
 		{
 			Pawn::Update(deltaTime);
 		}
 
-		virtual void SetupInputComponent(InputComponent* inputComponent) override
+		void SetupInputComponent(InputComponent* inputComponent) override
 		{
 			Pawn::SetupInputComponent(inputComponent);
 			inputComponent->BindAxis("MoveForward", CS_AXIS_FN(CameraPawn::MoveForward));
@@ -67,16 +69,16 @@ namespace Crystal {
 
 		void MoveForward(float value)
 		{
-			value *= 10000.0f;
+			value *= 100000.0f;
 			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetForward(), { value, value, value });
-			m_MovementComponent->AddMovementInput(force);
+			m_MovementComponent->AddForce(force);
 		}
 
 		void MoveRight(float value)
 		{
-			value *= 10000.0f;
+			value *= 100000.0f;
 			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetRight(), { value, value, value });
-			m_MovementComponent->AddMovementInput(force);
+			m_MovementComponent->AddForce(force);
 		}
 
 		void BeginMouseLock()

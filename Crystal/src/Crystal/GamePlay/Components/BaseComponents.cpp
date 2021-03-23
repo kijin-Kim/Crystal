@@ -4,9 +4,14 @@
 
 namespace Crystal {
 
-	RenderComponent::RenderComponent(const std::string& name) : TransformComponent(name)
+	PrimitiveComponent::PrimitiveComponent(const std::string& name) : TransformComponent(name)
 	{
-		Renderer::Instance().RegisterRenderComponent(this);	
+		m_PrimitiveComponentType = EPrimitiveComponentType::None;
+	}
+
+	void PrimitiveComponent::OnCreate()
+	{
+		Renderer::Instance().RegisterRenderComponent(this);
 	}
 
 }

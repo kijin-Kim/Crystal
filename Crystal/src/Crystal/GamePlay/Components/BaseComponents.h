@@ -3,7 +3,7 @@
 #include "Crystal/Math/Math.h"
 #include "Crystal/GamePlay/Actors/Actor.h"
 #include "../../Core/Logger.h"
-#include "../../Renderer/Renderable.h"
+#include "Crystal/Resources/Renderable.h"
 
 namespace Crystal {
 	class Component
@@ -11,6 +11,8 @@ namespace Crystal {
 	public:
 		explicit Component(const std::string& name) : m_Name(name) {}
 		virtual ~Component() = default;
+
+		virtual void OnCreate() {};
 
 		virtual void Update(const float deltaTime) {}
 
@@ -95,7 +97,13 @@ namespace Crystal {
 		}
 		void SetScale(const float scale) { m_Scale = scale; }
 		void SetVelocity(const DirectX::XMFLOAT3& velocity) { m_Velocity = velocity; }
-		void SetMass(const float mass) { m_Mass = mass; }
+		void SetMass(const float mass) { m_InverseMass = 1.0f / mass; }
+		void SetInverseMass(const float inverseMass) { m_InverseMass = inverseMass; }
+
+		void SetRoll(const float roll) { m_RollPitchYaw.x = roll; }
+		void SetPitch(const float pitch) { m_RollPitchYaw.y = pitch; }
+		void SetYaw(const float yaw) { m_RollPitchYaw.z = yaw; }
+		void SetRollPitchYaw(const DirectX::XMFLOAT3& rollPitchYaw) { m_RollPitchYaw = rollPitchYaw; }
 
 		void RotateRoll(const float roll) { m_RollPitchYaw.x += roll; }
 		void RotatePitch(const float pitch) { m_RollPitchYaw.y += pitch; }
@@ -107,7 +115,13 @@ namespace Crystal {
 
 		DirectX::XMFLOAT3 GetPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43}; }
 		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
-		float GetMass() const { return m_Mass; }
+		float GetMass() const 
+		{ 
+			CS_FATAL(m_InverseMass != 0, "질량이 무한대 입니다. 먼저 HasFiniteMass()로 검사되어야합니다");
+			return 1.0f / m_InverseMass; 
+		}
+		float GetInverseMass() const { return m_InverseMass; }
+		bool HasFiniteMass() const { return m_InverseMass != 0; }
 		DirectX::XMFLOAT3 GetRight() const { return Vector3::RotateQuaternion({ 1.0f, 0.0f, 0.0f }, GetOrientation()); }
 		DirectX::XMFLOAT3 GetUp() const { return Vector3::RotateQuaternion({ 0.0f, 1.0f, 0.0f }, GetOrientation()); }
 		DirectX::XMFLOAT3 GetForward() const { return Vector3::RotateQuaternion({ 0.0f, 0.0f, 1.0f }, GetOrientation()); }
@@ -125,42 +139,11 @@ namespace Crystal {
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
 		float m_Scale = 1.0f;
 		DirectX::XMFLOAT3 m_Velocity = { 0.0f, 0.0f,0.0f };
-		float m_Mass = 10.0f;
+		float m_InverseMass = 10.0f;
 
 		DirectX::XMFLOAT3 m_RollPitchYaw = { 0.0f, 0.0f, 0.0f };
 	};
 
 
-	/*물리적인 위치와 눈에 보이는 렌더링 가능한 오브젝트를 가지고 있는 컴포넌트들의 베이스 클래스*/
-	class RenderComponent : public TransformComponent
-	{
-	public:
-		enum class ERenderComponentType
-		{
-			None,
-			Mesh,
-			StaticMesh,
-			SkeletalMesh,
-		};
 
-	public:
-		explicit RenderComponent(const std::string& name);
-		~RenderComponent() override = default;
-
-	void Update(const float deltaTime) override
-		{
-			TransformComponent::Update(deltaTime);
-
-			m_Renderable->Update(deltaTime);
-		}
-		
-		ERenderComponentType GetRenderComponentType() const { return m_RenderComponentType; }
-
-		void SetRenderable(Renderable* renderable) { m_Renderable = renderable; }
-		const Renderable* GetRenderable() const { return m_Renderable; }
-
-	protected:
-		Renderable* m_Renderable = nullptr;
-		ERenderComponentType m_RenderComponentType = ERenderComponentType::None;
-	};
 }

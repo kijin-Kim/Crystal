@@ -32,9 +32,6 @@ namespace Crystal {
 		struct RenderPipelineInputs : public PipelineInputs
 		{
 			CameraComponent* Camera = nullptr;
-			Texture* RenderTargets[8] = {};
-			Texture* DepthStencilBuffer = nullptr;
-			D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		};
 
 	public:
