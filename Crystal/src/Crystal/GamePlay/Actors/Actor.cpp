@@ -2,6 +2,7 @@
 #include "Actor.h"
 
 #include "Crystal/GamePlay/Components/BaseComponents.h"
+#include "Crystal/GamePlay/World/World.h"
 
 namespace Crystal {
 
@@ -92,6 +93,11 @@ namespace Crystal {
 		}
 
 		CS_DEBUG_INFO("Component : %s Moved", component->GetName().c_str());
+	}
+
+	World* Actor::GetWorld() const
+	{
+		return m_Level->GetWorld();
 	}
 
 	void Actor::SetPosition(const DirectX::XMFLOAT3& position)

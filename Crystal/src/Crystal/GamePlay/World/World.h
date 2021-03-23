@@ -3,6 +3,7 @@
 
 #include "Crystal/GamePlay/Actors/Actor.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/GamePlay/Actors/LineActor.h"
 
 namespace Crystal {
 	class Level final
@@ -13,7 +14,8 @@ namespace Crystal {
 
 		void AddActor(const std::shared_ptr<Actor>& actor) 
 		{ 
-			actor->Begin();  
+			actor->Begin();
+			actor->SetLevel(this);
 			m_Actors.push_back(actor); 
 		}
 		//void RemoveActor() {}
@@ -27,8 +29,12 @@ namespace Crystal {
 			}
 		}
 
+		void SetWorld(World* world) { m_World = world; }
+		World* GetWorld() const { return m_World; }
+
 	private:
 		std::vector<std::shared_ptr<Actor>> m_Actors;
+		World* m_World = nullptr;
 	};
 
 	class World final
@@ -36,7 +42,9 @@ namespace Crystal {
 	public:
 		World()
 		{
-			m_Levels.push_back(new Level()); //Default Level
+			auto defaultLevel = new Level();
+			defaultLevel->SetWorld(this);
+			m_Levels.push_back(defaultLevel); //Default Level
 		}
 		~World() = default;
 
@@ -46,8 +54,13 @@ namespace Crystal {
 			// Need some validation like type checking...
 			std::shared_ptr<T> newActor = std::make_shared<T>();
 			if (level == nullptr)
+			{
 				m_Levels[0]->AddActor(newActor);
-
+			}
+			else
+			{
+				level->AddActor(newActor);
+			}
 			return newActor.get();
 		}
 
@@ -55,6 +68,14 @@ namespace Crystal {
 		{
 			for (const auto level : m_Levels)
 				level->Update(deltaTime);
+		}
+
+		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint)
+		{
+			LineActor* debugLineActor = SpawnActor<LineActor>();
+			auto lineComponent = debugLineActor->GetLineComponent();
+			lineComponent->SetStartPoint(startPoint);
+			lineComponent->SetEndPoint(endPoint);
 		}
 
 	private:

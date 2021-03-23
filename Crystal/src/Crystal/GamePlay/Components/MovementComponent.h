@@ -31,13 +31,15 @@ namespace Crystal {
 			const auto acceleration = Vector3::Divide(m_ForceAccum, { mass, mass, mass });
 
 
-			const auto newPosition = Vector3::Add(position, Vector3::Multiply(velocity, { deltaTime, deltaTime, deltaTime }));
+			const auto newPosition = Vector3::Add(position, Vector3::Multiply(velocity, 
+				{ deltaTime, deltaTime, deltaTime }));
 
 			const float damping = 0.2f;
 			const float dampingExponentDt = pow(damping, deltaTime);
 			
-			const auto newVelocity = Vector3::Add(Vector3::Multiply(velocity, { dampingExponentDt, dampingExponentDt, dampingExponentDt }),
-			                                      Vector3::Multiply(acceleration, { deltaTime, deltaTime, deltaTime }));
+			const auto newVelocity = Vector3::Add(Vector3::Multiply(velocity, 
+				{ dampingExponentDt, dampingExponentDt, dampingExponentDt }),
+				Vector3::Multiply(acceleration, { deltaTime, deltaTime, deltaTime }));
 
 			m_TargetComponent->SetPosition(newPosition);
 			m_TargetComponent->SetVelocity(newVelocity);

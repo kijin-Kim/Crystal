@@ -53,18 +53,24 @@ namespace Crystal {
 			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::RotatePitch));
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
-			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginMouseLock));
-			inputComponent->BindAction("LockMouse", EKeyEvent::KE_Released, CS_ACTION_FN(CameraPawn::EndMouseLock));
+
+			inputComponent->BindAction("Fire", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginFire));
 		}
 
 		void RotateYaw(float value)
 		{
-			ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
+			//ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
+			const float valueScale = 0.1f;
+			value *= valueScale;
+			m_MainComponent->RotateYaw(DirectX::XMConvertToRadians(value));
 		}
 
 		void RotatePitch(float value)
 		{
-			ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
+			//ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
+			const float valueScale = 0.1f;
+			value *= valueScale;
+			m_MainComponent->RotatePitch(DirectX::XMConvertToRadians(-value));
 		}
 
 		void MoveForward(float value)
@@ -81,17 +87,14 @@ namespace Crystal {
 			m_MovementComponent->AddForce(force);
 		}
 
-		void BeginMouseLock()
+		void BeginFire()
 		{
-			m_bMouseIsLocked = true;
+			CS_DEBUG_INFO("BeginFire!!");
+			auto start = m_MainComponent->GetPosition();
+			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
+			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetForward(), maxDistance));
+			GetWorld()->DrawDebugLine(start, end);
 		}
 
-		void EndMouseLock()
-		{
-			m_bMouseIsLocked = false;
-		}
-
-	private:
-		bool m_bMouseIsLocked = false;
 	};
 }

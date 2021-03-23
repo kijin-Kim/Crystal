@@ -3,6 +3,8 @@
 namespace Crystal {
 	class Component;
 	class TransformComponent;
+	class Level;
+	class World;
 
 	class Actor
 	{
@@ -25,6 +27,10 @@ namespace Crystal {
 
 		TransformComponent* GetMainComponent() const { return m_MainComponent; }
 
+		void SetLevel(Level* level) { m_Level = level; }
+		Level* GetLevel() const { return m_Level; }
+		World* GetWorld() const;
+
 		void SetPosition(const DirectX::XMFLOAT3& position);
 
 	protected:
@@ -46,5 +52,6 @@ namespace Crystal {
 		std::vector<std::unique_ptr<Component>> m_Components;
 		/*부모, 자식순으로 Transform 가 배치되어있는 컨테이너 (MainComponent 제외)*/
 		std::vector<std::unique_ptr<TransformComponent>> m_TransformHierarchy;
+		Level* m_Level = nullptr;
 	};
 }

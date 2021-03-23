@@ -90,6 +90,12 @@ namespace Crystal {
 			return result;
 		}
 
+		inline bool IsZero(const DirectX::XMFLOAT3& v1)
+		{
+			bool isZero = DirectX::XMVector3Equal(XMLoadFloat3(&v1), DirectX::XMVectorZero());
+			return isZero;	
+		}
+
 		inline DirectX::XMFLOAT3 RotateQuaternion(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT4& quaternion)
 		{
 			DirectX::XMFLOAT3 result;

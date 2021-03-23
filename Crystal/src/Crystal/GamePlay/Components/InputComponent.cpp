@@ -108,7 +108,6 @@ namespace Crystal {
 		actionKey.bCtrlDown = GetKeyState(VK_CONTROL) & 0x8000;
 		actionKey.bShiftDown = GetKeyState(VK_SHIFT) & 0x8000;
 
-
 		/*Process Action*/
 		auto actionIt = actionMap.find(actionKey);
 		if (actionIt != actionMap.end())
@@ -415,8 +414,8 @@ namespace Crystal {
 				
 			m_LastPosition = cursorPos;
 
-			codes.MouseX = { Mouse::X, (float)diffFromLast.x };
-			codes.MouseY = { Mouse::Y, -(float)diffFromLast.y};
+			codes.MouseX = { Mouse::X, +(float)diffFromLast.x };
+			codes.MouseY = { Mouse::Y, -(float)diffFromLast.y };
 		}
 
 		switch (uMsg)

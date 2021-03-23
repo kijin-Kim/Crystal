@@ -190,6 +190,7 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />

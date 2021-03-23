@@ -126,15 +126,21 @@ namespace Crystal {
 
 				const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
 				const auto newDirection = Vector3::Normalize(endSubStart);
-
-				const auto rotationAxis = Vector3::Normalize(Vector3::Cross(newDirection, currentDirection));
-				const auto rotationAngle = acosf(Vector3::Dot(newDirection, currentDirection));
-
+	
+				
 				const auto scaleMatrix = Matrix4x4::Scale(length);
-				const auto quternion = 
+
+				auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, newDirection));
+				if (Vector3::IsZero(rotationAxis))
+				{
+					rotationAxis = { 0.0f, 0.0f, -1.0f };
+				}
+				const auto rotationAngle = acosf(Vector3::Dot(currentDirection, newDirection));
+				const auto quternion =
 					Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
 				const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
-				const auto translationMatrix = Matrix4x4::Translation(endPoint);
+
+				const auto translationMatrix = Matrix4x4::Translation(startPoint);
 				postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
 				postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
 			}
