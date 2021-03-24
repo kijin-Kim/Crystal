@@ -41,14 +41,18 @@ namespace Crystal {
 			SetRenderable(new Line());
 		}
 
-		void SetStartPoint(const DirectX::XMFLOAT3& point) { m_StartPoint = point; }
-		void SetEndPoint(const DirectX::XMFLOAT3& point) { m_EndPoint = point; }
+		void SetOrigin(const DirectX::XMFLOAT3& origin) { m_Origin = origin; }
+		void SetDirection(const DirectX::XMFLOAT3& direcion) { m_Direction = direcion; }
+		void SetMaxDistance(float maxDistance) { m_MaxDistance = maxDistance; }
 
-		const DirectX::XMFLOAT3& GetStartPoint() const { return m_StartPoint; }
-		const DirectX::XMFLOAT3& GetEndPoint() const { return m_EndPoint; }
+		const DirectX::XMFLOAT3& GetOrigin() const { return m_Origin; }
+		const DirectX::XMFLOAT3& GetDirection() const { return m_Direction; }
+		float GetMaxDistance() const { return m_MaxDistance; }
+
 
 	private:
-		DirectX::XMFLOAT3 m_StartPoint = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 m_EndPoint = { 1.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_Origin = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_Direction = { 1.0f, 0.0f, 0.0f };
+		float m_MaxDistance = 1.0f;
 	};
 }

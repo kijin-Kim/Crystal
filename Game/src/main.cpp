@@ -19,6 +19,7 @@ public:
 	{
 		/*디폴트 월드*/
 		m_World = std::make_unique<Crystal::World>();
+
 	}
 
 	void Start() override
@@ -34,7 +35,6 @@ public:
 
 		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
 
-
 		/*키바인딩*/
 		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
 		playerController.Possess(cameraPawn);
@@ -42,11 +42,21 @@ public:
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
+		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::PageUp, 1.0f);
+		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::PageDown, -1.0f);
+
 		playerController.AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
 		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, 1.0f);
 		playerController.EnableModeSwitching(true);
+
+		Crystal::ActionMapping actionMapping = {};
+		actionMapping.CrystalCode = Crystal::Mouse::Button::Left;
+		actionMapping.bAltDown = false;
+		actionMapping.bCtrlDown = false;
+		actionMapping.bShiftDown = false;
+		playerController.AddActionMapping("Fire", actionMapping);
 	}
-	
+
 	void OnUpdate() override
 	{
 		m_MainTimer.Tick();

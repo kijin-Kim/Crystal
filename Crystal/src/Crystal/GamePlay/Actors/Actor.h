@@ -6,17 +6,32 @@ namespace Crystal {
 	class Level;
 	class World;
 
-	class Actor
+	class Object
+	{
+	public:
+		Object() = default;
+		virtual ~Object() = default;
+
+		virtual void Update(const float deltaTime) {}
+
+		void SetParent(Object* parent) { m_Parent = parent; }
+		Object* GetParent() const { return m_Parent; }
+
+	private:
+		Object* m_Parent = nullptr;
+	};
+
+	class Actor : public Object
 	{
 	public:
 		Actor() = default;
-		virtual ~Actor() = default;
+		~Actor() override = default;
 
 		virtual void Begin() {}
 		virtual void End() {}
-		virtual void Update(const float deltaTime) {}
+		void Update(const float deltaTime) override { Object::Update(deltaTime); }
+		
 		void UpdateComponents(float deltaTime);
-
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
 		void RegisterComponent(Component* component);
 		/*Component를 actor의 컨테이너에서 삭제하고 Owner를 nullptr로 지정합니다.*/
@@ -27,11 +42,10 @@ namespace Crystal {
 
 		TransformComponent* GetMainComponent() const { return m_MainComponent; }
 
-		void SetLevel(Level* level) { m_Level = level; }
-		Level* GetLevel() const { return m_Level; }
-		World* GetWorld() const;
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
+
+		
 
 	protected:
 		/*Component를 생성하고 Register합니다.*/
@@ -52,6 +66,5 @@ namespace Crystal {
 		std::vector<std::unique_ptr<Component>> m_Components;
 		/*부모, 자식순으로 Transform 가 배치되어있는 컨테이너 (MainComponent 제외)*/
 		std::vector<std::unique_ptr<TransformComponent>> m_TransformHierarchy;
-		Level* m_Level = nullptr;
 	};
 }

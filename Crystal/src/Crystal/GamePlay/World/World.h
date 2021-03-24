@@ -6,22 +6,16 @@
 #include "Crystal/GamePlay/Actors/LineActor.h"
 
 namespace Crystal {
-	class Level final
+
+	class Level : public Object
 	{
 	public:
 		Level() = default;
-		~Level() = default;
+		~Level() override = default;
 
-		void AddActor(const std::shared_ptr<Actor>& actor) 
-		{ 
-			actor->Begin();
-			actor->SetLevel(this);
-			m_Actors.push_back(actor); 
-		}
-		//void RemoveActor() {}
-
-		void Update(float deltaTime)
+		void Update(const float deltaTime) override
 		{
+			Object::Update(deltaTime);
 			for (const auto& actor : m_Actors)
 			{
 				actor->Update(deltaTime);
@@ -29,56 +23,91 @@ namespace Crystal {
 			}
 		}
 
-		void SetWorld(World* world) { m_World = world; }
-		World* GetWorld() const { return m_World; }
+		template<class T>
+		T* SpawnActorInLevel()
+		{	
+			// Create new actor
+			auto newActor = std::make_unique<T>();
+			newActor->SetParent(this);
+			newActor->Begin();
+
+			auto rawReturnActor = newActor.get(); // Get raw pointer before move
+			m_Actors.push_back(std::move(newActor));
+			
+			return rawReturnActor;
+		}
+		//void RemoveActor() {}
+
+		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint)
+		{
+			LineActor* debugLineActor = SpawnActorInLevel<LineActor>();
+			auto lineComponent = debugLineActor->GetLineComponent();
+
+			const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
+
+			const auto direction = Vector3::Normalize(endSubStart);
+			const auto maxDistance = Vector3::Length(endSubStart);
+
+			lineComponent->SetOrigin(startPoint);
+			lineComponent->SetDirection(direction);
+			lineComponent->SetMaxDistance(maxDistance);
+
+		}
+
+		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance)
+		{
+			LineActor* debugLineActor = SpawnActorInLevel<LineActor>();
+			auto lineComponent = debugLineActor->GetLineComponent();
+			lineComponent->SetOrigin(origin);
+			lineComponent->SetDirection(direction);
+			lineComponent->SetMaxDistance(maxDistance);
+		}
+
 
 	private:
-		std::vector<std::shared_ptr<Actor>> m_Actors;
-		World* m_World = nullptr;
+		std::vector<std::unique_ptr<Actor>> m_Actors;
+
 	};
 
-	class World final
+
+	class World : public Object
 	{
 	public:
 		World()
 		{
-			auto defaultLevel = new Level();
-			defaultLevel->SetWorld(this);
-			m_Levels.push_back(defaultLevel); //Default Level
+			auto defaultLevel = std::make_unique<Level>();
+			defaultLevel->SetParent(this);
+			m_Levels.push_back(std::move(defaultLevel)); //Default Level
 		}
-		~World() = default;
+
+
+		~World() override = default;
 
 		template<class T>
 		T* SpawnActor(Level* level = nullptr)
 		{
+			//std::find(new );
+
 			// Need some validation like type checking...
-			std::shared_ptr<T> newActor = std::make_shared<T>();
-			if (level == nullptr)
+			if (level)
 			{
-				m_Levels[0]->AddActor(newActor);
+				return level->SpawnActorInLevel<T>();
 			}
-			else
-			{
-				level->AddActor(newActor);
-			}
-			return newActor.get();
+			
+			return m_Levels[0]->SpawnActorInLevel<T>();
 		}
 
-		void Update(float deltaTime)
+		void Update(const float deltaTime) override
 		{
-			for (const auto level : m_Levels)
+			Object::Update(deltaTime);
+
+			for (const auto& level : m_Levels)
 				level->Update(deltaTime);
 		}
 
-		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint)
-		{
-			LineActor* debugLineActor = SpawnActor<LineActor>();
-			auto lineComponent = debugLineActor->GetLineComponent();
-			lineComponent->SetStartPoint(startPoint);
-			lineComponent->SetEndPoint(endPoint);
-		}
-
 	private:
-		std::vector<Level*> m_Levels;
+		std::vector<std::unique_ptr<Level>> m_Levels;
 	};
+
+
 }

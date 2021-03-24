@@ -118,16 +118,14 @@ namespace Crystal {
 			{
 				auto lineComponent = (LineComponent*)collisionComponents[i];
 
-				const auto startPoint = lineComponent->GetStartPoint();
-				const auto endPoint = lineComponent->GetEndPoint();
-				const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
-
-				const auto length = Vector3::Length(endSubStart);
+				const auto origin = lineComponent->GetOrigin();
+				const auto length = lineComponent->GetMaxDistance();
+				const auto newDirection = lineComponent->GetDirection();
 
 				const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
-				const auto newDirection = Vector3::Normalize(endSubStart);
-	
 				
+			
+					
 				const auto scaleMatrix = Matrix4x4::Scale(length);
 
 				auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, newDirection));
@@ -140,7 +138,7 @@ namespace Crystal {
 					Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
 				const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
 
-				const auto translationMatrix = Matrix4x4::Translation(startPoint);
+				const auto translationMatrix = Matrix4x4::Translation(origin);
 				postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
 				postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
 			}

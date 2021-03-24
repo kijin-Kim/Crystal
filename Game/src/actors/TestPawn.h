@@ -85,8 +85,6 @@ public:
 	void Update(const float deltaTime) override
 	{
 		Pawn::Update(deltaTime); // Updating All Component	
-
-		
 	}
 
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override
@@ -94,6 +92,7 @@ public:
 		Pawn::SetupInputComponent(inputComponent);
 		inputComponent->BindAxis("MoveForward", CS_AXIS_FN(TestPawn::MoveForward));
 		inputComponent->BindAxis("MoveRight", CS_AXIS_FN(TestPawn::MoveRight));
+		
 		inputComponent->BindAxis("LookUp", CS_AXIS_FN(TestPawn::RotatePitch));
 		inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::RotateYaw));
 	}

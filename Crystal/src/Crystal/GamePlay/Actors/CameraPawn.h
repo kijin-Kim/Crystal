@@ -50,6 +50,7 @@ namespace Crystal {
 			Pawn::SetupInputComponent(inputComponent);
 			inputComponent->BindAxis("MoveForward", CS_AXIS_FN(CameraPawn::MoveForward));
 			inputComponent->BindAxis("MoveRight", CS_AXIS_FN(CameraPawn::MoveRight));
+			inputComponent->BindAxis("MoveUp", CS_AXIS_FN(CameraPawn::MoveUp));
 			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::RotatePitch));
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
@@ -87,13 +88,22 @@ namespace Crystal {
 			m_MovementComponent->AddForce(force);
 		}
 
+		void MoveUp(float value)
+		{
+			value *= 100000.0f;
+			DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetUp(), { value, value, value });
+			m_MovementComponent->AddForce(force);
+		}
+
 		void BeginFire()
 		{
 			CS_DEBUG_INFO("BeginFire!!");
 			auto start = m_MainComponent->GetPosition();
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetForward(), maxDistance));
-			GetWorld()->DrawDebugLine(start, end);
+
+			Level* level = (Level*)GetParent();
+			level->DrawDebugLine(start, end);
 		}
 
 	};
