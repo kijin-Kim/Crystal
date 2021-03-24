@@ -18,6 +18,88 @@ namespace Crystal {
 			Object::Update(deltaTime);
 
 			
+			for (const auto obbComp1 : m_BoundingOrientedBoxComponents)
+			{
+				auto d3dOrientedBox1 = obbComp1->GetWorldBoundingOrientedBox();
+				// OBB and Ray
+				for (const auto ray : m_RayComponents)
+				{
+					DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
+					DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+
+					float outDistance = 0.0f;
+					if (d3dOrientedBox1.Intersects(origin, direction, outDistance))
+					{
+						if (ray->GetMaxDistance() >= abs(outDistance))
+						{
+							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						}
+					}
+				}
+
+				// OBB and Sphere
+				for (const auto sphereComp : m_BoundingSphereComponents)
+				{
+					auto d3dBoundingSphere = sphereComp->GetWorldBoundingSphere();
+					if (d3dOrientedBox1.Intersects(d3dBoundingSphere))
+					{
+						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+					}
+				}
+
+				// OBB and AABB
+				for (const auto aabbComp : m_BoundingBoxComponents)
+				{
+					auto d3dBoundingBox2 = aabbComp->GetWorldBoundingBox();
+					if (d3dOrientedBox1.Intersects(d3dBoundingBox2))
+					{
+						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+					}
+				}
+
+
+				// OBB and OBB
+				for (const auto obbComp2 : m_BoundingOrientedBoxComponents)
+				{
+					if (obbComp1 != obbComp2)
+					{
+						auto d3dOrientedBox2 = obbComp2->GetWorldBoundingOrientedBox();
+						if (d3dOrientedBox1.Intersects(d3dOrientedBox2))
+						{
+							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						}
+					}
+				}
+				
+			}
+
+			// Bounding Sphere and Ray
+			for (const auto component : m_BoundingSphereComponents)
+			{
+				auto d3dBoundingSphere = component->GetWorldBoundingSphere();
+
+				for (const auto ray : m_RayComponents)
+				{
+					DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
+					DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+
+					float outDistance = 0.0f;
+					if (d3dBoundingSphere.Intersects(origin, direction, outDistance))
+					{
+						if (ray->GetMaxDistance() >= abs(outDistance))
+						{
+							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							component->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						}
+						
+					}
+				}
+			}
+			
 		}
 
 		void RegisterCollisionComponent(CollisionComponent* component) 
@@ -101,6 +183,7 @@ namespace Crystal {
 			lineComponent->SetOrigin(startPoint);
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
+			lineComponent->SetLineColor({ 0.5f, 0.3f, 1.0f });
 
 		}
 
@@ -111,6 +194,7 @@ namespace Crystal {
 			lineComponent->SetOrigin(origin);
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
+			lineComponent->SetLineColor({ 0.5f, 0.3f, 1.0f });
 		}
 
 		void RegisterCollisionComponent(CollisionComponent* component) 

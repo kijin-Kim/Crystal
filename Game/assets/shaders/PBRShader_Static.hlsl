@@ -189,5 +189,4 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     finalColor = pow(finalColor, gammaFactor);
     
     return float4(finalColor, 1.0f);
-    
 }

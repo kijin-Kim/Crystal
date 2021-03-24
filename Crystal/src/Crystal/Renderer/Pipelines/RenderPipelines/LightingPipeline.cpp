@@ -218,7 +218,8 @@ namespace Crystal {
 			m_SkeletalMeshPerMaterialConstantBufferLists.resize(maxObjectCount);
 			for (int i = 0; i < maxObjectCount; i++)
 			{
-				m_SkeletalMeshPerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(SkeletalMeshPerObjectData)));
+				m_SkeletalMeshPerObjectConstantBuffers.push_back(
+					std::make_unique<ConstantBuffer>((int)sizeof(SkeletalMeshPerObjectData)));
 				for (int j = 0; j < maxMaterialCount; j++)
 				{
 					m_SkeletalMeshPerMaterialConstantBufferLists[i][j] 
@@ -227,7 +228,7 @@ namespace Crystal {
 			}
 		}
 
-		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
+		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
 		m_PerMaterialConstantBuffer= std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
 
 	}
@@ -245,7 +246,7 @@ namespace Crystal {
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
-		auto camPos = lightPipelineInputs->Camera->GetPosition();
+		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
@@ -288,6 +289,9 @@ namespace Crystal {
 			auto materials = staticMesh->GetMaterials();
 			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
+				if (!materials[j])
+					break;
+
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
@@ -389,6 +393,8 @@ namespace Crystal {
 			auto materials = skeletalMesh->GetMaterials();
 			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
+				if (!materials[j])
+					break;
 
 				PerMaterialData perMaterialData = {};
 
@@ -485,9 +491,13 @@ namespace Crystal {
 			staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			StaticMesh* staticMesh = (StaticMesh*)staticMeshComponents[i]->GetRenderable();
+			auto materials = staticMesh->GetMaterials();
 			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
-				commandList->SetGraphicsRootDescriptorTable(3, staticMeshDescriptorHeapHandle); // PerMaterial
+				if (materials[j])
+				{
+					commandList->SetGraphicsRootDescriptorTable(3, staticMeshDescriptorHeapHandle); // PerMaterial
+				}
 				staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
 				staticMesh->Render(commandList, j);
 			}
@@ -514,9 +524,13 @@ namespace Crystal {
 			skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
+			auto materials = skeletalMesh->GetMaterials();
 			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
-				commandList->SetGraphicsRootDescriptorTable(3, skeletalMeshDescriptorHeapHandle); // PerMaterial
+				if (materials[j])
+				{
+					commandList->SetGraphicsRootDescriptorTable(3, skeletalMeshDescriptorHeapHandle); // PerMaterial
+				}
 				skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
 				skeletalMesh->Render(commandList, j);
 			}

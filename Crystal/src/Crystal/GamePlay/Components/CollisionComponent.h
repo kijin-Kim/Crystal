@@ -16,10 +16,21 @@ namespace Crystal {
 		~CollisionComponent() override
 		{
 			// Collision Component Owns Renderable
-			delete m_Renderable;
+			if(m_Renderable)
+				delete m_Renderable;
 		}
 
+		void SetLineColor(const DirectX::XMFLOAT3& color) { m_Color = color; }
+		const DirectX::XMFLOAT3& GetLineColor() const { return m_Color; }
+
 		void OnCreate() override;
+
+		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
+
+	private:
+		DirectX::XMFLOAT3 m_Color = { 1.0f, 1.0f, 0.0f };
+	protected:
+		DirectX::XMFLOAT4X4 m_PostScaledTransform = Matrix4x4::Identity(); // This is for rendering
 	};
 
 	class RayComponent : public CollisionComponent
@@ -33,6 +44,31 @@ namespace Crystal {
 
 		~RayComponent() override = default;
 
+		void Update(const float deltaTime) override
+		{
+			CollisionComponent::Update(deltaTime);
+
+			// Caculate Post Transform
+			const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
+
+			const auto scaleMatrix = Matrix4x4::Scale(m_MaxDistance);
+			auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, m_Direction));
+			if (Vector3::IsZero(rotationAxis))
+			{
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
+			}
+			const auto rotationAngle = acosf(Vector3::Dot(currentDirection, m_Direction));
+			const auto quternion =
+				Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
+			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
+			const auto translationMatrix = Matrix4x4::Translation(m_Origin);
+
+
+			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+			postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
+			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
+		}
+
 		void SetOrigin(const DirectX::XMFLOAT3& origin) { m_Origin = origin; }
 		void SetDirection(const DirectX::XMFLOAT3& direcion) { m_Direction = direcion; }
 		void SetMaxDistance(float maxDistance) { m_MaxDistance = maxDistance; }
@@ -41,8 +77,8 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetDirection() const { return m_Direction; }
 		float GetMaxDistance() const { return m_MaxDistance; }
 
-
 	private:
+		
 		DirectX::XMFLOAT3 m_Origin = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3 m_Direction = { 1.0f, 0.0f, 0.0f };
 		float m_MaxDistance = 1.0f;
@@ -59,15 +95,29 @@ namespace Crystal {
 
 		~BoundingBoxComponent() override = default;
 
-		void SetCenter(const DirectX::XMFLOAT3& center) { m_Center = center; }
-		void SetExtents(const DirectX::XMFLOAT3& extent) { m_Extents = extent; }
+		void Update(const float deltaTime) override
+		{
+			CollisionComponent::Update(deltaTime);
 
-		const DirectX::XMFLOAT3& GetCenter() const { return m_Center; }
-		const DirectX::XMFLOAT3& GetExtents() const { return m_Extents; }
+			// Caculate Post Transform
+			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
+				m_BoundingBox.Extents, { 2.0f, 2.0f, 2.0f }));
+			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingBox.Center));
+			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
+		}
+
+		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingBox.Center = center; }
+		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingBox.Extents = extent; }
+
+		DirectX::BoundingBox GetWorldBoundingBox() 
+		{
+			DirectX::BoundingBox worldBoundingBox = {};
+			m_BoundingBox.Transform(worldBoundingBox, XMLoadFloat4x4(&m_WorldTransform));
+			return worldBoundingBox;
+		}
 
 	private:
-		DirectX::XMFLOAT3 m_Center = { 0.0f, 0.0f, 0.0f }; // Center of the box.
-		DirectX::XMFLOAT3 m_Extents = { 1.0f, 1.0f, 1.0f }; // Distance from the center to each side.
+		DirectX::BoundingBox m_BoundingBox = {};
 	};
 
 	class BoundingOrientedBoxComponent : public CollisionComponent
@@ -81,18 +131,37 @@ namespace Crystal {
 
 		~BoundingOrientedBoxComponent() override = default;
 
-		void SetCenter(const DirectX::XMFLOAT3& center) { m_Center = center; }
-		void SetExtents(const DirectX::XMFLOAT3& extent) { m_Extents = extent; }
-		void SetOrientation(const DirectX::XMFLOAT4& orientation) { m_Orientation = orientation; }
+		void Update(const float deltaTime) override
+		{
+			CollisionComponent::Update(deltaTime);
 
-		const DirectX::XMFLOAT3& GetCenter() const { return m_Center; }
-		const DirectX::XMFLOAT3& GetExtents() const { return m_Extents; }
-		const DirectX::XMFLOAT4& GetOrientation() const { return m_Orientation; }
+			// Caculate Post Transform
+			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
+				m_BoundingOrientedBox.Extents, { 2.0f, 2.0f, 2.0f }));
+			postTransform = Matrix4x4::Multiply(postTransform, 
+				Matrix4x4::RotationQuaternion(m_BoundingOrientedBox.Orientation));
+			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingOrientedBox.Center));
+			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
+		}
+
+		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingOrientedBox.Center = center; }
+		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingOrientedBox.Extents = extent; }
+		void SetOrientation(const DirectX::XMFLOAT4& orientation) { m_BoundingOrientedBox.Orientation = orientation; }
+		
+		DirectX::BoundingOrientedBox GetWorldBoundingOrientedBox()
+		{
+			DirectX::BoundingOrientedBox worldBoundingOrientedBox = {};
+			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, XMLoadFloat4x4(&m_WorldTransform));
+			return worldBoundingOrientedBox;
+		}
+
+		const DirectX::BoundingOrientedBox& GetBoundingOrientedBox() const 
+		{ 
+			return m_BoundingOrientedBox; 
+		}
 
 	private:
-		DirectX::XMFLOAT3 m_Center = { 0.0f, 0.0f, 0.0f }; // Center of the box.
-		DirectX::XMFLOAT3 m_Extents = { 0.0f, 0.0f, 0.0f }; // Distance from the center to each side.
-		DirectX::XMFLOAT4 m_Orientation = { 0.0f, 0.0f, 0.0f, 1.0f }; // Unit quaternion representing rotation (box -> world).
+		DirectX::BoundingOrientedBox m_BoundingOrientedBox = {};
 	};
 
 
@@ -107,15 +176,28 @@ namespace Crystal {
 			SetRenderable(new LineSphere());
 		}
 
-		void SetCenter(const DirectX::XMFLOAT3& center) { m_Center = center; }
-		void SetRadius(const float radius) { m_Radius = radius; }
+		void Update(const float deltaTime) override
+		{
+			CollisionComponent::Update(deltaTime);
 
-		const DirectX::XMFLOAT3& GetCenter() const { return m_Center; }
-		float GetRadius() const { return m_Radius; }
+			// Caculate Post Transform
+			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(m_BoundingSphere.Radius);
+			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingSphere.Center));
+			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
+		}
+
+		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingSphere.Center = center; }
+		void SetRadius(const float radius) { m_BoundingSphere.Radius = radius; }
+
+		DirectX::BoundingSphere GetWorldBoundingSphere() 
+		{
+			DirectX::BoundingSphere worldBoundingSphere = {};
+			m_BoundingSphere.Transform(worldBoundingSphere, XMLoadFloat4x4(&m_WorldTransform));
+			return worldBoundingSphere;
+		}
 
 	private:
-		DirectX::XMFLOAT3 m_Center = { 0.0f, 0.0f, 0.0f }; // Center of the sphere.
-		float m_Radius = 0.0f; // Radius of the sphere.
+		DirectX::BoundingSphere m_BoundingSphere = {};
 	};
 
 

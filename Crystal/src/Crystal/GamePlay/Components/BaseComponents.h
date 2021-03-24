@@ -114,6 +114,7 @@ namespace Crystal {
 		}
 
 		DirectX::XMFLOAT3 GetPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43}; }
+		DirectX::XMFLOAT3 GetWorldPosition() const { return { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 }; }
 		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
 		float GetMass() const 
 		{ 
@@ -125,14 +126,21 @@ namespace Crystal {
 		DirectX::XMFLOAT3 GetRight() const { return Vector3::RotateQuaternion({ 1.0f, 0.0f, 0.0f }, GetOrientation()); }
 		DirectX::XMFLOAT3 GetUp() const { return Vector3::RotateQuaternion({ 0.0f, 1.0f, 0.0f }, GetOrientation()); }
 		DirectX::XMFLOAT3 GetForward() const { return Vector3::RotateQuaternion({ 0.0f, 0.0f, 1.0f }, GetOrientation()); }
-		DirectX::XMFLOAT4 GetOrientation() const { return Vector4::QuaternionRollPitchYaw(m_RollPitchYaw); }
+		DirectX::XMFLOAT4 GetOrientation() const 
+		{ 
+			return Vector4::QuaternionRollPitchYaw({
+				DirectX::XMConvertToRadians(m_RollPitchYaw.x),
+				DirectX::XMConvertToRadians(m_RollPitchYaw.y),
+				DirectX::XMConvertToRadians(m_RollPitchYaw.z)
+				});
+		}
 
 
 		TransformComponent* GetParent() const { return m_Parent; }
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const { return m_WorldTransform; }
 
 
-	private:
+	protected:
 		/*OwnerShip을 가지고 있지 않음*/
 		TransformComponent* m_Parent = nullptr;
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();

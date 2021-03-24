@@ -10,7 +10,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 100;
+		descriptorHeapDesc.NumDescriptors = 300;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -110,76 +110,9 @@ namespace Crystal {
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
-
-			const auto collisionComponentType = collisionComponents[i]->GetPrimitiveComponentType();
-			switch (collisionComponentType)
-			{
-			case PrimitiveComponent::EPrimitiveComponentType::Ray:
-			{
-				auto lineComponent = (RayComponent*)collisionComponents[i];
-
-				const auto origin = lineComponent->GetOrigin();
-				const auto length = lineComponent->GetMaxDistance();
-				const auto newDirection = lineComponent->GetDirection();
-
-				const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
-				
-			
-					
-				const auto scaleMatrix = Matrix4x4::Scale(length);
-
-				auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, newDirection));
-				if (Vector3::IsZero(rotationAxis))
-				{
-					rotationAxis = { 0.0f, 0.0f, -1.0f };
-				}
-				const auto rotationAngle = acosf(Vector3::Dot(currentDirection, newDirection));
-				const auto quternion =
-					Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
-				const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
-
-				const auto translationMatrix = Matrix4x4::Translation(origin);
-				postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
-				postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
-			}
-				break;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingBox:
-			{
-				const auto extents = ((BoundingBoxComponent*)collisionComponents[i])->GetExtents();
-				const auto center = ((BoundingBoxComponent*)collisionComponents[i])->GetCenter();
-
-				postTransform = Matrix4x4::Scale(extents);
-				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
-			}
-				break;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox:
-			{
-				const auto extents = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetExtents();
-				const auto center = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetCenter();
-				const auto orientation = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetOrientation();
-
-				postTransform = Matrix4x4::Scale(extents);
-				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::RotationQuaternion(orientation));
-				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
-			}
-				break;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
-			{
-				const auto radius = ((BoundingSphereComponent*)collisionComponents[i])->GetRadius();
-				const auto center = ((BoundingSphereComponent*)collisionComponents[i])->GetCenter();
-
-				postTransform = Matrix4x4::Scale(radius);
-				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
-			}
-				break;
-			default:
-				CS_FATAL(false, "잘못된 PrimitiveComponent Type입니다.");
-				break;
-			}
-			
-			DirectX::XMFLOAT4X4 postScaledWorld = Matrix4x4::Multiply(postTransform, collisionComponents[i]->GetWorldTransform());
-			m_PerObjectData.World = Matrix4x4::Transpose(postScaledWorld);
-			m_PerObjectData.Color = { 1.0f, 1.0f, 0.0f };
+		
+			m_PerObjectData.World = Matrix4x4::Transpose(collisionComponents[i]->GetPostScaledTransform());
+			m_PerObjectData.Color = collisionComponents[i]->GetLineColor();
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
 
 			device->CopyDescriptorsSimple(1, cpuHandle, m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle(),

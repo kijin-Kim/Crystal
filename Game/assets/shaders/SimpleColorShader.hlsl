@@ -18,6 +18,6 @@ float4 vsMain(float3 Position : POSITION) : SV_POSITION
 
 float4 psMain() : SV_Target
 {
-    return float4(Color, 1.0f); // Yellow
+    return float4(Color, 1.0f);
 }
 

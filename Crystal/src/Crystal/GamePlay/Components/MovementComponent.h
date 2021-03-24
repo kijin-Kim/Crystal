@@ -20,7 +20,6 @@ namespace Crystal {
 		{
 			Component::Update(deltaTime);
 
-			
 			if (!m_TargetComponent->HasFiniteMass())
 				return;
 			// 최종위치 = 위치 + 속도 * dt +  0.5 * 가속도 * dt^2 (가속도에 의한 위치 변화는 생략)
@@ -34,7 +33,7 @@ namespace Crystal {
 			const auto newPosition = Vector3::Add(position, Vector3::Multiply(velocity, 
 				{ deltaTime, deltaTime, deltaTime }));
 
-			const float damping = 0.2f;
+			const float damping = 0.3f;
 			const float dampingExponentDt = pow(damping, deltaTime);
 			
 			const auto newVelocity = Vector3::Add(Vector3::Multiply(velocity, 

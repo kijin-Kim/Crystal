@@ -7,6 +7,7 @@
 
 #include "actors/TestPawn.h"
 #include "actors/Kraken.h"
+#include "actors\Aestroid.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -25,19 +26,27 @@ public:
 	void Start() override
 	{
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		for (int i = 0; i < 5; i++)
-		{
-			TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
-			testPawn->SetPosition({ 100.0f * i, 0.0f, 0.0f });
-		}
+		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
 			
 //		Kraken* kraken = m_World->SpawnActor<Kraken>();
 
-		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
+		for (int i = -10; i < 10; i++)
+		{
+			Asteroid* asteroid = m_World->SpawnActor<Asteroid>();
+			asteroid->SetPosition({ 3000.0f * i, 0.0f, 0.0f });
+		}
 
+		for (int i = -10; i < 10; i++)
+		{
+			RandomBox* randomBox = m_World->SpawnActor<RandomBox>();
+			randomBox->SetPosition({ 3000.0f * i, 3000.0f, 0.0f });
+		}
+
+
+		//Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
 		/*키바인딩*/
 		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
-		playerController.Possess(cameraPawn);
+		playerController.Possess(testPawn);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);

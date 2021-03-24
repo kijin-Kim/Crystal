@@ -15,9 +15,9 @@ namespace Crystal {
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
 			cameraComponent->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -8000.0f));
 			cameraComponent->SetFieldOfView(60.0f);
-			cameraComponent->SetNearPlane(1.0f);
+			cameraComponent->SetNearPlane(1000.0f);
 			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
-			cameraComponent->SetFarPlane(100000.0f);
+			cameraComponent->SetFarPlane(10000000.0f);
 			m_MainComponent = cameraComponent;
 			m_MainComponent->SetMass(60.0f);
 
@@ -63,7 +63,7 @@ namespace Crystal {
 			//ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
 			const float valueScale = 0.1f;
 			value *= valueScale;
-			m_MainComponent->RotateYaw(DirectX::XMConvertToRadians(value));
+			m_MainComponent->RotateYaw(value);
 		}
 
 		void RotatePitch(float value)
@@ -71,7 +71,7 @@ namespace Crystal {
 			//ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
 			const float valueScale = 0.1f;
 			value *= valueScale;
-			m_MainComponent->RotatePitch(DirectX::XMConvertToRadians(-value));
+			m_MainComponent->RotatePitch(-value);
 		}
 
 		void MoveForward(float value)
