@@ -28,7 +28,7 @@ public:
 		for (int i = 0; i < 5; i++)
 		{
 			TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
-			testPawn->SetPosition({ 5.0f * i, 0.0f, 0.0f });
+			testPawn->SetPosition({ 100.0f * i, 0.0f, 0.0f });
 		}
 			
 //		Kraken* kraken = m_World->SpawnActor<Kraken>();

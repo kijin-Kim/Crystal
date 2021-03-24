@@ -7,10 +7,59 @@
 
 namespace Crystal {
 
+	class PhysicsSystem : public Object
+	{
+	public:
+		PhysicsSystem(Object* parent) : Object(parent) {}
+		~PhysicsSystem() override = default;
+
+		void Update(const float deltaTime) override 
+		{ 
+			Object::Update(deltaTime);
+
+			
+		}
+
+		void RegisterCollisionComponent(CollisionComponent* component) 
+		{ 
+			auto type = component->GetPrimitiveComponentType();
+			switch (type)
+			{
+			case PrimitiveComponent::EPrimitiveComponentType::Ray:
+				m_RayComponents.push_back(static_cast<RayComponent*>(component));
+				return;
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingBox:
+				m_BoundingBoxComponents.push_back(static_cast<BoundingBoxComponent*>(component));
+				return;
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox:
+				m_BoundingOrientedBoxComponents.push_back(static_cast<BoundingOrientedBoxComponent*>(component));
+				return;
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
+				m_BoundingSphereComponents.push_back(static_cast<BoundingSphereComponent*>(component));
+				return;
+			default:
+				CS_FATAL(false, "잘못된 PrimitiveComponent Type입니다.");
+				return;
+			}
+		}
+
+	private:
+		// Actor Has OwnerShip
+		std::vector<RayComponent*> m_RayComponents;
+		std::vector<BoundingBoxComponent*> m_BoundingBoxComponents;
+		std::vector<BoundingOrientedBoxComponent*> m_BoundingOrientedBoxComponents;
+		std::vector<BoundingSphereComponent*> m_BoundingSphereComponents;
+		
+
+	};
+
 	class Level : public Object
 	{
 	public:
-		Level(Object* parent) : Object(parent) {}
+		Level(Object* parent) : Object(parent)
+		{
+			m_PhysicsSystem = std::make_unique<PhysicsSystem>(this);
+		}
 		~Level() override = default;
 
 		void Update(const float deltaTime) override
@@ -21,6 +70,8 @@ namespace Crystal {
 				actor->Update(deltaTime);
 				actor->UpdateComponents(deltaTime);
 			}
+
+			m_PhysicsSystem->Update(deltaTime);
 		}
 
 		template<class T>
@@ -61,8 +112,14 @@ namespace Crystal {
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
 		}
+
+		void RegisterCollisionComponent(CollisionComponent* component) 
+		{
+			m_PhysicsSystem->RegisterCollisionComponent(component); 
+		}
 		
 	private:
+		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
 		std::vector<std::unique_ptr<Actor>> m_Actors;
 	};
 

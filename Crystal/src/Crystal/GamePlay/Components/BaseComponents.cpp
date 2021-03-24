@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "BaseComponents.h"
 #include "Crystal/Renderer/Renderer.h"
+#include "Crystal/GamePlay/World/World.h"
 
 namespace Crystal {
 

@@ -18,7 +18,7 @@ namespace Crystal {
 
 	void Actor::RegisterComponent(Component* component)
 	{
-		component->SetOwner(this);
+		//component->SetOwner(this);
 		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(), 
 			[component](const std::unique_ptr<Component>& com)->bool {return com.get() == component;}))
 		{
@@ -32,7 +32,7 @@ namespace Crystal {
 
 	void Actor::UnRegisterComponent(Component* component)
 	{
-		component->SetOwner(nullptr);
+		//component->SetOwner(nullptr);
 		auto it = std::find_if(m_Components.begin(), m_Components.end(), 
 			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
 		if (it == m_Components.end())

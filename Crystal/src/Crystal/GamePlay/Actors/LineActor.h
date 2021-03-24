@@ -9,7 +9,7 @@ namespace Crystal {
 	public:
 		LineActor(Object* parent) : Actor(parent)
 		{
-			m_DebugLineComponent = CreateComponent<LineComponent>("DebugLineComponent");
+			m_DebugLineComponent = CreateComponent<RayComponent>("DebugLineComponent");
 			m_MainComponent = m_DebugLineComponent;
 		}
 
@@ -23,10 +23,10 @@ namespace Crystal {
 		}
 		void Update(const float deltaTime) override {}
 
-		LineComponent* GetLineComponent() const { return m_DebugLineComponent; }
+		RayComponent* GetLineComponent() const { return m_DebugLineComponent; }
 
 	private:
-		LineComponent* m_DebugLineComponent = nullptr;
+		RayComponent* m_DebugLineComponent = nullptr;
 	};
 
 }

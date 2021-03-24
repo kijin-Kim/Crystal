@@ -10,11 +10,15 @@ namespace Crystal {
 		enum class EPrimitiveComponentType
 		{
 			None,
-			Line,
+
 			Mesh,
 			StaticMesh,
 			SkeletalMesh,
+
 			Collision,
+			Ray,
+			BoundingBox,
+			BoundingOrientedBox,
 			BoundingSphere,
 		};
 

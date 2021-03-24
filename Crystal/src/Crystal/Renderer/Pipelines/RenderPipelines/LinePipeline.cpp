@@ -114,9 +114,9 @@ namespace Crystal {
 			const auto collisionComponentType = collisionComponents[i]->GetPrimitiveComponentType();
 			switch (collisionComponentType)
 			{
-			case Crystal::PrimitiveComponent::EPrimitiveComponentType::Line:
+			case PrimitiveComponent::EPrimitiveComponentType::Ray:
 			{
-				auto lineComponent = (LineComponent*)collisionComponents[i];
+				auto lineComponent = (RayComponent*)collisionComponents[i];
 
 				const auto origin = lineComponent->GetOrigin();
 				const auto length = lineComponent->GetMaxDistance();
@@ -143,17 +143,41 @@ namespace Crystal {
 				postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
 			}
 				break;
-			case Crystal::PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingBox:
+			{
+				const auto extents = ((BoundingBoxComponent*)collisionComponents[i])->GetExtents();
+				const auto center = ((BoundingBoxComponent*)collisionComponents[i])->GetCenter();
+
+				postTransform = Matrix4x4::Scale(extents);
+				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
+			}
+				break;
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox:
+			{
+				const auto extents = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetExtents();
+				const auto center = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetCenter();
+				const auto orientation = ((BoundingOrientedBoxComponent*)collisionComponents[i])->GetOrientation();
+
+				postTransform = Matrix4x4::Scale(extents);
+				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::RotationQuaternion(orientation));
+				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
+			}
+				break;
+			case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
 			{
 				const auto radius = ((BoundingSphereComponent*)collisionComponents[i])->GetRadius();
+				const auto center = ((BoundingSphereComponent*)collisionComponents[i])->GetCenter();
+
 				postTransform = Matrix4x4::Scale(radius);
+				postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(center));
 			}
 				break;
 			default:
+				CS_FATAL(false, "잘못된 PrimitiveComponent Type입니다.");
 				break;
 			}
 			
-			DirectX::XMFLOAT4X4 postScaledWorld = Matrix4x4::Multiply(collisionComponents[i]->GetWorldTransform(), postTransform);
+			DirectX::XMFLOAT4X4 postScaledWorld = Matrix4x4::Multiply(postTransform, collisionComponents[i]->GetWorldTransform());
 			m_PerObjectData.World = Matrix4x4::Transpose(postScaledWorld);
 			m_PerObjectData.Color = { 1.0f, 1.0f, 0.0f };
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);

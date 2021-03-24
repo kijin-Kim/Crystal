@@ -37,12 +37,18 @@ public:
 		mesh->SetMaterial(pbrMaterial, 0);*/
 		// ========================================================================
 
-		auto* boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-		//boundingSphereComponent->SetRadius(5000.0f);
-		boundingSphereComponent->SetRadius(100.0f);
+		/*auto* boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		boundingSphereComponent->SetRadius(5000.0f);
+		boundingSphereComponent->SetRadius(100.0f);*/
+
+		auto* boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+		boundingOrientedBoxComponent->SetExtents({ 100.0f, 100.0f, 100.0f });
+
+		const auto angle = DirectX::XMConvertToRadians(45.0f);
+		boundingOrientedBoxComponent->SetOrientation(Crystal::Vector4::QuaternionRollPitchYaw({ angle, 0.0f, 0.0f}));
 
 
-		m_MainComponent = boundingSphereComponent;
+		m_MainComponent = boundingOrientedBoxComponent;
 		
 		/*m_MeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 		m_MeshComponent->SetRenderable(mesh);
