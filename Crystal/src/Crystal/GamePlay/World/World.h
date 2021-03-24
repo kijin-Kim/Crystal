@@ -10,7 +10,7 @@ namespace Crystal {
 	class Level : public Object
 	{
 	public:
-		Level() = default;
+		Level(Object* parent) : Object(parent) {}
 		~Level() override = default;
 
 		void Update(const float deltaTime) override
@@ -27,8 +27,7 @@ namespace Crystal {
 		T* SpawnActorInLevel()
 		{	
 			// Create new actor
-			auto newActor = std::make_unique<T>();
-			newActor->SetParent(this);
+			auto newActor = std::make_unique<T>(this);
 			newActor->Begin();
 
 			auto rawReturnActor = newActor.get(); // Get raw pointer before move
@@ -62,21 +61,18 @@ namespace Crystal {
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
 		}
-
-
+		
 	private:
 		std::vector<std::unique_ptr<Actor>> m_Actors;
-
 	};
 
 
 	class World : public Object
 	{
 	public:
-		World()
+		World(Object* parent) : Object(parent)
 		{
-			auto defaultLevel = std::make_unique<Level>();
-			defaultLevel->SetParent(this);
+			auto defaultLevel = std::make_unique<Level>(this);
 			m_Levels.push_back(std::move(defaultLevel)); //Default Level
 		}
 

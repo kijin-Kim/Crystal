@@ -9,12 +9,11 @@ namespace Crystal {
 	class Object
 	{
 	public:
-		Object() = default;
+		Object(Object* parent) : m_Parent(parent) {}
 		virtual ~Object() = default;
-
+	
 		virtual void Update(const float deltaTime) {}
 
-		void SetParent(Object* parent) { m_Parent = parent; }
 		Object* GetParent() const { return m_Parent; }
 
 	private:
@@ -24,7 +23,7 @@ namespace Crystal {
 	class Actor : public Object
 	{
 	public:
-		Actor() = default;
+		Actor(Object* parent) : Object(parent) {}
 		~Actor() override = default;
 
 		virtual void Begin() {}
@@ -44,8 +43,6 @@ namespace Crystal {
 
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
-
-		
 
 	protected:
 		/*Component를 생성하고 Register합니다.*/

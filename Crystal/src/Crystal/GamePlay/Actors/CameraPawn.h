@@ -10,7 +10,7 @@ namespace Crystal {
 	class CameraPawn : public Pawn
 	{
 	public:
-		CameraPawn()
+		CameraPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
 		{
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
 			cameraComponent->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -8000.0f));

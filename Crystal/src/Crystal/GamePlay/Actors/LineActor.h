@@ -7,7 +7,7 @@ namespace Crystal {
 	class LineActor : public Actor
 	{
 	public:
-		LineActor()
+		LineActor(Object* parent) : Actor(parent)
 		{
 			m_DebugLineComponent = CreateComponent<LineComponent>("DebugLineComponent");
 			m_MainComponent = m_DebugLineComponent;

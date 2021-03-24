@@ -9,7 +9,7 @@ namespace Crystal {
 	class Pawn : public Actor
 	{
 	public:
-		Pawn()
+		Pawn(Object* parent) : Actor(parent)
 		{
 		}
 

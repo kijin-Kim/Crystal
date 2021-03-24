@@ -7,7 +7,7 @@
 class Kraken : public Crystal::Pawn
 {
 public:
-	Kraken()
+	Kraken(Crystal::Object* parent) : Crystal::Pawn(parent)
 	{
 		////// TEMPORARY ////
 		auto bodyAlbedoTexture 

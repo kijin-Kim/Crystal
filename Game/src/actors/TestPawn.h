@@ -7,7 +7,7 @@
 class TestPawn final : public Crystal::Pawn
 {
 public:
-	TestPawn()
+	TestPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
 	{
 		////// TEMPORARY ////
 

@@ -18,7 +18,7 @@ public:
 	GameApplication(HINSTANCE hIsntance, int width, int height) : Crystal::Application(hIsntance, width, height)
 	{
 		/*디폴트 월드*/
-		m_World = std::make_unique<Crystal::World>();
+		m_World = std::make_unique<Crystal::World>(nullptr);
 
 	}
 
