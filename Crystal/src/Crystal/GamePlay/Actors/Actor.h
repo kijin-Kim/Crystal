@@ -9,15 +9,15 @@ namespace Crystal {
 	class Object
 	{
 	public:
-		Object(Object* parent) : m_Parent(parent) {}
+		Object(Object* parent) : m_ParentObject(parent) {}
 		virtual ~Object() = default;
 	
 		virtual void Update(const float deltaTime) {}
 
-		Object* GetParent() const { return m_Parent; }
+		Object* GetParentObject() const { return m_ParentObject; }
 
 	private:
-		Object* m_Parent = nullptr;
+		Object* m_ParentObject = nullptr;
 	};
 
 	class Actor : public Object
@@ -57,7 +57,7 @@ namespace Crystal {
 		}
 	protected:
 		/*MainComponent를 가르키는 Raw Pointer입니다. 편의를 위한 Pointer일 뿐, 
-		LiftTime은 컨테이너의 Unique Pointer 에 의해 관리됩니다.*/
+		LifeTime은 컨테이너의 Unique Pointer 에 의해 관리됩니다.*/
 		TransformComponent* m_MainComponent = nullptr;
 		std::vector<std::unique_ptr<Component>> m_Components;
 		/*부모, 자식순으로 Transform 가 배치되어있는 컨테이너 (MainComponent 제외)*/

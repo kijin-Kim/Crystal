@@ -43,7 +43,7 @@ public:
 		}
 
 
-		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
+		/*Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/
 		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
 		playerController.Possess(testPawn);
@@ -62,7 +62,7 @@ public:
 
 
 		playerController.AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
-		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, 1.0f);
+		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
 
 		
 

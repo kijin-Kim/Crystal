@@ -16,9 +16,9 @@ namespace Crystal {
 			Vector4::QuternionRotationAxis(Vector3::UnitZ, DirectX::XMConvertToRadians(m_Roll)));
 
 
-		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitZ, quaternion));
 		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitX, quaternion));
 		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitY, quaternion));
+		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitZ, quaternion));
 
 
 		const auto position = GetLocalPosition();
@@ -31,8 +31,8 @@ namespace Crystal {
 
 
 		/*Parent부터 자식 순으로 계산하여야 함*/
-		if (m_Parent)
-			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_Parent->GetWorldTransform());
+		if (m_ParentComponent)
+			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
 		else
 			m_WorldTransform = m_LocalTransform;
 	}

@@ -20,9 +20,8 @@ namespace Crystal {
 		{
 			Component::Update(deltaTime);
 
-			if (!m_TargetComponent->HasFiniteMass() || Vector3::IsZero(m_ForceAccum))
+			if (!m_TargetComponent->HasFiniteMass())
 				return;
-
 
 			auto position = m_TargetComponent->GetLocalPosition();
 			auto velocity = m_TargetComponent->GetVelocity();
@@ -32,7 +31,6 @@ namespace Crystal {
 
 			float inverseMass = m_TargetComponent->GetInverseMass();
 			auto accelertion = Vector3::Multiply(m_ForceAccum, inverseMass);
-
 
 			velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
 

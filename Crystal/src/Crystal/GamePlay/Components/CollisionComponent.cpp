@@ -8,7 +8,7 @@ namespace Crystal {
 	{
 		PrimitiveComponent::OnCreate();
 
-		Level* level = (Level*)GetOwner()->GetParent();
+		Level* level = (Level*)GetOwner()->GetParentObject();
 		level->RegisterCollisionComponent(this);
 	}
 

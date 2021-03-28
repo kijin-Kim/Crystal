@@ -12,9 +12,6 @@ namespace Crystal {
 	public:
 		CameraPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
 		{
-			//m_MainComponent = CreateComponent<TransformComponent>("DefaultTransform");
-
-
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
 			cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 0.0f, -15000.0f));
 			cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 150000.0f, 0.0f));
@@ -24,15 +21,11 @@ namespace Crystal {
 			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 			cameraComponent->SetFarPlane(10000000.0f);
 			cameraComponent->SetMass(60.0f);
-			//cameraComponent->SetAttachment(m_MainComponent);
 
 			m_MainComponent = cameraComponent;
 
 			m_MovementComponent = CreateComponent<MovementComponent>("MovementComponent");
 			m_MovementComponent->SetTargetComponent(m_MainComponent);
-
-
-			
 
 			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
@@ -117,9 +110,11 @@ namespace Crystal {
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetForward(), maxDistance));
 
-			Level* level = (Level*)GetParent();
+			Level* level = (Level*)GetParentObject();
 			level->DrawDebugLine(start, end);
 		}
 
+	private:
+		MovementComponent* m_MovementComponent = nullptr;
 	};
 }

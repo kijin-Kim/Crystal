@@ -54,16 +54,12 @@ public:
 		mesh->SetMaterial(bodyMaterial);
 		mesh->SetMaterial(tentacleMaterial, 1);
 
-		m_MeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
-		m_MeshComponent->SetRenderable(mesh);
+		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
+		skeletalMeshComponent->SetRenderable(mesh);
 
 
-		m_MainComponent = m_MeshComponent;
+		m_MainComponent = skeletalMeshComponent;
 
-	
-		m_MeshComponent->AddPitch(90.0f);
-		m_MeshComponent->SetLocalPosition({ -5000.0f, 0.0f, 0.0f });
-		m_MeshComponent->SetScale(10.0f);
 
 	}
 
@@ -89,7 +85,5 @@ public:
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override
 	{
 	}
-private:
-	Crystal::BoundingSphereComponent* m_BoundingSphereComponent = nullptr;
 };
 
