@@ -194,6 +194,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.h" />
