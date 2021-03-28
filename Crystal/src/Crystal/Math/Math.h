@@ -131,6 +131,11 @@ namespace Crystal {
 
 	namespace Vector4
 	{
+		namespace Quaternion {
+			const DirectX::XMFLOAT4 Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
+		}
+		
+
 		inline DirectX::XMFLOAT4 QuaternionMultiply(const DirectX::XMFLOAT4& q1, const DirectX::XMFLOAT4& q2)
 		{
 			DirectX::XMFLOAT4 result;
@@ -141,7 +146,7 @@ namespace Crystal {
 		}
 
 
-		inline DirectX::XMFLOAT4 QuternionRotationAxis(const DirectX::XMFLOAT3& axis, float angle)
+		inline DirectX::XMFLOAT4 QuaternionRotationAxis(const DirectX::XMFLOAT3& axis, float angle)
 		{
 			DirectX::XMFLOAT4 result;
 			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationAxis(XMLoadFloat3(&axis), (angle));

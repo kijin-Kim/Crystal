@@ -7,23 +7,9 @@ namespace Crystal {
 	{
 		Component::Update(deltaTime);
 
-
-		auto quaternion = Vector4::QuternionRotationAxis(Vector3::UnitX,
-			DirectX::XMConvertToRadians(m_Pitch));
-		quaternion = Vector4::QuaternionMultiply(quaternion,
-			Vector4::QuternionRotationAxis(Vector3::UnitY, DirectX::XMConvertToRadians(m_Yaw)));
-		quaternion = Vector4::QuaternionMultiply(quaternion,
-			Vector4::QuternionRotationAxis(Vector3::UnitZ, DirectX::XMConvertToRadians(m_Roll)));
-
-
-		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitX, quaternion));
-		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitY, quaternion));
-		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitZ, quaternion));
-
-
 		const auto position = GetLocalPosition();
 		const auto scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
-		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(quaternion);
+		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_Rotation);
 		const auto translation = Matrix4x4::Translation(position);
 
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);
@@ -36,4 +22,50 @@ namespace Crystal {
 		else
 			m_WorldTransform = m_LocalTransform;
 	}
+
+	void TransformComponent::RotateRoll(float angle)
+	{
+		angle = DirectX::XMConvertToRadians(angle);
+
+		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitZ, m_Rotation));
+		
+		auto newQuat = Vector4::QuaternionRotationAxis(m_Forward, angle);
+
+		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(m_Up, newQuat));
+		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(m_Right, newQuat));
+
+		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
+	}
+
+
+	void TransformComponent::RotatePitch(float angle)
+	{
+
+		angle = DirectX::XMConvertToRadians(angle);
+
+		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitX, m_Rotation));
+		
+		auto newQuat = Vector4::QuaternionRotationAxis(m_Right, angle);
+
+		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(m_Up, newQuat));
+		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(m_Forward, newQuat));
+
+		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
+	}
+
+
+	void TransformComponent::RotateYaw(float angle)
+	{
+		angle = DirectX::XMConvertToRadians(angle);
+
+		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitY, m_Rotation));
+		
+		auto newQuat = Vector4::QuaternionRotationAxis(m_Up, angle);
+
+		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(m_Right, newQuat));
+		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(m_Forward, newQuat));
+
+		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
+	}
+
 }

@@ -59,7 +59,7 @@ public:
 		
 		auto cameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 4500.0f, -15000.0f));
-		cameraComponent->AddPitch(15.0f);
+		cameraComponent->RotatePitch(15.0f);
 		cameraComponent->SetFieldOfView(60.0f);
 		cameraComponent->SetNearPlane(1000.0f);
 		cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
@@ -69,28 +69,6 @@ public:
 		
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 		m_MovementComponent->SetTargetComponent(m_MainComponent);
-
-
-
-		m_RayX = CreateComponent<Crystal::RayComponent>("RayX");
-		m_RayY = CreateComponent<Crystal::RayComponent>("RayY");
-		/*m_RayZ = CreateComponent<Crystal::RayComponent>("RayZ");*/
-
-		m_RayX->SetAttachment(m_MainComponent);
-		m_RayY->SetAttachment(m_MainComponent);
-		/*m_RayZ->SetAttachment(m_MainComponent);*/
-
-		m_RayX->SetMaxDistance(10000.0f);
-		m_RayY->SetMaxDistance(10000.0f);
-		/*m_RayZ->SetMaxDistance(10000.0f);*/
-
-		m_RayX->SetDirection({ 1.0f, 0.0f, 0.0f });
-		m_RayY->SetDirection({ 0.0f, 1.0f, 0.0f });
-		/*m_RayZ->SetDirection({ 0.0f, 0.0f, 1.0f });*/
-
-		m_RayX->SetLineColor({ 1.0f, 0.0f, 0.0f });
-		m_RayY->SetLineColor({ 0.0f, 1.0f, 0.0f });
-		/*m_RayZ->SetLineColor({ 0.0f, 0.0f, 1.0f });*/
 
 
 		Crystal::ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
@@ -114,6 +92,9 @@ public:
 	void Update(const float deltaTime) override
 	{
 		Pawn::Update(deltaTime); // Updating All Component
+
+
+
 	}
 
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override
@@ -125,24 +106,24 @@ public:
 		inputComponent->BindAxis("MoveUp", CS_AXIS_FN(TestPawn::MoveUp));
 		inputComponent->BindAxis("RollRight", CS_AXIS_FN(TestPawn::RollRight));
 
-		inputComponent->BindAxis("LookUp", CS_AXIS_FN(TestPawn::AddPitch));
-		inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::AddYaw));
+		inputComponent->BindAxis("LookUp", CS_AXIS_FN(TestPawn::RotatePitch));
+		inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::RotateYaw));
 
 
 
 		inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::BeginFire));
 	}
 
-	void AddYaw(float value)
+	void RotateYaw(float value)
 	{
 		value *= 0.1f;
-		m_MainComponent->AddYaw(value);		
+		m_MainComponent->RotateYaw(value);	
 	}
 
-	void AddPitch(float value)
+	void RotatePitch(float value)
 	{
 		value *= 0.1f;
-		m_MainComponent->AddPitch(value);
+		m_MainComponent->RotatePitch(value);
 	}
 
 	void MoveForward(float value)
@@ -168,26 +149,27 @@ public:
 
 	void RollRight(float value)
 	{
-		m_MainComponent->AddRoll(-value);
+		m_MainComponent->RotateRoll(-value);
 	}
 
 	void BeginFire()
 	{
 		CS_DEBUG_INFO("BeginFire!!");
+		m_MainComponent->SetVelocity(Crystal::Vector3::Zero);
+
 		auto start = m_MainComponent->GetWorldPosition();
 
 		Crystal::Level* level = (Crystal::Level*)GetParentObject();
-		level->DrawDebugLine(start, m_MainComponent->GetForward(), 1000000.0f);
+		auto forward = m_MainComponent->GetForward();
+		auto up = m_MainComponent->GetUp();
+		auto right = m_MainComponent->GetRight();
+
+		level->DrawDebugLine(start, m_MainComponent->GetForward(), 1000000.0f, { 1.0f, 0.0f, 0.0f });
+		level->DrawDebugLine(start, m_MainComponent->GetUp(), 1000000.0f, { 0.0f, 1.0f, 0.0f });
+		level->DrawDebugLine(start, m_MainComponent->GetRight(), 1000000.0f, { 0.0f, 0.0f, 1.0f });
+
 	}
 
 private:
 	Crystal::MovementComponent* m_MovementComponent = nullptr;
-
-
-	// Test Purposes
-	Crystal::RayComponent* m_RayX = nullptr;
-	Crystal::RayComponent* m_RayY = nullptr;
-	Crystal::RayComponent* m_RayZ = nullptr;
-
-
 };

@@ -59,7 +59,7 @@ namespace Crystal {
 			}
 			const auto rotationAngle = acosf(Vector3::Dot(currentDirection, m_Direction));
 			const auto quternion =
-				Vector4::QuternionRotationAxis(rotationAxis, rotationAngle);
+				Vector4::QuaternionRotationAxis(rotationAxis, rotationAngle);
 			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quternion);
 			const auto translationMatrix = Matrix4x4::Translation(m_Origin);
 

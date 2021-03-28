@@ -33,7 +33,7 @@ namespace Crystal {
 						if (ray->GetMaxDistance() >= abs(outDistance))
 						{
 							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 					}
 				}
@@ -44,8 +44,8 @@ namespace Crystal {
 					auto d3dBoundingSphere = sphereComp->GetWorldBoundingSphere();
 					if (d3dOrientedBox1.Intersects(d3dBoundingSphere))
 					{
-						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						//sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
 					}
 				}
 
@@ -55,8 +55,8 @@ namespace Crystal {
 					auto d3dBoundingBox2 = aabbComp->GetWorldBoundingBox();
 					if (d3dOrientedBox1.Intersects(d3dBoundingBox2))
 					{
-						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						//aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
 					}
 				}
 
@@ -69,8 +69,8 @@ namespace Crystal {
 						auto d3dOrientedBox2 = obbComp2->GetWorldBoundingOrientedBox();
 						if (d3dOrientedBox1.Intersects(d3dOrientedBox2))
 						{
-							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							//obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 					}
 				}
@@ -93,7 +93,7 @@ namespace Crystal {
 						if (ray->GetMaxDistance() >= abs(outDistance))
 						{
 							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							component->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							//component->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 						
 					}
@@ -170,7 +170,8 @@ namespace Crystal {
 		}
 		//void RemoveActor() {}
 
-		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint)
+		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint, 
+			const DirectX::XMFLOAT3& color = { 0.0f, 1.0f, 0.0f })
 		{
 			LineActor* debugLineActor = SpawnActorInLevel<LineActor>();
 			auto lineComponent = debugLineActor->GetLineComponent();
@@ -183,18 +184,19 @@ namespace Crystal {
 			lineComponent->SetOrigin(startPoint);
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
-			lineComponent->SetLineColor({ 0.5f, 0.3f, 1.0f });
+			lineComponent->SetLineColor(color);
 
 		}
 
-		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance)
+		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance, 
+			const DirectX::XMFLOAT3& color = { 0.0f, 1.0f, 0.0f })
 		{
 			LineActor* debugLineActor = SpawnActorInLevel<LineActor>();
 			auto lineComponent = debugLineActor->GetLineComponent();
 			lineComponent->SetOrigin(origin);
 			lineComponent->SetDirection(direction);
 			lineComponent->SetMaxDistance(maxDistance);
-			lineComponent->SetLineColor({ 0.5f, 0.3f, 1.0f });
+			lineComponent->SetLineColor(color);
 		}
 
 		void RegisterCollisionComponent(CollisionComponent* component) 

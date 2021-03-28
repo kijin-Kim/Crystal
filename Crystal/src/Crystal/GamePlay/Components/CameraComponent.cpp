@@ -26,10 +26,10 @@ namespace Crystal {
 
 	void CameraComponent::computeViewProjection()
 	{
-		const auto& finalTransform = GetWorldTransform();
-		const DirectX::XMFLOAT3 finalPosition = { finalTransform._41, finalTransform._42, finalTransform._43 };
-		DirectX::XMFLOAT3 finalForward = { finalTransform._31, finalTransform._32, finalTransform._33 };
-		DirectX::XMFLOAT3 finalUp = { finalTransform._21, finalTransform._22, finalTransform._23 };
+		const auto& worldTransform = GetWorldTransform();
+		const DirectX::XMFLOAT3 worldPosition = { worldTransform._41, worldTransform._42, worldTransform._43 };
+		DirectX::XMFLOAT3 worldForward = { worldTransform._31, worldTransform._32, worldTransform._33 };
+		DirectX::XMFLOAT3 worldUp = { worldTransform._21, worldTransform._22, worldTransform._23 };
 
 
 		/// 해결법 Controller가 직접 rotation을 받아 Matrix를 만들기?	
@@ -37,7 +37,7 @@ namespace Crystal {
 		switch (m_ProjectionMode)
 		{
 		case ECameraProjectionMode::CPM_Persepective:
-			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(finalPosition, finalForward, finalUp), 
+			m_ViewProjection = Matrix4x4::Multiply(Matrix4x4::LookTo(worldPosition, worldForward, worldUp), 
 				Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView),
 					static_cast<float>(m_Viewport.Width) / static_cast<float>(m_Viewport.Height), m_NearPlane, m_FarPlane));
 			break;

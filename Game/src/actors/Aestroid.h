@@ -37,9 +37,9 @@ public:
 		float yAngle = DirectX::XMConvertToRadians(rand() % 360 + 1);
 		float zAngle = DirectX::XMConvertToRadians(rand() % 360 + 1);
 
-		m_MainComponent->AddRoll(xAngle);
-		m_MainComponent->AddPitch(yAngle);
-		m_MainComponent->AddYaw(zAngle);
+		m_MainComponent->RotateRoll(xAngle);
+		m_MainComponent->RotatePitch(yAngle);
+		m_MainComponent->RotateYaw(zAngle);
 
 		
 	}
