@@ -54,12 +54,13 @@ public:
 
 
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-		springArmComponent->SetArmLength(0.0f);
+		springArmComponent->RotatePitch(15.0f);
+		springArmComponent->SetLocalPosition({ 0, 4500.0f, -15000.0f });
 		springArmComponent->SetAttachment(m_MainComponent);
 		
 		auto cameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-		cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 4500.0f, -15000.0f));
-		cameraComponent->RotatePitch(15.0f);
+		//cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 4500.0f, -15000.0f));
+		//cameraComponent->RotatePitch(15.0f);
 		cameraComponent->SetFieldOfView(60.0f);
 		cameraComponent->SetNearPlane(1000.0f);
 		cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
@@ -116,33 +117,33 @@ public:
 
 	void RotateYaw(float value)
 	{
-		value *= 0.1f;
+		value *= 0.05f;
 		m_MainComponent->RotateYaw(value);	
 	}
 
 	void RotatePitch(float value)
 	{
-		value *= 0.1f;
+		value *= 0.05f;
 		m_MainComponent->RotatePitch(value);
 	}
 
 	void MoveForward(float value)
 	{
-		value *= 5000.0f;
+		value *= 2000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetForward(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveRight(float value)
 	{	
-		value *= 5000.0f;
+		value *= 2000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetRight(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveUp(float value)
 	{
-		value *= 5000.0f;
+		value *= 2000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetUp(), value);
 		m_MovementComponent->AddForce(force);
 	}
@@ -156,18 +157,10 @@ public:
 	{
 		CS_DEBUG_INFO("BeginFire!!");
 		m_MainComponent->SetVelocity(Crystal::Vector3::Zero);
-
 		auto start = m_MainComponent->GetWorldPosition();
 
 		Crystal::Level* level = (Crystal::Level*)GetParentObject();
-		auto forward = m_MainComponent->GetForward();
-		auto up = m_MainComponent->GetUp();
-		auto right = m_MainComponent->GetRight();
-
-		level->DrawDebugLine(start, m_MainComponent->GetForward(), 1000000.0f, { 1.0f, 0.0f, 0.0f });
-		level->DrawDebugLine(start, m_MainComponent->GetUp(), 1000000.0f, { 0.0f, 1.0f, 0.0f });
-		level->DrawDebugLine(start, m_MainComponent->GetRight(), 1000000.0f, { 0.0f, 0.0f, 1.0f });
-
+		level->DrawDebugLine(start, m_MainComponent->GetForward(), 1000000.0f, { 1.0f, 1.0f, 1.0f });
 	}
 
 private:

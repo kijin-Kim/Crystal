@@ -32,8 +32,8 @@ namespace Crystal {
 					{
 						if (ray->GetMaxDistance() >= abs(outDistance))
 						{
-							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 					}
 				}
@@ -44,8 +44,8 @@ namespace Crystal {
 					auto d3dBoundingSphere = sphereComp->GetWorldBoundingSphere();
 					if (d3dOrientedBox1.Intersects(d3dBoundingSphere))
 					{
-						//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						//sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
 					}
 				}
 
@@ -55,8 +55,8 @@ namespace Crystal {
 					auto d3dBoundingBox2 = aabbComp->GetWorldBoundingBox();
 					if (d3dOrientedBox1.Intersects(d3dBoundingBox2))
 					{
-						//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						//aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+						aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
 					}
 				}
 
@@ -69,8 +69,8 @@ namespace Crystal {
 						auto d3dOrientedBox2 = obbComp2->GetWorldBoundingOrientedBox();
 						if (d3dOrientedBox1.Intersects(d3dOrientedBox2))
 						{
-							//obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							//obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 					}
 				}
@@ -92,8 +92,8 @@ namespace Crystal {
 					{
 						if (ray->GetMaxDistance() >= abs(outDistance))
 						{
-							//ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							//component->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							component->SetLineColor({ 1.0f, 0.0f, 0.0f });
 						}
 						
 					}

@@ -35,7 +35,7 @@ namespace Crystal {
 			velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
 
 			// Drag
-			float damping = 0.8f;
+			float damping = 0.3f;
 			velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
 			m_TargetComponent->SetVelocity(velocity);
 

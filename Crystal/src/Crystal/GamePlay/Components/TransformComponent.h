@@ -28,7 +28,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 				GetName().c_str());
 
 			Actor* owner = GetOwner();
-			m_ParentComponent = parentComponent;
+			SetParentComponent(parentComponent);
+			m_ParentComponent->AddChildComponent(parentComponent);
 
 			/*현재 Component를 Transform Component Hierarchy로 이동시킵니다.*/
 			owner->MoveToTransformComponentHierarchy(this);
@@ -77,7 +78,14 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		const DirectX::XMFLOAT3& GetUp()  const { return m_Up; }
 		const DirectX::XMFLOAT3& GetForward() const { return m_Forward; }
 
+		void SetParentComponent(TransformComponent* component) { m_ParentComponent = component; }
 		TransformComponent* GetParentComponent() const { return m_ParentComponent; }
+
+		void AddChildComponent(TransformComponent* component) { m_ChildComponents.push_back(component); }
+
+		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform) { m_WorldTransform = worldTransform; }
+		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform) { m_LocalTransform = localTransform; }
+
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const { return m_WorldTransform; }
 		const DirectX::XMFLOAT4X4& GetLocalTransform() const { return m_LocalTransform; }
 
@@ -88,6 +96,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
 		TransformComponent* m_ParentComponent = nullptr;
+		std::vector<TransformComponent*> m_ChildComponents;
+
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
 		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
