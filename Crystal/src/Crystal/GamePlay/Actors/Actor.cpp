@@ -66,19 +66,20 @@ namespace Crystal {
 			return;
 		}
 
-		int componentIndex = componentIt - m_Components.begin();
+		/*erase_copy를 방지하기 위하여 맨 뒤에 원소를 앞으로 보냅니다.*/
+		m_Components.back().swap(*componentIt);
+
 		/*Move!*/
 		std::unique_ptr<TransformComponent> moveDestination(static_cast<TransformComponent*>((*componentIt).release()));
 
-		m_Components.erase(m_Components.begin() + componentIndex);
-
-
+		/*Relase되고 남은 nullptr를 삭제합니다*/
+		m_Components.erase(m_Components.end() - 1);
 
 		
 		
 		/*Transform Hierarchy에서의 위치를 찾아 삽입합니다..*/
 		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(), 
-			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component->GetParentComponent(); });
+			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component->GetParent(); });
 		/*부모를 찾았을 시*/
 		if (it != m_TransformHierarchy.end())
 		{
