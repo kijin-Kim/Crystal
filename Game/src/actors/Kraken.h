@@ -61,8 +61,8 @@ public:
 		m_MainComponent = m_MeshComponent;
 
 	
-		m_MeshComponent->RotatePitch(90.0f);
-		m_MeshComponent->SetPosition({ -5000.0f, 0.0f, 0.0f });
+		m_MeshComponent->AddPitch(90.0f);
+		m_MeshComponent->SetLocalPosition({ -5000.0f, 0.0f, 0.0f });
 		m_MeshComponent->SetScale(10.0f);
 
 	}

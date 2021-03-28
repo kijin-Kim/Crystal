@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "BaseComponents.h"
+#include "Component.h"
 #include "Crystal/GamePlay/Controllers/KeyCodes.h"
 
 namespace Crystal {

@@ -1,7 +1,7 @@
 #include "cspch.h"
 #include "Actor.h"
 
-#include "Crystal/GamePlay/Components/BaseComponents.h"
+#include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/World/World.h"
 
 namespace Crystal {
@@ -97,7 +97,7 @@ namespace Crystal {
 
 	void Actor::SetPosition(const DirectX::XMFLOAT3& position)
 	{
-		m_MainComponent->SetPosition(position);
+		m_MainComponent->SetLocalPosition(position);
 	}
 
 }

@@ -29,8 +29,6 @@ namespace Crystal {
 		virtual void SetupInputComponent(InputComponent* inputComponent)
 		{
 		}
-
-
 	protected:
 		MeshComponent* m_MeshComponent = nullptr;
 		MovementComponent* m_MovementComponent = nullptr;

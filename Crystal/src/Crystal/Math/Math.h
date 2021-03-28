@@ -5,6 +5,12 @@ namespace Crystal {
 
 	namespace Vector3
 	{
+		
+		const DirectX::XMFLOAT3 UnitX = { 1.0f, 0.0f, 0.0f };
+		const DirectX::XMFLOAT3 UnitY = { 0.0f, 1.0f, 0.0f };
+		const DirectX::XMFLOAT3 UnitZ = { 0.0f, 0.0f, 1.0f };
+		const DirectX::XMFLOAT3 Zero = { 0.0f, 0.0f, 0.0f };
+
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
 			DirectX::XMFLOAT3 result;
@@ -25,6 +31,15 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT3 result;
 			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
+			XMStoreFloat3(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT3 Multiply(const DirectX::XMFLOAT3& v1, float f1)
+		{
+			DirectX::XMFLOAT3 result;
+			
+			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat3(&v1), DirectX::XMVectorSet(f1, f1, f1, 0.0f));
 			XMStoreFloat3(&result, newVector);
 			return result;
 		}
@@ -96,6 +111,15 @@ namespace Crystal {
 			return isZero;	
 		}
 
+
+		inline DirectX::XMFLOAT3 Clamp(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const DirectX::XMFLOAT3& v3)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorClamp(XMLoadFloat3(&v1), XMLoadFloat3(&v2), XMLoadFloat3(&v3));
+			XMStoreFloat3(&result, newVector);
+			return result;
+		}
+
 		inline DirectX::XMFLOAT3 RotateQuaternion(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT4& quaternion)
 		{
 			DirectX::XMFLOAT3 result;
@@ -107,6 +131,16 @@ namespace Crystal {
 
 	namespace Vector4
 	{
+		inline DirectX::XMFLOAT4 QuaternionMultiply(const DirectX::XMFLOAT4& q1, const DirectX::XMFLOAT4& q2)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMQuaternionMultiply(XMLoadFloat4(&q1), XMLoadFloat4(&q2));
+			XMStoreFloat4(&result, newVector);
+			return result;
+
+		}
+
+
 		inline DirectX::XMFLOAT4 QuternionRotationAxis(const DirectX::XMFLOAT3& axis, float angle)
 		{
 			DirectX::XMFLOAT4 result;

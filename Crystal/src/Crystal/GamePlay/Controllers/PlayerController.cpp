@@ -3,10 +3,12 @@
 
 namespace Crystal {
 
-	PlayerController::PlayerController()
+	PlayerController::PlayerController(Object* parent) : Controller(parent)
 	{
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
 		m_UserInterfaceInputComponent = std::make_unique<InputComponent>("");
+
+		m_MainComponent = CreateComponent<TransformComponent>("DefaultMainComponent");
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
@@ -53,12 +55,10 @@ namespace Crystal {
 
 	void PlayerController::ProcessPitchInput(float value)
 	{
-		m_MainCamera->RotateRollPitchYaw({ 0.0f, -value * 0.05f, 0.0f });
 	}
 
 	void PlayerController::ProcessYawInput(float value)
 	{
-		m_MainCamera->RotateRollPitchYaw({ 0.0f, 0.0f, value * 0.05f });
 	}
 
 	void PlayerController::EnableModeSwitching(bool bEnable, int64_t keyCode /*= Crystal::Mouse::Right*/)

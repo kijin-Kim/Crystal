@@ -39,7 +39,7 @@ namespace Crystal {
 	class PlayerController : public Controller
 	{
 	public:
-		PlayerController();
+		PlayerController(Object* parent);
 		virtual ~PlayerController() = default;
 
 		void AddAxisMapping(const std::string& axisName, int key, float scale);
@@ -66,6 +66,7 @@ namespace Crystal {
 
 
 	private:
+		
 		/*유저 인터페이스 인풋*/
 		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
 		/*게임모드 인풋*/

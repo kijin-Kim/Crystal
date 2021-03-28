@@ -1,6 +1,5 @@
 #pragma once
-
-#include "BaseComponents.h"
+#include "TransformComponent.h"
 namespace Crystal {
 
 	/*물리적인 위치와 눈에 보이는 렌더링 가능한 오브젝트를 가지고 있는 컴포넌트들의 베이스 클래스*/
@@ -23,7 +22,10 @@ namespace Crystal {
 		};
 
 	public:
-		explicit PrimitiveComponent(const std::string& name);
+		PrimitiveComponent(const std::string& name) : TransformComponent(name)
+		{
+			m_PrimitiveComponentType = EPrimitiveComponentType::None;
+		}
 		~PrimitiveComponent() override = default;
 
 		void OnCreate() override;
@@ -31,13 +33,12 @@ namespace Crystal {
 		void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
-
 			m_Renderable->Update(deltaTime);
 		}
 
 		EPrimitiveComponentType GetPrimitiveComponentType() const { return m_PrimitiveComponentType; }
-		void SetPrimitiveComponentType(EPrimitiveComponentType type) { m_PrimitiveComponentType = type; }
 
+		void SetPrimitiveComponentType(EPrimitiveComponentType type) { m_PrimitiveComponentType = type; }
 		void SetRenderable(Renderable* renderable) { m_Renderable = renderable; }
 		Renderable* GetRenderable() const { return m_Renderable; }
 

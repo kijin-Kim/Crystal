@@ -27,7 +27,7 @@ public:
 	{
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
-			
+		
 //		Kraken* kraken = m_World->SpawnActor<Kraken>();
 
 		for (int i = -10; i < 10; i++)
@@ -43,27 +43,37 @@ public:
 		}
 
 
-		//Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
+		Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();
 		/*키바인딩*/
 		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
 		playerController.Possess(testPawn);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
+
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
-		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::PageUp, 1.0f);
-		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::PageDown, -1.0f);
+
+		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
+		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
+
+		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
+		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
+
+
 
 		playerController.AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
 		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, 1.0f);
+
+		
+
 		playerController.EnableModeSwitching(true);
 
-		Crystal::ActionMapping actionMapping = {};
-		actionMapping.CrystalCode = Crystal::Mouse::Button::Left;
-		actionMapping.bAltDown = false;
-		actionMapping.bCtrlDown = false;
-		actionMapping.bShiftDown = false;
-		playerController.AddActionMapping("Fire", actionMapping);
+		Crystal::ActionMapping fireActionMapping = {};
+		fireActionMapping.CrystalCode = Crystal::Mouse::Button::Left;
+		fireActionMapping.bAltDown = false;
+		fireActionMapping.bCtrlDown = false;
+		fireActionMapping.bShiftDown = false;
+		playerController.AddActionMapping("Fire", fireActionMapping);
 	}
 
 	void OnUpdate() override

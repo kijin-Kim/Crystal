@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseComponents.h"
+#include "TransformComponent.h"
 #include "Crystal/Math/Math.h"
 
 namespace Crystal {
@@ -16,12 +16,7 @@ namespace Crystal {
 		CameraComponent(const std::string& name);
 		virtual ~CameraComponent() = default;
 
-		void Update(const float deltaTime) override
-		{
-			TransformComponent::Update(deltaTime);
-
-			computeViewProjection();
-		}
+		void Update(const float deltaTime) override;
 
 		void SetViewport(const D3D12_VIEWPORT& viewport) { m_Viewport = viewport;}
 		void SetScissorRect(const D3D12_RECT& scissorRect) { m_ScissorRect = scissorRect;}

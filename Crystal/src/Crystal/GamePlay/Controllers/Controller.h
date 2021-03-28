@@ -4,10 +4,10 @@
 #include "Crystal/GamePlay/Components/InputComponent.h"
 
 namespace Crystal {
-	class Controller
+	class Controller : public Actor
 	{
 	public:
-		Controller() = default;
+		Controller(Object* parent) : Actor(parent) { }
 		virtual ~Controller() = default;
 
 		virtual void Possess(Pawn* pawn) {}

@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseComponents.h"
+#include "Component.h"
 #include "PrimitiveComponent.h"
 
 namespace Crystal {

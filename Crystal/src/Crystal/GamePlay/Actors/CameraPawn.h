@@ -12,19 +12,27 @@ namespace Crystal {
 	public:
 		CameraPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
 		{
+			//m_MainComponent = CreateComponent<TransformComponent>("DefaultTransform");
+
+
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
-			cameraComponent->SetPosition(DirectX::XMFLOAT3(0, 0.0f, -8000.0f));
+			cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 0.0f, -15000.0f));
+			cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 150000.0f, 0.0f));
+			cameraComponent->SetPitch(90.0f);
 			cameraComponent->SetFieldOfView(60.0f);
 			cameraComponent->SetNearPlane(1000.0f);
 			cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 			cameraComponent->SetFarPlane(10000000.0f);
+			cameraComponent->SetMass(60.0f);
+			//cameraComponent->SetAttachment(m_MainComponent);
+
 			m_MainComponent = cameraComponent;
-			m_MainComponent->SetMass(60.0f);
 
 			m_MovementComponent = CreateComponent<MovementComponent>("MovementComponent");
 			m_MovementComponent->SetTargetComponent(m_MainComponent);
 
 
+			
 
 			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
@@ -54,6 +62,8 @@ namespace Crystal {
 			inputComponent->BindAxis("LookUp", CS_AXIS_FN(CameraPawn::RotatePitch));
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
+			inputComponent->BindAxis("RollRight", CS_AXIS_FN(CameraPawn::RollRight));
+
 
 			inputComponent->BindAction("Fire", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginFire));
 		}
@@ -63,7 +73,7 @@ namespace Crystal {
 			//ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
 			const float valueScale = 0.1f;
 			value *= valueScale;
-			m_MainComponent->RotateYaw(value);
+			m_MainComponent->AddYaw(value);
 		}
 
 		void RotatePitch(float value)
@@ -71,7 +81,7 @@ namespace Crystal {
 			//ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
 			const float valueScale = 0.1f;
 			value *= valueScale;
-			m_MainComponent->RotatePitch(-value);
+			m_MainComponent->AddPitch(-value);
 		}
 
 		void MoveForward(float value)
@@ -95,10 +105,15 @@ namespace Crystal {
 			m_MovementComponent->AddForce(force);
 		}
 
+		void RollRight(float value)
+		{
+			m_MainComponent->AddRoll(-value);
+		}
+
 		void BeginFire()
 		{
 			CS_DEBUG_INFO("BeginFire!!");
-			auto start = m_MainComponent->GetPosition();
+			auto start = m_MainComponent->GetWorldPosition();
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetForward(), maxDistance));
 

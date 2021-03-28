@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "Crystal/GamePlay/Components/BaseComponents.h"
+#include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 #include "Crystal/Resources/Texture.h"

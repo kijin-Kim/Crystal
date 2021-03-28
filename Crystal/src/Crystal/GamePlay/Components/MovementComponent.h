@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseComponents.h"
+#include "Component.h"
 
 namespace Crystal {
 
@@ -20,34 +20,33 @@ namespace Crystal {
 		{
 			Component::Update(deltaTime);
 
-			if (!m_TargetComponent->HasFiniteMass())
+			if (!m_TargetComponent->HasFiniteMass() || Vector3::IsZero(m_ForceAccum))
 				return;
-			// 최종위치 = 위치 + 속도 * dt +  0.5 * 가속도 * dt^2 (가속도에 의한 위치 변화는 생략)
-			// 최종속도 = 속도 * 댐핑계수 + 가속도 * dt (댐핑계수 = 0.99^dt)
-			const auto position = m_TargetComponent->GetPosition();
-			const auto velocity = m_TargetComponent->GetVelocity();
-			const auto mass = m_TargetComponent->GetMass();
-			const auto acceleration = Vector3::Divide(m_ForceAccum, { mass, mass, mass });
 
 
-			const auto newPosition = Vector3::Add(position, Vector3::Multiply(velocity, 
-				{ deltaTime, deltaTime, deltaTime }));
+			auto position = m_TargetComponent->GetLocalPosition();
+			auto velocity = m_TargetComponent->GetVelocity();
 
-			const float damping = 0.3f;
-			const float dampingExponentDt = pow(damping, deltaTime);
+			position = Vector3::Add(position, Vector3::Multiply(velocity, deltaTime));
+			m_TargetComponent->SetLocalPosition(position);
+
+			float inverseMass = m_TargetComponent->GetInverseMass();
+			auto accelertion = Vector3::Multiply(m_ForceAccum, inverseMass);
+
+
+			velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
+
+			// Drag
+			float damping = 0.8f;
+			velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
+			m_TargetComponent->SetVelocity(velocity);
+
 			
-			const auto newVelocity = Vector3::Add(Vector3::Multiply(velocity, 
-				{ dampingExponentDt, dampingExponentDt, dampingExponentDt }),
-				Vector3::Multiply(acceleration, { deltaTime, deltaTime, deltaTime }));
-
-			m_TargetComponent->SetPosition(newPosition);
-			m_TargetComponent->SetVelocity(newVelocity);
-			
-			m_ForceAccum = { 0.0f, 0.0f, 0.0f };
+			m_ForceAccum = Vector3::Zero;
 		}
 
 	private:
-		DirectX::XMFLOAT3 m_ForceAccum = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 		TransformComponent* m_TargetComponent = nullptr;
 	};
 

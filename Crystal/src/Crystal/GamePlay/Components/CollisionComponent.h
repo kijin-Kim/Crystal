@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseComponents.h"
+#include "Component.h"
 #include <DirectXCollision.h>
 #include "Crystal\Resources\Meshes.h"
 #include "PrimitiveComponent.h"
