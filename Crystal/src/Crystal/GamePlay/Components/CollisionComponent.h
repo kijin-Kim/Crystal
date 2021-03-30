@@ -3,6 +3,7 @@
 #include <DirectXCollision.h>
 #include "Crystal\Resources\Meshes.h"
 #include "PrimitiveComponent.h"
+#include "Crystal\Resources\ResourceManager.h"
 
 namespace Crystal {
 
@@ -15,9 +16,6 @@ namespace Crystal {
 		}
 		~CollisionComponent() override
 		{
-			// Collision Component Owns Renderable
-			if(m_Renderable)
-				delete m_Renderable;
 		}
 
 		void SetLineColor(const DirectX::XMFLOAT3& color) { m_Color = color; }
@@ -39,7 +37,9 @@ namespace Crystal {
 		RayComponent(const std::string& name) : CollisionComponent(name)
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::Ray);
-			SetRenderable(new Line());
+
+			auto& resourceManager = ResourceManager::Instance();
+			SetRenderable(resourceManager.GetRenderable("LineMesh"));
 		}
 
 		~RayComponent() override = default;
@@ -90,7 +90,9 @@ namespace Crystal {
 		BoundingBoxComponent(const std::string& name) : CollisionComponent(name)
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingBox);
-			SetRenderable(new LineBox);
+			
+			auto& resourceManager = ResourceManager::Instance();
+			SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
 		}
 
 		~BoundingBoxComponent() override = default;
@@ -126,7 +128,8 @@ namespace Crystal {
 		BoundingOrientedBoxComponent(const std::string& name) : CollisionComponent(name)
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox);
-			SetRenderable(new LineBox);
+			auto& resourceManager = ResourceManager::Instance();
+			SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
 		}
 
 		~BoundingOrientedBoxComponent() override = default;
@@ -173,7 +176,8 @@ namespace Crystal {
 		BoundingSphereComponent(const std::string& name) : CollisionComponent(name)
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingSphere);
-			SetRenderable(new LineSphere());
+			auto& resourceManager = ResourceManager::Instance();
+			SetRenderable(resourceManager.GetRenderable("LineSphereMesh"));
 		}
 
 		void Update(const float deltaTime) override

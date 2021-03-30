@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Core/Logger.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class TestPawn final : public Crystal::Pawn
 {
@@ -28,16 +29,16 @@ public:
 		normalTexture->CreateShaderResourceView(normalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
 
-		auto& shaderManager = Crystal::ShaderManager::Instance();
-		auto pbrMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Static"));
+		auto& resourceManager = Crystal::ResourceManager::Instance();
 
+		auto pbrMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Static"));
 		pbrMaterial->Set("AlbedoTexture", albedoTexture);
 		pbrMaterial->Set("MetallicTexture", metallicTexture);
 		pbrMaterial->Set("RoughnessTexture", roughnessTexture);
 		pbrMaterial->Set("NormalTexture", normalTexture);
 
-		auto* mesh = new Crystal::StaticMesh("assets/models/SM_Frigate_BE2.fbx");
-		mesh->SetMaterial(pbrMaterial, 0);
+
+		auto frigateMesh = resourceManager.GetRenderable("Frigate");
 		// ========================================================================
 		
 
@@ -48,31 +49,30 @@ public:
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-		staticMeshComponent->SetRenderable(mesh);
+		staticMeshComponent->SetRenderable(frigateMesh);
+		staticMeshComponent->SetMaterial(pbrMaterial);
 		staticMeshComponent->SetLocalPosition({ 0.0f, 0.0f, 596.0f });
 		staticMeshComponent->SetAttachment(m_MainComponent);
 
 
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-		springArmComponent->RotatePitch(15.0f);
-		springArmComponent->SetLocalPosition({ 0, 4500.0f, -15000.0f });
+		//springArmComponent->RotatePitch(15.0f);
+		springArmComponent->SetOffsetPosition({ 0, 4500.0f, -15000.0f });
 		springArmComponent->SetAttachment(m_MainComponent);
 		
-		auto cameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-		//cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 4500.0f, -15000.0f));
-		//cameraComponent->RotatePitch(15.0f);
-		cameraComponent->SetFieldOfView(60.0f);
-		cameraComponent->SetNearPlane(1000.0f);
-		cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
-		cameraComponent->SetFarPlane(10000000.0f);
-		cameraComponent->SetAttachment(springArmComponent);
+		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
+		m_CameraComponent->SetFieldOfView(60.0f);
+		m_CameraComponent->SetNearPlane(1000.0f);
+		m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
+		m_CameraComponent->SetFarPlane(10000000.0f);
+		m_CameraComponent->SetAttachment(springArmComponent);
 
-		
+
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 		m_MovementComponent->SetTargetComponent(m_MainComponent);
 
 
-		Crystal::ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
+		Crystal::ApplicationUtility::GetPlayerController().SetMainCamera(m_CameraComponent);
 	
 	}
 
@@ -118,7 +118,7 @@ public:
 	void RotateYaw(float value)
 	{
 		value *= 0.05f;
-		m_MainComponent->RotateYaw(value);	
+		m_MainComponent->RotateYaw(value);
 	}
 
 	void RotatePitch(float value)
@@ -129,22 +129,22 @@ public:
 
 	void MoveForward(float value)
 	{
-		value *= 2000.0f;
-		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetForward(), value);
+		value *= 1300.0f;
+		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveRight(float value)
 	{	
-		value *= 2000.0f;
-		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetRight(), value);
+		value *= 1300.0f;
+		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveUp(float value)
 	{
-		value *= 2000.0f;
-		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetUp(), value);
+		value *= 1300.0f;
+		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
@@ -156,13 +156,17 @@ public:
 	void BeginFire()
 	{
 		CS_DEBUG_INFO("BeginFire!!");
-		m_MainComponent->SetVelocity(Crystal::Vector3::Zero);
-		auto start = m_MainComponent->GetWorldPosition();
 
 		Crystal::Level* level = (Crystal::Level*)GetParentObject();
-		level->DrawDebugLine(start, m_MainComponent->GetForward(), 1000000.0f, { 1.0f, 1.0f, 1.0f });
+
+		const auto start = m_CameraComponent->GetWorldPosition();	
+		const auto direction = m_CameraComponent->GetWorldForwardVector();
+		const float maxDistance = 1000000.0f;
+
+		level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
 	}
 
 private:
 	Crystal::MovementComponent* m_MovementComponent = nullptr;
+	Crystal::CameraComponent* m_CameraComponent = nullptr;
 };

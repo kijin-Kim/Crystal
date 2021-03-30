@@ -6,15 +6,14 @@
 #include "Shader.h"
 
 namespace Crystal {
-	class ShaderManager final
+	class ShaderManager
 	{
-	public:
-		static ShaderManager& Instance() { static ShaderManager instance; return instance; }
+		friend class ResourceManager;
+	private:
+		void load(const std::string& fileName, const std::string& shaderName);
+		void unLoad(const std::string& shaderName);
 
-		void Load(const std::string& fileName, const std::string& shaderName);
-		void Add(const std::shared_ptr<Shader>& shader, const std::string& shaderName);
-
-		std::shared_ptr<Shader> GetShader(const std::string& fileName) 
+		const std::shared_ptr<Shader>& getShader(const std::string& fileName)
 		{ 
 			auto it = m_Shaders.find(fileName);
 			if (it == m_Shaders.end())

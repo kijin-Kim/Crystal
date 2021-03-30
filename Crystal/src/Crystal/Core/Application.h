@@ -13,6 +13,7 @@
 #include "Crystal/Core/Layer.h"
 #include "Crystal/GamePlay/World/World.h"
 #include "Crystal/Core/Timer.h"
+#include "Crystal/Resources/BasicShapeMeshes.h"
 
 namespace Crystal {
 	class Application
@@ -21,7 +22,16 @@ namespace Crystal {
 		Application(HINSTANCE hInstance, int width, int height);
 		virtual ~Application() = default;
 
-		virtual void Start() {}
+		virtual void Start() 
+		{
+			// Default Resources
+			auto& resourceManager = Crystal::ResourceManager::Instance();
+			resourceManager.LoadRenderable<Crystal::Line>("LineMesh");
+			resourceManager.LoadRenderable<Crystal::LineBox>("LineBoxMesh");
+			resourceManager.LoadRenderable<Crystal::LineSphere>("LineSphereMesh");
+			resourceManager.LoadRenderable<Crystal::PlaneQuad>("PlaneQuadMesh");
+
+		}
 
 		void Run();
 

@@ -16,32 +16,20 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 
 		void Update(const float deltaTime) override;
 
+		void UpdateTransfromHierarchy()
+		{
+			/*Parent부터 자식 순으로 계산하여야 함*/
+			if (m_ParentComponent)
+				m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
+			else
+				m_WorldTransform = m_LocalTransform;
+		}
+
 		/*Component의 Transform이 다른 특정 Component에 종속되도록 합니다.*/
-		void SetAttachment(TransformComponent* parentComponent)
-		{
-			/*서로가 서로의 Parent*/
-			CS_FATAL(parentComponent->GetParentComponent() != this, "Component : %s 와 Component : %s는 서로가 서로의 부모입니다.",
-				GetName().c_str(), parentComponent->GetName().c_str());
-			CS_FATAL(GetOwner()->GetMainComponent(), "MainComponent가 존재 하지 않습니다. 먼저 MainComponent를 지정해주세요.",
-				GetName().c_str());
-			CS_FATAL(GetOwner()->GetMainComponent() != this, "Component : %s 는 MainComponent입니다 Maincomponent는 다른 Component에 Attach 될 수 없습니다.",
-				GetName().c_str());
+		void SetAttachment(TransformComponent* parentComponent);
 
-			Actor* owner = GetOwner();
-			SetParentComponent(parentComponent);
-			m_ParentComponent->AddChildComponent(parentComponent);
 
-			/*현재 Component를 Transform Component Hierarchy로 이동시킵니다.*/
-			owner->MoveToTransformComponentHierarchy(this);
-
-		}
-
-		void SetLocalPosition(const DirectX::XMFLOAT3& position)
-		{
-			m_LocalTransform._41 = position.x;
-			m_LocalTransform._42 = position.y;
-			m_LocalTransform._43 = position.z;
-		}
+		void SetLocalPosition(const DirectX::XMFLOAT3& position) { m_LocalPosition = position; }
 
 		void SetWorldPosition(const DirectX::XMFLOAT3& position)
 		{
@@ -62,7 +50,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		void RotateYaw(float angle);
 	
 
-		DirectX::XMFLOAT3 GetLocalPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43 }; }
+		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
 		DirectX::XMFLOAT3 GetWorldPosition() const { return { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 }; }
 		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
 		float GetMass() const
@@ -74,9 +62,12 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		bool HasFiniteMass() const { return m_InverseMass != 0; }
 
 	
-		const DirectX::XMFLOAT3& GetRight() const { return m_Right; }
-		const DirectX::XMFLOAT3& GetUp()  const { return m_Up; }
-		const DirectX::XMFLOAT3& GetForward() const { return m_Forward; }
+		const DirectX::XMFLOAT3& GetLocalRightVector() const { return m_Right; }
+		const DirectX::XMFLOAT3& GetLocalUpVector()  const { return m_Up; }
+		const DirectX::XMFLOAT3& GetLocalForwardVector() const { return m_Forward; }
+		DirectX::XMFLOAT3 GetWorldRightVector() const { return { m_WorldTransform._11, m_WorldTransform._12, m_WorldTransform._13 }; }
+		DirectX::XMFLOAT3 GetWorldUpVector() const { return { m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23 }; }
+		DirectX::XMFLOAT3 GetWorldForwardVector() const { return { m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33 }; }
 
 		void SetParentComponent(TransformComponent* component) { m_ParentComponent = component; }
 		TransformComponent* GetParentComponent() const { return m_ParentComponent; }
@@ -90,7 +81,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		const DirectX::XMFLOAT4X4& GetLocalTransform() const { return m_LocalTransform; }
 
 
-
+		const DirectX::XMFLOAT4& GetRotation() const { return m_Rotation; }
 
 
 	protected:
@@ -103,7 +94,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
 
 
-		DirectX::XMFLOAT3 m_Velocity = { 0.0f, 0.0f,0.0f };
+		DirectX::XMFLOAT3 m_Velocity = Vector3::Zero;
 		float m_InverseMass = 10.0f;
 
 		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
@@ -111,6 +102,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;
 		DirectX::XMFLOAT3 m_Up = Vector3::UnitY;
 		DirectX::XMFLOAT3 m_Forward = Vector3::UnitZ;
+
+		DirectX::XMFLOAT3 m_LocalPosition = Vector3::Zero;
 
 	};
 

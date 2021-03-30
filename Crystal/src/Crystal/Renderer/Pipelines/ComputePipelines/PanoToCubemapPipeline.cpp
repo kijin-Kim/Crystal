@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "PanoToCubemapPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -37,8 +38,8 @@ namespace Crystal {
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
-		auto& shaderManager = ShaderManager::Instance();
-		auto& shaderDatablobs = shaderManager.GetShader("PanoToCubemap")->GetRaw();
+		auto& resourceManager = ResourceManager::Instance();
+		auto& shaderDatablobs = resourceManager.GetShader("PanoToCubemap")->GetRaw();
 		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
 		computePipelineStateDesc.pRootSignature = m_RootSignature.Get();
 		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };

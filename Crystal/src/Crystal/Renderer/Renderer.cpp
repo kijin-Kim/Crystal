@@ -12,6 +12,7 @@
 #include "imgui/backends/imgui_impl_dx12.h"
 #include "imgui/backends/imgui_impl_win32.h"
 #include "Crystal/Core/ApplicationUtility.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -47,14 +48,17 @@ namespace Crystal {
 			D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		/*Shader를 로드합니다.*/
-		auto& shaderManager = ShaderManager::Instance();
-		shaderManager.Load("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
-		shaderManager.Load("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
-		shaderManager.Load("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
-		shaderManager.Load("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
-		shaderManager.Load("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
-		shaderManager.Load("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
-		shaderManager.Load("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
+		auto& resourceManager = ResourceManager::Instance();
+		resourceManager.LoadShader("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
+		resourceManager.LoadShader("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
+		resourceManager.LoadShader("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
+		resourceManager.LoadShader("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
+		resourceManager.LoadShader("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
+		resourceManager.LoadShader("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
+		resourceManager.LoadShader("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
+		resourceManager.LoadShader("assets/shaders/TestShader.hlsl", "TestShader");
+
+
 
 
 		/*Pipeline을 만듭니다.*/
@@ -343,6 +347,7 @@ namespace Crystal {
 
 	void Renderer::RegisterRenderComponent(PrimitiveComponent* component)
 	{
+		// TODO : Material 별로 나누어야함
 		const auto rcType = component->GetPrimitiveComponentType();
 		switch (rcType)
 		{

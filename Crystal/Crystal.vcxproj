@@ -190,7 +190,10 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Actors\LightActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\LightComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
@@ -202,10 +205,13 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipelines.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
+    <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
+    <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
     <ClInclude Include="src\Crystal\Resources\Renderable.h" />
     <ClInclude Include="src\Crystal\Resources\Animation.h" />
     <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
     <ClInclude Include="src\Crystal\Resources\Descriptor.h" />
+    <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
     <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
@@ -249,6 +255,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />
+    <ClCompile Include="src\Crystal\Resources\RenderableManager.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />

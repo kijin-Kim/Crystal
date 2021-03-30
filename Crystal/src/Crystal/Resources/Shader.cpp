@@ -55,6 +55,7 @@ namespace Crystal {
 
 	}
 
+
 	bool Shader::CheckInputValidation(const std::string& inputName, D3D_SHADER_INPUT_TYPE shaderInputType)
 	{
 		D3D12_SHADER_INPUT_BIND_DESC shaderInputBindDesc = {};

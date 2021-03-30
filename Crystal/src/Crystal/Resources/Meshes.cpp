@@ -16,27 +16,6 @@ namespace Crystal {
 		return Matrix4x4::Transpose(*(DirectX::XMFLOAT4X4*) & matrix);
 	}
 
-	PositionSubMesh::PositionSubMesh(aiMesh* mesh)
-	{
-		PositionVertices.reserve(mesh->mNumVertices);
-		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-		{
-			PositionVertex vertex = {};
-			vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-
-			PositionVertices.push_back(vertex);
-		}
-
-		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-		{
-			Indices.reserve(mesh->mFaces[i].mNumIndices);
-			for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; j++)
-			{
-				Indices.push_back(mesh->mFaces[i].mIndices[j]);
-			}
-		}
-	}
-
 
 	StaticSubMesh::StaticSubMesh(aiMesh* mesh)
 	{
@@ -127,38 +106,8 @@ namespace Crystal {
 
 	Mesh::~Mesh()
 	{
-		delete m_Importer;
-	}
-
-	PositionMesh::PositionMesh(const std::string& filePath) : Mesh(filePath)
-	{
-		CS_INFO("%s 메쉬 불러오는 중 ...", filePath.c_str());
-		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
-		for (const auto& submesh : m_Submeshes)
-		{
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((PositionSubMesh*)(submesh.get()))->PositionVertices.data(), 
-				(UINT)sizeof(PositionVertex),
-				(UINT)((PositionSubMesh*)(submesh.get()))->PositionVertices.size()));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(),
-				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
-		}
-
-		CS_INFO("%s 메쉬 불러오기 완료", filePath.c_str());
-	}
-
-
-	void PositionMesh::ProcessNode(aiNode* rootNode, const aiScene* scene)
-	{
-		for (unsigned int i = 0; i < rootNode->mNumMeshes; i++)
-		{
-			aiMesh* mesh = scene->mMeshes[rootNode->mMeshes[i]];
-			m_Submeshes.push_back(std::make_unique<PositionSubMesh>(mesh));
-		}
-
-		for (unsigned int i = 0; i < rootNode->mNumChildren; i++)
-		{
-			ProcessNode(rootNode->mChildren[i], scene);
-		}
+		if(m_Importer)
+			delete m_Importer;
 	}
 
 	StaticMesh::StaticMesh(const std::string& filePath) : Mesh(filePath)

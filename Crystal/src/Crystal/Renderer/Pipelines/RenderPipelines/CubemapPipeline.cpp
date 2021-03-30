@@ -2,6 +2,7 @@
 #include "CubemapPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -63,8 +64,8 @@ namespace Crystal {
 		cubemapPipelineStream.InputLayout = { cubemapInputLayout, _countof(cubemapInputLayout) };
 		cubemapPipelineStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		auto& shaderManager = ShaderManager::Instance();
-		auto& cubemapShaderDatablobs = shaderManager.GetShader("CubemapShader")->GetRaw();
+		auto& resourceManager = ResourceManager::Instance();
+		auto& cubemapShaderDatablobs = resourceManager.GetShader("CubemapShader")->GetRaw();
 		cubemapPipelineStream.VS = { cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		cubemapPipelineStream.PS = { cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 

@@ -37,25 +37,26 @@ public:
 			D3D12_SRV_DIMENSION_TEXTURE2D);
 
 
-		auto& shaderManager = Crystal::ShaderManager::Instance();
+		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto bodyMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Skeletal"));
+		auto bodyMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Skeletal"));
 		bodyMaterial->Set("AlbedoTexture", bodyAlbedoTexture);
 		bodyMaterial->Set("RoughnessTexture", bodyRoughnessTexture);
 		bodyMaterial->Set("NormalTexture", bodyNormalTexture);
 
-		auto tentacleMaterial = std::make_shared<Crystal::Material>(shaderManager.GetShader("PBRShader_Skeletal"));
+		auto tentacleMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Skeletal"));
 		tentacleMaterial->Set("AlbedoTexture", tentacleAlbedoTexture);
 		tentacleMaterial->Set("RoughnessTexture", tentacleRoughnessTexture);
 		tentacleMaterial->Set("NormalTexture", tentacleNormalTexture);
 
-		Crystal::SkeletalMesh* mesh = new Crystal::SkeletalMesh("assets/models/KRAKEN.fbx", 
+		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
 			"assets/models/KRAKEN_turn45LeftSmashAttack.fbx");
-		mesh->SetMaterial(bodyMaterial);
-		mesh->SetMaterial(tentacleMaterial, 1);
 
+	
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(mesh);
+		skeletalMeshComponent->SetMaterial(bodyMaterial);
+		skeletalMeshComponent->SetMaterial(tentacleMaterial, 1);
 
 
 		m_MainComponent = skeletalMeshComponent;

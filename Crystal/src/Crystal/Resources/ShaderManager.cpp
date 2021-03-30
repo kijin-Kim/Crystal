@@ -2,7 +2,7 @@
 #include "ShaderManager.h"
 
 namespace Crystal {
-	void ShaderManager::Load(const std::string& fileName, const std::string& shaderName)
+	void ShaderManager::load(const std::string& fileName, const std::string& shaderName)
 	{
 		if (m_Shaders.find(shaderName) != m_Shaders.end())
 		{
@@ -10,16 +10,15 @@ namespace Crystal {
 			return;
 		}
 
-		m_Shaders[shaderName] = std::make_shared<Shader>(fileName);
+		m_Shaders[shaderName] = std::make_unique<Shader>(fileName);
 	}
 
-	void ShaderManager::Add(const std::shared_ptr<Shader>& shader, const std::string& shaderName)
+	void ShaderManager::unLoad(const std::string& shaderName)
 	{
-		if (m_Shaders.find(shaderName) != m_Shaders.end())
-		{
-			CS_FATAL(false, "%s이 이미 존재합니다", shaderName);
-			return;
-		}
-		m_Shaders[shaderName] = shader;
+		auto it = m_Shaders.find(shaderName);
+		if (it == m_Shaders.end())
+			CS_FATAL(false, "Shader : %s를 찾을 수 없습니다.", shaderName.c_str());
+		m_Shaders.erase(shaderName);
 	}
+
 }

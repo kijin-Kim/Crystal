@@ -11,6 +11,11 @@ namespace Crystal {
 		const DirectX::XMFLOAT3 UnitZ = { 0.0f, 0.0f, 1.0f };
 		const DirectX::XMFLOAT3 Zero = { 0.0f, 0.0f, 0.0f };
 
+		const DirectX::XMFLOAT3 White = { 1.0f, 1.0f, 1.0f };
+		const DirectX::XMFLOAT3 Red = { 1.0f, 0.0f, 0.0f };
+		const DirectX::XMFLOAT3 Green = { 0.0f, 1.0f, 0.0f };
+		const DirectX::XMFLOAT3 Blue = { 0.0f, 0.0f, 1.0f };
+
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
 			DirectX::XMFLOAT3 result;
@@ -142,6 +147,42 @@ namespace Crystal {
 		namespace Quaternion {
 			const DirectX::XMFLOAT4 Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
 		}
+
+
+		inline DirectX::XMFLOAT4 Multiply(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4& v2)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat4(&v1), XMLoadFloat4(&v2));
+			XMStoreFloat4(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT4 Multiply(const DirectX::XMFLOAT4& v1, float f1)
+		{
+			DirectX::XMFLOAT4 result;
+
+			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat4(&v1), DirectX::XMVectorSet(f1, f1, f1, 0.0f));
+			XMStoreFloat4(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT4 Divide(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4& v2)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorDivide(XMLoadFloat4(&v1), XMLoadFloat4(&v2));
+			XMStoreFloat4(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT4 Divide(const DirectX::XMFLOAT4& v1, float f1)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorDivide(XMLoadFloat4(&v1), DirectX::XMVectorSet(f1, f1, f1, 0.0f));
+			XMStoreFloat4(&result, newVector);
+			return result;
+		}
+
+
 		
 
 		inline DirectX::XMFLOAT4 QuaternionMultiply(const DirectX::XMFLOAT4& q1, const DirectX::XMFLOAT4& q2)
@@ -150,7 +191,14 @@ namespace Crystal {
 			DirectX::XMVECTOR newVector = DirectX::XMQuaternionMultiply(XMLoadFloat4(&q1), XMLoadFloat4(&q2));
 			XMStoreFloat4(&result, newVector);
 			return result;
+		}
 
+		inline DirectX::XMFLOAT4 QuaternionInverse(const DirectX::XMFLOAT4& q1)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMQuaternionInverse(XMLoadFloat4(&q1));
+			XMStoreFloat4(&result, newVector);
+			return result;
 		}
 
 

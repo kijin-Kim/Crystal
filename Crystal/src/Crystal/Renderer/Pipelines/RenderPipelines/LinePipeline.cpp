@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "LinePipeline.h"
 #include "Crystal\Renderer\Renderer.h"
+#include "Crystal\Resources\ResourceManager.h"
 
 namespace Crystal {
 
@@ -65,8 +66,8 @@ namespace Crystal {
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		
 
-		auto& shaderManager = ShaderManager::Instance();
-		auto& ShaderDatablobs = shaderManager.GetShader("SimpleColorShader")->GetRaw();
+		auto& resourceManager = ResourceManager::Instance();
+		auto& ShaderDatablobs = resourceManager.GetShader("SimpleColorShader")->GetRaw();
 		pipelineStateStream.VS = { ShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
 			ShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		pipelineStateStream.PS = { ShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
@@ -133,7 +134,7 @@ namespace Crystal {
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			commandList->SetGraphicsRootDescriptorTable(1, gpuHandle);
-			auto* renderable = collisionComponents[i]->GetRenderable();
+			auto renderable = collisionComponents[i]->GetRenderable();
 			for(int j = 0; j < renderable->GetVertexbufferCount(); j++)
 				renderable->Render(commandList, j);
 

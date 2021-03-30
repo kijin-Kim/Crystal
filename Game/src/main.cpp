@@ -8,6 +8,8 @@
 #include "actors/TestPawn.h"
 #include "actors/Kraken.h"
 #include "actors\Aestroid.h"
+#include "Crystal/Resources/ResourceManager.h"
+#include "Crystal/GamePlay/Actors/SkyboxActor.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -25,8 +27,16 @@ public:
 
 	void Start() override
 	{
+		Crystal::Application::Start();
+
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+
+		resourceManager.LoadRenderableFromFile<Crystal::StaticMesh>("assets/models/SM_Frigate_BE2.fbx", "Frigate");
+
+
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = m_World->SpawnActor<TestPawn>();
+		Crystal::SkyboxActor* skyboxActor = m_World->SpawnActor<Crystal::SkyboxActor>();
 		
 //		Kraken* kraken = m_World->SpawnActor<Kraken>();
 
@@ -49,23 +59,14 @@ public:
 		playerController.Possess(testPawn);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
 		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
-
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
 		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
-
 		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
 		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
-
 		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
 		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
-
-
-
 		playerController.AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
 		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
-
-		
-
 		playerController.EnableModeSwitching(true);
 
 		Crystal::ActionMapping fireActionMapping = {};

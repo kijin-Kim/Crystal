@@ -18,7 +18,7 @@ namespace Crystal {
 		cbvDesc.BufferLocation = m_Resource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = m_Size;
 
-		m_ConstantBufferView= AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		m_ConstantBufferView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		device->CreateConstantBufferView(&cbvDesc, m_ConstantBufferView.GetDescriptorHandle());
 
 		m_Resource->Map(0, nullptr, (void**)&m_CpuBasePtr);

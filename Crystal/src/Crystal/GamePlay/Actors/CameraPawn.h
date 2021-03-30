@@ -78,21 +78,21 @@ namespace Crystal {
 		void MoveForward(float value)
 		{
 			value *= 100000.0f;
-			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetForward(), { value, value, value });
+			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), { value, value, value });
 			m_MovementComponent->AddForce(force);
 		}
 
 		void MoveRight(float value)
 		{
 			value *= 100000.0f;
-			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetRight(), { value, value, value });
+			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalRightVector(), { value, value, value });
 			m_MovementComponent->AddForce(force);
 		}
 
 		void MoveUp(float value)
 		{
 			value *= 100000.0f;
-			DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetUp(), { value, value, value });
+			DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), { value, value, value });
 			m_MovementComponent->AddForce(force);
 		}
 
@@ -106,7 +106,7 @@ namespace Crystal {
 			CS_DEBUG_INFO("BeginFire!!");
 			auto start = m_MainComponent->GetWorldPosition();
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
-			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetForward(), maxDistance));
+			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), maxDistance));
 
 			Level* level = (Level*)GetParentObject();
 			level->DrawDebugLine(start, end);

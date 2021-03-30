@@ -42,7 +42,7 @@ namespace Crystal {
 
 
 
-	Descriptor DescriptorHeapManager::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType, UINT descriptorCount)
+	Descriptor DescriptorHeapManager::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 	{
 		switch (descriptorHeapType)
 		{

@@ -16,11 +16,27 @@ namespace Crystal {
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, translation);
 
 
-		/*Parent부터 자식 순으로 계산하여야 함*/
-		if (m_ParentComponent)
-			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
-		else
-			m_WorldTransform = m_LocalTransform;
+		UpdateTransfromHierarchy();
+
+	}
+
+
+	void TransformComponent::SetAttachment(TransformComponent* parentComponent)
+	{
+		/*서로가 서로의 Parent*/
+		CS_FATAL(parentComponent->GetParentComponent() != this, "Component : %s 와 Component : %s는 서로가 서로의 부모입니다.",
+			GetName().c_str(), parentComponent->GetName().c_str());
+		CS_FATAL(GetOwner()->GetMainComponent(), "MainComponent가 존재 하지 않습니다. 먼저 MainComponent를 지정해주세요.",
+			GetName().c_str());
+		CS_FATAL(GetOwner()->GetMainComponent() != this, "Component : %s 는 MainComponent입니다 Maincomponent는 다른 Component에 Attach 될 수 없습니다.",
+			GetName().c_str());
+
+		Actor* owner = GetOwner();
+		SetParentComponent(parentComponent);
+		m_ParentComponent->AddChildComponent(parentComponent);
+
+		/*현재 Component를 Transform Component Hierarchy로 이동시킵니다.*/
+		owner->MoveToTransformComponentHierarchy(this);
 	}
 
 	void TransformComponent::RotateRoll(float angle)
@@ -40,7 +56,6 @@ namespace Crystal {
 
 	void TransformComponent::RotatePitch(float angle)
 	{
-
 		angle = DirectX::XMConvertToRadians(angle);
 
 		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitX, m_Rotation));

@@ -24,7 +24,7 @@ namespace Crystal {
 	{
 		friend class DescriptorObject;
 	public:
-		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType, UINT descriptorCount);
+		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType);
 	private:
 		DescriptorHeapManager();
 		~DescriptorHeapManager() = default;
@@ -48,10 +48,11 @@ namespace Crystal {
 		DescriptorObject() { if (!s_DescriptorHeapManager) s_DescriptorHeapManager = new DescriptorHeapManager(); }
 		virtual ~DescriptorObject() = default;
 
+
 	protected:
-		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType, UINT descriptorCount)
+		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 		{
-			return s_DescriptorHeapManager->AllocateDescriptor(descriptorHeapType, descriptorCount);
+			return s_DescriptorHeapManager->AllocateDescriptor(descriptorHeapType);
 		}
 	private:
 		static DescriptorHeapManager* s_DescriptorHeapManager;

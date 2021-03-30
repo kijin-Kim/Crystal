@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "LightingPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -77,8 +78,8 @@ namespace Crystal {
 			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 
-			auto& shaderManager = ShaderManager::Instance();
-			auto& shaderDatablobs = shaderManager.GetShader("PBRShader_Static")->GetRaw();
+			auto& resourceManager = ResourceManager::Instance();
+			auto& shaderDatablobs = resourceManager.GetShader("PBRShader_Static")->GetRaw();
 			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), 
 				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), 
@@ -191,8 +192,8 @@ namespace Crystal {
 			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 
-			auto& shaderManager = ShaderManager::Instance();
-			auto& shaderDatablobs = shaderManager.GetShader("PBRShader_Skeletal")->GetRaw();
+			auto& resourceManager = ResourceManager::Instance();
+			auto& shaderDatablobs = resourceManager.GetShader("PBRShader_Skeletal")->GetRaw();
 			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), 
 				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), 
@@ -284,9 +285,10 @@ namespace Crystal {
 			
 
 
-			const StaticMesh* staticMesh = (StaticMesh*)staticMeshComponents[i]->GetRenderable();
+			
+			auto staticMesh = std::static_pointer_cast<StaticMesh>(staticMeshComponents[i]->GetRenderable());
 
-			auto materials = staticMesh->GetMaterials();
+			auto materials = staticMeshComponents[i]->GetMaterials();
 			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
 				if (!materials[j])
@@ -377,7 +379,7 @@ namespace Crystal {
 		{
 			SkeletalMeshPerObjectData skeletalMeshPerObjectData = {};
 
-			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
+			auto skeletalMesh = std::static_pointer_cast<SkeletalMesh>(skeletalMeshComponents[i]->GetRenderable());
 
 			skeletalMeshPerObjectData.World = Matrix4x4::Transpose(skeletalMeshComponents[i]->GetWorldTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
@@ -390,7 +392,7 @@ namespace Crystal {
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-			auto materials = skeletalMesh->GetMaterials();
+			auto materials = skeletalMeshComponents[i]->GetMaterials();
 			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
 				if (!materials[j])
@@ -490,8 +492,8 @@ namespace Crystal {
 			commandList->SetGraphicsRootDescriptorTable(2, staticMeshDescriptorHeapHandle); // PerObject
 			staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			StaticMesh* staticMesh = (StaticMesh*)staticMeshComponents[i]->GetRenderable();
-			auto materials = staticMesh->GetMaterials();
+			auto staticMesh = std::static_pointer_cast<StaticMesh>(staticMeshComponents[i]->GetRenderable());
+			auto materials = staticMeshComponents[i]->GetMaterials();
 			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
 				if (materials[j])
@@ -523,8 +525,8 @@ namespace Crystal {
 			commandList->SetGraphicsRootDescriptorTable(2, skeletalMeshDescriptorHeapHandle); // PerObject
 			skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			SkeletalMesh* skeletalMesh = (SkeletalMesh*)skeletalMeshComponents[i]->GetRenderable();
-			auto materials = skeletalMesh->GetMaterials();
+			auto skeletalMesh = std::static_pointer_cast<SkeletalMesh>(skeletalMeshComponents[i]->GetRenderable());
+			auto materials = skeletalMeshComponents[i]->GetMaterials();
 			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
 			{
 				if (materials[j])

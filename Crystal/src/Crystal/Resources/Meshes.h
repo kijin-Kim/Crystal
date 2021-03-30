@@ -73,14 +73,6 @@ namespace Crystal {
 		std::vector<UINT> Indices;
 	};
 
-	struct PositionSubMesh : public SubMesh
-	{
-		PositionSubMesh(aiMesh* mesh);
-		virtual ~PositionSubMesh() = default;
-
-		std::vector<PositionVertex> PositionVertices;
-	};
-
 	struct StaticSubMesh : public SubMesh
 	{
 		StaticSubMesh(aiMesh* mesh);
@@ -100,47 +92,28 @@ namespace Crystal {
 	class Mesh : public Renderable
 	{
 	public:
+		Mesh() = default;
 		Mesh(const std::string& filePath);
 		virtual ~Mesh();
 
-		void SetMaterial(std::shared_ptr<Material> material, int index = 0) { m_Materials[index] = std::move(material); }
-		Material* GetMaterial(int index = 0) const 
-		{ 
-			if (!m_Materials[index])
-				CS_FATAL(false, "%s번째 Material이 존재 하지 않습니다.", index);
-			return m_Materials[index].get(); 
-		}
-
-		const std::array<std::shared_ptr<Material>, 5>& GetMaterials() const { return m_Materials; }
-
 	private:
-		virtual void ProcessNode(aiNode* rootNode, const aiScene* scene) = 0;
+		virtual void ProcessNode(aiNode* rootNode, const aiScene* scene) {};
 
 	protected:
 		std::vector <std::unique_ptr<SubMesh>> m_Submeshes;
-		std::array<std::shared_ptr<Material>, 5> m_Materials;
-
 		const aiScene* m_MeshScene = nullptr;
 
 	private:
-		Assimp::Importer* m_Importer;
+		Assimp::Importer* m_Importer = nullptr;
 
 	};
 
-
-	class PositionMesh : public Mesh
-	{
-	public:
-		PositionMesh(const std::string& filePath);
-		~PositionMesh() override = default;
-
-		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
-	};
 
 	/*SubMesh들의 컨테이너 입니다.*/
 	class StaticMesh : public Mesh
 	{
 	public:
+		StaticMesh() = default;
 		StaticMesh(const std::string& filePath);
 		~StaticMesh() override = default;
 	private:
@@ -150,6 +123,7 @@ namespace Crystal {
 	class SkeletalMesh : public Mesh 
 	{
 	public:
+		SkeletalMesh() = default;
 		SkeletalMesh(const std::string& meshFilePath, const std::string& animationFilePath = "");
 		~SkeletalMesh() override;
 

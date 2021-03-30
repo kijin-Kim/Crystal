@@ -151,7 +151,7 @@ namespace Crystal {
 		}
 
 
-		m_ShaderResourceView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		m_ShaderResourceView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		device->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
 	}
 
@@ -179,7 +179,7 @@ namespace Crystal {
 			break;
 		}
 
-		m_UnorderedAccessView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		m_UnorderedAccessView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		device->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
 
 	}
@@ -196,7 +196,7 @@ namespace Crystal {
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
 
-		m_RenderTargetView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
+		m_RenderTargetView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		device->CreateRenderTargetView(m_Resource.Get(), &rtvDesc, m_RenderTargetView.GetDescriptorHandle());
 	}
 
@@ -212,7 +212,7 @@ namespace Crystal {
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 		dsvDesc.Texture2D.MipSlice = 0;
 
-		m_DepthStencilView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+		m_DepthStencilView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		device->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
 	}
 
