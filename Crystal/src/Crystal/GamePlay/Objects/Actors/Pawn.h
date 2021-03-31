@@ -30,5 +30,7 @@ namespace Crystal {
 		virtual void SetupInputComponent(InputComponent* inputComponent)
 		{
 		}
+
+		STATIC_TYPE_IMPLE(Pawn)
 	};
 }

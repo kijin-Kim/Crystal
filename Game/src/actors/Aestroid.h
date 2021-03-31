@@ -12,6 +12,8 @@ public:
 		m_MainComponent = boundingSphereComponent;
 	}
 	~Asteroid() override = default;
+
+	STATIC_TYPE_IMPLE(Asteroid)
 };
 
 class RandomBox : public Crystal::Actor
@@ -40,4 +42,6 @@ public:
 		m_MainComponent->RotatePitch(yAngle);
 		m_MainComponent->RotateYaw(zAngle);
 	}
+
+	STATIC_TYPE_IMPLE(RandomBox)
 };

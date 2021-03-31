@@ -17,6 +17,11 @@ namespace Crystal {
 		auto& renderer = Renderer::Instance();
 		renderer.Init(m_Window);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
+
+		m_World = Object::CreateUniqueObject<World>();
+		m_World->SetObjectName("DefaultWorld");
+		m_World->CreateNewLevel("DefaultLevel");
+		m_World->OnCreate();
 	}
 
 	void Application::Run()

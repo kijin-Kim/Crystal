@@ -111,6 +111,8 @@ namespace Crystal {
 			level->DrawDebugLine(start, end);
 		}
 
+
+		STATIC_TYPE_IMPLE(CameraPawn)
 	private:
 		MovementComponent* m_MovementComponent = nullptr;
 	};

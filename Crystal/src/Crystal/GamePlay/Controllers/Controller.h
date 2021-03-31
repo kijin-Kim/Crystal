@@ -13,5 +13,7 @@ namespace Crystal {
 		virtual void Possess(Pawn* pawn) {}
 
 		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
+
+		STATIC_TYPE_IMPLE(Controller)
 	};
 }

@@ -119,6 +119,8 @@ namespace Crystal {
 			}
 		}
 
+
+		STATIC_TYPE_IMPLE(PhysicsSystem)
 	private:
 		// Actor Has OwnerShip
 		std::vector<RayComponent*> m_RayComponents;
@@ -151,13 +153,14 @@ namespace Crystal {
 		}
 
 		template<class T>
-		T* SpawnActor(const std::string& name)
+		T* SpawnActor(const std::string& name = "")
 		{
 			// Create new actor
-			auto newActor = std::make_unique<T>();
+			auto newActor = Object::CreateUniqueObject<T>();
 			newActor->SetObjectOwner(this, ObjectOwnerType::OOT_Level);
 			newActor->SetObjectOwner(GetObjectOwner(ObjectOwnerType::OOT_World), ObjectOwnerType::OOT_World);
-			newActor->SetObjectName(name);
+			if(!name.empty())
+				newActor->SetObjectName(name);
 			newActor->Begin();
 
 			auto rawReturnActor = newActor.get(); // Get raw pointer before move
@@ -170,7 +173,7 @@ namespace Crystal {
 		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
 			const DirectX::XMFLOAT3& color = { 0.0f, 1.0f, 0.0f })
 		{
-			LineActor* debugLineActor = SpawnActor<LineActor>("DebugLineActor");
+			LineActor* debugLineActor = SpawnActor<LineActor>();
 			auto lineComponent = debugLineActor->GetLineComponent();
 
 			const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
@@ -187,7 +190,7 @@ namespace Crystal {
 		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
 			const DirectX::XMFLOAT3& color = { 0.0f, 1.0f, 0.0f })
 		{
-			LineActor* debugLineActor = SpawnActor<LineActor>("DebugLineActor");
+			LineActor* debugLineActor = SpawnActor<LineActor>();
 			auto lineComponent = debugLineActor->GetLineComponent();
 			lineComponent->SetOrigin(origin);
 			lineComponent->SetDirection(direction);
@@ -199,7 +202,7 @@ namespace Crystal {
 		{			
 			//m_PhysicsSystem->RegisterCollisionComponent(component);
 		}
-
+		STATIC_TYPE_IMPLE(Level)
 	private:
 		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
 		std::vector<std::unique_ptr<Actor>> m_Actors;
@@ -269,6 +272,7 @@ namespace Crystal {
 				level->Update(deltaTime);
 		}
 
+		STATIC_TYPE_IMPLE(World)
 	private:
 		std::vector<std::unique_ptr<Level>> m_Levels;
 	};

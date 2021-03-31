@@ -62,6 +62,7 @@ namespace Crystal {
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
+		STATIC_TYPE_IMPLE(PlayerController)
 	private:
 
 		/*유저 인터페이스 인풋*/

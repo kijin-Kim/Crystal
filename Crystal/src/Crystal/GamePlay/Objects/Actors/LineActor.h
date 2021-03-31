@@ -24,6 +24,8 @@ namespace Crystal {
 
 		RayComponent* GetLineComponent() const { return m_DebugLineComponent; }
 
+
+		STATIC_TYPE_IMPLE(LineActor)
 	private:
 		RayComponent* m_DebugLineComponent = nullptr;
 	};

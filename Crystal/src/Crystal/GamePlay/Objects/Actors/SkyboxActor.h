@@ -16,5 +16,8 @@ namespace Crystal {
 		}
 
 		~SkyboxActor() override = default;
+
+
+		STATIC_TYPE_IMPLE(SkyboxActor)
 	};
 }

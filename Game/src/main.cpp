@@ -19,10 +19,6 @@ class GameApplication : public Crystal::Application
 public:
 	GameApplication(HINSTANCE hIsntance, int width, int height) : Crystal::Application(hIsntance, width, height)
 	{
-		/*디폴트 월드*/
-		m_World = std::make_unique<Crystal::World>();
-		m_World->SetObjectName("DefaultWorld");
-		m_World->CreateNewLevel("DefaultLevel");
 	}
 
 	void Start() override
@@ -68,24 +64,24 @@ public:
 		auto defaultLevel = m_World->GetLevelByName("DefaultLevel");
 
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		TestPawn* testPawn = m_World->SpawnActor<TestPawn>("TestPawn");
-		Crystal::SkyboxActor* skyboxActor = m_World->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
+		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
+		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
 
-		//Kraken* kraken = m_World->SpawnActor<Kraken>("Kraken");
+		//Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
 
 		for (int i = -10; i < 10; i++)
 		{
-			Asteroid* asteroid = m_World->SpawnActor<Asteroid>("Asteroid");
+			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
 			asteroid->SetPosition({ 3000.0f * i, 0.0f, 0.0f });
 		}
 
 		for (int i = -10; i < 10; i++)
 		{
-			RandomBox* randomBox = m_World->SpawnActor<RandomBox>("RandomBox");
+			RandomBox* randomBox = defaultLevel->SpawnActor<RandomBox>();
 			randomBox->SetPosition({ 3000.0f * i, 3000.0f, 0.0f });
 		}
 
-		/*Crystal::CameraPawn* cameraPawn = m_World->SpawnActor<Crystal::CameraPawn>();*/
+		/*Crystal::CameraPawn* cameraPawn = defaultLevel->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/
 		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
 		playerController.Possess(testPawn);
@@ -117,7 +113,6 @@ public:
 
 private:
 	Crystal::Timer m_MainTimer;
-	std::unique_ptr<Crystal::World> m_World;
 };
 
 Register_Application(GameApplication, WINDOW_WIDTH, WINDOW_HEIGHT);

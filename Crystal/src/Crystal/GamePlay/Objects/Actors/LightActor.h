@@ -14,6 +14,8 @@ namespace Crystal {
 
 		LightComponent* GetLightComponent() const { return m_LightComponent; }
 
+
+		STATIC_TYPE_IMPLE(LightActor)
 	protected:
 		LightComponent* m_LightComponent = nullptr;
 	};
@@ -26,5 +28,7 @@ namespace Crystal {
 			m_LightComponent = CreateComponent<Crystal::DirectionalLightComponent>("DirectionalLightComponent");
 		}
 		~DirectionalLightActor() override = default;
+
+		STATIC_TYPE_IMPLE(DirectionalLightActor)
 	};
 }

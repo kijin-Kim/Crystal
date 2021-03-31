@@ -36,11 +36,13 @@ namespace Crystal {
 
 		virtual void OnUpdate() {}
 
-		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	
 	private:
 		bool m_bShouldRun = true;
 		WindowsWindow* m_Window;
+
+	protected:
+		std::unique_ptr<Crystal::World> m_World;
 	};
 
 	Application* CreateApplication(HINSTANCE hInstance);

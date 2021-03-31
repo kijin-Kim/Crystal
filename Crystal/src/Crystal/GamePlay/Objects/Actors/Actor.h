@@ -32,6 +32,7 @@ namespace Crystal {
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
 
+		STATIC_TYPE_IMPLE(Actor)
 	protected:
 		/*Component를 생성하고 Register합니다.*/
 		template <class T>
