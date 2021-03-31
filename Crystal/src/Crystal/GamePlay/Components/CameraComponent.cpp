@@ -6,7 +6,7 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 namespace Crystal {
-	CameraComponent::CameraComponent(const std::string& name) : TransformComponent(name)
+	CameraComponent::CameraComponent()
 	{
 		Renderer& renderer = Renderer::Instance();
 		int resolutionWidth = renderer.GetResolutionWidth();

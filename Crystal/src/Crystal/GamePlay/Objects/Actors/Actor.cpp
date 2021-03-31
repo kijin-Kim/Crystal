@@ -21,12 +21,12 @@ namespace Crystal {
 		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(),
 			[component](const std::unique_ptr<Component>& com)->bool {return com.get() == component; }))
 		{
-			CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetName().c_str());
+			CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetObjectName().c_str());
 			return;
 		}
 		m_Components.emplace_back(component);
 
-		CS_DEBUG_INFO("Component : %s Registered", component->GetName().c_str());
+		CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
 	}
 
 	void Actor::UnRegisterComponent(Component* component)
@@ -36,12 +36,12 @@ namespace Crystal {
 			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
 		if (it == m_Components.end())
 		{
-			CS_WARN("삭제하려는 Component : %s 가 존재하지 않습니다", component->GetName().c_str());
+			CS_WARN("삭제하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
 			return;
 		}
 
 		/*erase_copy를 방지하기 위하여 맨 뒤에 원소를 앞으로 보냅니다.*/
-		CS_DEBUG_INFO("Component : %s Unregistered", component->GetName().c_str());
+		CS_DEBUG_INFO("Component : %s Unregistered", component->GetObjectName().c_str());
 		m_Components.back().swap(*it);
 		m_Components.erase(m_Components.end() - 1);
 	}
@@ -52,7 +52,7 @@ namespace Crystal {
 		if (m_TransformHierarchy.end() != std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component; }))
 		{
-			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다", component->GetName().c_str());
+			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다", component->GetObjectName().c_str());
 			return;
 		}
 
@@ -61,7 +61,7 @@ namespace Crystal {
 			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
 		if (componentIt == m_Components.end())
 		{
-			CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetName().c_str());
+			CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
 			return;
 		}
 
@@ -89,7 +89,7 @@ namespace Crystal {
 			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), std::move(moveDestination));
 		}
 
-		CS_DEBUG_INFO("Component : %s Moved", component->GetName().c_str());
+		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
 	}
 
 	void Actor::SetPosition(const DirectX::XMFLOAT3& position)

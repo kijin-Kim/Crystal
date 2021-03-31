@@ -12,7 +12,7 @@ namespace Crystal {
 	class InputComponent : public Component
 	{
 	public:
-		InputComponent(const std::string& name) : Component(name) {};
+		InputComponent() = default;
 		virtual ~InputComponent() = default;
 
 		void BindAxis(const std::string& axisName, const std::function<void(float value)>& function);
@@ -26,6 +26,9 @@ namespace Crystal {
 		/*커서를 바인딩 하기전 바인딩할 위치를 지정합니다.*/
 		void ReadyCursorBinding() { GetCursorPos(&m_BindPosition); }
 		void ShowCursor(bool bShowCursor) { m_bIsCursorVisible = bShowCursor; }
+
+
+		STATIC_TYPE_IMPLE(InputComponent)
 
 	private:
 		bool processAxisMappedInput(int64_t keyCode, float axisValue);

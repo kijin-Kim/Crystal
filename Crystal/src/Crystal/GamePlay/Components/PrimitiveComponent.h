@@ -23,7 +23,7 @@ namespace Crystal {
 		};
 
 	public:
-		PrimitiveComponent(const std::string& name) : TransformComponent(name)
+		PrimitiveComponent()
 		{
 			m_PrimitiveComponentType = EPrimitiveComponentType::None;
 		}
@@ -46,6 +46,7 @@ namespace Crystal {
 
 		EPrimitiveComponentType GetPrimitiveComponentType() const { return m_PrimitiveComponentType; }
 
+		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
 		std::shared_ptr<Renderable> m_Renderable = nullptr;
 		EPrimitiveComponentType m_PrimitiveComponentType;

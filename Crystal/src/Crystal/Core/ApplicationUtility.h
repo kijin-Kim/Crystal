@@ -21,6 +21,6 @@ namespace Crystal {
 
 	private:
 		static LayerStack s_LayerStack;
-		static PlayerController s_PlayerController;
+		static PlayerController* s_PlayerController;
 	};
 }

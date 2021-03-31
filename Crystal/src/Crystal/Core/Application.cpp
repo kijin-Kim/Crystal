@@ -18,10 +18,10 @@ namespace Crystal {
 		renderer.Init(m_Window);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
 
-		m_World = Object::CreateUniqueObject<World>();
+		m_World = std::make_shared<World>();
+		m_World->OnCreate();
 		m_World->SetObjectName("DefaultWorld");
 		m_World->CreateNewLevel("DefaultLevel");
-		m_World->OnCreate();
 	}
 
 	void Application::Run()

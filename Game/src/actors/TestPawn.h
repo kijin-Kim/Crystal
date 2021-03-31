@@ -125,14 +125,13 @@ public:
 	void BeginFire()
 	{
 		CS_DEBUG_INFO("BeginFire!!");
-
-		Crystal::Level* level = (Crystal::Level*)GetObjectOwner(ObjectOwnerType::OOT_Level);
-
 		const auto start = m_CameraComponent->GetWorldPosition();
 		const auto direction = m_CameraComponent->GetWorldForwardVector();
 		const float maxDistance = 1000000.0f;
 
-		level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
+		auto level = Crystal::Cast<Crystal::Level>(GetObjectOwner(ObjectOwnerType::OOT_Level));
+		if (level)
+			level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
 	}
 
 private:

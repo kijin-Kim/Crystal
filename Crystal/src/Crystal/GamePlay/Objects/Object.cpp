@@ -3,8 +3,8 @@
 
 namespace Crystal {
 
-	Object::ObjectCountTracker Object::s_ObjectCountTracker;
-	Object::ObjectNameTracker Object::s_ObjectNameTracker;
+	Object::ObjectCountTracker Object::s_ObjectCreationCountTracker;
+ 	Object::ObjectNameTracker Object::s_ObjectNameTracker;
 }
 
 

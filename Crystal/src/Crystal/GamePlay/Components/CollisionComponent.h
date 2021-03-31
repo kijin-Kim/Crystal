@@ -9,7 +9,7 @@ namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
 	{
 	public:
-		CollisionComponent(const std::string& name) : PrimitiveComponent(name)
+		CollisionComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::Collision);
 		}
@@ -24,6 +24,7 @@ namespace Crystal {
 
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
+		STATIC_TYPE_IMPLE(CollisionComponent)
 	private:
 		DirectX::XMFLOAT3 m_Color = { 1.0f, 1.0f, 0.0f };
 	protected:
@@ -33,7 +34,7 @@ namespace Crystal {
 	class RayComponent : public CollisionComponent
 	{
 	public:
-		RayComponent(const std::string& name) : CollisionComponent(name)
+		RayComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::Ray);
 
@@ -75,6 +76,8 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetDirection() const { return m_Direction; }
 		float GetMaxDistance() const { return m_MaxDistance; }
 
+
+		STATIC_TYPE_IMPLE(RayComponent)
 	private:
 
 		DirectX::XMFLOAT3 m_Origin = { 0.0f, 0.0f, 0.0f };
@@ -85,7 +88,7 @@ namespace Crystal {
 	class BoundingBoxComponent : public CollisionComponent
 	{
 	public:
-		BoundingBoxComponent(const std::string& name) : CollisionComponent(name)
+		BoundingBoxComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingBox);
 
@@ -116,6 +119,7 @@ namespace Crystal {
 			return worldBoundingBox;
 		}
 
+		STATIC_TYPE_IMPLE(BoundingBoxComponent)
 	private:
 		DirectX::BoundingBox m_BoundingBox = {};
 	};
@@ -123,7 +127,7 @@ namespace Crystal {
 	class BoundingOrientedBoxComponent : public CollisionComponent
 	{
 	public:
-		BoundingOrientedBoxComponent(const std::string& name) : CollisionComponent(name)
+		BoundingOrientedBoxComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox);
 			auto& resourceManager = ResourceManager::Instance();
@@ -161,6 +165,8 @@ namespace Crystal {
 			return m_BoundingOrientedBox;
 		}
 
+		STATIC_TYPE_IMPLE(BoundingOrientedBoxComponent)
+
 	private:
 		DirectX::BoundingOrientedBox m_BoundingOrientedBox = {};
 	};
@@ -168,7 +174,7 @@ namespace Crystal {
 	class BoundingSphereComponent : public CollisionComponent
 	{
 	public:
-		BoundingSphereComponent(const std::string& name) : CollisionComponent(name)
+		BoundingSphereComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::BoundingSphere);
 			auto& resourceManager = ResourceManager::Instance();
@@ -195,6 +201,7 @@ namespace Crystal {
 			return worldBoundingSphere;
 		}
 
+		STATIC_TYPE_IMPLE(BoundingSphereComponent)
 	private:
 		DirectX::BoundingSphere m_BoundingSphere = {};
 	};

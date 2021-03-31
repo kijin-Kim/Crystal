@@ -5,6 +5,7 @@
 namespace Crystal {
 	void PrimitiveComponent::OnCreate()
 	{
+		TransformComponent::OnCreate();
 		Renderer::Instance().RegisterRenderComponent(this);
 	}
 }

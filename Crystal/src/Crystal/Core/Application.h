@@ -42,7 +42,7 @@ namespace Crystal {
 		WindowsWindow* m_Window;
 
 	protected:
-		std::unique_ptr<Crystal::World> m_World;
+		std::shared_ptr<World> m_World;
 	};
 
 	Application* CreateApplication(HINSTANCE hInstance);

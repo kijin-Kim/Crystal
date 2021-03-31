@@ -36,12 +36,15 @@ namespace Crystal {
 	protected:
 		/*Component를 생성하고 Register합니다.*/
 		template <class T>
-		T* CreateComponent(const std::string& name)
+		T* CreateComponent(const std::string& name = "")
 		{
 			/*TODO : Component만 받게 체크...*/
-			T* newComponent = new T(name);
+			T* newComponent = new T();
 			RegisterComponent(newComponent);
 			newComponent->OnCreate();
+			if (!name.empty())
+				newComponent->SetObjectName(name);
+			
 			return newComponent;
 		}
 	protected:

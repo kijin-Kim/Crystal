@@ -6,7 +6,7 @@ namespace Crystal {
 	class SpringArmComponent final : public TransformComponent
 	{
 	public:
-		SpringArmComponent(const std::string& name) : TransformComponent(name)
+		SpringArmComponent()
 		{
 		}
 		~SpringArmComponent() override = default;
@@ -47,6 +47,8 @@ namespace Crystal {
 
 		void SetSpringConstant(const float springConstant) { m_SpirngConstant = springConstant; }
 		void SetOffsetPosition(const DirectX::XMFLOAT3& offset) { m_OffsetPosition = offset; }
+
+		STATIC_TYPE_IMPLE(SpringArmComponent)
 
 	private:
 		float m_SpirngConstant = 50.0f;

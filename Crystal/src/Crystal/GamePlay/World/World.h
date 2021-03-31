@@ -136,7 +136,7 @@ namespace Crystal {
 		{
 			m_PhysicsSystem = std::make_unique<PhysicsSystem>();
 			m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
-			m_PhysicsSystem->SetObjectOwner(this, ObjectOwnerType::OOT_Level);
+			m_PhysicsSystem->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_Level);
 		}
 		~Level() override = default;
 
@@ -156,8 +156,9 @@ namespace Crystal {
 		T* SpawnActor(const std::string& name = "")
 		{
 			// Create new actor
-			auto newActor = Object::CreateUniqueObject<T>();
-			newActor->SetObjectOwner(this, ObjectOwnerType::OOT_Level);
+			auto newActor = std::make_shared<T>();
+			newActor->OnCreate();
+			newActor->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_Level);
 			newActor->SetObjectOwner(GetObjectOwner(ObjectOwnerType::OOT_World), ObjectOwnerType::OOT_World);
 			if(!name.empty())
 				newActor->SetObjectName(name);
@@ -205,7 +206,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(Level)
 	private:
 		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
-		std::vector<std::unique_ptr<Actor>> m_Actors;
+		std::vector<std::shared_ptr<Actor>> m_Actors;
 	};
 
 	class World : public Updatable
@@ -236,11 +237,13 @@ namespace Crystal {
 			return m_Levels[0]->SpawnActor<T>(name);
 		}
 
-		Level* CreateNewLevel(const std::string& name)
+		Level* CreateNewLevel(const std::string& name = "")
 		{
-			auto level = std::make_unique<Level>();
-			level->SetObjectName(name);
-			level->SetObjectOwner(this, ObjectOwnerType::OOT_World);
+			auto level = std::make_shared<Level>();
+			level->OnCreate();
+			if(!name.empty())
+				level->SetObjectName(name);
+			level->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_World);
 
 			m_Levels.push_back(std::move(level));
 
@@ -249,7 +252,7 @@ namespace Crystal {
 
 		Level* GetLevelByName(const std::string& name)
 		{
-			auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [name](const std::unique_ptr<Level>& level)->bool
+			auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [name](const std::shared_ptr<Level>& level)->bool
 				{
 					return level->GetObjectName() == name;
 				}
@@ -274,6 +277,6 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(World)
 	private:
-		std::vector<std::unique_ptr<Level>> m_Levels;
+		std::vector<std::shared_ptr<Level>> m_Levels;
 	};
 }

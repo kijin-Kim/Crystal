@@ -7,10 +7,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 	class TransformComponent : public Component
 	{
 	public:
-		TransformComponent(const std::string& name) : Component(name)
-		{
-		}
-
+		TransformComponent() = default;
 		~TransformComponent() override = default;
 
 		void Update(const float deltaTime) override;
@@ -76,6 +73,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 
 		const DirectX::XMFLOAT4& GetRotation() const { return m_Rotation; }
 
+
+		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
 		TransformComponent* m_ParentComponent = nullptr;

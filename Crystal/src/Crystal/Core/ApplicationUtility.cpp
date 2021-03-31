@@ -4,7 +4,7 @@
 
 namespace Crystal {
 	LayerStack ApplicationUtility::s_LayerStack;
-	PlayerController ApplicationUtility::s_PlayerController;
+	PlayerController* ApplicationUtility::s_PlayerController = nullptr;
 
 	LayerStack& ApplicationUtility::GetLayerStack()
 	{
@@ -23,6 +23,8 @@ namespace Crystal {
 
 	PlayerController& ApplicationUtility::GetPlayerController()
 	{
-		return s_PlayerController;
+		if (s_PlayerController == nullptr)
+			s_PlayerController = new PlayerController();
+		return *s_PlayerController;
 	}
 }

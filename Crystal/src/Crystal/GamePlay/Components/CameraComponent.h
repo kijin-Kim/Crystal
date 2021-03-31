@@ -13,7 +13,7 @@ namespace Crystal {
 	class CameraComponent : public TransformComponent
 	{
 	public:
-		CameraComponent(const std::string& name);
+		CameraComponent();
 		virtual ~CameraComponent() = default;
 
 		void Update(const float deltaTime) override;
@@ -30,6 +30,8 @@ namespace Crystal {
 
 		/*VP와 InverseVP의 값은 매 프레임마다 Update가 불린 직후 어떠한 속성도 바뀌지 않았을 때만 보장됩니다.*/
 		const DirectX::XMFLOAT4X4& GetViewProjection() const { return m_ViewProjection; }
+
+		STATIC_TYPE_IMPLE(CameraComponent)
 
 	private:
 		void computeViewProjection();

@@ -6,24 +6,19 @@
 #include "Crystal/Resources/Renderable.h"
 
 namespace Crystal {
-	class Component
+	class Component : public Updatable
 	{
 	public:
-		explicit Component(const std::string& name) : m_Name(name) {}
-		virtual ~Component() = default;
-
-		virtual void OnCreate() {};
-
-		virtual void Update(const float deltaTime) {}
+		Component() = default;
+		~Component() override = default;
 
 		void SetOwner(Actor* owner) { m_Owner = owner; }
-
 		Actor* GetOwner() const { if (!m_Owner) CS_WARN("Owner가 nullptr입니다"); return m_Owner; }
-		const std::string& GetName() const { return m_Name; }
+
+		STATIC_TYPE_IMPLE(Component)
 
 	private:
 		/*OwnerShip을 가지고 있지 않음*/
 		Actor* m_Owner = nullptr;
-		std::string m_Name;
 	};
 }

@@ -5,7 +5,7 @@ namespace Crystal {
 	class MovementComponent final : public Component
 	{
 	public:
-		explicit MovementComponent(const std::string& name) : Component(name) {}
+		MovementComponent() = default;
 		~MovementComponent() override = default;
 
 		void SetTargetComponent(TransformComponent* targetComponent) { m_TargetComponent = targetComponent; }
@@ -41,6 +41,8 @@ namespace Crystal {
 			m_ForceAccum = Vector3::Zero;
 		}
 
+
+		STATIC_TYPE_IMPLE(MovementComponent)
 	private:
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 		TransformComponent* m_TargetComponent = nullptr;
