@@ -41,7 +41,7 @@ namespace Crystal {
 			compileShader(srcBlob, ShaderType::Compute);
 			bIsValidShader = true;
 		}
-		CS_FATAL(bIsValidShader, "%s 셰이더의 진입점을 찾을 수 없습니다",fileName.c_str());
+		CS_FATAL(bIsValidShader, "%s 셰이더의 진입점을 찾을 수 없습니다", fileName.c_str());
 		/* Crystal에서는 각각의 셰이더를 파싱할 때, 다음과 같은 prefix를 사용한 진입점을 요구합니다.
 		* 버텍스 셰이더 : vs
 		* 헐 셰이더 : hs
@@ -52,14 +52,12 @@ namespace Crystal {
 		*/
 
 		CS_INFO("%s 셰이더 불러오기 완료", fileName.c_str());
-
 	}
-
 
 	bool Shader::CheckInputValidation(const std::string& inputName, D3D_SHADER_INPUT_TYPE shaderInputType)
 	{
 		D3D12_SHADER_INPUT_BIND_DESC shaderInputBindDesc = {};
-		HRESULT hr = m_ShaderReflection->GetResourceBindingDescByName(inputName.c_str(),&shaderInputBindDesc);
+		HRESULT hr = m_ShaderReflection->GetResourceBindingDescByName(inputName.c_str(), &shaderInputBindDesc);
 		return SUCCEEDED(hr) && shaderInputBindDesc.Type == shaderInputType;
 	}
 
@@ -121,8 +119,6 @@ namespace Crystal {
 		entryPoint = staticShaderType + entryPoint;
 		compilationTarget = staticShaderType + compilationTarget;
 
-		
-		
 		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
 		HRESULT hr = D3DCompile(srcBlob->GetBufferPointer(), srcBlob->GetBufferSize(), nullptr, nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), compilationTarget.c_str(), compileFlag, 0, &m_ShaderDataBlobs[type], &errorBlob);
@@ -133,8 +129,6 @@ namespace Crystal {
 		}
 		CS_FATAL(SUCCEEDED(hr), "셰이더 컴파일에 실패하였습니다. %s", (char*)errorBlob->GetBufferPointer());
 
-
-		
 		hr = D3DReflect(m_ShaderDataBlobs[type]->GetBufferPointer(), m_ShaderDataBlobs[type]->GetBufferSize(), IID_PPV_ARGS(&m_ShaderReflection));
 		CS_FATAL(SUCCEEDED(hr), "셰이더 리플렉션을 실패하였습니다.");
 	}
@@ -160,5 +154,4 @@ namespace Crystal {
 			return false;
 		}
 	}
-
 }

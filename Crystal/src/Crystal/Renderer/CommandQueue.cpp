@@ -26,7 +26,7 @@ namespace Crystal {
 	{
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> d3d12CommandAllcator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> d3d12CommandList = nullptr;
-		
+
 		if (!m_CommandAllocatorQueue.empty() && IsExecutionCompleted(m_CommandAllocatorQueue.front().FenceValue))
 		{
 			d3d12CommandAllcator = m_CommandAllocatorQueue.front().CommandAlloctor;

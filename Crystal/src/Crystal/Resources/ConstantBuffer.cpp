@@ -22,7 +22,5 @@ namespace Crystal {
 		device->CreateConstantBufferView(&cbvDesc, m_ConstantBufferView.GetDescriptorHandle());
 
 		m_Resource->Map(0, nullptr, (void**)&m_CpuBasePtr);
-
-
 	}
 }

@@ -4,7 +4,6 @@
 #include "Crystal/Core/Logger.h"
 
 namespace Crystal {
-
 	class Texture final : public DescriptorObject
 	{
 	public:
@@ -34,7 +33,6 @@ namespace Crystal {
 			return m_RenderTargetView.GetDescriptorHandle();
 		}
 
-
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilView() const
 		{
 			if (m_DepthStencilView.IsNull())
@@ -49,7 +47,6 @@ namespace Crystal {
 			return m_UnorderedAccessView.GetDescriptorHandle();
 		}
 
-
 		ID3D12Resource* GetResource() { return m_Resource.Get(); }
 
 	public:
@@ -59,8 +56,4 @@ namespace Crystal {
 		Descriptor m_DepthStencilView = {};
 		Descriptor m_RenderTargetView = {};
 	};
-
-
-
-
 }

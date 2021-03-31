@@ -26,7 +26,7 @@ namespace Crystal {
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		/*윈도우 커서 카운팅 시스템에 따라 처리*/
-	
+
 		CURSORINFO cursorInfo = {};
 		cursorInfo.cbSize = sizeof(CURSORINFO);
 		GetCursorInfo(&cursorInfo);
@@ -39,7 +39,6 @@ namespace Crystal {
 		{
 			while (::ShowCursor(false) >= 0);
 		}
-		
 
 		/*액션 매핑을 처리합니다.*/
 		auto [keyCode, keyStatus] = getCrystalKeyCode(uMsg, wParam, lParam);
@@ -50,8 +49,6 @@ namespace Crystal {
 		processActionMappedInput(uMsg, mouseCodes.MouseY.first, lParam, EKeyEvent::KE_Pressed);
 		processActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
 		processActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
-
-
 
 		/*액시스 매핑을 처리합니다.*/
 		static UCHAR pKeysBuffer[256];
@@ -67,7 +64,6 @@ namespace Crystal {
 		processAxisMappedInput(mouseCodes.MouseY.first, mouseCodes.MouseY.second);
 		processAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
 		processAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
-
 
 		return false;
 	}
@@ -93,7 +89,6 @@ namespace Crystal {
 			}
 		}
 		return bHandledOnAxis;
-
 	}
 
 	bool InputComponent::processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
@@ -125,8 +120,6 @@ namespace Crystal {
 
 		return bHandledOnAction;
 	}
-
-
 
 	std::pair<int64_t, EKeyEvent> InputComponent::getCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -400,18 +393,18 @@ namespace Crystal {
 		{
 			POINT cursorPos = {};
 			GetCursorPos(&cursorPos);
-			
+
 			if (m_bShouldBindCursor)
 			{
 				m_LastPosition.x = m_BindPosition.x;
 				m_LastPosition.y = m_BindPosition.y;
 				SetCursorPos(m_LastPosition.x, m_LastPosition.y);
 			}
-			
+
 			POINT diffFromLast = {};
 			diffFromLast.x = cursorPos.x - m_LastPosition.x;
 			diffFromLast.y = cursorPos.y - m_LastPosition.y;
-				
+
 			m_LastPosition = cursorPos;
 
 			codes.MouseX = { Mouse::X, +(float)diffFromLast.x };
@@ -429,6 +422,5 @@ namespace Crystal {
 		}
 
 		return codes;
-
 	}
 }

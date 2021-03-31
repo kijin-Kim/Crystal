@@ -2,12 +2,11 @@
 #include "Material.h"
 
 namespace Crystal {
-
-	void Material::Set(const std::string& materialName, std::shared_ptr<Texture> texture)
+	void Material::Set(const std::string& materialName, std::weak_ptr<Texture> texture)
 	{
 		if (!m_Shader->CheckInputValidation(materialName, D3D_SIT_TEXTURE))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
-		
+
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
 		auto it = m_TextureInputs.find(materialName);
 		if (it != m_TextureInputs.end())
@@ -42,7 +41,7 @@ namespace Crystal {
 		auto it = m_FloatInputs.find(materialName);
 		if (it != m_FloatInputs.end())
 		{
-			it->second = {value.x, value.y, value.z, 0.0f};
+			it->second = { value.x, value.y, value.z, 0.0f };
 			return;
 		}
 		m_FloatInputs.emplace(materialName, DirectX::XMFLOAT4(value.x, value.y, value.z, 0.0f));
@@ -75,8 +74,7 @@ namespace Crystal {
 			it->second = { value, 0.0f, 0.0f, 0.0f };
 			return;
 		}
-		m_FloatInputs.emplace(materialName, DirectX::XMFLOAT4(value, 0.0f, 0.0f, 0.0f ));
-
+		m_FloatInputs.emplace(materialName, DirectX::XMFLOAT4(value, 0.0f, 0.0f, 0.0f));
 	}
 
 	void Material::Set(const std::string& materialName, const DirectX::XMINT4& value)
@@ -153,13 +151,13 @@ namespace Crystal {
 		m_BoolInputs.emplace(materialName, value);
 	}
 
-	Texture* Material::GetTextureInput(const std::string& textureName) const
+	std::shared_ptr<Texture> Material::GetTextureInput(const std::string& textureName) const
 	{
 		auto it = m_TextureInputs.find(textureName);
 		if (it == m_TextureInputs.end())
 			CS_FATAL(false, "%s의 Texture Input이 Set 되지 않았습니다.", textureName.c_str());
-		
-		return it->second.get();
+
+		return it->second.lock();
 	}
 
 	const DirectX::XMFLOAT4& Material::GetFloatInput(const std::string& floatName) const
@@ -188,5 +186,4 @@ namespace Crystal {
 
 		return it->second;
 	}
-
 }

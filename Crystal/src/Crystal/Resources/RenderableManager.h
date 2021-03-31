@@ -4,13 +4,12 @@
 #include "Renderable.h"
 
 namespace Crystal {
-
 	class RenderableManager
 	{
 		friend class ResourceManager;
 	private:
 		template<class T>
-		void loadFromFile(const std::string& filePath, const std::string& alias = "")
+		void createFromFile(const std::string& filePath, const std::string& alias = "")
 		{
 			std::string name;
 			name = alias.empty() ? filePath : alias;
@@ -20,12 +19,11 @@ namespace Crystal {
 				CS_FATAL(false, "%s이름을 가진 Renderable이 이미 존재합니다", name.c_str());
 			}
 
-			m_Meshes[name] = std::make_shared<T>(filePath.c_str());
+			m_Meshes[name] = std::make_shared<T>(filePath);
 		}
 
-
 		template<class T>
-		void load(const std::string& name)
+		void create(const std::string& name)
 		{
 			if (m_Meshes.find(name) != m_Meshes.end())
 			{
@@ -35,7 +33,7 @@ namespace Crystal {
 			m_Meshes[name] = std::make_shared<T>();
 		}
 
-		void unLoad(const std::string& name)
+		void destroy(const std::string& name)
 		{
 			auto it = m_Meshes.find(name);
 			if (it == m_Meshes.end())
@@ -43,9 +41,7 @@ namespace Crystal {
 			m_Meshes.erase(name);
 		}
 
-
-
-		const std::shared_ptr<Renderable>& getRenderable(const std::string& name)
+		const std::shared_ptr<Renderable>& get(const std::string& name)
 		{
 			auto it = m_Meshes.find(name);
 			if (it == m_Meshes.end())
@@ -53,7 +49,6 @@ namespace Crystal {
 			return m_Meshes[name];
 		}
 
-	
 	private:
 		RenderableManager() = default;
 		~RenderableManager() = default;
@@ -61,5 +56,4 @@ namespace Crystal {
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Renderable>> m_Meshes;
 	};
-
 }

@@ -5,7 +5,6 @@
 #include "Crystal/GamePlay/World/World.h"
 
 namespace Crystal {
-
 	void Actor::UpdateComponents(float deltaTime)
 	{
 		/*Non-Hierarchy Components + Main Component*/
@@ -19,8 +18,8 @@ namespace Crystal {
 	void Actor::RegisterComponent(Component* component)
 	{
 		component->SetOwner(this);
-		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(), 
-			[component](const std::unique_ptr<Component>& com)->bool {return com.get() == component;}))
+		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(),
+			[component](const std::unique_ptr<Component>& com)->bool {return com.get() == component; }))
 		{
 			CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetName().c_str());
 			return;
@@ -33,7 +32,7 @@ namespace Crystal {
 	void Actor::UnRegisterComponent(Component* component)
 	{
 		component->SetOwner(nullptr);
-		auto it = std::find_if(m_Components.begin(), m_Components.end(), 
+		auto it = std::find_if(m_Components.begin(), m_Components.end(),
 			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
 		if (it == m_Components.end())
 		{
@@ -50,7 +49,7 @@ namespace Crystal {
 	void Actor::MoveToTransformComponentHierarchy(TransformComponent* component)
 	{
 		/*Hierarchy에 이미 있는지 검사*/
-		if (m_TransformHierarchy.end() != std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(), 
+		if (m_TransformHierarchy.end() != std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component; }))
 		{
 			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다", component->GetName().c_str());
@@ -58,7 +57,7 @@ namespace Crystal {
 		}
 
 		/*Component 배열에서 Move할 컴포넌트를 찾음*/
-		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(), 
+		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),
 			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
 		if (componentIt == m_Components.end())
 		{
@@ -75,10 +74,8 @@ namespace Crystal {
 		/*Relase되고 남은 nullptr를 삭제합니다*/
 		m_Components.erase(m_Components.begin() + emptyMovedComponentIndex);
 
-		
-		
 		/*Transform Hierarchy에서의 위치를 찾아 삽입합니다..*/
-		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(), 
+		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component->GetParentComponent(); });
 		/*부모를 찾았을 시*/
 		if (it != m_TransformHierarchy.end())
@@ -99,5 +96,4 @@ namespace Crystal {
 	{
 		m_MainComponent->SetLocalPosition(position);
 	}
-
 }

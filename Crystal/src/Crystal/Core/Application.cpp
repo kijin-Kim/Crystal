@@ -40,7 +40,6 @@ namespace Crystal {
 			}
 			OnUpdate();
 			Renderer::Instance().Render();
-			
 		}
 	}
 
@@ -74,7 +73,7 @@ namespace Crystal {
 
 		/*IMGUI가 처리하지 않는 일부 데이터만 Application이 처리합니다.*/
 		ImGuiIO& io = ImGui::GetIO();
-		if(!io.WantCaptureKeyboard && !io.WantCaptureMouse)
+		if (!io.WantCaptureKeyboard && !io.WantCaptureMouse)
 			return ApplicationUtility::GetPlayerController().OnInputEvent(hWnd, uMsg, wParam, lParam);
 		return false;
 	}

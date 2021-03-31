@@ -18,7 +18,7 @@ namespace Crystal {
 		void BindAxis(const std::string& axisName, const std::function<void(float value)>& function);
 		void BindAction(const std::string& actionName, EKeyEvent keyEventType, const std::function<void(void)>& function);
 		void UnBindAction(const std::string& actionName, EKeyEvent keyEventType);
-		
+
 		bool ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		void BindCursor(bool bShouldBindCursor) { m_bShouldBindCursor = bShouldBindCursor; }
@@ -26,8 +26,6 @@ namespace Crystal {
 		/*커서를 바인딩 하기전 바인딩할 위치를 지정합니다.*/
 		void ReadyCursorBinding() { GetCursorPos(&m_BindPosition); }
 		void ShowCursor(bool bShowCursor) { m_bIsCursorVisible = bShowCursor; }
-		
-
 
 	private:
 		bool processAxisMappedInput(int64_t keyCode, float axisValue);

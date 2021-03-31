@@ -10,15 +10,15 @@ namespace Crystal {
 	{
 		friend class ResourceManager;
 	private:
-		void load(const std::string& fileName, const std::string& shaderName);
-		void unLoad(const std::string& shaderName);
+		void createFromFile(const std::string& fileName, const std::string& shaderName);
+		void destroy(const std::string& shaderName);
 
-		const std::shared_ptr<Shader>& getShader(const std::string& fileName)
-		{ 
+		const std::shared_ptr<Shader>& get(const std::string& fileName)
+		{
 			auto it = m_Shaders.find(fileName);
 			if (it == m_Shaders.end())
 				CS_FATAL(false, "Shader : %s를 찾을 수 없습니다.", fileName.c_str());
-			return m_Shaders[fileName]; 
+			return m_Shaders[fileName];
 		}
 
 	private:

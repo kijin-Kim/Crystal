@@ -39,7 +39,7 @@ namespace Crystal {
 	class PlayerController : public Controller
 	{
 	public:
-		PlayerController(Object* parent);
+		PlayerController();
 		virtual ~PlayerController() = default;
 
 		void AddAxisMapping(const std::string& axisName, int key, float scale);
@@ -52,7 +52,6 @@ namespace Crystal {
 		void ProcessPitchInput(float value);
 		void ProcessYawInput(float value);
 
-
 		void SetInputMode(EInputMode inputMode) { m_InputMode = inputMode; }
 		/*UI모드와 Game모드를 특정 키를 통하여 스위치 할 수 있게 합니다. 디폴트 오른쪽 마우스 키*/
 		void EnableModeSwitching(bool bEnable, int64_t keyCode = Crystal::Mouse::Right);
@@ -63,10 +62,8 @@ namespace Crystal {
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
-
-
 	private:
-		
+
 		/*유저 인터페이스 인풋*/
 		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
 		/*게임모드 인풋*/

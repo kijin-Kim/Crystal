@@ -4,9 +4,8 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-
-
-	PanoToCubemapPipeline::PanoToCubemapPipeline(const std::string& name) : ComputePipeline(name)
+	 PanoToCubemapPipeline::PanoToCubemapPipeline(const std::string& name, const std::shared_ptr<Shader>& shader)
+		 : ComputePipeline(name, shader)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
@@ -24,7 +23,6 @@ namespace Crystal {
 
 		CD3DX12_ROOT_PARAMETER1 rootParameters[1] = {};
 		rootParameters[0].InitAsDescriptorTable(_countof(descHeapRange), descHeapRange);
-
 
 		CD3DX12_STATIC_SAMPLER_DESC computeStaticSampler[1] = {};
 		computeStaticSampler[0].Init(0);
@@ -62,7 +60,6 @@ namespace Crystal {
 
 		panoToCubemapInputHandles[SourceTexture] = panoToCubemapPipelineInputs->SourceTexture->GetShaderResourceView();
 		panoToCubemapInputHandles[DestinationTexture] = panoToCubemapPipelineInputs->DestinationTexture->GetUnorderedAccessView();
-		
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		for (int i = 0; i < PANO_TO_CUBEMAP_INPUT_COUNT; i++)
@@ -70,7 +67,7 @@ namespace Crystal {
 			device->CopyDescriptorsSimple(1, handle, panoToCubemapInputHandles[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
-	
+
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetComputeRootSignature(m_RootSignature.Get());
 		ID3D12DescriptorHeap* equiToCubeHeaps[] = { m_DescriptorHeap.Get() };
@@ -82,7 +79,5 @@ namespace Crystal {
 		m_DestinationTextureHeight = destTextureDesc.Height;
 
 		commandList->Dispatch((UINT)(m_DestinationTextureWidth / 32), (UINT)(m_DestinationTextureHeight / 32), 6);
-
 	}
-
 }

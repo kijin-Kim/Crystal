@@ -2,7 +2,6 @@
 #include "TransformComponent.h"
 
 namespace Crystal {
-
 	void TransformComponent::Update(const float deltaTime)
 	{
 		Component::Update(deltaTime);
@@ -15,11 +14,8 @@ namespace Crystal {
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, translation);
 
-
 		UpdateTransfromHierarchy();
-
 	}
-
 
 	void TransformComponent::SetAttachment(TransformComponent* parentComponent)
 	{
@@ -44,7 +40,7 @@ namespace Crystal {
 		angle = DirectX::XMConvertToRadians(angle);
 
 		m_Forward = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitZ, m_Rotation));
-		
+
 		auto newQuat = Vector4::QuaternionRotationAxis(m_Forward, angle);
 
 		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(m_Up, newQuat));
@@ -53,13 +49,12 @@ namespace Crystal {
 		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
 	}
 
-
 	void TransformComponent::RotatePitch(float angle)
 	{
 		angle = DirectX::XMConvertToRadians(angle);
 
 		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitX, m_Rotation));
-		
+
 		auto newQuat = Vector4::QuaternionRotationAxis(m_Right, angle);
 
 		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(m_Up, newQuat));
@@ -68,13 +63,12 @@ namespace Crystal {
 		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
 	}
 
-
 	void TransformComponent::RotateYaw(float angle)
 	{
 		angle = DirectX::XMConvertToRadians(angle);
 
 		m_Up = Vector3::Normalize(Vector3::RotateQuaternion(Vector3::UnitY, m_Rotation));
-		
+
 		auto newQuat = Vector4::QuaternionRotationAxis(m_Up, angle);
 
 		m_Right = Vector3::Normalize(Vector3::RotateQuaternion(m_Right, newQuat));
@@ -82,5 +76,4 @@ namespace Crystal {
 
 		m_Rotation = Vector4::QuaternionMultiply(m_Rotation, newQuat);
 	}
-
 }

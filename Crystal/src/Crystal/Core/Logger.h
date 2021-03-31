@@ -6,7 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-
 //https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template<typename ... Args>
 std::string string_format(const std::string fmt_str, ...) {
@@ -37,7 +36,6 @@ namespace Crystal {
 	}
 }
 
-
 /*
 * DEBUG_INFO : Debug 모드에서 출력되는 메시지
 * INFO : Debug, Release 모드에서 출력되는 메시지
@@ -46,8 +44,6 @@ namespace Crystal {
 */
 
 #define CS_FORMAT(...) string_format(__VA_ARGS__)
-
-
 
 #define CS_INFO(...) Crystal::Log("[Crystal Info] : ", CS_FORMAT(__VA_ARGS__).c_str())
 #define CS_WARN(...) Crystal::Log("[Crystal Warn] : ", CS_FORMAT(__VA_ARGS__).c_str())

@@ -22,15 +22,14 @@ namespace Crystal {
 		Application(HINSTANCE hInstance, int width, int height);
 		virtual ~Application() = default;
 
-		virtual void Start() 
+		virtual void Start()
 		{
 			// Default Resources
 			auto& resourceManager = Crystal::ResourceManager::Instance();
-			resourceManager.LoadRenderable<Crystal::Line>("LineMesh");
-			resourceManager.LoadRenderable<Crystal::LineBox>("LineBoxMesh");
-			resourceManager.LoadRenderable<Crystal::LineSphere>("LineSphereMesh");
-			resourceManager.LoadRenderable<Crystal::PlaneQuad>("PlaneQuadMesh");
-
+			resourceManager.CreateRenderable<Crystal::Line>("LineMesh");
+			resourceManager.CreateRenderable<Crystal::LineBox>("LineBoxMesh");
+			resourceManager.CreateRenderable<Crystal::LineSphere>("LineSphereMesh");
+			resourceManager.CreateRenderable<Crystal::PlaneQuad>("PlaneQuadMesh");
 		}
 
 		void Run();
@@ -42,7 +41,6 @@ namespace Crystal {
 	private:
 		bool m_bShouldRun = true;
 		WindowsWindow* m_Window;
-		
 	};
 
 	Application* CreateApplication(HINSTANCE hInstance);

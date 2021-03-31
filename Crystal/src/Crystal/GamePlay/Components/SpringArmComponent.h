@@ -3,13 +3,11 @@
 #include <corecrt_math.h>
 
 namespace Crystal {
-
 	class SpringArmComponent final : public TransformComponent
 	{
 	public:
 		SpringArmComponent(const std::string& name) : TransformComponent(name)
 		{
-
 		}
 		~SpringArmComponent() override = default;
 
@@ -20,17 +18,15 @@ namespace Crystal {
 				CS_WARN("Spring Arm Component에 부모가 존재하지 않습니다");
 				return;
 			}
-				
 
 			m_LocalTransform = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
 			m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, Matrix4x4::RotationQuaternion(m_Rotation));
-			m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, 
+			m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform,
 				Matrix4x4::Translation(Vector3::Add(GetLocalPosition(), m_OffsetPosition)));
 
 			// Multiply parent to get world
 			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
 			DirectX::XMFLOAT3 worldTargetPosition = { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 };
-			
 
 			//=================================================================================================
 			// 후크의 법칙 (Position) TODO : 회전
@@ -57,5 +53,4 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_OffsetPosition = Vector3::Zero;
 		DirectX::XMFLOAT3 m_WorldLastPosition = Vector3::Zero;
 	};
-
 }

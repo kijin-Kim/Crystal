@@ -3,12 +3,11 @@
 #include "PrimitiveComponent.h"
 
 namespace Crystal {
-
 	class MeshComponent : public PrimitiveComponent
 	{
 	public:
-		MeshComponent(const std::string& name) : PrimitiveComponent(name) 
-		{ 
+		MeshComponent(const std::string& name) : PrimitiveComponent(name)
+		{
 			SetPrimitiveComponentType(EPrimitiveComponentType::Mesh);
 		}
 		virtual ~MeshComponent() = default;
@@ -17,7 +16,7 @@ namespace Crystal {
 	class StaticMeshComponent : public MeshComponent
 	{
 	public:
-		StaticMeshComponent(const std::string& name) : MeshComponent(name) 
+		StaticMeshComponent(const std::string& name) : MeshComponent(name)
 		{
 			SetPrimitiveComponentType(EPrimitiveComponentType::StaticMesh);
 		};
@@ -27,8 +26,8 @@ namespace Crystal {
 	class SkeletalMeshComponent : public MeshComponent
 	{
 	public:
-		SkeletalMeshComponent(const std::string& name) :MeshComponent(name) 
-		{ 
+		SkeletalMeshComponent(const std::string& name) :MeshComponent(name)
+		{
 			SetPrimitiveComponentType(EPrimitiveComponentType::SkeletalMesh);
 		};
 		virtual ~SkeletalMeshComponent() = default;

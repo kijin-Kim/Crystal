@@ -1,13 +1,12 @@
 #pragma once
 #include "Actor.h"
-#include "Crystal\GamePlay\Components\CollisionComponent.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 
 namespace Crystal {
-
 	class LineActor : public Actor
 	{
 	public:
-		LineActor(Object* parent) : Actor(parent)
+		LineActor()
 		{
 			m_DebugLineComponent = CreateComponent<RayComponent>("DebugLineComponent");
 			m_MainComponent = m_DebugLineComponent;
@@ -15,10 +14,10 @@ namespace Crystal {
 
 		~LineActor() override = default;
 
-		void Begin() override 
+		void Begin() override
 		{
 		}
-		void End() override 
+		void End() override
 		{
 		}
 		void Update(const float deltaTime) override {}
@@ -28,5 +27,4 @@ namespace Crystal {
 	private:
 		RayComponent* m_DebugLineComponent = nullptr;
 	};
-
 }

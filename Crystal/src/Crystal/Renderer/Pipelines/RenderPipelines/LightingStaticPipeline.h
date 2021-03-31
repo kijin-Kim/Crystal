@@ -4,8 +4,7 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
-
-	class LightingPipeline final : public RenderPipeline
+	class LightingStaticPipeline final : public RenderPipeline
 	{
 	public:
 		struct PerFrameData
@@ -45,14 +44,13 @@ namespace Crystal {
 			Texture* IrradiancemapTexture = nullptr;
 		};
 
-
 	public:
-		LightingPipeline(const std::string& name);
-		virtual ~LightingPipeline() = default;
+		LightingStaticPipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
+		virtual ~LightingStaticPipeline() = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
-
+		
 	private:
 		PerFrameData m_PerFrameData = {};
 
@@ -70,6 +68,5 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SkeletalMeshDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SkeletalMeshPipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_SkeletalMeshRootSignature = nullptr;
-
 	};
 }

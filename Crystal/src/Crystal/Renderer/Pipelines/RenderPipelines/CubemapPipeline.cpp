@@ -5,8 +5,7 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-
-	CubemapPipeline::CubemapPipeline(const std::string& name) : RenderPipeline(name)
+	CubemapPipeline::CubemapPipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : RenderPipeline(name, shader)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
@@ -46,7 +45,6 @@ namespace Crystal {
 		////////PIPELINE STATE//////////////////////////////
 		////////////////////////////////////////////////////
 
-
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
@@ -59,13 +57,12 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} cubemapPipelineStream;
 
-
 		cubemapPipelineStream.RootSignature = m_RootSignature.Get();
 		cubemapPipelineStream.InputLayout = { cubemapInputLayout, _countof(cubemapInputLayout) };
 		cubemapPipelineStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 		auto& resourceManager = ResourceManager::Instance();
-		auto& cubemapShaderDatablobs = resourceManager.GetShader("CubemapShader")->GetRaw();
+		auto& cubemapShaderDatablobs = resourceManager.GetShader("Cubemap")->GetRaw();
 		cubemapPipelineStream.VS = { cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		cubemapPipelineStream.PS = { cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(), cubemapShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
@@ -112,7 +109,6 @@ namespace Crystal {
 		m_QuadIndexBuffer = std::make_unique<IndexBuffer>((void*)quadIndices, (UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)));
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
-
 	}
 
 	void CubemapPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
@@ -121,7 +117,6 @@ namespace Crystal {
 
 		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)pipelineInputs;
 
-
 		auto viewProj = cubemapPipelineInputs->Camera->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		m_PerFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
@@ -129,7 +124,6 @@ namespace Crystal {
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cubemapDescriptorInputs[CUBEMAP_INPUT_COUNT] = {};
 		cubemapDescriptorInputs[CubemapTexture] = cubemapPipelineInputs->CubemapTexture->GetShaderResourceView();
-
 
 		auto device = Renderer::Instance().GetDevice();
 		for (int i = 0; i < CUBEMAP_INPUT_COUNT; i++)
@@ -148,5 +142,4 @@ namespace Crystal {
 		commandList->IASetIndexBuffer(&m_QuadIndexBuffer->GetView());
 		commandList->DrawIndexedInstanced(m_QuadIndexBuffer->GetCount(), 1, 0, 0, 0);
 	}
-
 }

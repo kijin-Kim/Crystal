@@ -6,10 +6,11 @@
 #include "Crystal/Resources/ShaderManager.h"
 
 namespace Crystal {
+	// User Controll-able actor
 	class Pawn : public Actor
 	{
 	public:
-		Pawn(Object* parent) : Actor(parent)
+		Pawn()
 		{
 		}
 

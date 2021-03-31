@@ -4,9 +4,7 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-
-
-	DiffIrradSamplingPipeline::DiffIrradSamplingPipeline(const std::string& name) : ComputePipeline(name)
+	DiffIrradSamplingPipeline::DiffIrradSamplingPipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : ComputePipeline(name, shader)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
@@ -60,14 +58,12 @@ namespace Crystal {
 		diffIrradSamplingInputHandles[SourceTexture] = diffIrradSamplingPipelineInputs->SourceTexture->GetShaderResourceView();
 		diffIrradSamplingInputHandles[DestinationTexture] = diffIrradSamplingPipelineInputs->DestinationTexture->GetUnorderedAccessView();
 
-
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		for (int i = 0; i < DIFF_IRRAD_SAMPLING_INPUT_COUNT; i++)
 		{
 			device->CopyDescriptorsSimple(1, handle, diffIrradSamplingInputHandles[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
-
 
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetComputeRootSignature(m_RootSignature.Get());
@@ -81,5 +77,4 @@ namespace Crystal {
 
 		commandList->Dispatch((UINT)(m_DestinationTextureWidth / 32), (UINT)(m_DestinationTextureHeight / 32), 6);
 	}
-
 }

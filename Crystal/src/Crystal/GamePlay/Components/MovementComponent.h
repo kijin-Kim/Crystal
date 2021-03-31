@@ -2,7 +2,6 @@
 #include "Component.h"
 
 namespace Crystal {
-
 	class MovementComponent final : public Component
 	{
 	public:
@@ -11,11 +10,11 @@ namespace Crystal {
 
 		void SetTargetComponent(TransformComponent* targetComponent) { m_TargetComponent = targetComponent; }
 
-		void AddForce(const DirectX::XMFLOAT3& force) 
+		void AddForce(const DirectX::XMFLOAT3& force)
 		{
 			m_ForceAccum = Vector3::Add(m_ForceAccum, force);
 		}
-		
+
 		void Update(const float deltaTime) override
 		{
 			Component::Update(deltaTime);
@@ -39,7 +38,6 @@ namespace Crystal {
 			velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
 			m_TargetComponent->SetVelocity(velocity);
 
-			
 			m_ForceAccum = Vector3::Zero;
 		}
 
@@ -47,5 +45,4 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 		TransformComponent* m_TargetComponent = nullptr;
 	};
-
 }

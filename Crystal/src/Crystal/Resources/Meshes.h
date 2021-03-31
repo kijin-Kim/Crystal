@@ -18,9 +18,7 @@ struct aiNodeAnim;
 
 namespace Assimp { class Importer; }
 
-
 namespace Crystal {
-	
 	struct PositionVertex
 	{
 		PositionVertex() = default;
@@ -51,9 +49,9 @@ namespace Crystal {
 
 		void AddBoneData(uint32_t boneID, float weight)
 		{
-			for (unsigned int i = 0; i < 4; i++) 
+			for (unsigned int i = 0; i < 4; i++)
 			{
-				if (Weights[i] == 0.0) 
+				if (Weights[i] == 0.0)
 				{
 					IDs[i] = boneID;
 					Weights[i] = weight;
@@ -105,9 +103,7 @@ namespace Crystal {
 
 	private:
 		Assimp::Importer* m_Importer = nullptr;
-
 	};
-
 
 	/*SubMesh들의 컨테이너 입니다.*/
 	class StaticMesh : public Mesh
@@ -120,7 +116,7 @@ namespace Crystal {
 		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
 	};
 
-	class SkeletalMesh : public Mesh 
+	class SkeletalMesh : public Mesh
 	{
 	public:
 		SkeletalMesh() = default;
@@ -145,7 +141,6 @@ namespace Crystal {
 		uint32_t findRotation(float animationTime, aiNodeAnim* nodeAnim);
 		uint32_t findTranslation(float animationTime, aiNodeAnim* nodeAnim);
 
-
 	private:
 		const aiScene* m_AnimationScene = nullptr;
 
@@ -158,7 +153,6 @@ namespace Crystal {
 		bool m_bMeshHasBones = false;
 		bool m_bMeshHasAnimations = false;
 		float m_AnimationTime = 0.0f;
-
 
 		Assimp::Importer* m_AnimationFileImporter = nullptr;
 	};

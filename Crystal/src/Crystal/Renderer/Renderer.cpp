@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "Crystal/Resources/ShaderManager.h"
-#include "Crystal/GamePlay/Actors/Pawn.h"
+#include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/Resources/Material.h"
 
@@ -23,52 +23,64 @@ namespace Crystal {
 		CreateRenderTargetViewFromSwapChain();
 		CreateDepthStencilView();
 
+		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-
-		/*텍스쳐 리소스를 로드합니다.*/
-		//m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/pink_sunrise_4k.hdr");
-		m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/T_Cube_Skybox_1.hdr");
-		//m_PanoTexture = std::make_unique<Texture>("assets/textures/cubemaps/debughdri.png");
-		m_CubemapTexture = std::make_unique<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, 
+		//============================================================================================
+		auto panoTextureWeak = resourceManager.CreateTextureFromFile(
+			"assets/textures/cubemaps/T_Cube_Skybox_1.hdr", "HDRI_Skybox_Space");
+		if (auto panoTexture = panoTextureWeak.lock())
+		{
+			panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		}
+		
+		auto cubemapWeak = resourceManager.CreateTexture(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-		m_IrradiancemapTexture = std::make_unique<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT, 
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space");
+		if (auto cubemap = cubemapWeak.lock())
+		{
+			cubemap->CreateUnorderedAccessView(cubemap->GetResource()->GetDesc().Format,
+				D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
+			cubemap->CreateShaderResourceView(cubemap->GetResource()->GetDesc().Format,
+				D3D12_SRV_DIMENSION_TEXTURECUBE);
+		}
+
+		auto irradianceMapWeak = resourceManager.CreateTexture(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-		/*각 텍스쳐 리소스에 대한 Shader Resource View를 만듭니다.*/
-		m_PanoTexture->CreateShaderResourceView(m_PanoTexture->GetResource()->GetDesc().Format, 
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-		m_CubemapTexture->CreateUnorderedAccessView(m_CubemapTexture->GetResource()->GetDesc().Format, 
-			D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
-		m_CubemapTexture->CreateShaderResourceView(m_CubemapTexture->GetResource()->GetDesc().Format, 
-			D3D12_SRV_DIMENSION_TEXTURECUBE);
-		m_IrradiancemapTexture->CreateUnorderedAccessView(m_IrradiancemapTexture->GetResource()->GetDesc().Format, 
-			D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
-		m_IrradiancemapTexture->CreateShaderResourceView(m_IrradiancemapTexture->GetResource()->GetDesc().Format, 
-			D3D12_SRV_DIMENSION_TEXTURECUBE);
-
-		/*Shader를 로드합니다.*/
-		auto& resourceManager = ResourceManager::Instance();
-		resourceManager.LoadShader("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
-		resourceManager.LoadShader("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
-		resourceManager.LoadShader("assets/shaders/SkyboxShader.hlsl", "CubemapShader");
-		resourceManager.LoadShader("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
-		resourceManager.LoadShader("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
-		resourceManager.LoadShader("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
-		resourceManager.LoadShader("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
-		resourceManager.LoadShader("assets/shaders/TestShader.hlsl", "TestShader");
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space_Irradiance");
+		if (auto irradianceMap = irradianceMapWeak.lock())
+		{
+			irradianceMap->CreateUnorderedAccessView(irradianceMap->GetResource()->GetDesc().Format,
+				D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
+			irradianceMap->CreateShaderResourceView(irradianceMap->GetResource()->GetDesc().Format,
+				D3D12_SRV_DIMENSION_TEXTURECUBE);
+		}
 
 
+		// TODO : TEMP
+		m_PanoTexture = resourceManager.GetTexture("HDRI_Skybox_Space").lock();
+		m_CubemapTexture = resourceManager.GetTexture("Cube_Skybox_Space").lock();
+		m_IrradiancemapTexture = resourceManager.GetTexture("Cube_Skybox_Space_Irradiance").lock();
+		//============================================================================================
 
+		resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
+		resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
+		resourceManager.CreateShaderFromFile("assets/shaders/SkyboxShader.hlsl", "Cubemap");
+		resourceManager.CreateShaderFromFile("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
+		resourceManager.CreateShaderFromFile("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
+		resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
+		resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
 
 		/*Pipeline을 만듭니다.*/
-		m_LightingPipeline = std::make_unique<LightingPipeline>("PBRLightingPipeline");
-		m_WireframePipeline = std::make_unique<LinePipeline>("WireframePipeline");
-		m_CubemapPipeline = std::make_unique<CubemapPipeline>("CubemapPipeline");
-		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>("PanoToCubemapPipeline");
-		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>("DiffIrradSamplingPipeline");
-
-
+		m_LightingPipeline = std::make_unique<LightingStaticPipeline>("PBRLightingPipeline", 
+			resourceManager.GetShader("PBRShader_Static"));
+		m_WireframePipeline = std::make_unique<LinePipeline>("LinePipline", 
+			resourceManager.GetShader("SimpleColorShader"));
+		m_CubemapPipeline = std::make_unique<CubemapPipeline>("CubemapPipeline", 
+			resourceManager.GetShader("Cubemap"));
+		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>("PanoToCubemapPipeline", 
+			resourceManager.GetShader("PanoToCubemap"));
+		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>("DiffIrradSamplingPipeline", 
+			resourceManager.GetShader("DiffuseIrradianceSampling"));
 
 		/// COMPUTE
 		auto commandList = m_CommandQueue->GetCommandList();
@@ -76,8 +88,9 @@ namespace Crystal {
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		
 		resourceBarrier.Transition.pResource = m_CubemapTexture->GetResource();
-		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE 
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -89,12 +102,12 @@ namespace Crystal {
 		m_PanoToCubemapPipeline->Record(commandList, &panoToCubemapPipelineInputs);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE 
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		resourceBarrier.Transition.pResource = m_IrradiancemapTexture->GetResource();
-		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE 
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -106,7 +119,7 @@ namespace Crystal {
 		m_DiffIrradSamplingPipeline->Record(commandList, &diffIrradSamplingPipelineInputs);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE 
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
@@ -116,11 +129,8 @@ namespace Crystal {
 		m_CommandQueue->Flush();
 		CS_INFO("HDRI로부터 Cubemap 생성 완료");
 
-
-
 		/*ImGui 구현*/
 		{
-
 			D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			descriptorHeapDesc.NumDescriptors = 1;
@@ -139,9 +149,9 @@ namespace Crystal {
 
 	void Renderer::Render()
 	{
-
 		ChangeResolution(1920, 1080);
 		ChangeDisplayMode();
+
 
 		auto commandList = m_CommandQueue->GetCommandList();
 
@@ -155,29 +165,28 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		const auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera();
-		
+
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
 		commandList->RSSetScissorRects(1, &mainCamera->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), TRUE, 
+		commandList->OMSetRenderTargets(1, &m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), TRUE,
 			&m_DepthStencilBufferTexture->GetDepthStencilView());
 
 		float clearColorValue[4] = { 1.0f, 0.0f, 1.0f, 0.0f };
 		const auto clearDepthValue = 1.0f;
 		const auto clearStencilValue = 0.0f;
-		commandList->ClearRenderTargetView(m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), 
+		commandList->ClearRenderTargetView(m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(),
 			clearColorValue, 0, nullptr);
 		commandList->ClearDepthStencilView(m_DepthStencilBufferTexture->GetDepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue, clearStencilValue, 0, nullptr);
 
-		LightingPipeline::LightingPipelineInputs lightingPipelineInputs = {};
+		LightingStaticPipeline::LightingPipelineInputs lightingPipelineInputs = {};
 		lightingPipelineInputs.SkeletalMeshComponents = &m_SkeletalMeshComponents;
 		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera;
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 		m_LightingPipeline->Record(commandList, &lightingPipelineInputs);
 
-		
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera;
@@ -186,13 +195,11 @@ namespace Crystal {
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera;
 		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
 		m_CubemapPipeline->Record(commandList, &cubemapPipelineInputs);
 
-		
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		resourceBarrier.Transition.pResource = m_RenderTargetTextures[m_RtvIndex]->GetResource();
@@ -201,22 +208,19 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		
 		m_CommandQueue->Execute(commandList);
-		
-		
+
 		DXGI_PRESENT_PARAMETERS presentParameters;
 		presentParameters.DirtyRectsCount = 0;
 		presentParameters.pDirtyRects = nullptr;
 		presentParameters.pScrollRect = nullptr;
 		presentParameters.pScrollOffset = nullptr;
 		m_SwapChain->Present1(1, 0, &presentParameters);
-		
+
 		m_CommandQueue->Flush();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
-
 	}
 
 	void Renderer::ChangeResolution(int width, int height)
@@ -230,9 +234,9 @@ namespace Crystal {
 			return;
 
 		CS_INFO("해상도를 변경하는 중...");
-		
+
 		m_RtvIndex = 0;
-		
+
 		m_ResWidth = width;
 		m_ResHeight = height;
 
@@ -252,7 +256,7 @@ namespace Crystal {
 		{
 			rt.reset();
 		}
-		
+
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
@@ -261,10 +265,10 @@ namespace Crystal {
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
 			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, 
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
-		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, 
+		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0,
 			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 
@@ -306,8 +310,8 @@ namespace Crystal {
 				// #DirectX Create Device
 				hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_Device));
 				m_Device->SetName(L"D3D12 Device");
-				CS_FATAL(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다."); 
-				
+				CS_FATAL(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다.");
+
 				break;
 			}
 		}
@@ -315,7 +319,7 @@ namespace Crystal {
 #if defined CS_DEBUG
 		Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 		if (SUCCEEDED(m_Device.As(&infoQueue)))
-		{	
+		{
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
@@ -339,14 +343,11 @@ namespace Crystal {
 		m_FenceEvent = CreateEvent(nullptr, false, false, nullptr);
 
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-		
-
 	}
-
 
 	void Renderer::RegisterRenderComponent(PrimitiveComponent* component)
 	{
+		
 		// TODO : Material 별로 나누어야함
 		const auto rcType = component->GetPrimitiveComponentType();
 		switch (rcType)
@@ -358,7 +359,7 @@ namespace Crystal {
 			m_SkeletalMeshComponents.push_back(static_cast<SkeletalMeshComponent*>(component));
 			break;
 		case PrimitiveComponent::EPrimitiveComponentType::Collision: [[Fallthrough]]
-		case PrimitiveComponent::EPrimitiveComponentType::Ray : [[Fallthrough]]
+		case PrimitiveComponent::EPrimitiveComponentType::Ray: [[Fallthrough]]
 		case PrimitiveComponent::EPrimitiveComponentType::BoundingBox: [[Fallthrough]]
 		case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox: [[Fallthrough]]
 		case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
@@ -369,8 +370,6 @@ namespace Crystal {
 			break;
 		}
 	}
-
-
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()
 	{
@@ -408,15 +407,15 @@ namespace Crystal {
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
 			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, 
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
 	}
 
 	void Renderer::CreateDepthStencilView()
 	{
-		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0, 
-			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, 
+		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 	}
@@ -438,7 +437,7 @@ namespace Crystal {
 			rt.reset();
 		}
 
-		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 
+		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 		for (int i = 0; i < 2; i++)
@@ -446,7 +445,7 @@ namespace Crystal {
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
 			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format, 
+			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
 		}
 
@@ -459,14 +458,13 @@ namespace Crystal {
 		targetParam.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-
 		hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
 		m_RtvIndex = 0;
 
 		CS_INFO("디스플레이 모드를 변환 완료.");
-		if(m_bIsFullScreen)
+		if (m_bIsFullScreen)
 			CS_INFO("현재 디스플레이 모드 : 전체화면 모드");
 		else
 			CS_INFO("현재 디스플레이 모드 : 창 모드");

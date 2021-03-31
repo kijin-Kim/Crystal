@@ -1,7 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "Crystal/Math/Math.h"
-#include "Crystal/GamePlay/Actors/Actor.h"
+#include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "../../Core/Logger.h"
 #include "Crystal/Resources/Renderable.h"
 
@@ -17,7 +17,7 @@ namespace Crystal {
 		virtual void Update(const float deltaTime) {}
 
 		void SetOwner(Actor* owner) { m_Owner = owner; }
-		
+
 		Actor* GetOwner() const { if (!m_Owner) CS_WARN("Owner가 nullptr입니다"); return m_Owner; }
 		const std::string& GetName() const { return m_Name; }
 
@@ -26,5 +26,4 @@ namespace Crystal {
 		Actor* m_Owner = nullptr;
 		std::string m_Name;
 	};
-
 }

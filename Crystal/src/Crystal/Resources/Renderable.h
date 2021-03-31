@@ -1,10 +1,9 @@
 #pragma once
 #include <d3d12.h>
-#include <wrl\client.h>
+#include <wrl/client.h>
 #include "Crystal/Resources/Buffers.h"
 
 namespace Crystal {
-
 	class Renderable
 	{
 	public:
@@ -25,6 +24,4 @@ namespace Crystal {
 		std::vector <std::unique_ptr<VertexBuffer>> m_VertexBuffers;
 		std::vector <std::unique_ptr<IndexBuffer>> m_IndexBuffers;
 	};
-
-
 }

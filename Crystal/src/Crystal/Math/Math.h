@@ -2,10 +2,8 @@
 #include <DirectXMath.h>
 
 namespace Crystal {
-
 	namespace Vector3
 	{
-		
 		const DirectX::XMFLOAT3 UnitX = { 1.0f, 0.0f, 0.0f };
 		const DirectX::XMFLOAT3 UnitY = { 0.0f, 1.0f, 0.0f };
 		const DirectX::XMFLOAT3 UnitZ = { 0.0f, 0.0f, 1.0f };
@@ -43,7 +41,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT3 Multiply(const DirectX::XMFLOAT3& v1, float f1)
 		{
 			DirectX::XMFLOAT3 result;
-			
+
 			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat3(&v1), DirectX::XMVectorSet(f1, f1, f1, 0.0f));
 			XMStoreFloat3(&result, newVector);
 			return result;
@@ -69,7 +67,7 @@ namespace Crystal {
 		{
 			return DirectX::XMVector3Equal(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
 		}
-		
+
 		inline float Greater(const DirectX::XMFLOAT3& v1)
 		{
 			DirectX::XMFLOAT3 result;
@@ -121,9 +119,8 @@ namespace Crystal {
 		inline bool IsZero(const DirectX::XMFLOAT3& v1)
 		{
 			bool isZero = DirectX::XMVector3Equal(XMLoadFloat3(&v1), DirectX::XMVectorZero());
-			return isZero;	
+			return isZero;
 		}
-
 
 		inline DirectX::XMFLOAT3 Clamp(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const DirectX::XMFLOAT3& v3)
 		{
@@ -147,7 +144,6 @@ namespace Crystal {
 		namespace Quaternion {
 			const DirectX::XMFLOAT4 Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
 		}
-
 
 		inline DirectX::XMFLOAT4 Multiply(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4& v2)
 		{
@@ -182,9 +178,6 @@ namespace Crystal {
 			return result;
 		}
 
-
-		
-
 		inline DirectX::XMFLOAT4 QuaternionMultiply(const DirectX::XMFLOAT4& q1, const DirectX::XMFLOAT4& q2)
 		{
 			DirectX::XMFLOAT4 result;
@@ -200,7 +193,6 @@ namespace Crystal {
 			XMStoreFloat4(&result, newVector);
 			return result;
 		}
-
 
 		inline DirectX::XMFLOAT4 QuaternionRotationAxis(const DirectX::XMFLOAT3& axis, float angle)
 		{
@@ -254,8 +246,6 @@ namespace Crystal {
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
-		
-
 
 		inline DirectX::XMFLOAT4X4 Transpose(const DirectX::XMFLOAT4X4& m1)
 		{
@@ -267,7 +257,7 @@ namespace Crystal {
 
 		inline DirectX::XMFLOAT4X4 Inverse(const DirectX::XMFLOAT4X4& m1)
 		{
-			DirectX::XMFLOAT4X4 result;	
+			DirectX::XMFLOAT4X4 result;
 			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixInverse(&DirectX::XMMatrixDeterminant(XMLoadFloat4x4(&m1)), XMLoadFloat4x4(&m1));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
@@ -296,7 +286,6 @@ namespace Crystal {
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
-
 
 		inline DirectX::XMFLOAT4X4 LookAt(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& lookAt, const DirectX::XMFLOAT3& up)
 		{
@@ -363,7 +352,6 @@ namespace Crystal {
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
-
 	}
 
 	namespace Matrix3x3
@@ -376,5 +364,4 @@ namespace Crystal {
 			return result;
 		}
 	}
-
 }

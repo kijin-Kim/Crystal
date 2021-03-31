@@ -2,7 +2,6 @@
 #include "Meshes.h"
 
 namespace Crystal {
-
 	class Line : public StaticMesh
 	{
 	public:
@@ -23,7 +22,6 @@ namespace Crystal {
 				sizeof(int) * _countof(indices), _countof(indices)));
 		}
 		~Line() override = default;
-
 	};
 
 	class LineQuad : public StaticMesh
@@ -49,8 +47,6 @@ namespace Crystal {
 		}
 		~LineQuad() override = default;
 	};
-
-
 
 	class LineBox : public StaticMesh
 	{
@@ -92,7 +88,6 @@ namespace Crystal {
 				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices))));
 		}
 		~LineBox() override = default;
-
 	};
 
 	class LineCircle : public StaticMesh
@@ -125,7 +120,6 @@ namespace Crystal {
 				(UINT)(sizeof(float) * 3), (UINT)_countof(circleVertices)));
 			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)circleIndices,
 				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices))));
-
 		}
 		~LineCircle() override = default;
 	};
@@ -159,7 +153,6 @@ namespace Crystal {
 				circleVertices[i].z = sin(DirectX::XMConvertToRadians(angle));
 			}
 
-
 			int circleIndices[_countof(circleVertices) * 2];
 			int j = 0;
 			for (int i = 0; i < _countof(circleIndices) - 1; i++)
@@ -177,7 +170,6 @@ namespace Crystal {
 				(UINT)(sizeof(float) * 3), (UINT)_countof(circleVertices)));
 			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)circleIndices,
 				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices))));
-
 		}
 		~LineSphere() override = default;
 	};
@@ -199,13 +191,11 @@ namespace Crystal {
 				0, 2, 3
 			};
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices, 
+			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices,
 				(UINT)(sizeof(float) * 2), (UINT)_countof(quadVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)quadIndices, 
+			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)quadIndices,
 				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices))));
-
 		}
 		~PlaneQuad() override = default;
-
 	};
 }

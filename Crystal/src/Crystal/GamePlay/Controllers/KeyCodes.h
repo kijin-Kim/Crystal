@@ -4,7 +4,6 @@
 ///// https://github.com/SFML/SFML/blob/master/include/SFML/Window/Mouse.hpp
 
 namespace Crystal {
-
 	struct MouseCodeWithDelta
 	{
 		std::pair<int64_t, float> MouseX;
@@ -148,19 +147,19 @@ namespace Crystal {
 		enum Button
 		{
 			UnKnown = 102,
-			Left,      
-			Right,    
-			Middle,   
-			XButton1, 
-			XButton2, 
+			Left,
+			Right,
+			Middle,
+			XButton1,
+			XButton2,
 
 			ButtonCount,
 		};
 
 		enum Wheel
 		{
-			VerticalWheel = 109, 
-			HorizontalWheel 
+			VerticalWheel = 109,
+			HorizontalWheel
 		};
 
 		enum Move
@@ -169,6 +168,4 @@ namespace Crystal {
 			Y
 		};
 	};
-	
-
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
 	class Component;
@@ -6,30 +7,18 @@ namespace Crystal {
 	class Level;
 	class World;
 
-	class Object
+
+	// Spawn-able object
+	class Actor : public Updatable
 	{
 	public:
-		Object(Object* parent) : m_ParentObject(parent) {}
-		virtual ~Object() = default;
-	
-		virtual void Update(const float deltaTime) {}
-
-		Object* GetParentObject() const { return m_ParentObject; }
-
-	private:
-		Object* m_ParentObject = nullptr;
-	};
-
-	class Actor : public Object
-	{
-	public:
-		Actor(Object* parent) : Object(parent) {}
+		Actor() = default;
 		~Actor() override = default;
 
 		virtual void Begin() {}
 		virtual void End() {}
-		void Update(const float deltaTime) override { Object::Update(deltaTime); }
-		
+		void Update(const float deltaTime) override { Updatable::Update(deltaTime); }
+
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
 		void RegisterComponent(Component* component);
@@ -40,7 +29,6 @@ namespace Crystal {
 		void MoveToTransformComponentHierarchy(TransformComponent* component);
 
 		TransformComponent* GetMainComponent() const { return m_MainComponent; }
-
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
 
@@ -56,7 +44,7 @@ namespace Crystal {
 			return newComponent;
 		}
 	protected:
-		/*MainComponent를 가르키는 Raw Pointer입니다. 편의를 위한 Pointer일 뿐, 
+		/*MainComponent를 가르키는 Raw Pointer입니다. 편의를 위한 Pointer일 뿐,
 		LifeTime은 컨테이너의 Unique Pointer 에 의해 관리됩니다.*/
 		TransformComponent* m_MainComponent = nullptr;
 		std::vector<std::unique_ptr<Component>> m_Components;

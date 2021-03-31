@@ -1,5 +1,5 @@
 #pragma once
-#include "Crystal/GamePlay/Actors/Pawn.h"
+#include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Core/Logger.h"
@@ -9,57 +9,34 @@
 class TestPawn final : public Crystal::Pawn
 {
 public:
-	TestPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
+	TestPawn()
 	{
 		////// TEMPORARY ////
-
-
-		auto albedoTexture 
-			= std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-		auto metallicTexture 
-			= std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-		auto roughnessTexture 
-			= std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-		auto normalTexture 
-			= std::make_shared<Crystal::Texture>("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
-
-		albedoTexture->CreateShaderResourceView(albedoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		metallicTexture->CreateShaderResourceView(metallicTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		roughnessTexture->CreateShaderResourceView(roughnessTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		normalTexture->CreateShaderResourceView(normalTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		auto pbrMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Static"));
-		pbrMaterial->Set("AlbedoTexture", albedoTexture);
-		pbrMaterial->Set("MetallicTexture", metallicTexture);
-		pbrMaterial->Set("RoughnessTexture", roughnessTexture);
-		pbrMaterial->Set("NormalTexture", normalTexture);
-
-
-		auto frigateMesh = resourceManager.GetRenderable("Frigate");
-		// ========================================================================
-		
+		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Frigate_Albedo"));
+		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Frigate_Metallic"));
+		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Frigate_Roughness"));
+		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
+		//===================================================================================================
 
 		auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 		boundingOrientedBoxComponent->SetExtents({ 9080.0f / 2.0f, 2940.0f / 2.0f, 8690.0f / 2.0f });
 
 		m_MainComponent = boundingOrientedBoxComponent;
 
-
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-		staticMeshComponent->SetRenderable(frigateMesh);
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Frigate"));
 		staticMeshComponent->SetMaterial(pbrMaterial);
 		staticMeshComponent->SetLocalPosition({ 0.0f, 0.0f, 596.0f });
 		staticMeshComponent->SetAttachment(m_MainComponent);
 
-
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-		//springArmComponent->RotatePitch(15.0f);
 		springArmComponent->SetOffsetPosition({ 0, 4500.0f, -15000.0f });
 		springArmComponent->SetAttachment(m_MainComponent);
-		
+
 		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		m_CameraComponent->SetFieldOfView(60.0f);
 		m_CameraComponent->SetNearPlane(1000.0f);
@@ -67,13 +44,10 @@ public:
 		m_CameraComponent->SetFarPlane(10000000.0f);
 		m_CameraComponent->SetAttachment(springArmComponent);
 
-
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 		m_MovementComponent->SetTargetComponent(m_MainComponent);
-
-
+		
 		Crystal::ApplicationUtility::GetPlayerController().SetMainCamera(m_CameraComponent);
-	
 	}
 
 	~TestPawn() override = default;
@@ -93,9 +67,6 @@ public:
 	void Update(const float deltaTime) override
 	{
 		Pawn::Update(deltaTime); // Updating All Component
-
-
-
 	}
 
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override
@@ -109,8 +80,6 @@ public:
 
 		inputComponent->BindAxis("LookUp", CS_AXIS_FN(TestPawn::RotatePitch));
 		inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::RotateYaw));
-
-
 
 		inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::BeginFire));
 	}
@@ -135,7 +104,7 @@ public:
 	}
 
 	void MoveRight(float value)
-	{	
+	{
 		value *= 1300.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
 		m_MovementComponent->AddForce(force);
@@ -157,9 +126,9 @@ public:
 	{
 		CS_DEBUG_INFO("BeginFire!!");
 
-		Crystal::Level* level = (Crystal::Level*)GetParentObject();
+		Crystal::Level* level = (Crystal::Level*)GetObjectOwner(ObjectOwnerType::OOT_Level);
 
-		const auto start = m_CameraComponent->GetWorldPosition();	
+		const auto start = m_CameraComponent->GetWorldPosition();
 		const auto direction = m_CameraComponent->GetWorldForwardVector();
 		const float maxDistance = 1000000.0f;
 

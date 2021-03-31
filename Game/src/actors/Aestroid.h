@@ -1,11 +1,11 @@
 #pragma once
-#include "Crystal\GamePlay\Actors\Actor.h"
-#include "Crystal\GamePlay\Components\CollisionComponent.h"
+#include "Crystal/GamePlay/Objects/Actors/Actor.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 
 class Asteroid : public Crystal::Actor
 {
 public:
-	Asteroid(Crystal::Object* parent) : Crystal::Actor(parent)
+	Asteroid()
 	{
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		boundingSphereComponent->SetRadius(1000.0f);
@@ -14,11 +14,10 @@ public:
 	~Asteroid() override = default;
 };
 
-
 class RandomBox : public Crystal::Actor
 {
 public:
-	RandomBox(Crystal::Object* parent) : Crystal::Actor(parent)
+	RandomBox()
 	{
 		auto boundingOrientedBox = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBox");
 		boundingOrientedBox->SetExtents({ 1000.0f, 400.0f, 1000.0f });
@@ -40,7 +39,5 @@ public:
 		m_MainComponent->RotateRoll(xAngle);
 		m_MainComponent->RotatePitch(yAngle);
 		m_MainComponent->RotateYaw(zAngle);
-
-		
 	}
 };

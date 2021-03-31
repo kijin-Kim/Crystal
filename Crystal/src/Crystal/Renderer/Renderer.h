@@ -8,7 +8,7 @@
 
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/Texture.h"
-#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingPipeline.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/CubemapPipeline.h"
 #include "Crystal/Renderer/Pipelines/ComputePipelines/PanoToCubemapPipeline.h"
 #include "Crystal/Renderer/Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
@@ -42,7 +42,6 @@ namespace Crystal {
 
 		void RegisterRenderComponent(PrimitiveComponent* component);
 		
-		
 
 		int GetResolutionWidth() const { return m_ResWidth; }
 		int GetResolutionHeight() const { return m_ResHeight; }
@@ -50,7 +49,7 @@ namespace Crystal {
 	private:
 		Renderer() = default;
 		~Renderer() = default;
-		
+
 		void CreateDevice();
 		void CreateRenderTargetViewFromSwapChain();
 		void CreateDepthStencilView();
@@ -64,7 +63,6 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3d12CommandQueue = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
 
-
 		HANDLE m_FenceEvent = nullptr;
 
 		UINT m_RtvIndex = 0;
@@ -74,7 +72,6 @@ namespace Crystal {
 		std::vector<StaticMeshComponent*> m_StaticMeshComponents;
 		std::vector<SkeletalMeshComponent*> m_SkeletalMeshComponents;
 		std::vector<CollisionComponent*> m_CollisionComponents;
-		
 
 		int m_ResWidth = 1920;
 		int m_ResHeight = 1080;
@@ -82,19 +79,19 @@ namespace Crystal {
 
 		std::unique_ptr<Texture> m_RenderTargetTextures[2];
 		std::unique_ptr<Texture> m_DepthStencilBufferTexture;
-		std::unique_ptr<Texture> m_PanoTexture;
-		std::unique_ptr<Texture> m_CubemapTexture;
-		std::unique_ptr<Texture> m_IrradiancemapTexture;
-		
+
+		// TODO 
+		std::shared_ptr<Texture> m_PanoTexture;
+		std::shared_ptr<Texture> m_CubemapTexture;
+		std::shared_ptr<Texture> m_IrradiancemapTexture;
+
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiHeap = nullptr;
 
-
-		std::unique_ptr<LightingPipeline> m_LightingPipeline = nullptr;
+		std::unique_ptr<LightingStaticPipeline> m_LightingPipeline = nullptr;
 		std::unique_ptr<LinePipeline> m_WireframePipeline = nullptr;
 		std::unique_ptr<CubemapPipeline> m_CubemapPipeline = nullptr;
-		
+
 		std::unique_ptr<PanoToCubemapPipeline> m_PanoToCubemapPipeline = nullptr;
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
-		
 	};
 }

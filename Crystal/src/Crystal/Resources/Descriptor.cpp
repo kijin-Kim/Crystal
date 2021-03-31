@@ -3,7 +3,6 @@
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
-
 	DescriptorHeapManager* DescriptorObject::s_DescriptorHeapManager = nullptr;
 	DescriptorHeapManager::DescriptorHeapManager()
 	{
@@ -37,10 +36,7 @@ namespace Crystal {
 		hr = device->CreateDescriptorHeap(&dsvDesc, IID_PPV_ARGS(&m_DSVHeap));
 		CS_FATAL(SUCCEEDED(hr), "RTV Descriptor Heap을 생성하는데 실패하였습니다.");
 		m_DSVHeapIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-
 	}
-
-
 
 	Descriptor DescriptorHeapManager::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 	{
@@ -69,5 +65,4 @@ namespace Crystal {
 			return Descriptor();
 		}
 	}
-
 }

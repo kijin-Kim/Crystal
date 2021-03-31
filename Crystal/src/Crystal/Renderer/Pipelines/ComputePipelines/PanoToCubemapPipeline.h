@@ -2,7 +2,6 @@
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 
 namespace Crystal {
-
 	class PanoToCubemapPipeline : public ComputePipeline
 	{
 	public:
@@ -13,18 +12,17 @@ namespace Crystal {
 			PANO_TO_CUBEMAP_INPUT_COUNT
 		};
 
-
 		struct PanoToCubemapPipelineInputs : public ComputePipelineInputs
 		{
 			Texture* SourceTexture = nullptr;
 			Texture* DestinationTexture = nullptr;
 		};
 
-		PanoToCubemapPipeline(const std::string& name);
+		PanoToCubemapPipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
 		virtual ~PanoToCubemapPipeline() {}
 
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
-
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 
@@ -33,6 +31,5 @@ namespace Crystal {
 
 		unsigned int m_DestinationTextureWidth = 0;
 		unsigned int m_DestinationTextureHeight = 0;
-
 	};
 }

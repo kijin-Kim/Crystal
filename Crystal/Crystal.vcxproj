@@ -199,10 +199,18 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Actor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\LightActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\LineActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Pawn.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\SkyboxActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingSkeletalPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingStaticPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipelines.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
@@ -240,6 +248,7 @@
     <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
     <ClInclude Include="src\Crystal\Resources\Shader.h" />
     <ClInclude Include="src\Crystal\Resources\ShaderManager.h" />
+    <ClInclude Include="src\Crystal\Resources\TextureManager.h" />
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -247,22 +256,21 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />
-    <ClCompile Include="src\Crystal\Resources\RenderableManager.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
     <ClCompile Include="src\Crystal\Core\Layer.cpp" />
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CameraComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\InputComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponents.cpp" />

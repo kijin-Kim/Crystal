@@ -2,8 +2,7 @@
 #include "PlayerController.h"
 
 namespace Crystal {
-
-	PlayerController::PlayerController(Object* parent) : Controller(parent)
+	PlayerController::PlayerController()
 	{
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
 		m_UserInterfaceInputComponent = std::make_unique<InputComponent>("");
@@ -83,7 +82,7 @@ namespace Crystal {
 		AddActionMapping("UIToGameToUI", actionKey);
 
 		/*만약 원래 Switchable Mode가 아니었고, 이번에 Switchable 모드가 된다면,*/
-		if (!bWasSwitchableMode && bIsSwitchableMode) 
+		if (!bWasSwitchableMode && bIsSwitchableMode)
 		{
 			if (!m_GameInputComponent)
 				CS_FATAL(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
@@ -97,8 +96,5 @@ namespace Crystal {
 			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Pressed);
 			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Released);
 		}
-
-
 	}
-
 }

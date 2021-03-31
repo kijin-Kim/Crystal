@@ -2,7 +2,6 @@
 #include <string>
 
 namespace Crystal {
-
 	struct aiScene;
 
 	class Animation final
@@ -11,11 +10,7 @@ namespace Crystal {
 		Animation(const std::string& filePath) {}
 		~Animation() = default;
 
-
-
 	private:
 		const aiScene* m_Scene = nullptr;
-	
 	};
-
 }

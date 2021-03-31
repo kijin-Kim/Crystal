@@ -18,12 +18,12 @@ namespace Crystal {
 
 		void Update(const float deltaTime) override;
 
-		void SetViewport(const D3D12_VIEWPORT& viewport) { m_Viewport = viewport;}
-		void SetScissorRect(const D3D12_RECT& scissorRect) { m_ScissorRect = scissorRect;}
+		void SetViewport(const D3D12_VIEWPORT& viewport) { m_Viewport = viewport; }
+		void SetScissorRect(const D3D12_RECT& scissorRect) { m_ScissorRect = scissorRect; }
 		void SetFieldOfView(float fieldOfView) { m_FieldOfView = fieldOfView; }
-		void SetNearPlane(float nearPlane) { m_NearPlane = nearPlane;}
-		void SetFarPlane(float farPlane) { m_FarPlane = farPlane;}
-		void SetProjectionMode(ECameraProjectionMode mode) { m_ProjectionMode = mode;}
+		void SetNearPlane(float nearPlane) { m_NearPlane = nearPlane; }
+		void SetFarPlane(float farPlane) { m_FarPlane = farPlane; }
+		void SetProjectionMode(ECameraProjectionMode mode) { m_ProjectionMode = mode; }
 
 		const D3D12_VIEWPORT& GetViewport() const { return m_Viewport; }
 		const D3D12_RECT& GetScissorRect() const { return m_ScissorRect; }
@@ -33,7 +33,7 @@ namespace Crystal {
 
 	private:
 		void computeViewProjection();
-		
+
 	private:
 		DirectX::XMFLOAT4X4 m_ViewProjection = {};
 		D3D12_VIEWPORT m_Viewport = {};

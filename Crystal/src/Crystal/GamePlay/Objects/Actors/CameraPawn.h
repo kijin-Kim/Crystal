@@ -10,7 +10,7 @@ namespace Crystal {
 	class CameraPawn : public Pawn
 	{
 	public:
-		CameraPawn(Crystal::Object* parent) : Crystal::Pawn(parent)
+		CameraPawn()
 		{
 			auto cameraComponent = CreateComponent<CameraComponent>("CameraComponent");
 			cameraComponent->SetLocalPosition(DirectX::XMFLOAT3(0, 0.0f, -15000.0f));
@@ -54,7 +54,6 @@ namespace Crystal {
 			inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
 			inputComponent->BindAxis("RollRight", CS_AXIS_FN(CameraPawn::RollRight));
-
 
 			inputComponent->BindAction("Fire", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginFire));
 		}
@@ -108,7 +107,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), maxDistance));
 
-			Level* level = (Level*)GetParentObject();
+			Level* level = (Level*)GetObjectOwner(ObjectOwnerType::OOT_Level);
 			level->DrawDebugLine(start, end);
 		}
 

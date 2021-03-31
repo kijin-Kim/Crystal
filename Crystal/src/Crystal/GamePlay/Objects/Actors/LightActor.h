@@ -1,13 +1,12 @@
 #pragma once
 #include "Actor.h"
-#include "Crystal\GamePlay\Components\LightComponent.h"
+#include "Crystal/GamePlay/Components/LightComponent.h"
 
 namespace Crystal {
-
 	class LightActor : public Actor
 	{
 	public:
-		LightActor(Object* object) : Actor(object)
+		LightActor()
 		{
 		}
 
@@ -15,20 +14,17 @@ namespace Crystal {
 
 		LightComponent* GetLightComponent() const { return m_LightComponent; }
 
-
 	protected:
 		LightComponent* m_LightComponent = nullptr;
 	};
 
-
 	class DirectionalLightActor : public LightActor
 	{
 	public:
-		DirectionalLightActor(Object* object) : LightActor(object)
+		DirectionalLightActor()
 		{
 			m_LightComponent = CreateComponent<Crystal::DirectionalLightComponent>("DirectionalLightComponent");
 		}
 		~DirectionalLightActor() override = default;
 	};
-
 }

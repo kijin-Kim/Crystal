@@ -4,7 +4,6 @@
 #include "Crystal/Resources/Buffers.h"
 
 namespace Crystal {
-
 	class CubemapPipeline final : public RenderPipeline
 	{
 	public:
@@ -24,14 +23,13 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT4X4 InverseViewProjection;
 		};
-		
+
 	public:
-		CubemapPipeline(const std::string& name);
+		CubemapPipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
 		virtual ~CubemapPipeline() = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
-
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 

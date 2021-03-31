@@ -1,11 +1,10 @@
 #include "cspch.h"
 #include "LinePipeline.h"
-#include "Crystal\Renderer\Renderer.h"
-#include "Crystal\Resources\ResourceManager.h"
+#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-
-	LinePipeline::LinePipeline(const std::string& name) : RenderPipeline(name)
+	LinePipeline::LinePipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : RenderPipeline(name, shader)
 	{
 		auto device = Renderer::Instance().GetDevice();
 
@@ -18,8 +17,6 @@ namespace Crystal {
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
 		CS_FATAL(SUCCEEDED(hr), "Descriptor 힙을 생성하는데 실패하였습니다.");
 
-		
-
 		CD3DX12_ROOT_PARAMETER1 rootParameter[2] = {};
 		rootParameter[0].InitAsConstantBufferView(0);
 
@@ -28,9 +25,8 @@ namespace Crystal {
 		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges),
 			commonDescriptorHeapRanges);
 
-	
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
-		rootSigDesc.Init_1_1(_countof(rootParameter), rootParameter, 0, nullptr, 
+		rootSigDesc.Init_1_1(_countof(rootParameter), rootParameter, 0, nullptr,
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
@@ -60,11 +56,9 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} pipelineStateStream;
 
-
 		pipelineStateStream.RootSignature = m_RootSignature.Get();
 		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-		
 
 		auto& resourceManager = ResourceManager::Instance();
 		auto& ShaderDatablobs = resourceManager.GetShader("SimpleColorShader")->GetRaw();
@@ -73,7 +67,6 @@ namespace Crystal {
 		pipelineStateStream.PS = { ShaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
 			ShaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
 
-		
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY RtvFormat = {};
 		RtvFormat.NumRenderTargets = 1;
@@ -84,16 +77,14 @@ namespace Crystal {
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
-
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-		
 
 		const int maxObjectCount = 300;
 		for (int i = 0; i < maxObjectCount; i++)
 			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
 	}
 
-	void LinePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+	void LinePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 		const PipelineInputs* const pipelineInputs)
 	{
 		RenderPipeline::Record(commandList, pipelineInputs);
@@ -103,7 +94,6 @@ namespace Crystal {
 		LinePipelineInputs* linePipelineInputs = (LinePipelineInputs*)pipelineInputs;
 		auto& collisionComponents = *linePipelineInputs->CollisionComponents;
 
-
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(linePipelineInputs->Camera->GetViewProjection());
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
@@ -111,7 +101,7 @@ namespace Crystal {
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
-		
+
 			m_PerObjectData.World = Matrix4x4::Transpose(collisionComponents[i]->GetPostScaledTransform());
 			m_PerObjectData.Color = collisionComponents[i]->GetLineColor();
 			m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
@@ -121,26 +111,21 @@ namespace Crystal {
 			cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
-
-
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetGraphicsRootSignature(m_RootSignature.Get());
 		commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
 
-		
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			commandList->SetGraphicsRootDescriptorTable(1, gpuHandle);
 			auto renderable = collisionComponents[i]->GetRenderable();
-			for(int j = 0; j < renderable->GetVertexbufferCount(); j++)
+			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 				renderable->Render(commandList, j);
 
 			gpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
-	
 	}
-
 }

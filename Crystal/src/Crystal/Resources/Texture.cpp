@@ -4,7 +4,6 @@
 #include "DirectXTex/DirectXTex.h"
 
 namespace Crystal {
-
 	Texture::Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS resourceFlags, D3D12_RESOURCE_STATES initialStates)
 	{
 		D3D12_RESOURCE_DESC textureDesc = {};
@@ -22,7 +21,6 @@ namespace Crystal {
 			&textureDesc, initialStates,
 			nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
-			
 	}
 
 	Texture::Texture(const std::string& fileName, D3D12_RESOURCE_FLAGS resourceFlags)
@@ -57,7 +55,6 @@ namespace Crystal {
 		}
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
-
 		DirectX::ScratchImage mipChain;
 		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐의 밉 체인을 생성하는데 실패하였습니다.", filePath.string().c_str());
@@ -72,12 +69,10 @@ namespace Crystal {
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
-
 		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&textureDesc, D3D12_RESOURCE_STATE_COMMON,
 			nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
-
 
 		std::vector<D3D12_SUBRESOURCE_DATA> subResources(mipChain.GetImageCount());
 		const DirectX::Image* image = mipChain.GetImages();
@@ -88,7 +83,6 @@ namespace Crystal {
 			subResource.SlicePitch = image[i].slicePitch;
 			subResource.pData = image[i].pixels;
 		}
-
 
 		UINT64 requiredSize = 0;
 		device->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
@@ -126,10 +120,12 @@ namespace Crystal {
 	void Texture::CreateShaderResourceView(DXGI_FORMAT format, D3D12_SRV_DIMENSION srvDimension)
 	{
 		if (!m_ShaderResourceView.IsNull())
+		{
+			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
+		}
 		/*셰이더 리소스 뷰를 생성합니다.*/
 		auto device = Renderer::Instance().GetDevice();
-
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 		shaderResourceViewDesc.Format = format;
@@ -150,16 +146,17 @@ namespace Crystal {
 			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
 		}
 
-
 		m_ShaderResourceView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		device->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
 	}
 
-
 	void Texture::CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension)
 	{
 		if (!m_UnorderedAccessView.IsNull())
+		{
+			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
+		}
 		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
@@ -181,13 +178,15 @@ namespace Crystal {
 
 		m_UnorderedAccessView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		device->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
-
 	}
 
 	void Texture::CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension)
 	{
 		if (!m_RenderTargetView.IsNull())
+		{
+			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
+		}
 		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -203,7 +202,10 @@ namespace Crystal {
 	void Texture::CreateDepthStencilView(DXGI_FORMAT format, D3D12_DSV_DIMENSION dsvDimension)
 	{
 		if (!m_DepthStencilView.IsNull())
+		{
+			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
+		}
 		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -215,5 +217,4 @@ namespace Crystal {
 		m_DepthStencilView = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		device->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
 	}
-
 }

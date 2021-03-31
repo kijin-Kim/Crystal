@@ -1,9 +1,8 @@
 #pragma once
 #include <d3d12.h>
-#include <wrl\client.h>
+#include <wrl/client.h>
 
 namespace Crystal {
-
 	class Descriptor
 	{
 	public:
@@ -16,7 +15,6 @@ namespace Crystal {
 
 	public:
 		D3D12_CPU_DESCRIPTOR_HANDLE m_Handle;
-
 	};
 
 	/*°£´ÜÇÑ ±Û·Î¹ú Èü*/
@@ -48,7 +46,6 @@ namespace Crystal {
 		DescriptorObject() { if (!s_DescriptorHeapManager) s_DescriptorHeapManager = new DescriptorHeapManager(); }
 		virtual ~DescriptorObject() = default;
 
-
 	protected:
 		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 		{
@@ -57,5 +54,4 @@ namespace Crystal {
 	private:
 		static DescriptorHeapManager* s_DescriptorHeapManager;
 	};
-
 }

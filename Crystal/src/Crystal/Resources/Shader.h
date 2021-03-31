@@ -4,9 +4,7 @@
 #include <set>
 #include <d3d12shader.h>
 
-
 namespace Crystal {
-
 	enum class ShaderType
 	{
 		None, Vertex, Hull, Domain, Geometry, Pixel, Compute

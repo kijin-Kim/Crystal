@@ -1,7 +1,7 @@
 #pragma once
-#include "Crystal\Renderer\Pipelines\Pipelines.h"
-#include "Crystal\GamePlay\Components\CollisionComponent.h"
-#include "Crystal\Resources\ConstantBuffer.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/Resources/ConstantBuffer.h"
 
 namespace Crystal {
 	class LinePipeline : public RenderPipeline
@@ -24,12 +24,12 @@ namespace Crystal {
 		};
 
 	public:
-		LinePipeline(const std::string& name);
+		LinePipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
 		~LinePipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
-
+		
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
@@ -39,6 +39,5 @@ namespace Crystal {
 		PerFrameData m_PerFrameData = {};
 		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
 		PerObjectData m_PerObjectData = {};
-
 	};
 }

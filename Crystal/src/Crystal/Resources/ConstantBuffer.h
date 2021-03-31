@@ -2,7 +2,6 @@
 #include "Descriptor.h"
 
 namespace Crystal {
-
 	/*µ¿Àû Constant Buffer*/
 	class ConstantBuffer final : public DescriptorObject
 	{
@@ -19,5 +18,4 @@ namespace Crystal {
 		UINT8* m_CpuBasePtr = nullptr;
 		unsigned int m_Size;
 	};
-
 }

@@ -2,7 +2,6 @@
 #include "TransformComponent.h"
 
 namespace Crystal {
-
 	class LightComponent : public TransformComponent
 	{
 	public:
@@ -22,5 +21,4 @@ namespace Crystal {
 		DirectionalLightComponent() = default;
 		~DirectionalLightComponent() override = default;
 	};
-
 }

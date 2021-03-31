@@ -8,14 +8,11 @@
 #include <assimp/postprocess.h>
 #include "Crystal/Renderer/CommandList.h"
 
-
 namespace Crystal {
-
 	DirectX::XMFLOAT4X4 ToDirectXMathMatrix4x4(const aiMatrix4x4& matrix)
 	{
-		return Matrix4x4::Transpose(*(DirectX::XMFLOAT4X4*) & matrix);
+		return Matrix4x4::Transpose(*(DirectX::XMFLOAT4X4*)&matrix);
 	}
-
 
 	StaticSubMesh::StaticSubMesh(aiMesh* mesh)
 	{
@@ -32,7 +29,7 @@ namespace Crystal {
 
 			if (mesh->HasTangentsAndBitangents())
 			{
-				vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z};
+				vertex.Tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
 				vertex.BiTangent = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
 			}
 
@@ -89,7 +86,6 @@ namespace Crystal {
 		}
 	}
 
-
 	Mesh::Mesh(const std::string& filePath)
 	{
 		m_Importer = new Assimp::Importer();
@@ -100,13 +96,13 @@ namespace Crystal {
 			aiProcess_SortByPType |
 			aiProcess_OptimizeMeshes |
 			aiProcess_ValidateDataStructure);
-		CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode), 
+		CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode),
 			"%s 메쉬를 로드하는데 실패하였습니다", filePath.c_str());
 	}
 
 	Mesh::~Mesh()
 	{
-		if(m_Importer)
+		if (m_Importer)
 			delete m_Importer;
 	}
 
@@ -116,10 +112,10 @@ namespace Crystal {
 		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
 		for (const auto& submesh : m_Submeshes)
 		{
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((StaticSubMesh*)(submesh.get()))->StaticVertices.data(), 
-				(UINT)sizeof(StaticVertex), 
+			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((StaticSubMesh*)(submesh.get()))->StaticVertices.data(),
+				(UINT)sizeof(StaticVertex),
 				(UINT)((StaticSubMesh*)(submesh.get()))->StaticVertices.size()));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), 
+			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(),
 				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
 		}
 
@@ -142,7 +138,7 @@ namespace Crystal {
 
 	SkeletalMesh::SkeletalMesh(const std::string& meshFilePath, const std::string& animationFilePath /*= ""*/) : Mesh(meshFilePath)
 	{
-		/*만약 animation file의 path가 따로 전달 되었다면*/	
+		/*만약 animation file의 path가 따로 전달 되었다면*/
 		CS_INFO("%s 스켈레탈 메쉬 불러오는 중 ...", meshFilePath.c_str());
 		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
 		/*Skeletal Mesh를 로드합니다.*/
@@ -157,7 +153,7 @@ namespace Crystal {
 			m_AnimationScene = m_AnimationFileImporter->ReadFile(animationFilePath,
 				aiProcess_ConvertToLeftHanded);
 
-			CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode), 
+			CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode),
 				"%s 애니메이션 데이터를 로드하는데 실패하였습니다", animationFilePath.c_str());
 		}
 		else if (m_bMeshHasAnimations) // 별도의 Animation File Path가 전달되지 않았고, 애니메이션 데이터가 Mesh File에 존재하면
@@ -180,11 +176,9 @@ namespace Crystal {
 			}
 		}
 
-
 		// Bones
 
 		m_InverseGlobalTransform = Matrix4x4::Inverse(ToDirectXMathMatrix4x4(m_MeshScene->mRootNode->mTransformation));
-
 
 		if (m_bMeshHasBones)
 		{
@@ -218,17 +212,15 @@ namespace Crystal {
 			}
 		}
 
-
 		for (const auto& submesh : m_Submeshes)
 		{
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((SkeletalSubMesh*)(submesh.get()))->SkeletalVertices.data(), 
-				(UINT)sizeof(SkeletalVertex), 
+			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((SkeletalSubMesh*)(submesh.get()))->SkeletalVertices.data(),
+				(UINT)sizeof(SkeletalVertex),
 				(UINT)((SkeletalSubMesh*)(submesh.get()))->SkeletalVertices.size()));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(), 
+			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(),
 				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
 		}
 
-		
 		CS_INFO("%s 스켈레탈 메쉬 불러오기 완료", meshFilePath.c_str());
 	}
 
@@ -241,7 +233,7 @@ namespace Crystal {
 	{
 		Mesh::Update(deltaTime);
 
-		float ticksPerSecond = m_AnimationScene->mAnimations[0]->mTicksPerSecond != 0 
+		float ticksPerSecond = m_AnimationScene->mAnimations[0]->mTicksPerSecond != 0
 			? (float)m_AnimationScene->mAnimations[0]->mTicksPerSecond : 25.0f;
 		m_AnimationTime += deltaTime * ticksPerSecond;
 		m_AnimationTime = fmod(m_AnimationTime, (float)m_AnimationScene->mAnimations[0]->mDuration);
@@ -305,7 +297,6 @@ namespace Crystal {
 				Matrix4x4::Multiply(Matrix4x4::Multiply(m_BoneOffsets[boneIndex], transform), m_InverseGlobalTransform));
 		}
 
-
 		for (uint32_t i = 0; i < pNode->mNumChildren; i++)
 			readNodeHierarchy(animationTime, pNode->mChildren[i], transform);
 	}
@@ -324,7 +315,7 @@ namespace Crystal {
 	DirectX::XMFLOAT3 SkeletalMesh::interpolateScale(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		if (nodeAnim->mNumScalingKeys == 1)
-			return { nodeAnim->mScalingKeys[0].mValue.x, nodeAnim->mScalingKeys[0].mValue.y, 
+			return { nodeAnim->mScalingKeys[0].mValue.x, nodeAnim->mScalingKeys[0].mValue.y,
 			nodeAnim->mScalingKeys[0].mValue.z };
 
 		uint32_t index = findScale(animationTime, nodeAnim);
@@ -345,7 +336,7 @@ namespace Crystal {
 	DirectX::XMFLOAT4 SkeletalMesh::interpolateRotation(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		if (nodeAnim->mNumRotationKeys == 1)
-			return { nodeAnim->mRotationKeys[0].mValue.x, nodeAnim->mRotationKeys[0].mValue.y, 
+			return { nodeAnim->mRotationKeys[0].mValue.x, nodeAnim->mRotationKeys[0].mValue.y,
 			nodeAnim->mRotationKeys[0].mValue.z,  nodeAnim->mRotationKeys[0].mValue.w };
 
 		uint32_t index = findRotation(animationTime, nodeAnim);
@@ -416,5 +407,4 @@ namespace Crystal {
 		}
 		return 0;
 	}
-
 }
