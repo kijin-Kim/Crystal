@@ -4,6 +4,8 @@
 #include <set>
 #include <d3d12shader.h>
 
+struct CD3DX12_STATIC_SAMPLER_DESC;
+
 namespace Crystal {
 	enum class ShaderType
 	{
@@ -38,7 +40,8 @@ namespace Crystal {
 	{
 	public:
 		RootSignature() = default;
-		RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw);
+		RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw,
+			std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers = {});
 		~RootSignature() = default;
 
 		ID3D12RootSignature* GetData() const { return m_D3d12RootSignature.Get(); }

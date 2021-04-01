@@ -5,7 +5,8 @@
 namespace Crystal {
 
 
-	RootSignature::RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw)
+	RootSignature::RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw,
+		std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers)
 	{
 		int cbvRegister = 0;
 		int srvRegister = 0;
@@ -19,23 +20,29 @@ namespace Crystal {
 		if (PerFrame.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerFrame.CbvCount, cbvRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerFrame.CbvCount, cbvRegister);
 			perFrameRanges.push_back(range);
+
+			cbvRegister += PerFrame.CbvCount;
 		}
 
 		if (PerFrame.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerFrame.SrvCount, srvRegister++,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerFrame.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perFrameRanges.push_back(range);
+
+			srvRegister += PerFrame.SrvCount;
 		}
 
 		if (PerFrame.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerFrame.UavCount, uavRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerFrame.UavCount, uavRegister);
 			perFrameRanges.push_back(range);
+
+			uavRegister += PerFrame.UavCount;
 		}
 
 		CD3DX12_ROOT_PARAMETER1 rootParameter = {};
@@ -51,23 +58,29 @@ namespace Crystal {
 		if (PerObject.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerObject.CbvCount, cbvRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerObject.CbvCount, cbvRegister);
 			perObjectRanges.push_back(range);
+
+			cbvRegister += PerObject.CbvCount;
 		}
 
 		if (PerObject.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerObject.SrvCount, srvRegister++,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerObject.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perObjectRanges.push_back(range);
+
+			srvRegister += PerObject.SrvCount;
 		}
 
 		if (PerObject.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerObject.UavCount, uavRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerObject.UavCount, uavRegister);
 			perObjectRanges.push_back(range);
+
+			uavRegister += PerObject.UavCount;
 		}
 
 		rootParameter = {};
@@ -83,23 +96,29 @@ namespace Crystal {
 		if (PerDraw.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerDraw.CbvCount, cbvRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerDraw.CbvCount, cbvRegister);
 			perDrawRanges.push_back(range);
+
+			cbvRegister += PerDraw.CbvCount;
 		}
 
 		if (PerDraw.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerDraw.SrvCount, srvRegister++,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerDraw.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perDrawRanges.push_back(range);
+
+			srvRegister += PerDraw.SrvCount;
 		}
 
 		if (PerDraw.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerDraw.UavCount, uavRegister++);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerDraw.UavCount, uavRegister);
 			perDrawRanges.push_back(range);
+
+			uavRegister += PerDraw.UavCount;
 		}
 
 		rootParameter = {};
@@ -112,7 +131,7 @@ namespace Crystal {
 		//===========================================================================
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
-		rootSigDesc.Init_1_1(rootParameters.size(), rootParameters.data(), 0, nullptr,
+		rootSigDesc.Init_1_1(rootParameters.size(), rootParameters.data(), samplers.size(), samplers.begin(),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;

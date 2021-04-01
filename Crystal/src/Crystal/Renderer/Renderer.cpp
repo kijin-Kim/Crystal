@@ -71,18 +71,50 @@ namespace Crystal {
 		resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
 
 
-		resourceManager.GetShader("SimpleColorShader")->SetInputLayout({
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			});
+		
+		{
+			resourceManager.GetShader("PBRShader_Static")->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});
 
-		RootParameter perFrame = {};
-		RootParameter perObject = {};
-		RootParameter perDraw = {};
 
-		perFrame.CbvCount = 1;
-		perObject.CbvCount = 1;
+			RootParameter perFrame = {};
+			RootParameter perObject = {};
+			RootParameter perDraw = {};
 
-		resourceManager.GetShader("SimpleColorShader")->SetRootSignature({ perFrame, perObject, perDraw });
+			perFrame.CbvCount = 1;
+			perFrame.SrvCount = 1;
+
+			perObject.CbvCount = 1;
+
+			perDraw.CbvCount = 1;
+			perDraw.SrvCount = 4;
+
+
+			RootSignature rootsig = { perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0) }};
+			resourceManager.GetShader("PBRShader_Static")->SetRootSignature(rootsig);
+		}
+
+
+		{
+			resourceManager.GetShader("SimpleColorShader")->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});
+
+			RootParameter perFrame = {};
+			RootParameter perObject = {};
+			RootParameter perDraw = {};
+
+			perFrame.CbvCount = 1;
+
+			perObject.CbvCount = 1;
+
+			resourceManager.GetShader("SimpleColorShader")->SetRootSignature({ perFrame, perObject, perDraw });
+		}
 
 
 
