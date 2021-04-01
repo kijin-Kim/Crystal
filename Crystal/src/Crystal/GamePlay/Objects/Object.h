@@ -7,20 +7,10 @@
 
 namespace Crystal {
 #define STATIC_TYPE_IMPLE(classType) virtual std::string StaticType() const { return #classType; }
-
+#define MAX_OBJECT_OWNER_COUNT 5
 	// Has name
 	class Object : public std::enable_shared_from_this<Object>
 	{
-	public:
-		enum ObjectOwnerType
-		{
-			OOT_Level = 0,
-			OOT_World,
-			OOT_Actor,
-			OOT_Component,
-			OOT_Spawner,
-			Object_Owner_Type_Count
-		};
 	public:
 		Object() = default;
 		virtual ~Object()
@@ -33,36 +23,49 @@ namespace Crystal {
 			// 디폴트 이름 설정
 			// 오브젝트의 타입을 기반으로 이름을 설정
 			// 오브젝트의 카운트를 찾고 그 카운트를 기반으로 이름을 설정
-			m_Name = StaticType() + "_";
-			m_Name += std::to_string(s_ObjectCreationCountTracker[m_Name]++);
 			
+			SetDefaultName();
+
 			CS_DEBUG_INFO("Object : [ %s ]가 생성되었습니다", m_Name.c_str());
 			s_ObjectCreationCountTracker[m_Name]++;
 		}
 
+
+		void SetDefaultName()
+		{
+			m_Name = StaticType() + "_";
+			m_Name += std::to_string(s_ObjectCreationCountTracker[m_Name]++);
+		}
 
 		void SetObjectName(const std::string& name) 
 		{
 			auto it = s_ObjectNameTracker.find(name);
 			if (it != s_ObjectNameTracker.end())
 			{
-				CS_WARN("[ %s ]이름을 가진 Object가 이미 존재합니다", name.c_str());
 				return;
 			}
 
 			s_ObjectNameTracker.insert(name);
 			m_Name = name; 
 		}
-		void SetObjectOwner(std::weak_ptr<Object> object, ObjectOwnerType ownerType) { m_Owners[ownerType] = object; }
+		void SetObjectOwner(std::weak_ptr<Object> object, int ownerType) { m_Owners[ownerType] = object; }
 
 		const std::string& GetObjectName() const { return m_Name; }
-		std::weak_ptr<Object> GetObjectOwner(ObjectOwnerType ownerType) const { return m_Owners[ownerType]; }
+		std::weak_ptr<Object> GetObjectOwner(int ownerType) const 
+		{ 
+			if (ownerType >= MAX_OBJECT_OWNER_COUNT)
+			{
+				CS_WARN("잘못된 ownerType입니다");
+				return {};
+			}
+			return m_Owners[ownerType]; 
+		}
 
 		STATIC_TYPE_IMPLE(Object)
 
 	private:
 		std::string m_Name;
-		std::array<std::weak_ptr<Object>, Object_Owner_Type_Count> m_Owners = {};
+		std::array<std::weak_ptr<Object>, MAX_OBJECT_OWNER_COUNT> m_Owners = {};
 
 
 		using ObjectCountTracker = std::unordered_map<std::string, int>;

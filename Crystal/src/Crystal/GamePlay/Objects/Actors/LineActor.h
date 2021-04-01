@@ -9,7 +9,6 @@ namespace Crystal {
 		LineActor()
 		{
 			m_DebugLineComponent = CreateComponent<RayComponent>("DebugLineComponent");
-			m_MainComponent = m_DebugLineComponent;
 		}
 
 		~LineActor() override = default;
@@ -22,11 +21,11 @@ namespace Crystal {
 		}
 		void Update(const float deltaTime) override {}
 
-		RayComponent* GetLineComponent() const { return m_DebugLineComponent; }
+		std::shared_ptr<RayComponent> GetLineComponent() const { return m_DebugLineComponent; }
 
 
 		STATIC_TYPE_IMPLE(LineActor)
 	private:
-		RayComponent* m_DebugLineComponent = nullptr;
+		std::shared_ptr<RayComponent> m_DebugLineComponent = nullptr;
 	};
 }

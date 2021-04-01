@@ -35,7 +35,7 @@ namespace Crystal {
 			perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
 			rootParameter[3].InitAsDescriptorTable(_countof(perMeshRootParameterRanges), perMeshRootParameterRanges);
 
-			CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {};
+			CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {}; 
 			StaticSamplerDescs[0].Init(0);
 
 			CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;

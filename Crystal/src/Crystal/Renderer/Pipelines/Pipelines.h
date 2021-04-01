@@ -17,7 +17,7 @@ namespace Crystal {
 		};
 
 	public:
-		Pipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : m_Name(name), m_Shader(shader) {}
+		Pipeline(const std::string& name, std::weak_ptr<Shader> shader) : m_Name(name), m_Shader(shader) {}
 		virtual ~Pipeline() = default;
 
 		

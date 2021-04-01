@@ -17,30 +17,33 @@ namespace Crystal {
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
 		CS_FATAL(SUCCEEDED(hr), "Descriptor 힙을 생성하는데 실패하였습니다.");
 
-		CD3DX12_ROOT_PARAMETER1 rootParameter[2] = {};
-		rootParameter[0].InitAsConstantBufferView(0);
+		//CD3DX12_ROOT_PARAMETER1 rootParameter[2] = {};
+		//
+		//CD3DX12_DESCRIPTOR_RANGE1 perFrameRages[3] = {};
+		//perFrameRages[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+		//rootParameter[0].InitAsDescriptorTable(_countof(perFrameRages),
+		//	perFrameRages);
 
-		CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[1] = {};
-		commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-		rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges),
-			commonDescriptorHeapRanges);
+		//CD3DX12_DESCRIPTOR_RANGE1 commonDescriptorHeapRanges[1] = {};
+		//commonDescriptorHeapRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+		//rootParameter[1].InitAsDescriptorTable(_countof(commonDescriptorHeapRanges),
+		//	commonDescriptorHeapRanges);
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
-		rootSigDesc.Init_1_1(_countof(rootParameter), rootParameter, 0, nullptr,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		//CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
+		//rootSigDesc.Init_1_1(_countof(rootParameter), rootParameter, 0, nullptr,
+		//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
-		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
-		hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
-		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
-			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+		//Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
+		//Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
+		//hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
+		//CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		//hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
+		//	rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+		//CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
-		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-		};
-
+		
+		auto inputLayout = m_Shader->GetInputLayout();
+		auto rootSignature = m_Shader->GetRootSignature();
 		////////////////////////////////////////////////////
 		////////PIPELINE STATE//////////////////////////////
 		////////////////////////////////////////////////////
@@ -56,8 +59,8 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 		} pipelineStateStream;
 
-		pipelineStateStream.RootSignature = m_RootSignature.Get();
-		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
+		pipelineStateStream.RootSignature = rootSignature.GetData();
+		pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
 		auto& resourceManager = ResourceManager::Instance();
@@ -98,6 +101,10 @@ namespace Crystal {
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
@@ -114,10 +121,14 @@ namespace Crystal {
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 		commandList->SetPipelineState(m_PipelineState.Get());
-		commandList->SetGraphicsRootSignature(m_RootSignature.Get());
-		commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootSignature(m_Shader->GetRootSignature().GetData());
+		//commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
 
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		commandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
+
+		gpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 		for (int i = 0; i < collisionComponents.size(); i++)
 		{
 			commandList->SetGraphicsRootDescriptorTable(1, gpuHandle);

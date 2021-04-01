@@ -132,11 +132,15 @@ namespace Crystal {
 	class Level : public Updatable
 	{
 	public:
+		enum LevelOwnerType
+		{
+			Owner_World = 0
+		};
+	public:
 		Level()
 		{
 			m_PhysicsSystem = std::make_unique<PhysicsSystem>();
 			m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
-			m_PhysicsSystem->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_Level);
 		}
 		~Level() override = default;
 
@@ -158,8 +162,7 @@ namespace Crystal {
 			// Create new actor
 			auto newActor = std::make_shared<T>();
 			newActor->OnCreate();
-			newActor->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_Level);
-			newActor->SetObjectOwner(GetObjectOwner(ObjectOwnerType::OOT_World), ObjectOwnerType::OOT_World);
+			newActor->SetObjectOwner(weak_from_this(), Actor::ActorOwnerType::Owner_Level);
 			if(!name.empty())
 				newActor->SetObjectName(name);
 			newActor->Begin();
@@ -243,7 +246,7 @@ namespace Crystal {
 			level->OnCreate();
 			if(!name.empty())
 				level->SetObjectName(name);
-			level->SetObjectOwner(weak_from_this(), ObjectOwnerType::OOT_World);
+			level->SetObjectOwner(weak_from_this(), Level::LevelOwnerType::Owner_World);
 
 			m_Levels.push_back(std::move(level));
 

@@ -12,6 +12,13 @@ namespace Crystal {
 	class Actor : public Updatable
 	{
 	public:
+		enum ActorOwnerType
+		{
+			Owner_Level = 0,
+			Owner_Spawner = 1
+		};
+
+	public:
 		Actor() = default;
 		~Actor() override = default;
 
@@ -21,25 +28,30 @@ namespace Crystal {
 
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
-		void RegisterComponent(Component* component);
-		/*Component를 actor의 컨테이너에서 삭제하고 Owner를 nullptr로 지정합니다.*/
-		void UnRegisterComponent(Component* component);
+		void RegisterComponent(const std::shared_ptr<Component>& component);
 
 		/*Component를 TransformComponent들의 Hierarchy에 옮깁니다.*/
-		void MoveToTransformComponentHierarchy(TransformComponent* component);
+		void MoveToTransformComponentHierarchy(const std::shared_ptr <TransformComponent>& component);
 
-		TransformComponent* GetMainComponent() const { return m_MainComponent; }
+		std::weak_ptr<TransformComponent> GetMainComponent() const { return m_MainComponent; }
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
+
+
+		void SetAttachment(const std::shared_ptr<TransformComponent>& from, 
+			const std::shared_ptr<TransformComponent>& to);
+
 
 		STATIC_TYPE_IMPLE(Actor)
 	protected:
 		/*Component를 생성하고 Register합니다.*/
 		template <class T>
-		T* CreateComponent(const std::string& name = "")
+		std::shared_ptr<T> CreateComponent(const std::string& name = "")
 		{
 			/*TODO : Component만 받게 체크...*/
-			T* newComponent = new T();
+			std::shared_ptr<T> newComponent = std::make_shared<T>();
+			newComponent->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
+
 			RegisterComponent(newComponent);
 			newComponent->OnCreate();
 			if (!name.empty())
@@ -48,11 +60,9 @@ namespace Crystal {
 			return newComponent;
 		}
 	protected:
-		/*MainComponent를 가르키는 Raw Pointer입니다. 편의를 위한 Pointer일 뿐,
-		LifeTime은 컨테이너의 Unique Pointer 에 의해 관리됩니다.*/
-		TransformComponent* m_MainComponent = nullptr;
-		std::vector<std::unique_ptr<Component>> m_Components;
+		std::shared_ptr<TransformComponent> m_MainComponent = nullptr;
+		std::vector<std::shared_ptr<Component>> m_Components;
 		/*부모, 자식순으로 Transform 가 배치되어있는 컨테이너 (MainComponent 제외)*/
-		std::vector<std::unique_ptr<TransformComponent>> m_TransformHierarchy;
+		std::vector<std::shared_ptr<TransformComponent>> m_TransformHierarchy;
 	};
 }

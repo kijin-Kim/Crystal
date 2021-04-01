@@ -22,27 +22,27 @@ public:
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
 		//===================================================================================================
 
-		auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-		boundingOrientedBoxComponent->SetExtents({ 9080.0f / 2.0f, 2940.0f / 2.0f, 8690.0f / 2.0f });
+		auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+		boxComponent->SetExtents({ 9080.0f / 2.0f, 2940.0f / 2.0f, 8690.0f / 2.0f });
 
-		m_MainComponent = boundingOrientedBoxComponent;
+		m_MainComponent = boxComponent;
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Frigate"));
 		staticMeshComponent->SetMaterial(pbrMaterial);
 		staticMeshComponent->SetLocalPosition({ 0.0f, 0.0f, 596.0f });
-		staticMeshComponent->SetAttachment(m_MainComponent);
+		SetAttachment(staticMeshComponent, m_MainComponent);
 
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 		springArmComponent->SetOffsetPosition({ 0, 4500.0f, -15000.0f });
-		springArmComponent->SetAttachment(m_MainComponent);
+		SetAttachment(springArmComponent, m_MainComponent);
 
 		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		m_CameraComponent->SetFieldOfView(60.0f);
 		m_CameraComponent->SetNearPlane(1000.0f);
 		m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 		m_CameraComponent->SetFarPlane(10000000.0f);
-		m_CameraComponent->SetAttachment(springArmComponent);
+		SetAttachment(m_CameraComponent, springArmComponent);
 
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 		m_MovementComponent->SetTargetComponent(m_MainComponent);
@@ -129,12 +129,12 @@ public:
 		const auto direction = m_CameraComponent->GetWorldForwardVector();
 		const float maxDistance = 1000000.0f;
 
-		auto level = Crystal::Cast<Crystal::Level>(GetObjectOwner(ObjectOwnerType::OOT_Level));
+		auto level = Crystal::Cast<Crystal::Level>(GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
 		if (level)
 			level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
 	}
 
 private:
-	Crystal::MovementComponent* m_MovementComponent = nullptr;
-	Crystal::CameraComponent* m_CameraComponent = nullptr;
+	std::shared_ptr<Crystal::MovementComponent> m_MovementComponent = nullptr;
+	std::shared_ptr<Crystal::CameraComponent> m_CameraComponent = nullptr;
 };

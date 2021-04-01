@@ -67,7 +67,7 @@ public:
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
 		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
 
-		//Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
+//		Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
 
 		for (int i = -10; i < 10; i++)
 		{

@@ -21,8 +21,6 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 				m_WorldTransform = m_LocalTransform;
 		}
 
-		/*Component의 Transform이 다른 특정 Component에 종속되도록 합니다.*/
-		void SetAttachment(TransformComponent* parentComponent);
 
 		void SetLocalPosition(const DirectX::XMFLOAT3& position) { m_LocalPosition = position; }
 
@@ -60,10 +58,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		DirectX::XMFLOAT3 GetWorldUpVector() const { return { m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23 }; }
 		DirectX::XMFLOAT3 GetWorldForwardVector() const { return { m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33 }; }
 
-		void SetParentComponent(TransformComponent* component) { m_ParentComponent = component; }
-		TransformComponent* GetParentComponent() const { return m_ParentComponent; }
-
-		void AddChildComponent(TransformComponent* component) { m_ChildComponents.push_back(component); }
+		void SetParentComponent(const std::shared_ptr<TransformComponent> component) { m_ParentComponent = std::move(component); }
+		TransformComponent* GetParentComponent() const { return m_ParentComponent.get(); }
 
 		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform) { m_WorldTransform = worldTransform; }
 		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform) { m_LocalTransform = localTransform; }
@@ -77,7 +73,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
-		TransformComponent* m_ParentComponent = nullptr;
+		std::shared_ptr<TransformComponent> m_ParentComponent = nullptr;
 		std::vector<TransformComponent*> m_ChildComponents;
 
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();

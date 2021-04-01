@@ -107,7 +107,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), maxDistance));
 
-			auto level = Crystal::Cast<Level>(GetObjectOwner(ObjectOwnerType::OOT_Level));
+			auto level = Crystal::Cast<Level>(GetObjectOwner(Crystal::Actor::ActorOwnerType::Owner_Level));
 			if(level)
 				level->DrawDebugLine(start, end);
 		}
@@ -115,6 +115,6 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(CameraPawn)
 	private:
-		MovementComponent* m_MovementComponent = nullptr;
+		std::shared_ptr<MovementComponent> m_MovementComponent = nullptr;
 	};
 }

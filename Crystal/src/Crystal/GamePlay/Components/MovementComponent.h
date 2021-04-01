@@ -8,7 +8,7 @@ namespace Crystal {
 		MovementComponent() = default;
 		~MovementComponent() override = default;
 
-		void SetTargetComponent(TransformComponent* targetComponent) { m_TargetComponent = targetComponent; }
+		void SetTargetComponent(std::shared_ptr<TransformComponent> targetComponent) { m_TargetComponent = std::move(targetComponent); }
 
 		void AddForce(const DirectX::XMFLOAT3& force)
 		{
@@ -45,6 +45,6 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(MovementComponent)
 	private:
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
-		TransformComponent* m_TargetComponent = nullptr;
+		std::shared_ptr<TransformComponent> m_TargetComponent = nullptr;
 	};
 }

@@ -9,16 +9,15 @@ namespace Crystal {
 	class Component : public Updatable
 	{
 	public:
+		enum ComponentOwnerType
+		{
+			Owner_Component = 0,
+			Owner_Actor = 1
+		};
+	public:
 		Component() = default;
 		~Component() override = default;
 
-		void SetOwner(Actor* owner) { m_Owner = owner; }
-		Actor* GetOwner() const { if (!m_Owner) CS_WARN("Owner가 nullptr입니다"); return m_Owner; }
-
 		STATIC_TYPE_IMPLE(Component)
-
-	private:
-		/*OwnerShip을 가지고 있지 않음*/
-		Actor* m_Owner = nullptr;
 	};
 }

@@ -3,6 +3,133 @@
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
+
+
+	RootSignature::RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw)
+	{
+		int cbvRegister = 0;
+		int srvRegister = 0;
+		int uavRegister = 0;
+
+
+		std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters;
+
+		//=========== Per Frame ======================================================
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perFrameRanges;
+		if (PerFrame.CbvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerFrame.CbvCount, cbvRegister++);
+			perFrameRanges.push_back(range);
+		}
+
+		if (PerFrame.SrvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerFrame.SrvCount, srvRegister++,
+				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
+			perFrameRanges.push_back(range);
+		}
+
+		if (PerFrame.UavCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerFrame.UavCount, uavRegister++);
+			perFrameRanges.push_back(range);
+		}
+
+		CD3DX12_ROOT_PARAMETER1 rootParameter = {};
+		if (!perFrameRanges.empty())
+		{
+			rootParameter.InitAsDescriptorTable(perFrameRanges.size(), perFrameRanges.data());
+			rootParameters.push_back(rootParameter);
+		}
+		
+		//=========== Per Object ======================================================
+
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perObjectRanges;
+		if (PerObject.CbvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerObject.CbvCount, cbvRegister++);
+			perObjectRanges.push_back(range);
+		}
+
+		if (PerObject.SrvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerObject.SrvCount, srvRegister++,
+				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
+			perObjectRanges.push_back(range);
+		}
+
+		if (PerObject.UavCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerObject.UavCount, uavRegister++);
+			perObjectRanges.push_back(range);
+		}
+
+		rootParameter = {};
+		if (!perObjectRanges.empty())
+		{
+			rootParameter.InitAsDescriptorTable(perObjectRanges.size(), perObjectRanges.data());
+			rootParameters.push_back(rootParameter);
+		}
+
+		//=========== Per Draw ======================================================
+
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perDrawRanges;
+		if (PerDraw.CbvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerDraw.CbvCount, cbvRegister++);
+			perDrawRanges.push_back(range);
+		}
+
+		if (PerDraw.SrvCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerDraw.SrvCount, srvRegister++,
+				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
+			perDrawRanges.push_back(range);
+		}
+
+		if (PerDraw.UavCount > 0)
+		{
+			CD3DX12_DESCRIPTOR_RANGE1 range = {};
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerDraw.UavCount, uavRegister++);
+			perDrawRanges.push_back(range);
+		}
+
+		rootParameter = {};
+		if (!perDrawRanges.empty())
+		{
+			rootParameter.InitAsDescriptorTable(perDrawRanges.size(), perDrawRanges.data());
+			rootParameters.push_back(rootParameter);
+		}
+
+		//===========================================================================
+
+		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
+		rootSigDesc.Init_1_1(rootParameters.size(), rootParameters.data(), 0, nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
+		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
+		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
+		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		auto device = Renderer::Instance().GetDevice();
+		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
+			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_D3d12RootSignature));
+		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+	}
+
+
+
+
+
+
 	Shader::Shader(const std::string& fileName)
 	{
 		CS_INFO("%s 셰이더 불러오는 중...", fileName.c_str());

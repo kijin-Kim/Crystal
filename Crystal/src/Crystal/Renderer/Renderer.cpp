@@ -70,6 +70,22 @@ namespace Crystal {
 		resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
 		resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
 
+
+		resourceManager.GetShader("SimpleColorShader")->SetInputLayout({
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+			});
+
+		RootParameter perFrame = {};
+		RootParameter perObject = {};
+		RootParameter perDraw = {};
+
+		perFrame.CbvCount = 1;
+		perObject.CbvCount = 1;
+
+		resourceManager.GetShader("SimpleColorShader")->SetRootSignature({ perFrame, perObject, perDraw });
+
+
+
 		/*Pipeline¿ª ∏∏µÏ¥œ¥Ÿ.*/
 		m_LightingPipeline = std::make_unique<LightingStaticPipeline>("PBRLightingPipeline", 
 			resourceManager.GetShader("PBRShader_Static"));
@@ -164,7 +180,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		const auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera();
+		const auto mainCamera = ApplicationUtility::GetPlayerController().GetMainCamera().lock();
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
@@ -183,20 +199,20 @@ namespace Crystal {
 		LightingStaticPipeline::LightingPipelineInputs lightingPipelineInputs = {};
 		lightingPipelineInputs.SkeletalMeshComponents = &m_SkeletalMeshComponents;
 		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
-		lightingPipelineInputs.Camera = mainCamera;
+		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 		m_LightingPipeline->Record(commandList, &lightingPipelineInputs);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
-		wireframePipelineInputs.Camera = mainCamera;
+		wireframePipelineInputs.Camera = mainCamera.get();
 		wireframePipelineInputs.CollisionComponents = &m_CollisionComponents;
 		m_WireframePipeline->Record(commandList, &wireframePipelineInputs);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
-		cubemapPipelineInputs.Camera = mainCamera;
+		cubemapPipelineInputs.Camera = mainCamera.get();
 		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
 		m_CubemapPipeline->Record(commandList, &cubemapPipelineInputs);
 
@@ -272,7 +288,7 @@ namespace Crystal {
 			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 
-		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera();
+		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera().lock();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
 		cameraComponent->SetScissorRect({ 0, 0, width, height });
 		m_Window->SetWidth(targetParam.Width);

@@ -15,11 +15,10 @@ namespace Crystal {
 			transformComponent->Update(deltaTime);
 	}
 
-	void Actor::RegisterComponent(Component* component)
+	void Actor::RegisterComponent(const std::shared_ptr<Component>& component)
 	{
-		component->SetOwner(this);
 		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(),
-			[component](const std::unique_ptr<Component>& com)->bool {return com.get() == component; }))
+			[component](const std::shared_ptr<Component>& com)->bool {return com == component; }))
 		{
 			CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetObjectName().c_str());
 			return;
@@ -29,28 +28,11 @@ namespace Crystal {
 		CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
 	}
 
-	void Actor::UnRegisterComponent(Component* component)
-	{
-		component->SetOwner(nullptr);
-		auto it = std::find_if(m_Components.begin(), m_Components.end(),
-			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
-		if (it == m_Components.end())
-		{
-			CS_WARN("삭제하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
-			return;
-		}
-
-		/*erase_copy를 방지하기 위하여 맨 뒤에 원소를 앞으로 보냅니다.*/
-		CS_DEBUG_INFO("Component : %s Unregistered", component->GetObjectName().c_str());
-		m_Components.back().swap(*it);
-		m_Components.erase(m_Components.end() - 1);
-	}
-
-	void Actor::MoveToTransformComponentHierarchy(TransformComponent* component)
+	void Actor::MoveToTransformComponentHierarchy(const std::shared_ptr <TransformComponent>& component)
 	{
 		/*Hierarchy에 이미 있는지 검사*/
 		if (m_TransformHierarchy.end() != std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
-			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component; }))
+			[component](const std::shared_ptr<TransformComponent>& com) ->bool {return com == component; }))
 		{
 			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다", component->GetObjectName().c_str());
 			return;
@@ -58,35 +40,29 @@ namespace Crystal {
 
 		/*Component 배열에서 Move할 컴포넌트를 찾음*/
 		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),
-			[component](const std::unique_ptr<Component>& com) ->bool {return com.get() == component; });
+			[component](const std::shared_ptr<Component>& com) ->bool {return com == component; });
 		if (componentIt == m_Components.end())
 		{
 			CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
 			return;
 		}
 
-		/*erase_copy를 방지하기 위하여 맨 뒤에 원소를 앞으로 보냅니다.*/
-		auto emptyMovedComponentIndex = componentIt - m_Components.begin();
-
-		/*Move!*/
-		std::unique_ptr<TransformComponent> moveDestination(static_cast<TransformComponent*>((*componentIt).release()));
-
-		/*Relase되고 남은 nullptr를 삭제합니다*/
-		m_Components.erase(m_Components.begin() + emptyMovedComponentIndex);
+		// 기존의 배열에서 erase 합니다.
+		m_Components.erase(componentIt);
 
 		/*Transform Hierarchy에서의 위치를 찾아 삽입합니다..*/
 		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
-			[component](const std::unique_ptr<TransformComponent>& com) ->bool {return com.get() == component->GetParentComponent(); });
+			[component](const std::shared_ptr<TransformComponent>& com) ->bool {return com.get() == component->GetParentComponent(); });
 		/*부모를 찾았을 시*/
 		if (it != m_TransformHierarchy.end())
 		{
 			/*부모 바로 다음 자리에 삽입*/
-			m_TransformHierarchy.insert(it + 1, std::move(moveDestination));
+			m_TransformHierarchy.insert(it + 1, component);
 		}
 		/*부모를 못 찾았을 시 == MainComponent의 자식*/
 		else
 		{
-			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), std::move(moveDestination));
+			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), component);
 		}
 
 		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
@@ -96,4 +72,11 @@ namespace Crystal {
 	{
 		m_MainComponent->SetLocalPosition(position);
 	}
+
+	void Actor::SetAttachment(const std::shared_ptr<TransformComponent>& from, const std::shared_ptr<TransformComponent>& to)
+	{
+		from->SetParentComponent(to);
+		MoveToTransformComponentHierarchy(from);
+	}
+
 }

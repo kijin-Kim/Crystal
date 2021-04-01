@@ -2,11 +2,11 @@
 #include <memory>
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Resources/Shader.h"
+#include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
-	// TODO : Material 단위로 텍스쳐를 로딩
 
-	class Material final
+	class Material : public Object
 	{
 	public:
 		Material(const std::shared_ptr<Shader>& shader) : m_Shader(shader) {}
@@ -41,6 +41,7 @@ namespace Crystal {
 
 		Shader* GetShader() const { return m_Shader.get(); }
 
+		STATIC_TYPE_IMPLE(Material)
 	private:
 		using TextureInputs = std::map<std::string, std::weak_ptr<Texture>>;
 		using FloatInputs = std::map<std::string, DirectX::XMFLOAT4>;

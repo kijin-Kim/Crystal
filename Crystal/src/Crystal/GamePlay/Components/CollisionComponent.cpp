@@ -7,10 +7,9 @@ namespace Crystal {
 	{
 		PrimitiveComponent::OnCreate();
 
-		if (auto owner = GetOwner())
+		if (auto owner = GetObjectOwner(Component::ComponentOwnerType::Owner_Actor).lock())
 		{
-			auto levelWeak = owner->GetObjectOwner(Object::ObjectOwnerType::OOT_Level);
-			auto level = std::static_pointer_cast<Level>(levelWeak.lock());
+			auto level = Cast<Level>(owner->GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
 			if (level)
 			{
 				level->RegisterCollisionComponent(this);

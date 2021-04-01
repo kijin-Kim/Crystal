@@ -17,24 +17,6 @@ namespace Crystal {
 		UpdateTransfromHierarchy();
 	}
 
-	void TransformComponent::SetAttachment(TransformComponent* parentComponent)
-	{
-		/*서로가 서로의 Parent*/
-		CS_FATAL(parentComponent->GetParentComponent() != this, "Component : %s 와 Component : %s는 서로가 서로의 부모입니다.",
-			GetObjectName().c_str(), parentComponent->GetObjectName().c_str());
-		CS_FATAL(GetOwner()->GetMainComponent(), "MainComponent가 존재 하지 않습니다. 먼저 MainComponent를 지정해주세요.",
-			GetObjectName().c_str());
-		CS_FATAL(GetOwner()->GetMainComponent() != this, "Component : %s 는 MainComponent입니다 Maincomponent는 다른 Component에 Attach 될 수 없습니다.",
-			GetObjectName().c_str());
-
-		Actor* owner = GetOwner();
-		SetParentComponent(parentComponent);
-		m_ParentComponent->AddChildComponent(parentComponent);
-
-		/*현재 Component를 Transform Component Hierarchy로 이동시킵니다.*/
-		owner->MoveToTransformComponentHierarchy(this);
-	}
-
 	void TransformComponent::RotateRoll(float angle)
 	{
 		angle = DirectX::XMConvertToRadians(angle);
