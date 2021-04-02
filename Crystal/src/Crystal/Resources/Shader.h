@@ -3,6 +3,7 @@
 #include <wrl/client.h>
 #include <set>
 #include <d3d12shader.h>
+#include "Crystal/GamePlay/Objects/Object.h"
 
 struct CD3DX12_STATIC_SAMPLER_DESC;
 
@@ -40,17 +41,36 @@ namespace Crystal {
 	{
 	public:
 		RootSignature() = default;
-		RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw,
+		RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perDraw,
 			std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers = {});
 		~RootSignature() = default;
 
 		ID3D12RootSignature* GetData() const { return m_D3d12RootSignature.Get(); }
+
+		bool HasPerFrameParameter() const { return !m_PerFrame.IsNull(); }
+		bool HasPerObjectParameter() const { return !m_PerObject.IsNull(); }
+		bool HasPerDrawParameter() const { return !m_PerDraw.IsNull(); }
+
+		int GetPerFrameDescriptorCount() const { return m_PerFrame.CbvCount + m_PerFrame.SrvCount + m_PerFrame.UavCount; }
+		int GetPerObjectDescriptorCount() const { return m_PerObject.CbvCount + m_PerObject.SrvCount + m_PerObject.UavCount; }
+		int GetPerDrawDescriptorCount() const { return m_PerDraw.CbvCount + m_PerDraw.SrvCount + m_PerDraw.UavCount; }
+
+		int GetPerFrameParameterIndex() const { return !m_PerFrame.IsNull() - 1; }
+		int GetPerObjectParameterIndex() const { return !m_PerFrame.IsNull() + !m_PerObject.IsNull() - 1; }
+		int GetPerDrawParameterIndex() const { return !m_PerFrame.IsNull() + !m_PerObject.IsNull() + !m_PerDraw.IsNull() - 1; }
+
+		
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_D3d12RootSignature = nullptr;
+
+		RootParameter m_PerFrame = {};
+		RootParameter m_PerObject = {};
+		RootParameter m_PerDraw = {};
 	};
 
 
-	class Shader final
+	class Shader : public Object
 	{
 		friend class ShaderManager;
 	public:
@@ -69,10 +89,15 @@ namespace Crystal {
 		void SetInputLayout(InputLayout inputLayout) { m_InputLayout = inputLayout; }
 		const InputLayout& GetInputLayout() const { return m_InputLayout; }
 
+		void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE type) { m_PrimitiveTopologyType = type; }
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const { return m_PrimitiveTopologyType; }
+
+		bool HasShader(ShaderType type) { return m_ShaderDataBlobs.count(type) != 0; }
+
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> loadSourceFromFile(const std::string& filePath);
 		void compileShader(Microsoft::WRL::ComPtr<ID3DBlob>& srcblob, ShaderType type);
-		bool hasShader(ShaderType type, const std::string& src);
+		bool canCompile(ShaderType type, const std::string& src);
 
 	private:
 		mutable std::map<ShaderType, Microsoft::WRL::ComPtr<ID3DBlob>> m_ShaderDataBlobs;
@@ -81,6 +106,8 @@ namespace Crystal {
 
 		InputLayout m_InputLayout = {};
 		RootSignature m_RootSignature = {};
+
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE m_PrimitiveTopologyType;
 
 		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_ShaderReflection = nullptr;
 	};

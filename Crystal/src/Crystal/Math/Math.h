@@ -14,6 +14,10 @@ namespace Crystal {
 		const DirectX::XMFLOAT3 Green = { 0.0f, 1.0f, 0.0f };
 		const DirectX::XMFLOAT3 Blue = { 0.0f, 0.0f, 1.0f };
 
+		const DirectX::XMFLOAT3 Cyan = { 0.0f, 1.0f, 1.0f };
+		const DirectX::XMFLOAT3 Magenta = { 1.0f, 0.0f, 1.0f };
+		const DirectX::XMFLOAT3 Yellow = { 1.0f, 1.0f, 0.0f };
+
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
 			DirectX::XMFLOAT3 result;

@@ -45,23 +45,24 @@ namespace Crystal {
 		};
 
 	public:
-		LightingStaticPipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
-		virtual ~LightingStaticPipeline() = default;
+		LightingStaticPipeline() = default;
+		~LightingStaticPipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+		void OnCreate() override;
+
+		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
 		
 	private:
 		PerFrameData m_PerFrameData = {};
 
 		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-		std::unique_ptr<ConstantBuffer> m_PerMaterialConstantBuffer = nullptr;
 
 		std::vector<std::unique_ptr<ConstantBuffer>> m_StaticMeshPerObjectConstantBuffers;
 		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_StaticMeshPerMaterialConstantBufferLists;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_StaticMeshDescriptorHeap = nullptr;
+		/*Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_StaticMeshDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_StaticMeshPipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_StaticMeshRootSignature = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_StaticMeshRootSignature = nullptr;*/
 
 		std::vector<std::unique_ptr<ConstantBuffer>> m_SkeletalMeshPerObjectConstantBuffers;
 		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_SkeletalMeshPerMaterialConstantBufferLists;

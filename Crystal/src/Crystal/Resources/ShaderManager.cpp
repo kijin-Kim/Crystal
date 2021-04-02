@@ -2,15 +2,18 @@
 #include "ShaderManager.h"
 
 namespace Crystal {
-	void ShaderManager::createFromFile(const std::string& fileName, const std::string& shaderName)
+	std::weak_ptr<Shader> ShaderManager::createFromFile(const std::string& fileName, const std::string& shaderName)
 	{
 		if (m_Shaders.find(shaderName) != m_Shaders.end())
 		{
 			CS_FATAL(false, "%s이 이미 존재합니다", shaderName);
-			return;
+			return {};
 		}
 
-		m_Shaders[shaderName] = std::make_shared<Shader>(fileName);
+		auto newShader = std::make_shared<Shader>(fileName);
+		newShader->SetObjectName(shaderName);
+		newShader->OnCreate();
+		return (m_Shaders[shaderName] = std::move(newShader));
 	}
 
 	void ShaderManager::destroy(const std::string& shaderName)

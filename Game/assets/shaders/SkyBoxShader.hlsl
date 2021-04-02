@@ -20,6 +20,7 @@ PS_INPUT vsMain(VS_INPUT input)
     PS_INPUT output;
     output.Position = float4(input.Position, 1.0f, 1.0f);
     output.TexCoord = mul(output.Position, InverseViewProj).xyz;
+    
     return output;
 }
 

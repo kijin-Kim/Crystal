@@ -9,7 +9,13 @@ namespace Crystal {
 	class Material : public Object
 	{
 	public:
-		Material(const std::shared_ptr<Shader>& shader) : m_Shader(shader) {}
+		enum MaterialOwnerType
+		{
+			Owner_Shader = 0
+		};
+
+	public:
+		Material() = default;
 		~Material() = default;
 
 		void Set(const std::string& materialName, std::weak_ptr<Texture> texture);
@@ -39,16 +45,12 @@ namespace Crystal {
 		const DirectX::XMINT4& GetIntInput(const std::string& intName) const;
 		bool GetBoolInput(const std::string& boolName) const;
 
-		Shader* GetShader() const { return m_Shader.get(); }
-
 		STATIC_TYPE_IMPLE(Material)
 	private:
 		using TextureInputs = std::map<std::string, std::weak_ptr<Texture>>;
 		using FloatInputs = std::map<std::string, DirectX::XMFLOAT4>;
 		using IntInputs = std::map<std::string, DirectX::XMINT4>;
 		using BoolInputs = std::map<std::string, bool>;
-
-		std::shared_ptr<Shader> m_Shader = nullptr;
 
 		mutable TextureInputs m_TextureInputs;
 		FloatInputs m_FloatInputs;

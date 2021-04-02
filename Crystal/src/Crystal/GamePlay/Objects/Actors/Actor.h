@@ -22,6 +22,8 @@ namespace Crystal {
 		Actor() = default;
 		~Actor() override = default;
 
+		void OnCreate() override;
+
 		virtual void Begin() {}
 		virtual void End() {}
 		void Update(const float deltaTime) override { Updatable::Update(deltaTime); }
@@ -56,9 +58,14 @@ namespace Crystal {
 			newComponent->OnCreate();
 			if (!name.empty())
 				newComponent->SetObjectName(name);
-			
+
 			return newComponent;
 		}
+
+
+
+
+
 	protected:
 		std::shared_ptr<TransformComponent> m_MainComponent = nullptr;
 		std::vector<std::shared_ptr<Component>> m_Components;

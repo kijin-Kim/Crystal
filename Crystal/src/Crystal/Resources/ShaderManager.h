@@ -10,10 +10,10 @@ namespace Crystal {
 	{
 		friend class ResourceManager;
 	private:
-		void createFromFile(const std::string& fileName, const std::string& shaderName);
+		std::weak_ptr<Shader> createFromFile(const std::string& fileName, const std::string& shaderName);
 		void destroy(const std::string& shaderName);
 
-		const std::shared_ptr<Shader>& get(const std::string& fileName)
+		std::weak_ptr<Shader> get(const std::string& fileName)
 		{
 			auto it = m_Shaders.find(fileName);
 			if (it == m_Shaders.end())

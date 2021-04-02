@@ -24,16 +24,15 @@ namespace Crystal {
 		};
 
 	public:
-		LinePipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
+		LinePipeline() = default;
 		~LinePipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+		void OnCreate() override;
+
+		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
 		
 	private:
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
 
 		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
 		PerFrameData m_PerFrameData = {};

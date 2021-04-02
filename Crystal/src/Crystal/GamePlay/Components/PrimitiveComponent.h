@@ -37,8 +37,8 @@ namespace Crystal {
 			m_Renderable->Update(deltaTime);
 		}
 
-		void SetMaterial(std::shared_ptr<Material> material, int index = 0) { m_Materials[index] = std::move(material); }
-		const std::array<std::shared_ptr<Material>, 5>& GetMaterials() const { return m_Materials; }
+		void AddMaterial(std::shared_ptr<Material> material) { m_Materials.push_back(std::move(material)); }
+		const std::vector<std::shared_ptr<Material>>& GetMaterials() const { return m_Materials; }
 
 		void SetPrimitiveComponentType(EPrimitiveComponentType type) { m_PrimitiveComponentType = type; }
 		void SetRenderable(std::shared_ptr<Renderable> renderable) { m_Renderable = std::move(renderable); }
@@ -46,11 +46,13 @@ namespace Crystal {
 
 		EPrimitiveComponentType GetPrimitiveComponentType() const { return m_PrimitiveComponentType; }
 
+		bool CanBeRendered()const override { return true; }
+
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
 		std::shared_ptr<Renderable> m_Renderable = nullptr;
 		EPrimitiveComponentType m_PrimitiveComponentType;
 
-		std::array<std::shared_ptr<Material>, 5> m_Materials;
+		std::vector<std::shared_ptr<Material>> m_Materials;
 	};
 }

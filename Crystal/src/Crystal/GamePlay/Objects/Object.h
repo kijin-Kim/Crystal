@@ -24,7 +24,8 @@ namespace Crystal {
 			// 오브젝트의 타입을 기반으로 이름을 설정
 			// 오브젝트의 카운트를 찾고 그 카운트를 기반으로 이름을 설정
 			
-			SetDefaultName();
+			if(m_Name.empty())
+				SetDefaultName();
 
 			CS_DEBUG_INFO("Object : [ %s ]가 생성되었습니다", m_Name.c_str());
 			s_ObjectCreationCountTracker[m_Name]++;

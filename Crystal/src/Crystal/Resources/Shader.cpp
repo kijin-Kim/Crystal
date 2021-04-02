@@ -5,8 +5,9 @@
 namespace Crystal {
 
 
-	RootSignature::RootSignature(const RootParameter& PerFrame, const RootParameter& PerObject, const RootParameter& PerDraw,
-		std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers)
+	RootSignature::RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perDraw,
+		std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers) 
+		: m_PerFrame(perFrame), m_PerObject(perObject), m_PerDraw(perDraw)
 	{
 		int cbvRegister = 0;
 		int srvRegister = 0;
@@ -17,32 +18,32 @@ namespace Crystal {
 
 		//=========== Per Frame ======================================================
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perFrameRanges;
-		if (PerFrame.CbvCount > 0)
+		if (perFrame.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerFrame.CbvCount, cbvRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, perFrame.CbvCount, cbvRegister);
 			perFrameRanges.push_back(range);
 
-			cbvRegister += PerFrame.CbvCount;
+			cbvRegister += perFrame.CbvCount;
 		}
 
-		if (PerFrame.SrvCount > 0)
+		if (perFrame.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerFrame.SrvCount, srvRegister,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, perFrame.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perFrameRanges.push_back(range);
 
-			srvRegister += PerFrame.SrvCount;
+			srvRegister += perFrame.SrvCount;
 		}
 
-		if (PerFrame.UavCount > 0)
+		if (perFrame.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerFrame.UavCount, uavRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, perFrame.UavCount, uavRegister);
 			perFrameRanges.push_back(range);
 
-			uavRegister += PerFrame.UavCount;
+			uavRegister += perFrame.UavCount;
 		}
 
 		CD3DX12_ROOT_PARAMETER1 rootParameter = {};
@@ -52,35 +53,35 @@ namespace Crystal {
 			rootParameters.push_back(rootParameter);
 		}
 		
-		//=========== Per Object ======================================================
+		//=========== per Object ======================================================
 
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perObjectRanges;
-		if (PerObject.CbvCount > 0)
+		if (perObject.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerObject.CbvCount, cbvRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, perObject.CbvCount, cbvRegister);
 			perObjectRanges.push_back(range);
 
-			cbvRegister += PerObject.CbvCount;
+			cbvRegister += perObject.CbvCount;
 		}
 
-		if (PerObject.SrvCount > 0)
+		if (perObject.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerObject.SrvCount, srvRegister,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, perObject.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perObjectRanges.push_back(range);
 
-			srvRegister += PerObject.SrvCount;
+			srvRegister += perObject.SrvCount;
 		}
 
-		if (PerObject.UavCount > 0)
+		if (perObject.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerObject.UavCount, uavRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, perObject.UavCount, uavRegister);
 			perObjectRanges.push_back(range);
 
-			uavRegister += PerObject.UavCount;
+			uavRegister += perObject.UavCount;
 		}
 
 		rootParameter = {};
@@ -90,35 +91,35 @@ namespace Crystal {
 			rootParameters.push_back(rootParameter);
 		}
 
-		//=========== Per Draw ======================================================
+		//=========== per Draw ======================================================
 
 		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perDrawRanges;
-		if (PerDraw.CbvCount > 0)
+		if (perDraw.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, PerDraw.CbvCount, cbvRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, perDraw.CbvCount, cbvRegister);
 			perDrawRanges.push_back(range);
 
-			cbvRegister += PerDraw.CbvCount;
+			cbvRegister += perDraw.CbvCount;
 		}
 
-		if (PerDraw.SrvCount > 0)
+		if (perDraw.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, PerDraw.SrvCount, srvRegister,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, perDraw.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 			perDrawRanges.push_back(range);
 
-			srvRegister += PerDraw.SrvCount;
+			srvRegister += perDraw.SrvCount;
 		}
 
-		if (PerDraw.UavCount > 0)
+		if (perDraw.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, PerDraw.UavCount, uavRegister);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, perDraw.UavCount, uavRegister);
 			perDrawRanges.push_back(range);
 
-			uavRegister += PerDraw.UavCount;
+			uavRegister += perDraw.UavCount;
 		}
 
 		rootParameter = {};
@@ -157,32 +158,32 @@ namespace Crystal {
 		const std::string srcString = (char*)srcBlob->GetBufferPointer();
 
 		bool bIsValidShader = false;
-		if (hasShader(ShaderType::Vertex, srcString))
+		if (canCompile(ShaderType::Vertex, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Vertex);
 			bIsValidShader = true;
 		}
-		if (hasShader(ShaderType::Hull, srcString))
+		if (canCompile(ShaderType::Hull, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Hull);
 			bIsValidShader = true;
 		}
-		if (hasShader(ShaderType::Domain, srcString))
+		if (canCompile(ShaderType::Domain, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Domain);
 			bIsValidShader = true;
 		}
-		if (hasShader(ShaderType::Geometry, srcString))
+		if (canCompile(ShaderType::Geometry, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Geometry);
 			bIsValidShader = true;
 		}
-		if (hasShader(ShaderType::Pixel, srcString))
+		if (canCompile(ShaderType::Pixel, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Pixel);
 			bIsValidShader = true;
 		}
-		if (hasShader(ShaderType::Compute, srcString))
+		if (canCompile(ShaderType::Compute, srcString))
 		{
 			compileShader(srcBlob, ShaderType::Compute);
 			bIsValidShader = true;
@@ -279,7 +280,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "셰이더 리플렉션을 실패하였습니다.");
 	}
 
-	bool Shader::hasShader(ShaderType type, const std::string& src)
+	bool Shader::canCompile(ShaderType type, const std::string& src)
 	{
 		switch (type)
 		{

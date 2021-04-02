@@ -4,6 +4,7 @@
 namespace Crystal {
 	/*물리적인 위치를 나타내는 특성을 가지고 있는 컴포넌트들의 베이스 클래스
 MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 지님*/
+
 	class TransformComponent : public Component
 	{
 	public:
@@ -69,6 +70,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 
 		const DirectX::XMFLOAT4& GetRotation() const { return m_Rotation; }
 
+		virtual bool CanBeRendered() const { return false; }
 
 		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:

@@ -4,8 +4,11 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-	DiffIrradSamplingPipeline::DiffIrradSamplingPipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : ComputePipeline(name, shader)
+
+	void DiffIrradSamplingPipeline::OnCreate()
 	{
+		ComputePipeline::OnCreate();
+
 		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
@@ -35,8 +38,8 @@ namespace Crystal {
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
-		auto& resourceManager = ResourceManager::Instance();
-		auto& shaderDatablobs = resourceManager.GetShader("DiffuseIrradianceSampling")->GetRaw();
+		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto& shaderDatablobs = shader->GetRaw();
 		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
 		computePipelineStateDesc.pRootSignature = m_RootSignature.Get();
 		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };
@@ -45,9 +48,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "PipelineState를 생성하는데 실패하였습니다.");
 	}
 
-	void DiffIrradSamplingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void DiffIrradSamplingPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::Record(commandList, pipelineInputs);
+		ComputePipeline::PrepareRecord(commandList, pipelineInputs);
 
 		DiffIrradSamplingPipelineInputs* diffIrradSamplingPipelineInputs = (DiffIrradSamplingPipelineInputs*)pipelineInputs;
 

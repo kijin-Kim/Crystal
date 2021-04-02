@@ -7,7 +7,7 @@
 
 #include "actors/TestPawn.h"
 #include "actors/Kraken.h"
-#include "actors/Aestroid.h"
+#include "actors/Asteroid.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
 
@@ -29,35 +29,36 @@ public:
 		
 		//============ Load Renderables =======================================
 		resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("assets/models/SM_Frigate_BE2.fbx", "Frigate");
+		resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx", "Asteroid_Mesh_1");
 
 		//============ Load Textures ==========================================
-		auto frigateAlbedoWeak = resourceManager.CreateTextureFromFile(
-			"assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga", "Frigate_Albedo");
-		if (auto frigateAlbedo = frigateAlbedoWeak.lock())
-		{
-			frigateAlbedo->CreateShaderResourceView(frigateAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		}
+		auto frigateAlbedo = resourceManager.CreateTextureFromFile(
+			"assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga", "Frigate_Albedo").lock();
+		frigateAlbedo->CreateShaderResourceView(frigateAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 			
-		auto frigateMetallicWeak = resourceManager.CreateTextureFromFile(
-			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga", "Frigate_Metallic");
-		if (auto frigateMetallic = frigateMetallicWeak.lock())
-		{
-			frigateMetallic->CreateShaderResourceView(frigateMetallic->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		}
+		auto frigateMetallic = resourceManager.CreateTextureFromFile(
+			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga", "Frigate_Metallic").lock();
+		frigateMetallic->CreateShaderResourceView(frigateMetallic->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
-		auto frigateRoughnessWeak = resourceManager.CreateTextureFromFile(
-			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga", "Frigate_Roughness");
-		if (auto frigateRoughness = frigateRoughnessWeak.lock())
-		{
-			frigateRoughness->CreateShaderResourceView(frigateRoughness->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		}
+		auto frigateRoughness = resourceManager.CreateTextureFromFile(
+			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga", "Frigate_Roughness").lock();
+		frigateRoughness->CreateShaderResourceView(frigateRoughness->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 			
-		auto frigateNormalWeak = resourceManager.CreateTextureFromFile(
-			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga", "Frigate_Normal");
-		if (auto frigateNormal = frigateNormalWeak.lock())
-		{
-			frigateNormal->CreateShaderResourceView(frigateNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		}
+		auto frigateNormal = resourceManager.CreateTextureFromFile(
+			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga", "Frigate_Normal").lock();
+		frigateNormal->CreateShaderResourceView(frigateNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
+		auto asteroidBlueAlbedo = resourceManager.CreateTextureFromFile(
+			"assets/textures/Asteroid/AstOre_1_A.tga", "Asteroid_Blue_Albedo").lock();
+		asteroidBlueAlbedo->CreateShaderResourceView(asteroidBlueAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
+		auto asteroidBlueNormal = resourceManager.CreateTextureFromFile(
+			"assets/textures/Asteroid/AstOre_1_N.tga", "Asteroid_Blue_Normal").lock();
+		asteroidBlueNormal->CreateShaderResourceView(asteroidBlueNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
 		//=====================================================================
 
 
@@ -69,17 +70,11 @@ public:
 
 //		Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
 
-		for (int i = -10; i < 10; i++)
+		for (int i = 0; i < 40; i++)
 		{
-			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
-			asteroid->SetPosition({ 3000.0f * i, 0.0f, 0.0f });
+			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();	
 		}
 
-		for (int i = -10; i < 10; i++)
-		{
-			RandomBox* randomBox = defaultLevel->SpawnActor<RandomBox>();
-			randomBox->SetPosition({ 3000.0f * i, 3000.0f, 0.0f });
-		}
 
 		/*Crystal::CameraPawn* cameraPawn = defaultLevel->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/

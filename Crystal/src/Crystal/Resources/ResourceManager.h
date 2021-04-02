@@ -9,9 +9,9 @@ namespace Crystal {
 	public:
 		static ResourceManager& Instance() { static ResourceManager instance; return instance; }
 
-		void CreateShaderFromFile(const std::string& fileName, const std::string& name)
+		std::weak_ptr<Shader> CreateShaderFromFile(const std::string& fileName, const std::string& name)
 		{
-			m_ShaderManager.createFromFile(fileName, name);
+			return m_ShaderManager.createFromFile(fileName, name);
 		}
 
 		void DestroyShader(const std::string& name)
@@ -19,7 +19,7 @@ namespace Crystal {
 			m_ShaderManager.destroy(name);
 		}
 
-		const std::shared_ptr<Shader>& GetShader(const std::string& name)
+		std::weak_ptr<Shader> GetShader(const std::string& name)
 		{
 			return m_ShaderManager.get(name);
 		}

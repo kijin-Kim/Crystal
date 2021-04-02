@@ -40,7 +40,7 @@ namespace Crystal {
 		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
 		void ActiveFullScreenMode(const bool bActive) { m_bIsFullScreen = bActive; }
 
-		void RegisterRenderComponent(PrimitiveComponent* component);
+		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 		
 
 		int GetResolutionWidth() const { return m_ResWidth; }
@@ -88,10 +88,12 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_ImGuiHeap = nullptr;
 
 		std::unique_ptr<LightingStaticPipeline> m_LightingPipeline = nullptr;
-		std::unique_ptr<LinePipeline> m_WireframePipeline = nullptr;
+		std::unique_ptr<LinePipeline> m_LinePipeline = nullptr;
 		std::unique_ptr<CubemapPipeline> m_CubemapPipeline = nullptr;
 
 		std::unique_ptr<PanoToCubemapPipeline> m_PanoToCubemapPipeline = nullptr;
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
+
+		std::vector<std::unique_ptr<RenderPipeline>> m_MainColorPipelines;
 	};
 }

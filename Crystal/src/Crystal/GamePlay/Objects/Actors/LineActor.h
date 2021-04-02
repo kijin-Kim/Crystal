@@ -9,6 +9,7 @@ namespace Crystal {
 		LineActor()
 		{
 			m_DebugLineComponent = CreateComponent<RayComponent>("DebugLineComponent");
+			m_MainComponent = m_DebugLineComponent;
 		}
 
 		~LineActor() override = default;

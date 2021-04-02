@@ -12,21 +12,35 @@ namespace Crystal {
 		CollisionComponent()
 		{
 			SetPrimitiveComponentType(PrimitiveComponent::EPrimitiveComponentType::Collision);
+
+			auto& resourceManager = ResourceManager::Instance();
+
+			auto simpleColorMaterial = std::make_shared<Crystal::Material>();
+			simpleColorMaterial->SetObjectOwner(resourceManager.GetShader("SimpleColorShader"),
+				Crystal::Material::MaterialOwnerType::Owner_Shader);
+			simpleColorMaterial->Set("Color", Vector3::Yellow);
+
+			AddMaterial(std::move(simpleColorMaterial));
 		}
 		~CollisionComponent() override
 		{
 		}
 
-		void SetLineColor(const DirectX::XMFLOAT3& color) { m_Color = color; }
-		const DirectX::XMFLOAT3& GetLineColor() const { return m_Color; }
+		void SetLineColor(const DirectX::XMFLOAT3& color) 
+		{
+			m_Materials[0]->Set("Color", color); 
+		}
+		const DirectX::XMFLOAT3& GetLineColor() const 
+		{ 
+			auto color = m_Materials[0]->GetFloatInput("Color"); 
+			return { color.x, color.y, color.z };
+		}
 
 		void OnCreate() override;
 
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
-	private:
-		DirectX::XMFLOAT3 m_Color = { 1.0f, 1.0f, 0.0f };
 	protected:
 		DirectX::XMFLOAT4X4 m_PostScaledTransform = Matrix4x4::Identity(); // This is for rendering
 	};

@@ -15,33 +15,38 @@ public:
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto pbrMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Static"));
+		auto pbrMaterial = std::make_shared<Crystal::Material>();
+		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
+			Crystal::Material::MaterialOwnerType::Owner_Shader);
 		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Frigate_Albedo"));
 		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Frigate_Metallic"));
 		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Frigate_Roughness"));
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
+
+
+		
+
 		//===================================================================================================
 
 		auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-		boxComponent->SetExtents({ 9080.0f / 2.0f, 2940.0f / 2.0f, 8690.0f / 2.0f });
+		boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });
 
 		m_MainComponent = boxComponent;
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		staticMeshComponent->SetMaterial(pbrMaterial);
-		staticMeshComponent->SetLocalPosition({ 0.0f, 0.0f, 596.0f });
+		staticMeshComponent->AddMaterial(pbrMaterial);
 		SetAttachment(staticMeshComponent, m_MainComponent);
 
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-		springArmComponent->SetOffsetPosition({ 0, 4500.0f, -15000.0f });
+		springArmComponent->SetOffsetPosition({ 0, 450.0f, -1500.0f });
 		SetAttachment(springArmComponent, m_MainComponent);
 
 		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		m_CameraComponent->SetFieldOfView(60.0f);
-		m_CameraComponent->SetNearPlane(1000.0f);
+		m_CameraComponent->SetNearPlane(10.0f);
 		m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
-		m_CameraComponent->SetFarPlane(10000000.0f);
+		m_CameraComponent->SetFarPlane(100000.0f);
 		SetAttachment(m_CameraComponent, springArmComponent);
 
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
@@ -98,21 +103,21 @@ public:
 
 	void MoveForward(float value)
 	{
-		value *= 1300.0f;
+		value *= 130.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveRight(float value)
 	{
-		value *= 1300.0f;
+		value *= 130.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
 
 	void MoveUp(float value)
 	{
-		value *= 1300.0f;
+		value *= 130.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
 		m_MovementComponent->AddForce(force);
 	}
@@ -127,7 +132,7 @@ public:
 		CS_DEBUG_INFO("BeginFire!!");
 		const auto start = m_CameraComponent->GetWorldPosition();
 		const auto direction = m_CameraComponent->GetWorldForwardVector();
-		const float maxDistance = 1000000.0f;
+		const float maxDistance = 10000.0f;
 
 		auto level = Crystal::Cast<Crystal::Level>(GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
 		if (level)

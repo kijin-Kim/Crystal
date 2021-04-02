@@ -4,95 +4,15 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-	LightingStaticPipeline::LightingStaticPipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : RenderPipeline(name, shader)
+
+	void LightingStaticPipeline::OnCreate()
 	{
-		auto device = Renderer::Instance().GetDevice();
+		RenderPipeline::OnCreate();
+
 
 		// Create StaticMesh's PipelineState
 		{
-			D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
-			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-			descriptorHeapDesc.NumDescriptors = 100;
-			descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-			descriptorHeapDesc.NodeMask = 0;
-
-			HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_StaticMeshDescriptorHeap));
-			CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
-
-			//CD3DX12_ROOT_PARAMETER1 rootParameter[3] = {}; // per frame
-
-			//CD3DX12_DESCRIPTOR_RANGE1 perFrameRootParameterRanges[2] = {}; // irradiance
-			//perFrameRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-			//perFrameRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-			//rootParameter[0].InitAsDescriptorTable(_countof(perFrameRootParameterRanges), perFrameRootParameterRanges);
-
-			//CD3DX12_DESCRIPTOR_RANGE1 perObjectRootParamRanges[1] = {};
-			//perObjectRootParamRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-			//rootParameter[1].InitAsDescriptorTable(_countof(perObjectRootParamRanges), perObjectRootParamRanges);
-
-			//CD3DX12_DESCRIPTOR_RANGE1 perMeshRootParameterRanges[2] = {};
-			//perMeshRootParameterRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
-			//perMeshRootParameterRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // VOLATILE로 설정해야 모든 Descriptor가 없어도 렌더링을 진행할 수 있음.
-			//rootParameter[2].InitAsDescriptorTable(_countof(perMeshRootParameterRanges), perMeshRootParameterRanges);
-
-			/*CD3DX12_STATIC_SAMPLER_DESC StaticSamplerDescs[1] = {}; 
-
-			StaticSamplerDescs[0].Init(0);*/
-
-			
-
-			//CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootsigDesc;
-			//rootsigDesc.Init_1_1(_countof(rootParameter), rootParameter, _countof(StaticSamplerDescs), StaticSamplerDescs, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-			//Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
-			//Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
-			//hr = D3D12SerializeVersionedRootSignature(&rootsigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-			//CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다 %s", rootSignatureErrorBlob->GetBufferPointer());
-			//hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(), rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_StaticMeshRootSignature));
-			//CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
-
-
-
-			struct PipelineStateStream
-			{
-				CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
-				CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-				CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
-				CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-				CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-				CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-			} pipelineStateStream;
-
-			////////////////////////////////////////////////////
-			////////PIPELINE STATE//////////////////////////////
-			////////////////////////////////////////////////////
-
-			pipelineStateStream.RootSignature = m_Shader->GetRootSignature().GetData();
-			auto inputLayout = m_Shader->GetInputLayout();
-			pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
-			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-			auto& resourceManager = ResourceManager::Instance();
-			auto& shaderDatablobs = resourceManager.GetShader("PBRShader_Static")->GetRaw();
-			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
-				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
-			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
-				shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
-
-			pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-			rtvFormat.NumRenderTargets = 1;
-			rtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-			pipelineStateStream.RTVFormats = rtvFormat;
-
-			D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
-
-			hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_StaticMeshPipelineState));
-			CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
-
-			// 임시로 10개의 오브젝트 까지 받을 수 있게함.
-			const int maxObjectCount = 10;
+			const int maxObjectCount = 50;
 			const int maxMaterialCount = 5;
 
 			m_StaticMeshPerMaterialConstantBufferLists.resize(maxObjectCount);
@@ -107,6 +27,7 @@ namespace Crystal {
 			}
 		}
 
+		auto device = Renderer::Instance().GetDevice();
 		// Create SkeletalMesh's PipelineState
 		{
 			D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
@@ -179,7 +100,8 @@ namespace Crystal {
 			pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 			auto& resourceManager = ResourceManager::Instance();
-			auto& shaderDatablobs = resourceManager.GetShader("PBRShader_Skeletal")->GetRaw();
+			auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+			auto& shaderDatablobs = shader->GetRaw();
 			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
 				shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
@@ -214,13 +136,12 @@ namespace Crystal {
 		}
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-		m_PerMaterialConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerMaterialData));
 	}
 
-	void LightingStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+	void LightingStaticPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 		const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::Record(commandList, pipelineInputs);
+		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
 
 		auto device = Renderer::Instance().GetDevice();
 
@@ -234,12 +155,11 @@ namespace Crystal {
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 		auto& skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
-		auto& staticMeshComponents = *lightPipelineInputs->StaticMeshComponents;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_StaticMeshDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView(); // Per Frame
 
+		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -248,20 +168,24 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-		for (int i = 0; i < staticMeshComponents.size(); i++) // PerObject
+		for (int i = 0; i < m_Components.size(); i++) // PerObject
 		{
+			auto meshComponent = m_Components[i].lock();
+			if(!meshComponent)
+				continue;
+
 			StaticMeshPerObjectData staticMeshPerObjectData = {};
 
-			staticMeshPerObjectData.World = Matrix4x4::Transpose(staticMeshComponents[i]->GetWorldTransform());
+			staticMeshPerObjectData.World = Matrix4x4::Transpose(meshComponent->GetWorldTransform());
 			m_StaticMeshPerObjectConstantBuffers[i]->SetData((void*)&staticMeshPerObjectData);
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_StaticMeshPerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
 			device->CopyDescriptorsSimple(1, destHeapHandle, perObjectConstantBufferHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			auto staticMesh = std::static_pointer_cast<StaticMesh>(staticMeshComponents[i]->GetRenderable());
+			auto staticMesh = std::static_pointer_cast<StaticMesh>(meshComponent->GetRenderable());
 
-			auto materials = staticMeshComponents[i]->GetMaterials();
+			auto materials = meshComponent->GetMaterials();
 			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
 			{
 				if (!materials[j])
@@ -434,60 +358,6 @@ namespace Crystal {
 				if (normalTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, normalTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			}
-		}
-
-		commandList->SetPipelineState(m_StaticMeshPipelineState.Get());
-		commandList->SetGraphicsRootSignature(m_Shader->GetRootSignature().GetData());
-		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_StaticMeshDescriptorHeap.Get() };
-		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE staticMeshDescriptorHeapHandle = m_StaticMeshDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		commandList->SetGraphicsRootDescriptorTable(0, staticMeshDescriptorHeapHandle); // Irradiance
-		staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
-
-		for (int i = 0; i < staticMeshComponents.size(); i++)
-		{
-			commandList->SetGraphicsRootDescriptorTable(1, staticMeshDescriptorHeapHandle); // PerObject
-			staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			auto staticMesh = std::static_pointer_cast<StaticMesh>(staticMeshComponents[i]->GetRenderable());
-			auto materials = staticMeshComponents[i]->GetMaterials();
-			for (int j = 0; j < staticMesh->GetVertexbufferCount(); j++)
-			{
-				if (materials[j])
-				{
-					commandList->SetGraphicsRootDescriptorTable(2, staticMeshDescriptorHeapHandle); // PerMaterial
-				}
-				staticMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
-				staticMesh->Render(commandList, j);
-			}
-		}
-
-		commandList->SetPipelineState(m_SkeletalMeshPipelineState.Get());
-		commandList->SetGraphicsRootSignature(m_SkeletalMeshRootSignature.Get());
-		ID3D12DescriptorHeap* skeletalDescriptorHeaps[] = { m_SkeletalMeshDescriptorHeap.Get() };
-		commandList->SetDescriptorHeaps(_countof(skeletalDescriptorHeaps), skeletalDescriptorHeaps);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE skeletalMeshDescriptorHeapHandle = m_SkeletalMeshDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		commandList->SetGraphicsRootDescriptorTable(0, skeletalMeshDescriptorHeapHandle); // Irradiance
-		skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
-
-		for (int i = 0; i < skeletalMeshComponents.size(); i++)
-		{
-			commandList->SetGraphicsRootDescriptorTable(1, skeletalMeshDescriptorHeapHandle); // PerObject
-			skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			auto skeletalMesh = std::static_pointer_cast<SkeletalMesh>(skeletalMeshComponents[i]->GetRenderable());
-			auto materials = skeletalMeshComponents[i]->GetMaterials();
-			for (int j = 0; j < skeletalMesh->GetVertexbufferCount(); j++)
-			{
-				if (materials[j])
-				{
-					commandList->SetGraphicsRootDescriptorTable(2, skeletalMeshDescriptorHeapHandle); // PerMaterial
-				}
-				skeletalMeshDescriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
-				skeletalMesh->Render(commandList, j);
 			}
 		}
 	}

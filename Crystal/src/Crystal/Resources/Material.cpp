@@ -4,7 +4,15 @@
 namespace Crystal {
 	void Material::Set(const std::string& materialName, std::weak_ptr<Texture> texture)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, D3D_SIT_TEXTURE))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+			
+
+		if (!shader->CheckInputValidation(materialName, D3D_SIT_TEXTURE))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -19,7 +27,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMFLOAT4& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "float4"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "float4"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -34,7 +49,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMFLOAT3& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "float3"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "float3"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -49,7 +71,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMFLOAT2& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "float2"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "float2"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -64,7 +93,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, float value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "float"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "float"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -79,7 +115,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMINT4& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "int4"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "int4"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -94,7 +137,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMINT3& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "int3"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "int3"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -109,7 +159,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, const DirectX::XMINT2& value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "int2"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "int2"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -124,7 +181,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, int value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "int"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "int"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
@@ -139,7 +203,14 @@ namespace Crystal {
 
 	void Material::Set(const std::string& materialName, bool value)
 	{
-		if (!m_Shader->CheckInputValidation(materialName, "bool"))
+		auto shader = Cast<Shader>(GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+		if (!shader)
+		{
+			CS_WARN("Material의 Shader가 존재하지 않습니다");
+			return;
+		}
+
+		if (!shader->CheckInputValidation(materialName, "bool"))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		auto it = m_BoolInputs.find(materialName);

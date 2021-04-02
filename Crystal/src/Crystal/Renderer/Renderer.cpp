@@ -26,35 +26,25 @@ namespace Crystal {
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		//============================================================================================
-		auto panoTextureWeak = resourceManager.CreateTextureFromFile(
-			"assets/textures/cubemaps/T_Cube_Skybox_1.hdr", "HDRI_Skybox_Space");
-		if (auto panoTexture = panoTextureWeak.lock())
-		{
-			panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		}
+		auto panoTexture = resourceManager.CreateTextureFromFile(
+			"assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr", "HDRI_Skybox_Space").lock();
+		panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		
-		auto cubemapWeak = resourceManager.CreateTexture(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+		auto cubemap = resourceManager.CreateTexture(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space");
-		if (auto cubemap = cubemapWeak.lock())
-		{
-			cubemap->CreateUnorderedAccessView(cubemap->GetResource()->GetDesc().Format,
-				D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
-			cubemap->CreateShaderResourceView(cubemap->GetResource()->GetDesc().Format,
-				D3D12_SRV_DIMENSION_TEXTURECUBE);
-		}
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space").lock();
+		cubemap->CreateUnorderedAccessView(cubemap->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
+		cubemap->CreateShaderResourceView(cubemap->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURECUBE);
 
-		auto irradianceMapWeak = resourceManager.CreateTexture(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+		auto irradianceMap = resourceManager.CreateTexture(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space_Irradiance");
-		if (auto irradianceMap = irradianceMapWeak.lock())
-		{
-			irradianceMap->CreateUnorderedAccessView(irradianceMap->GetResource()->GetDesc().Format,
-				D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
-			irradianceMap->CreateShaderResourceView(irradianceMap->GetResource()->GetDesc().Format,
-				D3D12_SRV_DIMENSION_TEXTURECUBE);
-		}
-
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space_Irradiance").lock();
+		irradianceMap->CreateUnorderedAccessView(irradianceMap->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2DARRAY);
+		irradianceMap->CreateShaderResourceView(irradianceMap->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		// TODO : TEMP
 		m_PanoTexture = resourceManager.GetTexture("HDRI_Skybox_Space").lock();
@@ -62,18 +52,17 @@ namespace Crystal {
 		m_IrradiancemapTexture = resourceManager.GetTexture("Cube_Skybox_Space_Irradiance").lock();
 		//============================================================================================
 
-		resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static");
-		resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal");
-		resourceManager.CreateShaderFromFile("assets/shaders/SkyboxShader.hlsl", "Cubemap");
-		resourceManager.CreateShaderFromFile("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap");
-		resourceManager.CreateShaderFromFile("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling");
-		resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling");
-		resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader");
-
+		auto pbrStaticShader = resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Static.hlsl", "PBRShader_Static").lock();
+		auto pbrSkeletalShader = resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal").lock();
+		auto skyboxShader = resourceManager.CreateShaderFromFile("assets/shaders/SkyboxShader.hlsl", "Skybox").lock();
+		auto panoToCubemapShader = resourceManager.CreateShaderFromFile("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap").lock();
+		auto diffIrradianceShader = resourceManager.CreateShaderFromFile("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling").lock();
+		auto specularIrradianceShader = resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling").lock();
+		auto simpleColorShader = resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader").lock();
 
 		
 		{
-			resourceManager.GetShader("PBRShader_Static")->SetInputLayout({
+			pbrStaticShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -82,53 +71,69 @@ namespace Crystal {
 				});
 
 
-			RootParameter perFrame = {};
-			RootParameter perObject = {};
-			RootParameter perDraw = {};
+			RootParameter perFrame = { 1, 1, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perDraw = { 1, 4, 0 };
 
-			perFrame.CbvCount = 1;
-			perFrame.SrvCount = 1;
-
-			perObject.CbvCount = 1;
-
-			perDraw.CbvCount = 1;
-			perDraw.SrvCount = 4;
-
-
-			RootSignature rootsig = { perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0) }};
-			resourceManager.GetShader("PBRShader_Static")->SetRootSignature(rootsig);
+			pbrStaticShader->SetRootSignature({ perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
+			pbrStaticShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
 
 		{
-			resourceManager.GetShader("SimpleColorShader")->SetInputLayout({
+			simpleColorShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});
+
+			RootParameter perFrame = { 1, 0, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perDraw = {};
+
+			simpleColorShader->SetRootSignature({ perFrame, perObject, perDraw });
+			simpleColorShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+		}
+
+		{
+			skyboxShader->SetInputLayout({ 
+				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} 
 				});
 
 			RootParameter perFrame = {};
 			RootParameter perObject = {};
-			RootParameter perDraw = {};
+			RootParameter perDraw = { 1, 1, 0 };
 
-			perFrame.CbvCount = 1;
-
-			perObject.CbvCount = 1;
-
-			resourceManager.GetShader("SimpleColorShader")->SetRootSignature({ perFrame, perObject, perDraw });
+			skyboxShader->SetRootSignature({ perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_ANISOTROPIC) } });
+			skyboxShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
 
 
 		/*Pipeline을 만듭니다.*/
-		m_LightingPipeline = std::make_unique<LightingStaticPipeline>("PBRLightingPipeline", 
-			resourceManager.GetShader("PBRShader_Static"));
-		m_WireframePipeline = std::make_unique<LinePipeline>("LinePipline", 
-			resourceManager.GetShader("SimpleColorShader"));
-		m_CubemapPipeline = std::make_unique<CubemapPipeline>("CubemapPipeline", 
-			resourceManager.GetShader("Cubemap"));
-		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>("PanoToCubemapPipeline", 
-			resourceManager.GetShader("PanoToCubemap"));
-		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>("DiffIrradSamplingPipeline", 
-			resourceManager.GetShader("DiffuseIrradianceSampling"));
+		m_LightingPipeline = std::make_unique<LightingStaticPipeline>();
+		m_LightingPipeline->SetObjectOwner(pbrStaticShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		m_LightingPipeline->OnCreate();
+
+		m_MainColorPipelines.push_back(std::move(m_LightingPipeline));
+
+		m_LinePipeline = std::make_unique<LinePipeline>();
+		m_LinePipeline->SetObjectOwner(simpleColorShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		m_LinePipeline->OnCreate();
+
+		m_MainColorPipelines.push_back(std::move(m_LinePipeline));
+
+		m_CubemapPipeline = std::make_unique<CubemapPipeline>();
+		m_CubemapPipeline->SetObjectOwner(skyboxShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		m_CubemapPipeline->OnCreate();
+
+		m_MainColorPipelines.push_back(std::move(m_CubemapPipeline));
+
+		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>();
+		m_PanoToCubemapPipeline->SetObjectOwner(panoToCubemapShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		m_PanoToCubemapPipeline->OnCreate();
+
+		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>();
+		m_DiffIrradSamplingPipeline->SetObjectOwner(diffIrradianceShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		m_DiffIrradSamplingPipeline->OnCreate();
 
 		/// COMPUTE
 		auto commandList = m_CommandQueue->GetCommandList();
@@ -147,7 +152,7 @@ namespace Crystal {
 		PanoToCubemapPipeline::PanoToCubemapPipelineInputs panoToCubemapPipelineInputs = {};
 		panoToCubemapPipelineInputs.SourceTexture = m_PanoTexture.get();
 		panoToCubemapPipelineInputs.DestinationTexture = m_CubemapTexture.get();
-		m_PanoToCubemapPipeline->Record(commandList, &panoToCubemapPipelineInputs);
+		m_PanoToCubemapPipeline->PrepareRecord(commandList, &panoToCubemapPipelineInputs);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -164,7 +169,7 @@ namespace Crystal {
 		DiffIrradSamplingPipeline::DiffIrradSamplingPipelineInputs diffIrradSamplingPipelineInputs = {};
 		diffIrradSamplingPipelineInputs.SourceTexture = m_CubemapTexture.get();
 		diffIrradSamplingPipelineInputs.DestinationTexture = m_IrradiancemapTexture.get();
-		m_DiffIrradSamplingPipeline->Record(commandList, &diffIrradSamplingPipelineInputs);
+		m_DiffIrradSamplingPipeline->PrepareRecord(commandList, &diffIrradSamplingPipelineInputs);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -233,20 +238,23 @@ namespace Crystal {
 		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
-		m_LightingPipeline->Record(commandList, &lightingPipelineInputs);
+		m_MainColorPipelines[0]->PrepareRecord(commandList, &lightingPipelineInputs);
+		m_MainColorPipelines[0]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera.get();
 		wireframePipelineInputs.CollisionComponents = &m_CollisionComponents;
-		m_WireframePipeline->Record(commandList, &wireframePipelineInputs);
+		m_MainColorPipelines[1]->PrepareRecord(commandList, &wireframePipelineInputs);
+		m_MainColorPipelines[1]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
 		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
-		m_CubemapPipeline->Record(commandList, &cubemapPipelineInputs);
+		m_MainColorPipelines[2]->PrepareRecord(commandList, &cubemapPipelineInputs);
+		m_MainColorPipelines[2]->Record(commandList);
 
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -393,30 +401,26 @@ namespace Crystal {
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 	}
 
-	void Renderer::RegisterRenderComponent(PrimitiveComponent* component)
+	void Renderer::RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak)
 	{
-		
-		// TODO : Material 별로 나누어야함
-		const auto rcType = component->GetPrimitiveComponentType();
-		switch (rcType)
+		auto component = componentWeak.lock();
+
+		if (component->GetMaterials().empty())
+			return;
+
+		for (int i = 0; i < m_MainColorPipelines.size(); i++)
 		{
-		case PrimitiveComponent::EPrimitiveComponentType::StaticMesh:
-			m_StaticMeshComponents.push_back(static_cast<StaticMeshComponent*>(component));
-			break;
-		case PrimitiveComponent::EPrimitiveComponentType::SkeletalMesh:
-			m_SkeletalMeshComponents.push_back(static_cast<SkeletalMeshComponent*>(component));
-			break;
-		case PrimitiveComponent::EPrimitiveComponentType::Collision: [[Fallthrough]]
-		case PrimitiveComponent::EPrimitiveComponentType::Ray: [[Fallthrough]]
-		case PrimitiveComponent::EPrimitiveComponentType::BoundingBox: [[Fallthrough]]
-		case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox: [[Fallthrough]]
-		case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
-			m_CollisionComponents.push_back(static_cast<CollisionComponent*>(component));
-			break;
-		default:
-			CS_FATAL(false, "잘못된 PrimitiveComponent Type입니다.");
-			break;
+			auto materialShader = Cast<Shader>(component->GetMaterials()[0]->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+			auto wname = materialShader->GetObjectName();
+			auto pipelineShader = Cast<Shader>(m_MainColorPipelines[i]->GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+			auto name = pipelineShader->GetObjectName();
+			if(!materialShader || !pipelineShader || materialShader != pipelineShader)
+				continue;
+
+			m_MainColorPipelines[i]->RegisterPipelineComponents(componentWeak);
 		}
+		
+
 	}
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()

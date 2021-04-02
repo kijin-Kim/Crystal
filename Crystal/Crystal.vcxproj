@@ -206,7 +206,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
-    <ClInclude Include="src\Crystal\Renderer\Passes\Pass.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.h" />

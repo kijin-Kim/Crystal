@@ -7,13 +7,6 @@ namespace Crystal {
 	class CubemapPipeline final : public RenderPipeline
 	{
 	public:
-
-		enum ECubemapDescriptorInputType
-		{
-			CubemapTexture = 0,
-			CUBEMAP_INPUT_COUNT
-		};
-
 		struct CubemapPipelineInputs : public RenderPipelineInputs
 		{
 			Texture* CubemapTexture = nullptr;
@@ -25,21 +18,15 @@ namespace Crystal {
 		};
 
 	public:
-		CubemapPipeline(const std::string& name, const std::shared_ptr<Shader>& shader);
-		virtual ~CubemapPipeline() = default;
+		CubemapPipeline() = default;
+		~CubemapPipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+		void OnCreate() override;
+
+		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
 	private:
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
-
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-
 		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-
-		std::unique_ptr<VertexBuffer> m_QuadVertexBuffer = nullptr;
-		std::unique_ptr<IndexBuffer> m_QuadIndexBuffer = nullptr;
 
 		PerFrameData m_PerFrameData = {};
 	};

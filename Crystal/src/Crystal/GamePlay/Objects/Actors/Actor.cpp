@@ -3,8 +3,29 @@
 
 #include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/World/World.h"
+#include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
+
+	void Actor::OnCreate()
+	{
+		Updatable::OnCreate();
+
+		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
+
+		if(m_MainComponent->CanBeRendered())
+			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(m_MainComponent));
+
+		for (const auto& tc : m_TransformHierarchy)
+		{
+			if(!tc->CanBeRendered())
+				continue;
+
+			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(tc));
+		}
+		
+	}
+
 	void Actor::UpdateComponents(float deltaTime)
 	{
 		/*Non-Hierarchy Components + Main Component*/
@@ -64,7 +85,6 @@ namespace Crystal {
 		{
 			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), component);
 		}
-
 		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
 	}
 

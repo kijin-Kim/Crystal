@@ -7,25 +7,39 @@
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Resources/Shader.h"
+#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 
 namespace Crystal {
-	class Pipeline
+	class Pipeline : public Object
 	{
 	public:
+		enum PipelineOwnerType
+		{
+			Owner_Shader = 0
+		};
+
 		struct PipelineInputs
 		{
 		};
 
 	public:
-		Pipeline(const std::string& name, std::weak_ptr<Shader> shader) : m_Name(name), m_Shader(shader) {}
+		Pipeline() = default;
 		virtual ~Pipeline() = default;
 
-		
-		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs);
+		void RegisterPipelineComponents(std::weak_ptr<PrimitiveComponent> component) { m_Components.push_back(component); }
+	
+		virtual void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs);
+		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) {}
 
+		STATIC_TYPE_IMPLE(Pipeline)
 	protected:
 		std::string m_Name;
-		std::shared_ptr<Shader> m_Shader;
+		std::vector<std::weak_ptr<PrimitiveComponent>> m_Components;
+
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
+
+
 	};
 
 	class RenderPipeline : public Pipeline
@@ -36,10 +50,16 @@ namespace Crystal {
 			CameraComponent* Camera = nullptr;
 		};
 	public:
-		RenderPipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : Pipeline(name, shader) {}
+		RenderPipeline() = default;
 		~RenderPipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		void OnCreate() override;
+
+		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+
+
+	private:
 	};
 
 	class ComputePipeline : public Pipeline
@@ -49,9 +69,9 @@ namespace Crystal {
 		{
 		};
 	public:
-		ComputePipeline(const std::string& name, const std::shared_ptr<Shader>& shader) : Pipeline(name, shader) {}
+		ComputePipeline() = default;
 		~ComputePipeline() override = default;
 
-		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override { Pipeline::Record(commandList, pipelineInputs); }
+		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override { Pipeline::PrepareRecord(commandList, pipelineInputs); }
 	};
 }

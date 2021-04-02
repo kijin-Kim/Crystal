@@ -37,12 +37,17 @@ public:
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto bodyMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Skeletal"));
+		auto bodyMaterial = std::make_shared<Crystal::Material>();
+		bodyMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
+			Crystal::Material::MaterialOwnerType::Owner_Shader);
+
 		bodyMaterial->Set("AlbedoTexture", bodyAlbedoTexture);
 		bodyMaterial->Set("RoughnessTexture", bodyRoughnessTexture);
 		bodyMaterial->Set("NormalTexture", bodyNormalTexture);
 
-		auto tentacleMaterial = std::make_shared<Crystal::Material>(resourceManager.GetShader("PBRShader_Skeletal"));
+		auto tentacleMaterial = std::make_shared<Crystal::Material>();
+		tentacleMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
+			Crystal::Material::MaterialOwnerType::Owner_Shader);
 		tentacleMaterial->Set("AlbedoTexture", tentacleAlbedoTexture);
 		tentacleMaterial->Set("RoughnessTexture", tentacleRoughnessTexture);
 		tentacleMaterial->Set("NormalTexture", tentacleNormalTexture);
@@ -52,8 +57,8 @@ public:
 
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(mesh);
-		skeletalMeshComponent->SetMaterial(bodyMaterial);
-		skeletalMeshComponent->SetMaterial(tentacleMaterial, 1);
+		skeletalMeshComponent->AddMaterial(bodyMaterial);
+		skeletalMeshComponent->AddMaterial(tentacleMaterial);
 
 		m_MainComponent = skeletalMeshComponent;
 	}
