@@ -33,7 +33,7 @@ cbuffer PerFrameData : register(b0)
 cbuffer PerObjectData : register(b1)
 {
     float4x4 World;
-    float4x4 Bones[200];
+    float4x4 Bones[300];
 }
 
 cbuffer PerMeshData : register(b2)
@@ -132,7 +132,7 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 lightColor = 6.0f;
+    float3 lightColor = 3.0f;
     float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
     float metallic = bToggleMetallicTexture ? MetallicTexture.Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;

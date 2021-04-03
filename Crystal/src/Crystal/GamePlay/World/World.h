@@ -18,6 +18,7 @@ namespace Crystal {
 
 			for (const auto obbComp1 : m_BoundingOrientedBoxComponents)
 			{
+				CS_FATAL(false,"Scale을 고려하세요");
 				auto d3dOrientedBox1 = obbComp1->GetWorldBoundingOrientedBox();
 				// OBB and Ray
 				for (const auto ray : m_RayComponents)

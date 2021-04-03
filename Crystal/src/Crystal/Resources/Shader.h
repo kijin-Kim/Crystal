@@ -4,6 +4,7 @@
 #include <set>
 #include <d3d12shader.h>
 #include "Crystal/GamePlay/Objects/Object.h"
+#include "Crystal/Math/Math.h"
 
 struct CD3DX12_STATIC_SAMPLER_DESC;
 
@@ -41,7 +42,7 @@ namespace Crystal {
 	{
 	public:
 		RootSignature() = default;
-		RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perDraw,
+		RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perExecute,
 			std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers = {});
 		~RootSignature() = default;
 
@@ -49,24 +50,24 @@ namespace Crystal {
 
 		bool HasPerFrameParameter() const { return !m_PerFrame.IsNull(); }
 		bool HasPerObjectParameter() const { return !m_PerObject.IsNull(); }
-		bool HasPerDrawParameter() const { return !m_PerDraw.IsNull(); }
+		bool HasPerExecuteParameter() const { return !m_PerExecute.IsNull(); }
 
 		int GetPerFrameDescriptorCount() const { return m_PerFrame.CbvCount + m_PerFrame.SrvCount + m_PerFrame.UavCount; }
 		int GetPerObjectDescriptorCount() const { return m_PerObject.CbvCount + m_PerObject.SrvCount + m_PerObject.UavCount; }
-		int GetPerDrawDescriptorCount() const { return m_PerDraw.CbvCount + m_PerDraw.SrvCount + m_PerDraw.UavCount; }
+		int GetPerExecuteDescriptorCount() const { return m_PerExecute.CbvCount + m_PerExecute.SrvCount + m_PerExecute.UavCount; }
 
 		int GetPerFrameParameterIndex() const { return !m_PerFrame.IsNull() - 1; }
 		int GetPerObjectParameterIndex() const { return !m_PerFrame.IsNull() + !m_PerObject.IsNull() - 1; }
-		int GetPerDrawParameterIndex() const { return !m_PerFrame.IsNull() + !m_PerObject.IsNull() + !m_PerDraw.IsNull() - 1; }
+		int GetPerExecuteParameterIndex() const { return !m_PerFrame.IsNull() + !m_PerObject.IsNull() + !m_PerExecute.IsNull() - 1; }
 
-		
+
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_D3d12RootSignature = nullptr;
 
 		RootParameter m_PerFrame = {};
 		RootParameter m_PerObject = {};
-		RootParameter m_PerDraw = {};
+		RootParameter m_PerExecute = {};
 	};
 
 
@@ -86,13 +87,22 @@ namespace Crystal {
 		void SetRootSignature(RootSignature rootsig) { m_RootSignature = rootsig; }
 		const RootSignature& GetRootSignature() const { return m_RootSignature; }
 
+		//== For Render Shader =======
 		void SetInputLayout(InputLayout inputLayout) { m_InputLayout = inputLayout; }
 		const InputLayout& GetInputLayout() const { return m_InputLayout; }
 
 		void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE type) { m_PrimitiveTopologyType = type; }
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const { return m_PrimitiveTopologyType; }
 
+		//== For Compute Shader =======
+		void SetDispatchThreadGroupCounts(const DirectX::XMFLOAT3& count) { m_DispatchThreadGroupCount = count; }
+		const DirectX::XMFLOAT3& GetDispatchThreadGroupCounts() const  { return m_DispatchThreadGroupCount; }
+		
+		
+
 		bool HasShader(ShaderType type) { return m_ShaderDataBlobs.count(type) != 0; }
+
+		STATIC_TYPE_IMPLE(Shader)
 
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> loadSourceFromFile(const std::string& filePath);
@@ -110,5 +120,7 @@ namespace Crystal {
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE m_PrimitiveTopologyType;
 
 		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_ShaderReflection = nullptr;
+
+		DirectX::XMFLOAT3 m_DispatchThreadGroupCount = Vector3::Zero;
 	};
 }

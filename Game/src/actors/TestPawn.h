@@ -16,6 +16,7 @@ public:
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		auto pbrMaterial = std::make_shared<Crystal::Material>();
+		pbrMaterial->OnCreate();
 		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
 		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Frigate_Albedo"));

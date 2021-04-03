@@ -9,6 +9,17 @@ namespace Crystal {
 		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
 	}
 
+	bool Pipeline::IsValidForThisPipeline(const std::shared_ptr<Material>& material)
+	{
+		if (!material)
+			return false;
+
+		auto thisPipelineShader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto inputMaterialShader = Cast<Shader>(material->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+
+		return thisPipelineShader == inputMaterialShader;
+	}
+
 	void RenderPipeline::OnCreate()
 	{
 		Pipeline::OnCreate();
@@ -162,17 +173,57 @@ namespace Crystal {
 			{
 				if (materials[j])
 				{
-					if (rootSignature.GetPerDrawDescriptorCount())
+					if (rootSignature.GetPerExecuteDescriptorCount())
 					{
-						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerDrawParameterIndex(), descriptorHeapHandle); // PerMaterial
+						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(), descriptorHeapHandle); // PerMaterial
 						descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-							* rootSignature.GetPerDrawDescriptorCount();
+							* rootSignature.GetPerExecuteDescriptorCount();
 					}
 
 				}
 				renderable->Render(commandList, j);
 			}
 		}
+	}
+
+	void ComputePipeline::OnCreate()
+	{
+		auto device = Renderer::Instance().GetDevice();
+
+		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
+		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		descriptorHeapDesc.NumDescriptors = 10;
+		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+
+
+		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto& shaderDatablobs = shader->GetRaw();
+		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
+		computePipelineStateDesc.pRootSignature = shader->GetRootSignature().GetData();
+		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };
+
+		hr = device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&m_PipelineState));
+		CS_FATAL(SUCCEEDED(hr), "PipelineState를 생성하는데 실패하였습니다.");
+	}
+
+	void ComputePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	{
+		Pipeline::Record(commandList);
+
+		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+
+		commandList->SetPipelineState(m_PipelineState.Get());
+		commandList->SetComputeRootSignature(shader->GetRootSignature().GetData());
+		ID3D12DescriptorHeap* irradianceSamplingHeaps[] = { m_DescriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(_countof(irradianceSamplingHeaps), irradianceSamplingHeaps);
+		commandList->SetComputeRootDescriptorTable(0, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+
+		auto dispatchThreadGroupCounts = shader->GetDispatchThreadGroupCounts();
+		commandList->Dispatch(dispatchThreadGroupCounts.x, dispatchThreadGroupCounts.y, dispatchThreadGroupCounts.z);
 	}
 
 }

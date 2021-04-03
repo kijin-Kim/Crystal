@@ -25,6 +25,7 @@ namespace Crystal {
 		Renderer(const Renderer&) = delete;
 		static Renderer& Instance() { static Renderer instance; return instance; }
 
+		void PrepareRender();
 		void Render();
 
 		ID3D12Device2* GetDevice() const { return m_Device.Get(); }
@@ -94,6 +95,6 @@ namespace Crystal {
 		std::unique_ptr<PanoToCubemapPipeline> m_PanoToCubemapPipeline = nullptr;
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
 
-		std::vector<std::unique_ptr<RenderPipeline>> m_MainColorPipelines;
+		std::vector<std::unique_ptr<Pipeline>> m_Pipelines;
 	};
 }

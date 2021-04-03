@@ -9,58 +9,37 @@ class Kraken : public Crystal::Pawn
 public:
 	Kraken()
 	{
-		////// TEMPORARY ////
-		auto bodyAlbedoTexture
-			= std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga");
-		auto bodyRoughnessTexture
-			= std::make_shared<Crystal::Texture>("assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga");
-		auto bodyNormalTexture = std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga");
-		bodyAlbedoTexture->CreateShaderResourceView(bodyAlbedoTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-		bodyRoughnessTexture->CreateShaderResourceView(bodyRoughnessTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-		bodyNormalTexture->CreateShaderResourceView(bodyNormalTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-
-		auto tentacleAlbedoTexture
-			= std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_BaseColor.tga");
-		auto tentacleRoughnessTexture
-			= std::make_shared<Crystal::Texture>("assets/textures/Kraken/T_M_KRAKEN_Mat_TENTACLES_LEGS_CLAWS_Roughness.tga");
-		auto tentacleNormalTexture
-			= std::make_shared<Crystal::Texture>("assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_CLAW_NRM.tga");
-		tentacleAlbedoTexture->CreateShaderResourceView(tentacleAlbedoTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-		tentacleRoughnessTexture->CreateShaderResourceView(tentacleRoughnessTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-		tentacleNormalTexture->CreateShaderResourceView(tentacleNormalTexture->GetResource()->GetDesc().Format,
-			D3D12_SRV_DIMENSION_TEXTURE2D);
-
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		auto bodyMaterial = std::make_shared<Crystal::Material>();
+		bodyMaterial->OnCreate();
 		bodyMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
-
-		bodyMaterial->Set("AlbedoTexture", bodyAlbedoTexture);
-		bodyMaterial->Set("RoughnessTexture", bodyRoughnessTexture);
-		bodyMaterial->Set("NormalTexture", bodyNormalTexture);
+		bodyMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Body_Albedo"));
+		bodyMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Body_Roughness"));
+		bodyMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Body_Normal"));
 
 		auto tentacleMaterial = std::make_shared<Crystal::Material>();
+		tentacleMaterial->OnCreate();
 		tentacleMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
-		tentacleMaterial->Set("AlbedoTexture", tentacleAlbedoTexture);
-		tentacleMaterial->Set("RoughnessTexture", tentacleRoughnessTexture);
-		tentacleMaterial->Set("NormalTexture", tentacleNormalTexture);
+		tentacleMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Tentacle_Albedo"));
+		tentacleMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Tentacle_Roughness"));
+		tentacleMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Tentacle_Normal"));
 
 		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
-			"assets/models/KRAKEN_turn45LeftSmashAttack.fbx");
+			"assets/models/KRAKEN_idle.fbx");
 
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(mesh);
+		skeletalMeshComponent->RotatePitch(90.0f);
 		skeletalMeshComponent->AddMaterial(bodyMaterial);
 		skeletalMeshComponent->AddMaterial(tentacleMaterial);
 
 		m_MainComponent = skeletalMeshComponent;
+
+
+		SetPosition({ 0.0f, 0.0f, 2000.0f });
 	}
 
 	virtual ~Kraken()
@@ -85,4 +64,7 @@ public:
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override
 	{
 	}
+
+
+	STATIC_TYPE_IMPLE(Kraken)
 };

@@ -13,8 +13,14 @@ namespace Crystal {
 
 		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
 
-		if(m_MainComponent->CanBeRendered())
-			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(m_MainComponent));
+
+		for (const auto& c : m_Components)
+		{
+			if (!c->CanBeRendered())
+				continue;
+
+			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(c));
+		}
 
 		for (const auto& tc : m_TransformHierarchy)
 		{

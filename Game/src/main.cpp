@@ -32,6 +32,8 @@ public:
 		resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx", "Asteroid_Mesh_1");
 
 		//============ Load Textures ==========================================
+
+		//=== Frigate Textures =================================
 		auto frigateAlbedo = resourceManager.CreateTextureFromFile(
 			"assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga", "Frigate_Albedo").lock();
 		frigateAlbedo->CreateShaderResourceView(frigateAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
@@ -48,17 +50,50 @@ public:
 			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga", "Frigate_Normal").lock();
 		frigateNormal->CreateShaderResourceView(frigateNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
-
+		//=== Asteroid Textures =================================
 		auto asteroidBlueAlbedo = resourceManager.CreateTextureFromFile(
 			"assets/textures/Asteroid/AstOre_1_A.tga", "Asteroid_Blue_Albedo").lock();
 		asteroidBlueAlbedo->CreateShaderResourceView(asteroidBlueAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
+		auto asteroidBlueMetallic = resourceManager.CreateTextureFromFile(
+			"assets/textures/Asteroid/AstOre_1_M.tga", "Asteroid_Blue_Metallic").lock();
+		asteroidBlueMetallic->CreateShaderResourceView(asteroidBlueMetallic->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		auto asteroidBlueRoughness = resourceManager.CreateTextureFromFile(
+			"assets/textures/Asteroid/AstOre_1_R.tga", "Asteroid_Blue_Roughness").lock();
+		asteroidBlueRoughness->CreateShaderResourceView(asteroidBlueRoughness->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
 		auto asteroidBlueNormal = resourceManager.CreateTextureFromFile(
 			"assets/textures/Asteroid/AstOre_1_N.tga", "Asteroid_Blue_Normal").lock();
 		asteroidBlueNormal->CreateShaderResourceView(asteroidBlueNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
+		//=== Kraken Textures =================================
 
+		//=== body ========
+		auto krakenBodyAlbedo = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga", "Kraken_Body_Albedo").lock();
+		krakenBodyAlbedo->CreateShaderResourceView(krakenBodyAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		auto krakenBodyRoughness = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga", "Kraken_Body_Roughness").lock();
+		krakenBodyRoughness->CreateShaderResourceView(krakenBodyRoughness->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		auto krakenBodyNormal = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga", "Kraken_Body_Normal").lock();
+		krakenBodyNormal->CreateShaderResourceView(krakenBodyNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		//=== tentacle =====
+		auto krakenTentacleAlbedo = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_BaseColor.tga", "Kraken_Tentacle_Albedo").lock();
+		krakenTentacleAlbedo->CreateShaderResourceView(krakenTentacleAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+		
+		auto krakenTentacleRoughness = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/T_M_KRAKEN_Mat_TENTACLES_LEGS_CLAWS_Roughness.tga", "Kraken_Tentacle_Roughness").lock();
+		krakenTentacleRoughness->CreateShaderResourceView(krakenTentacleRoughness->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		auto krakenTentacleNormal = resourceManager.CreateTextureFromFile(
+			"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_CLAW_NRM.tga", "Kraken_Tentacle_Normal").lock();
+		krakenTentacleNormal->CreateShaderResourceView(krakenTentacleNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		//=====================================================================
 
 
@@ -68,7 +103,7 @@ public:
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
 		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
 
-//		Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
+		Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");
 
 		for (int i = 0; i < 40; i++)
 		{
@@ -100,7 +135,7 @@ public:
 		playerController.AddActionMapping("Fire", fireActionMapping);
 	}
 
-	void OnUpdate() override
+	void Update() override
 	{
 		m_MainTimer.Tick();
 		m_World->Update(m_MainTimer.DeltaTime());

@@ -18,6 +18,8 @@ namespace Crystal {
 		Component() = default;
 		~Component() override = default;
 
+		virtual bool CanBeRendered() const { return false; }
+
 		STATIC_TYPE_IMPLE(Component)
 	};
 }

@@ -21,15 +21,12 @@ namespace Crystal {
 		DiffIrradSamplingPipeline() = default;
 		~DiffIrradSamplingPipeline() override = default;
 
-		void OnCreate() override;
-
 		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+
+
+		STATIC_TYPE_IMPLE(DiffIrradSamplingPipeline)
 		
 	private:
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
-
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 		unsigned int m_DestinationTextureWidth = 0;
 		unsigned int m_DestinationTextureHeight = 0;

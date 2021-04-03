@@ -1,17 +1,15 @@
 #include "cspch.h"
-#include "LightingStaticPipeline.h"
+#include "LightingSkeletalPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
-#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
-	void LightingStaticPipeline::OnCreate()
+	void LightingSkeletalPipeline::OnCreate()
 	{
 		RenderPipeline::OnCreate();
 
-
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-		
+
 		const int maxObjectCount = 50;
 		const int maxMaterialCount = 5;
 
@@ -22,21 +20,17 @@ namespace Crystal {
 			for (int j = 0; j < maxMaterialCount; j++)
 			{
 				m_PerDrawConstantBufferLists[i][j]
-					= std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData));
+					= std::make_unique<ConstantBuffer>((int)sizeof(PerDrawData));
 			}
 		}
-
-		
 	}
 
-	void LightingStaticPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+	void LightingSkeletalPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
 		const PipelineInputs* const pipelineInputs)
 	{
 		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
 
-		auto device = Renderer::Instance().GetDevice();
-
-		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
+		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
 
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
 		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
@@ -45,97 +39,98 @@ namespace Crystal {
 		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
-		auto& skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
+		auto device = Renderer::Instance().GetDevice();
 
-
-		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView(); // Per Frame
-
-		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+		auto destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+
+		auto irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView();
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		
+
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-		for (int i = 0; i < m_Components.size(); i++) // PerObject
+		for (int i = 0; i < m_Components.size(); i++)
 		{
-			auto meshComponent = m_Components[i].lock();
-			if(!meshComponent)
+			auto component = m_Components[i].lock();
+			if(!component)
 				continue;
 
-			PerObjectData staticMeshPerObjectData = {};
+			PerObjectData perObjectData = {};
 
-			staticMeshPerObjectData.World = Matrix4x4::Transpose(meshComponent->GetWorldTransform());
-			m_PerObjectConstantBuffers[i]->SetData((void*)&staticMeshPerObjectData);
+			auto skeletalMesh = Cast<SkeletalMesh>(component->GetRenderable());
+
+			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
+			auto boneMatrices = skeletalMesh->GetBoneTransforms();
+			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
+			m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData);
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
 			device->CopyDescriptorsSimple(1, destHeapHandle, perObjectConstantBufferHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			auto staticMesh = std::static_pointer_cast<StaticMesh>(meshComponent->GetRenderable());
-
-			auto materials = meshComponent->GetMaterials();
-			auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+			auto materials = component->GetMaterials();
 			for (int j = 0; j < materials.size(); j++)
 			{
 				if (!IsValidForThisPipeline(materials[j]))
 					continue;
+
+				PerDrawData perDrawData = {};
 
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
 
-				PerDrawData perMaterialData = {};
-
 				if (materials[j]->HasTextureInput("AlbedoTexture"))
 				{
-					perMaterialData.bToggleAlbedoTexture = true;
+					perDrawData.bToggleAlbedoTexture = true;
 					albedoTextureHandle = materials[j]->GetTextureInput("AlbedoTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("AlbedoColor"))
 				{
-					perMaterialData.bToggleAlbedoTexture = false;
+					perDrawData.bToggleAlbedoTexture = false;
 					const DirectX::XMFLOAT4& floatInput = materials[j]->GetFloatInput("AlbedoColor");
-					perMaterialData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
+					perDrawData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
 				}
 
 				if (materials[j]->HasTextureInput("MetallicTexture"))
 				{
-					perMaterialData.bToggleMetallicTexture = true;
+					perDrawData.bToggleMetallicTexture = true;
 					metallicTextureHandle = materials[j]->GetTextureInput("MetallicTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("MetallicConstant"))
 				{
-					perMaterialData.bToggleMetallicTexture = false;
-					perMaterialData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
+					perDrawData.bToggleMetallicTexture = false;
+					perDrawData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("RoughnessTexture"))
 				{
-					perMaterialData.bToggleRoughnessTexture = true;
+					perDrawData.bToggleRoughnessTexture = true;
 					roughnessTextureHandle = materials[j]->GetTextureInput("RoughnessTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("RoughnessConstant"))
 				{
-					perMaterialData.bToggleRoughnessTexture = false;
-					perMaterialData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
+					perDrawData.bToggleRoughnessTexture = false;
+					perDrawData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("NormalTexture"))
 				{
-					perMaterialData.bToggleNormalTexture = true;
+					perDrawData.bToggleNormalTexture = true;
 					normalTextureHandle = materials[j]->GetTextureInput("NormalTexture")->GetShaderResourceView();
 				}
 				else
-					perMaterialData.bToggleNormalTexture = false;
+					perDrawData.bToggleNormalTexture = false;
 
-				perMaterialData.bToggleIrradianceTexture = true;
+				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perMaterialData);
-				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBufferLists[i][j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perDrawData);
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBufferLists[i][j]->GetCPUDescriptorHandle(), 
+					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (albedoTextureHandle.ptr)
@@ -153,6 +148,9 @@ namespace Crystal {
 			}
 		}
 
-		
 	}
+
 }
+
+
+

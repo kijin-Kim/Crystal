@@ -11,16 +11,35 @@ namespace Crystal {
 		{
 			auto& resourceManager = ResourceManager::Instance();
 
-
 			auto skyboxMaterial = std::make_shared<Crystal::Material>();
 			skyboxMaterial->SetObjectOwner(resourceManager.GetShader("Skybox"),
 				Crystal::Material::MaterialOwnerType::Owner_Shader);
+			skyboxMaterial->OnCreate();
 			skyboxMaterial->Set("CubemapTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
+			
+			//==== ComputeShader Materials ========================
+			auto panoToCubeMaterial = std::make_shared<Crystal::Material>();
+			panoToCubeMaterial->SetObjectOwner(resourceManager.GetShader("PanoToCubemap"),
+				Crystal::Material::MaterialOwnerType::Owner_Shader);
+			panoToCubeMaterial->OnCreate();
+			panoToCubeMaterial->Set("EquiTexture", resourceManager.GetTexture("Pano_Skybox_Space"));
+			panoToCubeMaterial->Set("OutputTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
 
+			auto diffIrradSamplingMaterial = std::make_shared<Crystal::Material>();
+			diffIrradSamplingMaterial->SetObjectOwner(resourceManager.GetShader("DiffuseIrradianceSampling"),
+				Crystal::Material::MaterialOwnerType::Owner_Shader);
+			diffIrradSamplingMaterial->OnCreate();
+			diffIrradSamplingMaterial->Set("CubemapTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
+			diffIrradSamplingMaterial->Set("OutputTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
+			//=====================================================
+
+			
 
 			auto staticMeshComponent = CreateComponent<StaticMeshComponent>("StaticMeshComponent");
 			staticMeshComponent->SetRenderable(resourceManager.GetRenderable("PlaneQuadMesh"));
 			staticMeshComponent->AddMaterial(skyboxMaterial);
+			staticMeshComponent->AddMaterial(panoToCubeMaterial);
+			staticMeshComponent->AddMaterial(diffIrradSamplingMaterial);
 
 			m_MainComponent = staticMeshComponent;
 

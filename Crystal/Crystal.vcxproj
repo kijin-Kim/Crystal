@@ -262,6 +262,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingSkeletalPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />

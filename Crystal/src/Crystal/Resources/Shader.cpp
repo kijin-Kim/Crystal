@@ -5,9 +5,9 @@
 namespace Crystal {
 
 
-	RootSignature::RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perDraw,
+	RootSignature::RootSignature(const RootParameter& perFrame, const RootParameter& perObject, const RootParameter& perExecute,
 		std::initializer_list<CD3DX12_STATIC_SAMPLER_DESC> samplers) 
-		: m_PerFrame(perFrame), m_PerObject(perObject), m_PerDraw(perDraw)
+		: m_PerFrame(perFrame), m_PerObject(perObject), m_PerExecute(perExecute)
 	{
 		int cbvRegister = 0;
 		int srvRegister = 0;
@@ -91,41 +91,41 @@ namespace Crystal {
 			rootParameters.push_back(rootParameter);
 		}
 
-		//=========== per Draw ======================================================
+		//=========== per Execute ======================================================
 
-		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perDrawRanges;
-		if (perDraw.CbvCount > 0)
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> perExecuteRanges;
+		if (perExecute.CbvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, perDraw.CbvCount, cbvRegister);
-			perDrawRanges.push_back(range);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, perExecute.CbvCount, cbvRegister);
+			perExecuteRanges.push_back(range);
 
-			cbvRegister += perDraw.CbvCount;
+			cbvRegister += perExecute.CbvCount;
 		}
 
-		if (perDraw.SrvCount > 0)
+		if (perExecute.SrvCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, perDraw.SrvCount, srvRegister,
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, perExecute.SrvCount, srvRegister,
 				0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
-			perDrawRanges.push_back(range);
+			perExecuteRanges.push_back(range);
 
-			srvRegister += perDraw.SrvCount;
+			srvRegister += perExecute.SrvCount;
 		}
 
-		if (perDraw.UavCount > 0)
+		if (perExecute.UavCount > 0)
 		{
 			CD3DX12_DESCRIPTOR_RANGE1 range = {};
-			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, perDraw.UavCount, uavRegister);
-			perDrawRanges.push_back(range);
+			range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, perExecute.UavCount, uavRegister);
+			perExecuteRanges.push_back(range);
 
-			uavRegister += perDraw.UavCount;
+			uavRegister += perExecute.UavCount;
 		}
 
 		rootParameter = {};
-		if (!perDrawRanges.empty())
+		if (!perExecuteRanges.empty())
 		{
-			rootParameter.InitAsDescriptorTable(perDrawRanges.size(), perDrawRanges.data());
+			rootParameter.InitAsDescriptorTable(perExecuteRanges.size(), perExecuteRanges.data());
 			rootParameters.push_back(rootParameter);
 		}
 

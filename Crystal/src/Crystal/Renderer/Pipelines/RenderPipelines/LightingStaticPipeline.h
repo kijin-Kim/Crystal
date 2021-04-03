@@ -14,18 +14,12 @@ namespace Crystal {
 			DirectX::XMFLOAT4 LightPositionInWorld[2];
 		};
 
-		struct StaticMeshPerObjectData
+		struct PerObjectData
 		{
 			DirectX::XMFLOAT4X4 World;
 		};
 
-		struct SkeletalMeshPerObjectData
-		{
-			DirectX::XMFLOAT4X4 World;
-			DirectX::XMFLOAT4X4 Bones[200];
-		};
-
-		struct PerMaterialData
+		struct PerDrawData
 		{
 			DirectX::XMFLOAT3 AlbedoColor = { 1.0f, 0.0f, 0.0f };
 			int bToggleAlbedoTexture = false;
@@ -52,22 +46,13 @@ namespace Crystal {
 
 		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
 			const PipelineInputs* const pipelineInputs) override;
-		
+		STATIC_TYPE_IMPLE(LightingStaticPipeline)
 	private:
 		PerFrameData m_PerFrameData = {};
 
+		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
+		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_PerDrawConstantBufferLists;
+
 		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-
-		std::vector<std::unique_ptr<ConstantBuffer>> m_StaticMeshPerObjectConstantBuffers;
-		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_StaticMeshPerMaterialConstantBufferLists;
-		/*Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_StaticMeshDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_StaticMeshPipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_StaticMeshRootSignature = nullptr;*/
-
-		std::vector<std::unique_ptr<ConstantBuffer>> m_SkeletalMeshPerObjectConstantBuffers;
-		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_SkeletalMeshPerMaterialConstantBufferLists;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SkeletalMeshDescriptorHeap = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SkeletalMeshPipelineState = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_SkeletalMeshRootSignature = nullptr;
 	};
 }

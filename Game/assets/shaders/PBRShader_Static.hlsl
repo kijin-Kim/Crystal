@@ -119,7 +119,7 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 lightColor = 6.0f;
+    float3 lightColor = 3.0f;
     float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
     float metallic = bToggleMetallicTexture ? MetallicTexture.Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
@@ -176,7 +176,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     // AMBIENT
     float3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0f), F0, roughness);
     float3 kD = 1.0f - kS;
-    float3 irradiance = bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb : 1.0f;
+    float3 irradiance = bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb  : 1.0f;
     float3 diffuse = irradiance * albedo;
     float3 ambient = kD * diffuse;
     float3 finalColor = Lo + ambient;

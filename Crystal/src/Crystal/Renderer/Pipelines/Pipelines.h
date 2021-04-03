@@ -31,6 +31,9 @@ namespace Crystal {
 		virtual void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs);
 		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) {}
 
+
+		bool IsValidForThisPipeline(const std::shared_ptr<Material>& material);
+
 		STATIC_TYPE_IMPLE(Pipeline)
 	protected:
 		std::string m_Name;
@@ -58,7 +61,7 @@ namespace Crystal {
 		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 
-
+		STATIC_TYPE_IMPLE(RenderPipeline)
 	private:
 	};
 
@@ -72,6 +75,9 @@ namespace Crystal {
 		ComputePipeline() = default;
 		~ComputePipeline() override = default;
 
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override { Pipeline::PrepareRecord(commandList, pipelineInputs); }
+		void OnCreate() override;
+		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+
+		STATIC_TYPE_IMPLE(ComputePipeline)
 	};
 }

@@ -30,12 +30,17 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CBVSRVUAVHeap = nullptr;
 		UINT m_CBVSRVUAVHeapIncrementSize = 0;
 		UINT m_CBVSRVUAVHeapDescriptorCount = 0;
+		const UINT m_MaxCBVSRVUAVHeapDescriptorCount = 3000;
+		
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RTVHeap = nullptr;
 		UINT m_RTVHeapIncrementSize = 0;
 		UINT m_RTVHeapDescriptorCount = 0;
+		const UINT m_MaxRTVHeapDescriptorCount = 30;
+
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DSVHeap = nullptr;
 		UINT m_DSVHeapIncrementSize = 0;
 		UINT m_DSVHeapDescriptorCount = 0;
+		const UINT m_MaxDSVHeapDescriptorCount = 30;
 	};
 
 	/*Descriptor 를 사용하는 클래스들의 상위 클래스입니다

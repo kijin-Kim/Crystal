@@ -27,6 +27,8 @@ namespace Crystal {
 	void Application::Run()
 	{
 		Start();
+		auto& renderer = Renderer::Instance();
+		renderer.PrepareRender();
 		while (m_bShouldRun)
 		{
 			int msgCount = 0;
@@ -43,8 +45,8 @@ namespace Crystal {
 				if (msgCount >= maxMessageCount)
 					break;
 			}
-			OnUpdate();
-			Renderer::Instance().Render();
+			Update();
+			renderer.Render();
 		}
 	}
 

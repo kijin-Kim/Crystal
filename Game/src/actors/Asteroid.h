@@ -22,6 +22,8 @@ public:
 		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
 		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Asteroid_Blue_Albedo"));
+		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Asteroid_Blue_Metallic"));
+		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Asteroid_Blue_Roughness"));
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Asteroid_Blue_Normal"));
 
 

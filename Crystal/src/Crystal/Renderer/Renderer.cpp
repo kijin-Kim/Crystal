@@ -13,6 +13,7 @@
 #include "imgui/backends/imgui_impl_win32.h"
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/Resources/ResourceManager.h"
+#include "Pipelines/RenderPipelines/LightingSkeletalPipeline.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -27,9 +28,9 @@ namespace Crystal {
 
 		//============================================================================================
 		auto panoTexture = resourceManager.CreateTextureFromFile(
-			"assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr", "HDRI_Skybox_Space").lock();
+			"assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr", "Pano_Skybox_Space").lock();
 		panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-		
+
 		auto cubemap = resourceManager.CreateTexture(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, "Cube_Skybox_Space").lock();
@@ -47,7 +48,7 @@ namespace Crystal {
 			D3D12_SRV_DIMENSION_TEXTURECUBE);
 
 		// TODO : TEMP
-		m_PanoTexture = resourceManager.GetTexture("HDRI_Skybox_Space").lock();
+		m_PanoTexture = resourceManager.GetTexture("Pano_Skybox_Space").lock();
 		m_CubemapTexture = resourceManager.GetTexture("Cube_Skybox_Space").lock();
 		m_IrradiancemapTexture = resourceManager.GetTexture("Cube_Skybox_Space_Irradiance").lock();
 		//============================================================================================
@@ -60,7 +61,7 @@ namespace Crystal {
 		auto specularIrradianceShader = resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling").lock();
 		auto simpleColorShader = resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader").lock();
 
-		
+
 		{
 			pbrStaticShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -73,11 +74,33 @@ namespace Crystal {
 
 			RootParameter perFrame = { 1, 1, 0 };
 			RootParameter perObject = { 1, 0, 0 };
-			RootParameter perDraw = { 1, 4, 0 };
+			RootParameter perExecute = { 1, 4, 0 };
 
-			pbrStaticShader->SetRootSignature({ perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
+			pbrStaticShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
 			pbrStaticShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
+
+		{
+			pbrSkeletalShader->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"BONEIDS", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});
+
+
+			RootParameter perFrame = { 1, 1, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perExecute = { 1, 4, 0 };
+
+			pbrSkeletalShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
+			pbrSkeletalShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		}
+
+
 
 
 		{
@@ -87,23 +110,43 @@ namespace Crystal {
 
 			RootParameter perFrame = { 1, 0, 0 };
 			RootParameter perObject = { 1, 0, 0 };
-			RootParameter perDraw = {};
+			RootParameter perExecute = {};
 
-			simpleColorShader->SetRootSignature({ perFrame, perObject, perDraw });
+			simpleColorShader->SetRootSignature({ perFrame, perObject, perExecute });
 			simpleColorShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 		}
 
 		{
-			skyboxShader->SetInputLayout({ 
-				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} 
+			skyboxShader->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 				});
 
-			RootParameter perFrame = {};
+			RootParameter perFrame = { 1, 1, 0 };
 			RootParameter perObject = {};
-			RootParameter perDraw = { 1, 1, 0 };
+			RootParameter perExecute = {};
 
-			skyboxShader->SetRootSignature({ perFrame, perObject, perDraw, { CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_ANISOTROPIC) } });
+			skyboxShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
 			skyboxShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		}
+
+		{
+
+			RootParameter perFrame = { 0, 1, 1 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+
+			panoToCubemapShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
+			panoToCubemapShader->SetDispatchThreadGroupCounts({ 2048 / 32, 2048 / 32, 6 });
+		}
+
+		{
+
+			RootParameter perFrame = { 0, 1, 1 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+
+			diffIrradianceShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
+			diffIrradianceShader->SetDispatchThreadGroupCounts({ 32 / 32, 32 / 32, 6 });
 		}
 
 
@@ -113,35 +156,52 @@ namespace Crystal {
 		m_LightingPipeline->SetObjectOwner(pbrStaticShader, Pipeline::PipelineOwnerType::Owner_Shader);
 		m_LightingPipeline->OnCreate();
 
-		m_MainColorPipelines.push_back(std::move(m_LightingPipeline));
+		m_Pipelines.push_back(std::move(m_LightingPipeline));
+
+		auto lightingSkeletalPipeline = std::make_unique<LightingSkeletalPipeline>();
+		lightingSkeletalPipeline->SetObjectOwner(pbrSkeletalShader, Pipeline::PipelineOwnerType::Owner_Shader);
+		lightingSkeletalPipeline->OnCreate();
+
+		m_Pipelines.push_back(std::move(lightingSkeletalPipeline));
+
+
 
 		m_LinePipeline = std::make_unique<LinePipeline>();
 		m_LinePipeline->SetObjectOwner(simpleColorShader, Pipeline::PipelineOwnerType::Owner_Shader);
 		m_LinePipeline->OnCreate();
 
-		m_MainColorPipelines.push_back(std::move(m_LinePipeline));
+		m_Pipelines.push_back(std::move(m_LinePipeline));
 
 		m_CubemapPipeline = std::make_unique<CubemapPipeline>();
 		m_CubemapPipeline->SetObjectOwner(skyboxShader, Pipeline::PipelineOwnerType::Owner_Shader);
 		m_CubemapPipeline->OnCreate();
 
-		m_MainColorPipelines.push_back(std::move(m_CubemapPipeline));
+		m_Pipelines.push_back(std::move(m_CubemapPipeline));
 
 		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>();
 		m_PanoToCubemapPipeline->SetObjectOwner(panoToCubemapShader, Pipeline::PipelineOwnerType::Owner_Shader);
 		m_PanoToCubemapPipeline->OnCreate();
 
+		m_Pipelines.push_back(std::move(m_PanoToCubemapPipeline));
+
+
 		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>();
 		m_DiffIrradSamplingPipeline->SetObjectOwner(diffIrradianceShader, Pipeline::PipelineOwnerType::Owner_Shader);
 		m_DiffIrradSamplingPipeline->OnCreate();
 
+		m_Pipelines.push_back(std::move(m_DiffIrradSamplingPipeline));
+
+	}
+
+	void Renderer::PrepareRender()
+	{
 		/// COMPUTE
 		auto commandList = m_CommandQueue->GetCommandList();
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		
+
 		resourceBarrier.Transition.pResource = m_CubemapTexture->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
@@ -152,7 +212,8 @@ namespace Crystal {
 		PanoToCubemapPipeline::PanoToCubemapPipelineInputs panoToCubemapPipelineInputs = {};
 		panoToCubemapPipelineInputs.SourceTexture = m_PanoTexture.get();
 		panoToCubemapPipelineInputs.DestinationTexture = m_CubemapTexture.get();
-		m_PanoToCubemapPipeline->PrepareRecord(commandList, &panoToCubemapPipelineInputs);
+		m_Pipelines[4]->PrepareRecord(commandList, &panoToCubemapPipelineInputs);
+		m_Pipelines[4]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -165,11 +226,12 @@ namespace Crystal {
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
-
+		
 		DiffIrradSamplingPipeline::DiffIrradSamplingPipelineInputs diffIrradSamplingPipelineInputs = {};
 		diffIrradSamplingPipelineInputs.SourceTexture = m_CubemapTexture.get();
 		diffIrradSamplingPipelineInputs.DestinationTexture = m_IrradiancemapTexture.get();
-		m_DiffIrradSamplingPipeline->PrepareRecord(commandList, &diffIrradSamplingPipelineInputs);
+		m_Pipelines[5]->PrepareRecord(commandList, &diffIrradSamplingPipelineInputs);
+		m_Pipelines[5]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -238,23 +300,27 @@ namespace Crystal {
 		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
-		m_MainColorPipelines[0]->PrepareRecord(commandList, &lightingPipelineInputs);
-		m_MainColorPipelines[0]->Record(commandList);
+		m_Pipelines[0]->PrepareRecord(commandList, &lightingPipelineInputs);
+		m_Pipelines[0]->Record(commandList);
+
+		m_Pipelines[1]->PrepareRecord(commandList, &lightingPipelineInputs);
+		m_Pipelines[1]->Record(commandList);
+		
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera.get();
 		wireframePipelineInputs.CollisionComponents = &m_CollisionComponents;
-		m_MainColorPipelines[1]->PrepareRecord(commandList, &wireframePipelineInputs);
-		m_MainColorPipelines[1]->Record(commandList);
+		m_Pipelines[2]->PrepareRecord(commandList, &wireframePipelineInputs);
+		m_Pipelines[2]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
 		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
-		m_MainColorPipelines[2]->PrepareRecord(commandList, &cubemapPipelineInputs);
-		m_MainColorPipelines[2]->Record(commandList);
+		m_Pipelines[3]->PrepareRecord(commandList, &cubemapPipelineInputs);
+		m_Pipelines[3]->Record(commandList);
 
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -405,21 +471,32 @@ namespace Crystal {
 	{
 		auto component = componentWeak.lock();
 
-		if (component->GetMaterials().empty())
+		const auto& materials = component->GetMaterials();
+		if (materials.empty())
 			return;
 
-		for (int i = 0; i < m_MainColorPipelines.size(); i++)
-		{
-			auto materialShader = Cast<Shader>(component->GetMaterials()[0]->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
-			auto wname = materialShader->GetObjectName();
-			auto pipelineShader = Cast<Shader>(m_MainColorPipelines[i]->GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
-			auto name = pipelineShader->GetObjectName();
-			if(!materialShader || !pipelineShader || materialShader != pipelineShader)
-				continue;
+		std::vector<int> registeredPipelineIndex;
 
-			m_MainColorPipelines[i]->RegisterPipelineComponents(componentWeak);
-		}
-		
+		for (const auto& mat : materials)
+		{
+			for (int i = 0; i < m_Pipelines.size(); i++)
+			{
+				bool bAlreadyRegisteredInThisPipeline = std::find(registeredPipelineIndex.begin(), 
+					registeredPipelineIndex.end(), i) != registeredPipelineIndex.end();
+				if(bAlreadyRegisteredInThisPipeline)
+					continue;
+				
+				auto materialShader = Cast<Shader>(mat->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
+				auto wname = materialShader->GetObjectName();
+				auto pipelineShader = Cast<Shader>(m_Pipelines[i]->GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+				auto name = pipelineShader->GetObjectName();
+				if (!materialShader || !pipelineShader || materialShader != pipelineShader)
+					continue;
+
+				m_Pipelines[i]->RegisterPipelineComponents(componentWeak);
+				registeredPipelineIndex.push_back(i);
+			}
+		}	
 
 	}
 

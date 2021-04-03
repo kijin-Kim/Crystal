@@ -12,7 +12,7 @@ namespace Crystal {
 		}
 			
 
-		if (!shader->CheckInputValidation(materialName, D3D_SIT_TEXTURE))
+		if (!shader->CheckInputValidation(materialName, D3D_SIT_TEXTURE) && !shader->CheckInputValidation(materialName, D3D_SIT_UAV_RWTYPED))
 			CS_FATAL(false, "%s 이름을 가진 Shader Input이 존재하지 않거나 %s 이름을 가진 Shader Input의 타입과 현재 타입이 매칭되지 않습니다", materialName.c_str(), materialName.c_str());
 
 		/*이미 슬롯에 Material 있으면 현재 전달된 Material로 대체 합니다.*/
