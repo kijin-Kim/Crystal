@@ -34,12 +34,13 @@ public:
 		SetAttachment(meshComponent, m_MainComponent);
 
 
-		auto randomScale = rand() % 4;
+		auto randomScale = rand() % 6;
 
 		m_MainComponent->RotateRoll(rand() % 360);
 		m_MainComponent->RotatePitch(rand() % 360);
 		m_MainComponent->RotateYaw(rand() % 360);
 		m_MainComponent->SetScale(randomScale);
+		m_MainComponent->SetMass(5000.0f * randomScale);
 
 		SetPosition({ (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000) });
 		

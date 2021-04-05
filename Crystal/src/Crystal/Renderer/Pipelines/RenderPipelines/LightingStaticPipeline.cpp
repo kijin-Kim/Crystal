@@ -12,7 +12,7 @@ namespace Crystal {
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
 		
-		const int maxObjectCount = 50;
+		const int maxObjectCount = 80;
 		const int maxMaterialCount = 5;
 
 		m_PerDrawConstantBufferLists.resize(maxObjectCount);

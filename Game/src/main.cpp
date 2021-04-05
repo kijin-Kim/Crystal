@@ -101,11 +101,12 @@ public:
 
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
+		testPawn->SetPosition({ 0.0f, 0.0f, -6000.0f });
 		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
 
 		/*Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();	
 		}

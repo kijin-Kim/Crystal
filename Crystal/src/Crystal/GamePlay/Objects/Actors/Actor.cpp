@@ -25,7 +25,7 @@ namespace Crystal {
 
 			if (c->IsCollisionEnabled())
 			{
-				level->RegisterPhysicsSystemComponent(c);
+				level->RegisterPhysicsWorldComponent(c);
 			}
 			
 		}
@@ -39,7 +39,7 @@ namespace Crystal {
 
 			if (tc->IsCollisionEnabled())
 			{
-				level->RegisterPhysicsSystemComponent(tc);
+				level->RegisterPhysicsWorldComponent(tc);
 			}
 		}
 		

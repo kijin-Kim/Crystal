@@ -15,7 +15,7 @@ namespace Crystal {
 		Object() = default;
 		virtual ~Object()
 		{
-			CS_DEBUG_INFO("Object : [ %s ]가 제거되었습니다", m_Name.c_str());
+			CS_DEBUG_INFO("Object : [%s]가 제거되었습니다", m_Name.c_str());
 		}
 
 		virtual void OnCreate()
@@ -27,7 +27,7 @@ namespace Crystal {
 			if(m_Name.empty())
 				SetDefaultName();
 
-			CS_DEBUG_INFO("Object : [ %s ]가 생성되었습니다", m_Name.c_str());
+			CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
 			s_ObjectCreationCountTracker[m_Name]++;
 		}
 

@@ -35,7 +35,7 @@ public:
 
 		auto boxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
 		boxComponent->SetRadius(908.0f / 2.0f);
-		//boxComponent->SetMass(30.0f);
+		boxComponent->SetMass(20000.0f);
 		//boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });
 
 		m_MainComponent = boxComponent;
@@ -110,21 +110,21 @@ public:
 
 	void MoveForward(float value)
 	{
-		value *= 13000.0f;
+		value *= 30000000;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
 		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}
 
 	void MoveRight(float value)
 	{
-		value *= 13000.0f;
+		value *= 30000000;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
 		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}
 
 	void MoveUp(float value)
 	{
-		value *= 13000.0f;
+		value *= 30000000;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
 		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}

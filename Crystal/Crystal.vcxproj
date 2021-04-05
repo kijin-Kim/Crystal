@@ -207,6 +207,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
+    <ClInclude Include="src\Crystal\GamePlay\World\PhysicsWorld.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\World\PhysicsWorld.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />

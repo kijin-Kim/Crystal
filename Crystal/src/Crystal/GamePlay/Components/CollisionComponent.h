@@ -203,14 +203,14 @@ namespace Crystal {
 		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingOrientedBox.Extents = extent; }
 		void SetOrientation(const DirectX::XMFLOAT4& orientation) { m_BoundingOrientedBox.Orientation = orientation; }
 
-		DirectX::BoundingOrientedBox GetWorldBoundingOrientedBox()
+		Collision::BoundingOrientedBox GetWorldBoundingOrientedBox()
 		{
-			DirectX::BoundingOrientedBox worldBoundingOrientedBox = {};
+			Collision::BoundingOrientedBox worldBoundingOrientedBox = {};
 			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, XMLoadFloat4x4(&m_WorldTransform));
 			return worldBoundingOrientedBox;
 		}
 
-		const DirectX::BoundingOrientedBox& GetBoundingOrientedBox() const
+		const Collision::BoundingOrientedBox& GetBoundingOrientedBox() const
 		{
 			return m_BoundingOrientedBox;
 		}
@@ -218,7 +218,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BoundingOrientedBoxComponent)
 
 	private:
-		DirectX::BoundingOrientedBox m_BoundingOrientedBox = {};
+		Collision::BoundingOrientedBox m_BoundingOrientedBox = {};
 	};
 
 	class BoundingSphereComponent : public CollisionComponent
