@@ -14,6 +14,8 @@
 #include "Crystal/Renderer/Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Pipelines/RenderPipelines/LinePipeline.h"
+#include "Crystal/Core/ApplicationUtility.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 namespace Crystal {
 	class PlayerController;
@@ -47,6 +49,8 @@ namespace Crystal {
 		int GetResolutionWidth() const { return m_ResWidth; }
 		int GetResolutionHeight() const { return m_ResHeight; }
 
+		std::shared_ptr<CameraComponent> GetCamera() { return ApplicationUtility::GetPlayerController().GetMainCamera().lock(); }
+
 	private:
 		Renderer() = default;
 		~Renderer() = default;
@@ -54,6 +58,19 @@ namespace Crystal {
 		void CreateDevice();
 		void CreateRenderTargetViewFromSwapChain();
 		void CreateDepthStencilView();
+
+		template <class T>
+		std::unique_ptr<Pipeline> CreatePipline(std::weak_ptr<Shader> shader, const std::string& name)
+		{
+			/*Pipeline¿ª ∏∏µÏ¥œ¥Ÿ.*/
+			auto pipeline = std::make_unique<T>();
+			pipeline->SetObjectOwner(shader, Pipeline::PipelineOwnerType::Owner_Shader);
+			pipeline->SetObjectName(name);
+			pipeline->OnCreate();
+
+			return pipeline;
+		}
+
 	private:
 
 		WindowsWindow* m_Window = nullptr;
@@ -96,5 +113,9 @@ namespace Crystal {
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
 
 		std::vector<std::unique_ptr<Pipeline>> m_Pipelines;
+
+		using RenderGraph = std::vector<std::unique_ptr<Pipeline>>;
+
+		RenderGraph m_RenderGraph;
 	};
 }

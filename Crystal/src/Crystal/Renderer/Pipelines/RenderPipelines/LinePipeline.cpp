@@ -17,16 +17,15 @@ namespace Crystal {
 			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
 	}
 
-	void LinePipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
-		const PipelineInputs* const pipelineInputs)
+	void LinePipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
+		RenderPipeline::PrepareRecord(pipelineInputs);
 
-		auto device = Renderer::Instance().GetDevice();
+		auto& renderer = Renderer::Instance();
+		auto device = renderer.GetDevice();
 
-		LinePipelineInputs* linePipelineInputs = (LinePipelineInputs*)pipelineInputs;
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(linePipelineInputs->Camera->GetViewProjection());
+		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

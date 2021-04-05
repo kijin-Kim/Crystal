@@ -19,6 +19,7 @@ namespace Crystal {
 		~Component() override = default;
 
 		virtual bool CanBeRendered() const { return false; }
+		virtual bool IsCollisionEnabled() const { return false; }
 
 		STATIC_TYPE_IMPLE(Component)
 	};

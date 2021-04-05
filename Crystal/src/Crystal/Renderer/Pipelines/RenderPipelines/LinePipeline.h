@@ -9,7 +9,6 @@ namespace Crystal {
 	public:
 		struct LinePipelineInputs : public RenderPipelineInputs
 		{
-			std::vector<CollisionComponent*>* CollisionComponents = nullptr;
 		};
 
 		struct PerFrameData
@@ -29,8 +28,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
-			const PipelineInputs* const pipelineInputs) override;
+		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		
 
 		STATIC_TYPE_IMPLE(LinePipeline)

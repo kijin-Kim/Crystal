@@ -14,14 +14,12 @@ namespace Crystal {
 
 		struct DiffIrradSamplingPipelineInputs : public ComputePipelineInputs
 		{
-			Texture* SourceTexture = nullptr;
-			Texture* DestinationTexture = nullptr;
 		};
 
 		DiffIrradSamplingPipeline() = default;
 		~DiffIrradSamplingPipeline() override = default;
 
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs) override;
+		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 
 
 		STATIC_TYPE_IMPLE(DiffIrradSamplingPipeline)

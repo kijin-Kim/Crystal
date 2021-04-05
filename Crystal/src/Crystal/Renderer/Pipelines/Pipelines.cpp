@@ -3,7 +3,7 @@
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
-	void Pipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void Pipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		/*CommandList를 녹화합니다*/
 		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
@@ -122,9 +122,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 	}
 
-	void RenderPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void RenderPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		Pipeline::PrepareRecord(commandList, pipelineInputs);
+		Pipeline::PrepareRecord(pipelineInputs);
 	}
 
 	void RenderPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)

@@ -23,14 +23,20 @@ public:
 		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Frigate_Metallic"));
 		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Frigate_Roughness"));
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
+		pbrMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
 
 		
 
 		//===================================================================================================
 
-		auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-		boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });
+		/*auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+		boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });*/
+
+		auto boxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+		boxComponent->SetRadius(908.0f / 2.0f);
+		//boxComponent->SetMass(30.0f);
+		//boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });
 
 		m_MainComponent = boxComponent;
 
@@ -104,23 +110,23 @@ public:
 
 	void MoveForward(float value)
 	{
-		value *= 130.0f;
+		value *= 13000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
-		m_MovementComponent->AddForce(force);
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}
 
 	void MoveRight(float value)
 	{
-		value *= 130.0f;
+		value *= 13000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
-		m_MovementComponent->AddForce(force);
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}
 
 	void MoveUp(float value)
 	{
-		value *= 130.0f;
+		value *= 13000.0f;
 		DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
-		m_MovementComponent->AddForce(force);
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 	}
 
 	void RollRight(float value)

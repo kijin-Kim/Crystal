@@ -25,15 +25,16 @@ namespace Crystal {
 		}
 	}
 
-	void LightingSkeletalPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
-		const PipelineInputs* const pipelineInputs)
+	void LightingSkeletalPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
+		RenderPipeline::PrepareRecord(pipelineInputs);
 
 		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
-		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
+		auto& renderer = Renderer::Instance();
+
+		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		auto camPos = renderer.GetCamera()->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);

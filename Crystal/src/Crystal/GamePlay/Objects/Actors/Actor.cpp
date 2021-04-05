@@ -13,28 +13,41 @@ namespace Crystal {
 
 		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
 
+		auto level = Cast<Level>(GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
+
 
 		for (const auto& c : m_Components)
 		{
-			if (!c->CanBeRendered())
-				continue;
+			if (c->CanBeRendered())
+			{
+				Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(c));
+			}
 
-			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(c));
+			if (c->IsCollisionEnabled())
+			{
+				level->RegisterPhysicsSystemComponent(c);
+			}
+			
 		}
 
 		for (const auto& tc : m_TransformHierarchy)
 		{
-			if(!tc->CanBeRendered())
-				continue;
+			if (tc->CanBeRendered())
+			{
+				Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(tc));
+			}
 
-			Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(tc));
+			if (tc->IsCollisionEnabled())
+			{
+				level->RegisterPhysicsSystemComponent(tc);
+			}
 		}
 		
 	}
 
 	void Actor::UpdateComponents(float deltaTime)
 	{
-		/*Non-Hierarchy Components + Main Component*/
+		/*Non-Hierarchy Components + Main Component*/	
 		for (auto& component : m_Components)
 			component->Update(deltaTime);
 		/*Hierarchy Components 계산의 효율을 위해 최상위 부모 (MainComponent)부터 자식 순으로 transform이 계산됩니다.*/

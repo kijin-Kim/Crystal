@@ -9,7 +9,6 @@ namespace Crystal {
 	public:
 		struct CubemapPipelineInputs : public RenderPipelineInputs
 		{
-			Texture* CubemapTexture = nullptr;
 		};
 
 		struct PerFrameData
@@ -23,8 +22,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
-			const PipelineInputs* const pipelineInputs) override;
+		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 
 		STATIC_TYPE_IMPLE(CubemapPipeline)
 	private:

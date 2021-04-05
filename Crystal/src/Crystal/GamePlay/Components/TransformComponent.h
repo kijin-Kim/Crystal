@@ -23,7 +23,12 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		}
 
 
-		void SetLocalPosition(const DirectX::XMFLOAT3& position) { m_LocalPosition = position; }
+		void SetLocalPosition(const DirectX::XMFLOAT3& position) 
+		{
+			m_LocalTransform._41 = position.x;
+			m_LocalTransform._42 = position.y;
+			m_LocalTransform._43 = position.z;
+		}
 
 		void SetWorldPosition(const DirectX::XMFLOAT3& position)
 		{
@@ -41,7 +46,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		void RotatePitch(float angle);
 		void RotateYaw(float angle);
 
-		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
+		DirectX::XMFLOAT3 GetLocalPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43 }; }
 		DirectX::XMFLOAT3 GetWorldPosition() const { return { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 }; }
 		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
 		float GetMass() const
@@ -71,6 +76,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		const DirectX::XMFLOAT4& GetRotation() const { return m_Rotation; }
 
 		bool CanBeRendered() const override { return false; }
+		bool IsCollisionEnabled() const override { return false; }
 
 		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:
@@ -83,7 +89,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
 
 		DirectX::XMFLOAT3 m_Velocity = Vector3::Zero;
-		float m_InverseMass = 10.0f;
+		float m_InverseMass = 1 / 10.0f;
 
 		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
 
@@ -92,5 +98,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		DirectX::XMFLOAT3 m_Forward = Vector3::UnitZ;
 
 		DirectX::XMFLOAT3 m_LocalPosition = Vector3::Zero;
+
+
 	};
 }

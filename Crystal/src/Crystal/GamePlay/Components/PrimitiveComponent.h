@@ -7,26 +7,7 @@ namespace Crystal {
 	class PrimitiveComponent : public TransformComponent
 	{
 	public:
-		enum class EPrimitiveComponentType
-		{
-			None,
-
-			Mesh,
-			StaticMesh,
-			SkeletalMesh,
-
-			Collision,
-			Ray,
-			BoundingBox,
-			BoundingOrientedBox,
-			BoundingSphere,
-		};
-
-	public:
-		PrimitiveComponent()
-		{
-			m_PrimitiveComponentType = EPrimitiveComponentType::None;
-		}
+		PrimitiveComponent() = default;
 		~PrimitiveComponent() override = default;
 
 		void OnCreate() override;
@@ -40,19 +21,21 @@ namespace Crystal {
 		void AddMaterial(std::shared_ptr<Material> material) { m_Materials.push_back(std::move(material)); }
 		const std::vector<std::shared_ptr<Material>>& GetMaterials() const { return m_Materials; }
 
-		void SetPrimitiveComponentType(EPrimitiveComponentType type) { m_PrimitiveComponentType = type; }
 		void SetRenderable(std::shared_ptr<Renderable> renderable) { m_Renderable = std::move(renderable); }
 		const std::shared_ptr<Renderable>& GetRenderable() const { return m_Renderable; }
 
-		EPrimitiveComponentType GetPrimitiveComponentType() const { return m_PrimitiveComponentType; }
+		bool CanBeRendered() const override { return true; }
+		bool IsCollisionEnabled() const override { return false; }
 
-		bool CanBeRendered()const override { return true; }
+		void AddForce(const DirectX::XMFLOAT3& force) { m_ForceAccum = Vector3::Add(m_ForceAccum, force); }
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
 		std::shared_ptr<Renderable> m_Renderable = nullptr;
-		EPrimitiveComponentType m_PrimitiveComponentType;
 
 		std::vector<std::shared_ptr<Material>> m_Materials;
+
+
+		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 	};
 }

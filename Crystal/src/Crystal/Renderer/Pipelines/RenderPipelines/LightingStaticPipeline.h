@@ -33,8 +33,6 @@ namespace Crystal {
 
 		struct LightingPipelineInputs : public RenderPipelineInputs
 		{
-			std::vector<SkeletalMeshComponent*>* SkeletalMeshComponents = nullptr;
-			std::vector<StaticMeshComponent*>* StaticMeshComponents = nullptr;
 			Texture* IrradiancemapTexture = nullptr;
 		};
 
@@ -44,8 +42,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
-			const PipelineInputs* const pipelineInputs) override;
+		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		STATIC_TYPE_IMPLE(LightingStaticPipeline)
 	private:
 		PerFrameData m_PerFrameData = {};

@@ -151,45 +151,12 @@ namespace Crystal {
 
 
 
-		/*Pipeline을 만듭니다.*/
-		m_LightingPipeline = std::make_unique<LightingStaticPipeline>();
-		m_LightingPipeline->SetObjectOwner(pbrStaticShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		m_LightingPipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(m_LightingPipeline));
-
-		auto lightingSkeletalPipeline = std::make_unique<LightingSkeletalPipeline>();
-		lightingSkeletalPipeline->SetObjectOwner(pbrSkeletalShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		lightingSkeletalPipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(lightingSkeletalPipeline));
-
-
-
-		m_LinePipeline = std::make_unique<LinePipeline>();
-		m_LinePipeline->SetObjectOwner(simpleColorShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		m_LinePipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(m_LinePipeline));
-
-		m_CubemapPipeline = std::make_unique<CubemapPipeline>();
-		m_CubemapPipeline->SetObjectOwner(skyboxShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		m_CubemapPipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(m_CubemapPipeline));
-
-		m_PanoToCubemapPipeline = std::make_unique<PanoToCubemapPipeline>();
-		m_PanoToCubemapPipeline->SetObjectOwner(panoToCubemapShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		m_PanoToCubemapPipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(m_PanoToCubemapPipeline));
-
-
-		m_DiffIrradSamplingPipeline = std::make_unique<DiffIrradSamplingPipeline>();
-		m_DiffIrradSamplingPipeline->SetObjectOwner(diffIrradianceShader, Pipeline::PipelineOwnerType::Owner_Shader);
-		m_DiffIrradSamplingPipeline->OnCreate();
-
-		m_Pipelines.push_back(std::move(m_DiffIrradSamplingPipeline));
+		m_Pipelines.push_back(CreatePipline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
+		m_Pipelines.push_back(CreatePipline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+		m_Pipelines.push_back(CreatePipline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
+		m_Pipelines.push_back(CreatePipline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
+		m_Pipelines.push_back(CreatePipline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
+		m_Pipelines.push_back(CreatePipline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
 
 	}
 
@@ -210,9 +177,7 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		PanoToCubemapPipeline::PanoToCubemapPipelineInputs panoToCubemapPipelineInputs = {};
-		panoToCubemapPipelineInputs.SourceTexture = m_PanoTexture.get();
-		panoToCubemapPipelineInputs.DestinationTexture = m_CubemapTexture.get();
-		m_Pipelines[4]->PrepareRecord(commandList, &panoToCubemapPipelineInputs);
+		m_Pipelines[4]->PrepareRecord(&panoToCubemapPipelineInputs);
 		m_Pipelines[4]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -228,9 +193,8 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 		
 		DiffIrradSamplingPipeline::DiffIrradSamplingPipelineInputs diffIrradSamplingPipelineInputs = {};
-		diffIrradSamplingPipelineInputs.SourceTexture = m_CubemapTexture.get();
-		diffIrradSamplingPipelineInputs.DestinationTexture = m_IrradiancemapTexture.get();
-		m_Pipelines[5]->PrepareRecord(commandList, &diffIrradSamplingPipelineInputs);
+
+		m_Pipelines[5]->PrepareRecord(&diffIrradSamplingPipelineInputs);
 		m_Pipelines[5]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -296,30 +260,29 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue, clearStencilValue, 0, nullptr);
 
 		LightingStaticPipeline::LightingPipelineInputs lightingPipelineInputs = {};
-		lightingPipelineInputs.SkeletalMeshComponents = &m_SkeletalMeshComponents;
-		lightingPipelineInputs.StaticMeshComponents = &m_StaticMeshComponents;
 		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
-		m_Pipelines[0]->PrepareRecord(commandList, &lightingPipelineInputs);
+
+		m_Pipelines[0]->PrepareRecord(&lightingPipelineInputs);
 		m_Pipelines[0]->Record(commandList);
 
-		m_Pipelines[1]->PrepareRecord(commandList, &lightingPipelineInputs);
+		m_Pipelines[1]->PrepareRecord(&lightingPipelineInputs);
 		m_Pipelines[1]->Record(commandList);
 		
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera.get();
-		wireframePipelineInputs.CollisionComponents = &m_CollisionComponents;
-		m_Pipelines[2]->PrepareRecord(commandList, &wireframePipelineInputs);
+
+		m_Pipelines[2]->PrepareRecord(&wireframePipelineInputs);
 		m_Pipelines[2]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
-		cubemapPipelineInputs.CubemapTexture = m_CubemapTexture.get();
-		m_Pipelines[3]->PrepareRecord(commandList, &cubemapPipelineInputs);
+
+		m_Pipelines[3]->PrepareRecord(&cubemapPipelineInputs);
 		m_Pipelines[3]->Record(commandList);
 
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -475,7 +438,8 @@ namespace Crystal {
 		if (materials.empty())
 			return;
 
-		std::vector<int> registeredPipelineIndex;
+		std::vector<int> registeredPipelineIndex; // Component가 Register되어 있는 pipeline의 컨테이너 상의 Index
+
 
 		for (const auto& mat : materials)
 		{
@@ -483,21 +447,16 @@ namespace Crystal {
 			{
 				bool bAlreadyRegisteredInThisPipeline = std::find(registeredPipelineIndex.begin(), 
 					registeredPipelineIndex.end(), i) != registeredPipelineIndex.end();
-				if(bAlreadyRegisteredInThisPipeline)
-					continue;
-				
-				auto materialShader = Cast<Shader>(mat->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
-				auto wname = materialShader->GetObjectName();
-				auto pipelineShader = Cast<Shader>(m_Pipelines[i]->GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
-				auto name = pipelineShader->GetObjectName();
-				if (!materialShader || !pipelineShader || materialShader != pipelineShader)
+
+				// 이미 Register되어 있거나 material이 이 Pipeline에서 사용되지 않으면
+				if(bAlreadyRegisteredInThisPipeline || !m_Pipelines[i]->IsValidForThisPipeline(mat)) 
 					continue;
 
-				m_Pipelines[i]->RegisterPipelineComponents(componentWeak);
+
+				m_Pipelines[i]->RegisterPipelineComponents(componentWeak); // 이 파이프라인에 컴포넌트를 등록
 				registeredPipelineIndex.push_back(i);
 			}
-		}	
-
+		}
 	}
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()

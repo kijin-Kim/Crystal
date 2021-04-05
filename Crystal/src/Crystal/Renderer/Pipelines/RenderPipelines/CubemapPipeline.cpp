@@ -13,18 +13,19 @@ namespace Crystal {
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
 	}
 
-	void CubemapPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void CubemapPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
+		RenderPipeline::PrepareRecord(pipelineInputs);
 
 		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)pipelineInputs;
 
-		auto viewProj = cubemapPipelineInputs->Camera->GetViewProjection();
+		auto& renderer = Renderer::Instance();
+		auto viewProj = renderer.GetCamera()->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		m_PerFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = renderer.GetDevice();
 
 		auto descHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		for (const auto& weak : m_Components)

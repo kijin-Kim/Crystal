@@ -17,6 +17,7 @@ namespace Crystal {
 			skyboxMaterial->OnCreate();
 			skyboxMaterial->Set("CubemapTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
 			
+			
 			//==== ComputeShader Materials ========================
 			auto panoToCubeMaterial = std::make_shared<Crystal::Material>();
 			panoToCubeMaterial->SetObjectOwner(resourceManager.GetShader("PanoToCubemap"),

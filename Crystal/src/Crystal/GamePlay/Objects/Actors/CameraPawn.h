@@ -78,21 +78,21 @@ namespace Crystal {
 		{
 			value *= 100000.0f;
 			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), { value, value, value });
-			m_MovementComponent->AddForce(force);
+			//m_MovementComponent->AddForce(force);
 		}
 
 		void MoveRight(float value)
 		{
 			value *= 100000.0f;
 			DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalRightVector(), { value, value, value });
-			m_MovementComponent->AddForce(force);
+			//m_MovementComponent->AddForce(force);
 		}
 
 		void MoveUp(float value)
 		{
 			value *= 100000.0f;
 			DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), { value, value, value });
-			m_MovementComponent->AddForce(force);
+			//m_MovementComponent->AddForce(force);
 		}
 
 		void RollRight(float value)

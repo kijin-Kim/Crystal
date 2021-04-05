@@ -16,107 +16,241 @@ namespace Crystal {
 		{
 			Updatable::Update(deltaTime);
 
-			for (const auto obbComp1 : m_BoundingOrientedBoxComponents)
+			//auto collisionShape = collisionComponent->GetWorldCollisionShape();
+			//collsionShape->Instersects(otherCollisionShape);
+			//collsionShape->SetWorldTransform();
+
+			//for (const auto& obbComp1Weak : m_BoundingOrientedBoxComponents)
+			//{
+			//	auto obbComp1 = obbComp1Weak.lock();
+			//	if(!obbComp1)
+			//		continue;
+
+
+			//	auto d3dOrientedBox1 = obbComp1->GetWorldBoundingOrientedBox();
+			//	// OBB and Ray
+			//	for (const auto& rayWeak : m_RayComponents)
+			//	{
+			//		auto ray = rayWeak.lock();
+			//		if(!ray)
+			//			continue;
+
+			//		DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
+			//		DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+
+			//		float outDistance = 0.0f;
+			//		if (d3dOrientedBox1.Intersects(origin, direction, outDistance))
+			//		{
+			//			if (ray->GetMaxDistance() >= abs(outDistance))
+			//			{
+			//				ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//				obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//			}
+			//		}
+			//	}
+
+			//	// OBB and Sphere
+			//	for (const auto& sphereCompWeak : m_BoundingSphereComponents)
+			//	{
+			//		auto sphereComp = sphereCompWeak.lock();
+			//		if(!sphereComp)
+			//			continue;
+
+			//		auto d3dBoundingSphere = sphereComp->GetWorldBoundingSphere();
+			//		if (d3dOrientedBox1.Intersects(d3dBoundingSphere))
+			//		{
+			//			obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//			sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//		}
+			//	}
+
+			//	// OBB and AABB
+			//	for (const auto& aabbCompWeak : m_BoundingBoxComponents)
+			//	{
+			//		auto aabbComp = aabbCompWeak.lock();
+			//		if(!aabbComp)
+			//			continue;
+
+			//		auto d3dBoundingBox2 = aabbComp->GetWorldBoundingBox();
+			//		if (d3dOrientedBox1.Intersects(d3dBoundingBox2))
+			//		{
+			//			obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//			aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//		}
+			//	}
+
+			//	// OBB and OBB
+			//	for (const auto& obbComp2Weak : m_BoundingOrientedBoxComponents)
+			//	{
+			//		auto obbComp2 = obbComp2Weak.lock();
+			//		if(!obbComp2)
+			//			continue;
+
+			//		if (obbComp1 != obbComp2)
+			//		{
+			//			auto d3dOrientedBox2 = obbComp2->GetWorldBoundingOrientedBox();
+			//			if (d3dOrientedBox1.Intersects(d3dOrientedBox2))
+			//			{
+			//				obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//				obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//			}
+			//		}
+			//	}
+			//}
+			
+			
+			for (int i = 0; i < m_BoundingSphereComponents.size() - 1; i++)
 			{
-				CS_FATAL(false,"Scale을 고려하세요");
-				auto d3dOrientedBox1 = obbComp1->GetWorldBoundingOrientedBox();
-				// OBB and Ray
-				for (const auto ray : m_RayComponents)
-				{
-					DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
-					DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+				auto sphereComplhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[i]);
+				if(!sphereComplhs)
+					continue;
 
-					float outDistance = 0.0f;
-					if (d3dOrientedBox1.Intersects(origin, direction, outDistance))
+				auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
+
+
+				for (int j = i + 1; j < m_BoundingSphereComponents.size() - i; j++)
+				{
+					auto sphereCompRhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[j]);
+					if(!sphereCompRhs)
+						continue;
+
+					auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
+					
+					float totalDist = 0.0f;
+					if (sphereLhs.Intersects(sphereRhs, totalDist))
 					{
-						if (ray->GetMaxDistance() >= abs(outDistance))
+						sphereComplhs->SetLineColor(Vector3::Red);
+						sphereCompRhs->SetLineColor(Vector3::Red);
+
+						auto contactNormal = Vector3::Normalize(Vector3::Subtract(sphereComplhs->GetWorldPosition(),
+									sphereCompRhs->GetWorldPosition()));
+
+
+						// 분리속도 기반 충격량
 						{
-							ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							auto relativeVelocity = Vector3::Subtract(sphereComplhs->GetVelocity(), sphereCompRhs->GetVelocity());
+							auto contactNormal = Vector3::Normalize(Vector3::Subtract(sphereComplhs->GetWorldPosition(), 
+								sphereCompRhs->GetWorldPosition()));
+							auto seperatingVelocity = Vector3::Dot(relativeVelocity, contactNormal);
+							if (seperatingVelocity > 0)
+								continue;
+
+							
+							float newSepVelocity = -seperatingVelocity * 0.3f; // 충돌후 분리속도 = -충돌전 분리속도 * 반발계수
+							float deltaVelocity = newSepVelocity - seperatingVelocity; // 속도 변화량
+
+
+							float totalInverseMass = sphereComplhs->GetInverseMass() + sphereCompRhs->GetInverseMass();
+							if(totalInverseMass <= 0)
+								continue;
+
+							float impulse = deltaVelocity / totalInverseMass;
+
+							auto impulsePerIMass = Vector3::Multiply(contactNormal, impulse);
+
+							sphereComplhs->SetVelocity(Vector3::Add(sphereComplhs->GetVelocity(), Vector3::Multiply(impulsePerIMass,
+								sphereComplhs->GetInverseMass())));
+
+							sphereCompRhs->SetVelocity(Vector3::Add(sphereCompRhs->GetVelocity(), Vector3::Multiply(impulsePerIMass,
+								-sphereCompRhs->GetInverseMass())));
+
 						}
-					}
-				}
 
-				// OBB and Sphere
-				for (const auto sphereComp : m_BoundingSphereComponents)
-				{
-					auto d3dBoundingSphere = sphereComp->GetWorldBoundingSphere();
-					if (d3dOrientedBox1.Intersects(d3dBoundingSphere))
-					{
-						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						sphereComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
-					}
-				}
-
-				// OBB and AABB
-				for (const auto aabbComp : m_BoundingBoxComponents)
-				{
-					auto d3dBoundingBox2 = aabbComp->GetWorldBoundingBox();
-					if (d3dOrientedBox1.Intersects(d3dBoundingBox2))
-					{
-						obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						aabbComp->SetLineColor({ 1.0f, 0.0f, 0.0f });
-					}
-				}
-
-				// OBB and OBB
-				for (const auto obbComp2 : m_BoundingOrientedBoxComponents)
-				{
-					if (obbComp1 != obbComp2)
-					{
-						auto d3dOrientedBox2 = obbComp2->GetWorldBoundingOrientedBox();
-						if (d3dOrientedBox1.Intersects(d3dOrientedBox2))
+						// 관통 해소
 						{
-							obbComp1->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							obbComp2->SetLineColor({ 1.0f, 0.0f, 0.0f });
+							
+							float totalInverseMass = sphereComplhs->GetInverseMass() + sphereCompRhs->GetInverseMass();
+							if(totalInverseMass <= 0.0f)
+								continue;
+							
+							auto distPerIMass = Vector3::Multiply(contactNormal, totalDist / totalInverseMass);
+
+							auto lhsDist = Vector3::Multiply(distPerIMass, sphereComplhs->GetInverseMass());
+							auto rhsDist = Vector3::Multiply(distPerIMass, -sphereCompRhs->GetInverseMass());
+
+							CS_DEBUG_INFO("%f", totalDist);
+							sphereComplhs->SetLocalPosition(Vector3::Add(sphereComplhs->GetLocalPosition(), lhsDist));
+							sphereCompRhs->SetLocalPosition(Vector3::Add(sphereCompRhs->GetLocalPosition(), rhsDist));
+
+							
 						}
+						
 					}
 				}
 			}
 
-			// Bounding Sphere and Ray
-			for (const auto component : m_BoundingSphereComponents)
-			{
-				auto d3dBoundingSphere = component->GetWorldBoundingSphere();
+			//for (const auto& componentWeak : m_BoundingSphereComponents)
+			//{
+			//	auto component = componentWeak.lock();
+			//	if(!component)
+			//		continue;
 
-				for (const auto ray : m_RayComponents)
-				{
-					DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
-					DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+			//	auto d3dBoundingSphere = component->GetWorldBoundingSphere();
 
-					float outDistance = 0.0f;
-					if (d3dBoundingSphere.Intersects(origin, direction, outDistance))
-					{
-						if (ray->GetMaxDistance() >= abs(outDistance))
-						{
-							ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
-							component->SetLineColor({ 1.0f, 0.0f, 0.0f });
-						}
-					}
-				}
-			}
+			//	// Bounding Sphere and Ray
+			//	for (const auto& rayWeak : m_RayComponents)
+			//	{
+			//		auto ray = rayWeak.lock();
+			//		if(!ray)
+			//			continue;
+
+			//		DirectX::XMVECTOR origin = XMLoadFloat3(&ray->GetOrigin());
+			//		DirectX::XMVECTOR direction = XMLoadFloat3(&ray->GetDirection());
+
+			//		float outDistance = 0.0f;
+			//		if (d3dBoundingSphere.Intersects(origin, direction, outDistance))
+			//		{
+			//			if (ray->GetMaxDistance() >= abs(outDistance))
+			//			{
+			//				ray->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//				component->SetLineColor({ 1.0f, 0.0f, 0.0f });
+			//			}
+			//		}
+			//	}
+
+			//	for (const auto& sphereWeak : m_BoundingSphereComponents)
+			//	{
+			//		auto sphereComp = sphereWeak.lock();
+			//		if(!sphereComp || sphereComp == component)
+			//			continue;
+
+			//		auto d3dBoundingSphere2 = sphereComp->GetWorldBoundingSphere();
+			//		if (d3dBoundingSphere.Intersects(d3dBoundingSphere2))
+			//		{
+			//			component->SetLineColor(Vector3::Red);
+			//			sphereComp->SetLineColor(Vector3::Red);
+
+			//			component->SetVelocity({ 0.0f, 0.0f, 0.0f });					
+			//		}
+			//	}
+
+			//	
+			//}
 		}
 
-		void RegisterCollisionComponent(CollisionComponent* component)
+		void RegisterPhysicsSystemComponent(std::weak_ptr<Component> compWeak)
 		{
-			auto type = component->GetPrimitiveComponentType();
-			switch (type)
+			auto component = compWeak.lock();
+			if (!component)
+				return;
+
+			auto staticType = component->StaticType();
+
+			if (staticType == "RayComponent")
 			{
-			case PrimitiveComponent::EPrimitiveComponentType::Ray:
-				m_RayComponents.push_back(static_cast<RayComponent*>(component));
-				return;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingBox:
-				m_BoundingBoxComponents.push_back(static_cast<BoundingBoxComponent*>(component));
-				return;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingOrientedBox:
-				m_BoundingOrientedBoxComponents.push_back(static_cast<BoundingOrientedBoxComponent*>(component));
-				return;
-			case PrimitiveComponent::EPrimitiveComponentType::BoundingSphere:
-				m_BoundingSphereComponents.push_back(static_cast<BoundingSphereComponent*>(component));
-				return;
-			default:
-				CS_FATAL(false, "잘못된 PrimitiveComponent Type입니다.");
-				return;
+				m_RayComponents.push_back(Cast<RayComponent>(component));
+			}
+			else if (staticType == "BoundingBoxComponent")
+			{
+				m_BoundingBoxComponents.push_back(Cast<BoundingBoxComponent>(component));
+			}
+			else if (staticType == "BoundingOrientedBoxComponent")
+			{
+				m_BoundingOrientedBoxComponents.push_back(Cast<BoundingOrientedBoxComponent>(component));
+			}
+			else if (staticType == "BoundingSphereComponent")
+			{
+				m_BoundingSphereComponents.push_back(Cast<BoundingSphereComponent>(component));
 			}
 		}
 
@@ -124,10 +258,10 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(PhysicsSystem)
 	private:
 		// Actor Has OwnerShip
-		std::vector<RayComponent*> m_RayComponents;
-		std::vector<BoundingBoxComponent*> m_BoundingBoxComponents;
-		std::vector<BoundingOrientedBoxComponent*> m_BoundingOrientedBoxComponents;
-		std::vector<BoundingSphereComponent*> m_BoundingSphereComponents;
+		std::vector<std::weak_ptr<RayComponent>> m_RayComponents;
+		std::vector<std::weak_ptr<BoundingBoxComponent>> m_BoundingBoxComponents;
+		std::vector<std::weak_ptr<BoundingOrientedBoxComponent>> m_BoundingOrientedBoxComponents;
+		std::vector<std::weak_ptr<BoundingSphereComponent>> m_BoundingSphereComponents;
 	};
 
 	class Level : public Updatable
@@ -162,8 +296,8 @@ namespace Crystal {
 		{
 			// Create new actor
 			auto newActor = std::make_shared<T>();
-			newActor->OnCreate();
 			newActor->SetObjectOwner(weak_from_this(), Actor::ActorOwnerType::Owner_Level);
+			newActor->OnCreate();
 			if(!name.empty())
 				newActor->SetObjectName(name);
 			newActor->Begin();
@@ -203,9 +337,9 @@ namespace Crystal {
 			lineComponent->SetLineColor(color);
 		}
 
-		void RegisterCollisionComponent(CollisionComponent* component)
+		void RegisterPhysicsSystemComponent(std::weak_ptr<Component> component)
 		{			
-			//m_PhysicsSystem->RegisterCollisionComponent(component);
+			m_PhysicsSystem->RegisterPhysicsSystemComponent(component);
 		}
 		STATIC_TYPE_IMPLE(Level)
 	private:
@@ -216,15 +350,7 @@ namespace Crystal {
 	class World : public Updatable
 	{
 	public:
-		World()
-		{
-			//auto defaultLevel = std::make_unique<Level>();
-			//defaultLevel->SetObjectName("DefaultLevel");
-			//defaultLevel->SetObjectOwner(this, ObjectOwnerType::OOT_World);
-
-			//m_Levels.push_back(std::move(defaultLevel)); //Default Level
-		}
-
+		World() = default;
 		~World() override = default;
 
 		template<class T>

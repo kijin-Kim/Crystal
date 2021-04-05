@@ -18,6 +18,7 @@ public:
 		bodyMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Body_Albedo"));
 		bodyMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Body_Roughness"));
 		bodyMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Body_Normal"));
+		bodyMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
 		auto tentacleMaterial = std::make_shared<Crystal::Material>();
 		tentacleMaterial->OnCreate();
@@ -26,6 +27,7 @@ public:
 		tentacleMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Tentacle_Albedo"));
 		tentacleMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Tentacle_Roughness"));
 		tentacleMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Tentacle_Normal"));
+		tentacleMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
 		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
 			"assets/models/KRAKEN_idle.fbx");

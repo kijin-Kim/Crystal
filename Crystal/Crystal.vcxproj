@@ -193,6 +193,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Actors\LightActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\LightComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
@@ -296,6 +297,9 @@
     <ProjectReference Include="external\imgui\ImGui.vcxproj">
       <Project>{ffabe88a-f7c7-4134-b287-54119e3d0ef4}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Crystal\GamePlay\Components\CollisionShapes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

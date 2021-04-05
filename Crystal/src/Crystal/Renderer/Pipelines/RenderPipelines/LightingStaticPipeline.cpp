@@ -29,23 +29,22 @@ namespace Crystal {
 		
 	}
 
-	void LightingStaticPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
-		const PipelineInputs* const pipelineInputs)
+	void LightingStaticPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(commandList, pipelineInputs);
+		RenderPipeline::PrepareRecord(pipelineInputs);
 
-		auto device = Renderer::Instance().GetDevice();
+		auto& renderer = Renderer::Instance();
+		auto device = renderer.GetDevice();
 
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
-		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
+		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		auto camPos = renderer.GetCamera()->GetWorldPosition();
 		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
-		auto& skeletalMeshComponents = *lightPipelineInputs->SkeletalMeshComponents;
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView(); // Per Frame
@@ -88,53 +87,53 @@ namespace Crystal {
 				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
 
-				PerDrawData perMaterialData = {};
+				PerDrawData perDrawData = {};
 
 				if (materials[j]->HasTextureInput("AlbedoTexture"))
 				{
-					perMaterialData.bToggleAlbedoTexture = true;
+					perDrawData.bToggleAlbedoTexture = true;
 					albedoTextureHandle = materials[j]->GetTextureInput("AlbedoTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("AlbedoColor"))
 				{
-					perMaterialData.bToggleAlbedoTexture = false;
+					perDrawData.bToggleAlbedoTexture = false;
 					const DirectX::XMFLOAT4& floatInput = materials[j]->GetFloatInput("AlbedoColor");
-					perMaterialData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
+					perDrawData.AlbedoColor = { floatInput.x, floatInput.y, floatInput.z };
 				}
 
 				if (materials[j]->HasTextureInput("MetallicTexture"))
 				{
-					perMaterialData.bToggleMetallicTexture = true;
+					perDrawData.bToggleMetallicTexture = true;
 					metallicTextureHandle = materials[j]->GetTextureInput("MetallicTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("MetallicConstant"))
 				{
-					perMaterialData.bToggleMetallicTexture = false;
-					perMaterialData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
+					perDrawData.bToggleMetallicTexture = false;
+					perDrawData.MetallicConstant = materials[j]->GetFloatInput("MetallicConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("RoughnessTexture"))
 				{
-					perMaterialData.bToggleRoughnessTexture = true;
+					perDrawData.bToggleRoughnessTexture = true;
 					roughnessTextureHandle = materials[j]->GetTextureInput("RoughnessTexture")->GetShaderResourceView();
 				}
 				else if (materials[j]->HasFloatInput("RoughnessConstant"))
 				{
-					perMaterialData.bToggleRoughnessTexture = false;
-					perMaterialData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
+					perDrawData.bToggleRoughnessTexture = false;
+					perDrawData.RoughnessConstant = materials[j]->GetFloatInput("RoughnessConstant").x;
 				}
 
 				if (materials[j]->HasTextureInput("NormalTexture"))
 				{
-					perMaterialData.bToggleNormalTexture = true;
+					perDrawData.bToggleNormalTexture = true;
 					normalTextureHandle = materials[j]->GetTextureInput("NormalTexture")->GetShaderResourceView();
 				}
 				else
-					perMaterialData.bToggleNormalTexture = false;
+					perDrawData.bToggleNormalTexture = false;
 
-				perMaterialData.bToggleIrradianceTexture = true;
+				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perMaterialData);
+				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perDrawData);
 				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBufferLists[i][j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

@@ -6,11 +6,10 @@
 namespace Crystal {
 
 
-	void PanoToCubemapPipeline::PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, const PipelineInputs* const pipelineInputs)
+	void PanoToCubemapPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::PrepareRecord(commandList, pipelineInputs);
+		ComputePipeline::PrepareRecord(pipelineInputs);
 
-		PanoToCubemapPipelineInputs* panoToCubemapPipelineInputs = (PanoToCubemapPipelineInputs*)pipelineInputs;
 
 		auto device = Renderer::Instance().GetDevice();
 

@@ -8,7 +8,6 @@ namespace Crystal {
 	public:
 		MeshComponent()
 		{
-			SetPrimitiveComponentType(EPrimitiveComponentType::Mesh);
 		}
 		virtual ~MeshComponent() = default;
 
@@ -21,7 +20,6 @@ namespace Crystal {
 	public:
 		StaticMeshComponent()
 		{
-			SetPrimitiveComponentType(EPrimitiveComponentType::StaticMesh);
 		};
 		virtual ~StaticMeshComponent() = default;
 
@@ -34,7 +32,6 @@ namespace Crystal {
 	public:
 		SkeletalMeshComponent()
 		{
-			SetPrimitiveComponentType(EPrimitiveComponentType::SkeletalMesh);
 		};
 		virtual ~SkeletalMeshComponent() = default;
 

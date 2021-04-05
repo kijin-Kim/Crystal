@@ -37,8 +37,7 @@ namespace Crystal {
 
 
 		void OnCreate() override;
-		void PrepareRecord(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, 
-			const PipelineInputs* const pipelineInputs) override;
+		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		STATIC_TYPE_IMPLE(LightingSkeletalPipeline)
 	private:
 		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
