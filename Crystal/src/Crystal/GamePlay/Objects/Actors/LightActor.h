@@ -12,12 +12,10 @@ namespace Crystal {
 
 		~LightActor() override = default;
 
-		LightComponent* GetLightComponent() const { return m_LightComponent; }
-
 
 		STATIC_TYPE_IMPLE(LightActor)
 	protected:
-		LightComponent* m_LightComponent = nullptr;
+		std::shared_ptr<LightComponent> m_LightComponent = nullptr;
 	};
 
 	class DirectionalLightActor : public LightActor
@@ -26,8 +24,11 @@ namespace Crystal {
 		DirectionalLightActor()
 		{
 			m_LightComponent = CreateComponent<Crystal::DirectionalLightComponent>("DirectionalLightComponent");
+			m_LightComponent->SetLocalPosition({ 0.0f, 0.0f, 0.0f });
+			
 		}
 		~DirectionalLightActor() override = default;
+
 
 		STATIC_TYPE_IMPLE(DirectionalLightActor)
 	};

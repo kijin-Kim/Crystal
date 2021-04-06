@@ -214,6 +214,7 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingSkeletalPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingStaticPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipelines.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
@@ -256,6 +257,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
@@ -268,6 +270,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingSkeletalPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />

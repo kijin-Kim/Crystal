@@ -8,4 +8,13 @@ namespace Crystal {
 	{
 		TransformComponent::OnCreate();
 	}
+
+	void PrimitiveComponent::RegisterComponent()
+	{
+		TransformComponent::RegisterComponent();
+
+		Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
+
+	}
+
 }

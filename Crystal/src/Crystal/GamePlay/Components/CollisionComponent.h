@@ -36,7 +36,7 @@ namespace Crystal {
 			return { color.x, color.y, color.z };
 		}
 
-		void OnCreate() override;
+		void RegisterComponent() override;
 
 		void Update(const float deltaTime) override
 		{

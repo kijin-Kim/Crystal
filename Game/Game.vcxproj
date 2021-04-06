@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="src\actors\Asteroid.h" />
     <ClInclude Include="src\actors\Kraken.h" />
+    <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\TestPawn.h" />
   </ItemGroup>
   <ItemGroup>

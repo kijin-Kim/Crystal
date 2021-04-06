@@ -18,6 +18,8 @@ namespace Crystal {
 		Component() = default;
 		~Component() override = default;
 
+		virtual void RegisterComponent() {}
+
 		virtual bool CanBeRendered() const { return false; }
 		virtual bool IsCollisionEnabled() const { return false; }
 

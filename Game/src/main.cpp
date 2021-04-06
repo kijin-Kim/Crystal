@@ -10,6 +10,7 @@
 #include "actors/Asteroid.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
+#include "actors/Sun.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -102,11 +103,16 @@ public:
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
 		testPawn->SetPosition({ 0.0f, 0.0f, -6000.0f });
+
+		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
+		sun->SetPosition({ 0.0f, 0.0f, 10000.0f });
+
+
 		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
 
 		/*Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 30; i++)
 		{
 			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();	
 		}

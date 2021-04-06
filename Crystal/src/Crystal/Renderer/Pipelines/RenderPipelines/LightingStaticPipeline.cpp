@@ -7,8 +7,7 @@ namespace Crystal {
 
 	void LightingStaticPipeline::OnCreate()
 	{
-		RenderPipeline::OnCreate();
-
+		LightPipeline::OnCreate();
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
 		
@@ -26,12 +25,11 @@ namespace Crystal {
 			}
 		}
 
-		
 	}
 
 	void LightingStaticPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(pipelineInputs);
+		LightPipeline::PrepareRecord(pipelineInputs);
 
 		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
@@ -39,10 +37,33 @@ namespace Crystal {
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
 		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		auto camPos = renderer.GetCamera()->GetWorldPosition();
-		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
-		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
-		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
+		m_PerFrameData.CameraPositionInWorld = renderer.GetCamera()->GetWorldPosition();
+	
+
+		const int maxLightCount = 20;
+		int lightCount = 0;
+		for (const auto& weak : m_LocalLightComponents)
+		{
+			if (lightCount >= maxLightCount)
+				break;
+
+			auto localLightComponent = weak.lock();
+			if (!localLightComponent)
+				continue;
+
+			auto lightPosition =
+
+				m_PerFrameData.Lights[lightCount].WorldPosition = localLightComponent->GetWorldPosition();
+
+			m_PerFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
+			m_PerFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
+
+
+			lightCount++;
+		}
+
+		m_PerFrameData.LightCount = lightCount;
+		
 		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
 
 
@@ -86,6 +107,7 @@ namespace Crystal {
 				D3D12_CPU_DESCRIPTOR_HANDLE metallicTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
+				D3D12_CPU_DESCRIPTOR_HANDLE emissiveTextureHandle = {};
 
 				PerDrawData perDrawData = {};
 
@@ -130,6 +152,18 @@ namespace Crystal {
 				}
 				else
 					perDrawData.bToggleNormalTexture = false;
+				if (materials[j]->HasTextureInput("EmissiveTexutre"))
+				{
+					perDrawData.bToggleEmissiveTexture = true;
+					emissiveTextureHandle = materials[j]->GetTextureInput("EmissiveTexture")->GetShaderResourceView();
+				}
+				else if (materials[j]->HasFloatInput("EmissiveColor"))
+				{
+					perDrawData.bToggleEmissiveTexture = false;
+					auto color = materials[j]->GetFloatInput("EmissiveColor");
+					perDrawData.EmissiveColor = { color.x, color.y, color.z };
+				}
+
 
 				perDrawData.bToggleIrradianceTexture = true;
 
@@ -148,6 +182,9 @@ namespace Crystal {
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				if (normalTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, normalTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				if(emissiveTextureHandle.ptr)
+					device->CopyDescriptorsSimple(1, destHeapHandle, emissiveTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			}
 		}

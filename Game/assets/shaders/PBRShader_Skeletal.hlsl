@@ -27,7 +27,8 @@ cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
     float4 WorldCameraPosition : packoffset(c4);
-    float4 WorldLightPosition[2] : packoffset(c5);
+    float4 WorldLightPosition[20] : packoffset(c5);
+    int LightCount : packoffset(c25);
 }
 
 cbuffer PerObjectData : register(b1)
@@ -154,7 +155,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 
     
     float3 Lo = 0.0f;
-    for(int i= 0; i < lightCount; i++)
+    for (int i = 0; i < LightCount; i++)
     {
         // L()
         float3 L = normalize(WorldLightPosition[i] - input.WorldPosition).xyz;

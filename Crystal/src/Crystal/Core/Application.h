@@ -30,6 +30,7 @@ namespace Crystal {
 			resourceManager.CreateRenderable<Crystal::LineBox>("LineBoxMesh");
 			resourceManager.CreateRenderable<Crystal::LineSphere>("LineSphereMesh");
 			resourceManager.CreateRenderable<Crystal::PlaneQuad>("PlaneQuadMesh");
+			resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("assets/models/Sphere.fbx", "Sphere");
 		}
 
 		void Run();

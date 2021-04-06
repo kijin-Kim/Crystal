@@ -74,7 +74,7 @@ namespace Crystal {
 
 			RootParameter perFrame = { 1, 1, 0 };
 			RootParameter perObject = { 1, 0, 0 };
-			RootParameter perExecute = { 1, 4, 0 };
+			RootParameter perExecute = { 1, 5, 0 };
 
 			pbrStaticShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
 			pbrStaticShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
@@ -151,8 +151,10 @@ namespace Crystal {
 
 
 
-		m_Pipelines.push_back(CreatePipline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
-		m_Pipelines.push_back(CreatePipline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+		m_LightPipelines.push_back(CreatePipline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
+		m_LightPipelines.push_back(CreatePipline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+
+
 		m_Pipelines.push_back(CreatePipline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
 		m_Pipelines.push_back(CreatePipline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
 		m_Pipelines.push_back(CreatePipline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
@@ -177,8 +179,8 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		PanoToCubemapPipeline::PanoToCubemapPipelineInputs panoToCubemapPipelineInputs = {};
-		m_Pipelines[4]->PrepareRecord(&panoToCubemapPipelineInputs);
-		m_Pipelines[4]->Record(commandList);
+		m_Pipelines[2]->PrepareRecord(&panoToCubemapPipelineInputs);
+		m_Pipelines[2]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -194,8 +196,8 @@ namespace Crystal {
 		
 		DiffIrradSamplingPipeline::DiffIrradSamplingPipelineInputs diffIrradSamplingPipelineInputs = {};
 
-		m_Pipelines[5]->PrepareRecord(&diffIrradSamplingPipelineInputs);
-		m_Pipelines[5]->Record(commandList);
+		m_Pipelines[3]->PrepareRecord(&diffIrradSamplingPipelineInputs);
+		m_Pipelines[3]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -263,27 +265,27 @@ namespace Crystal {
 		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 
-		m_Pipelines[0]->PrepareRecord(&lightingPipelineInputs);
-		m_Pipelines[0]->Record(commandList);
+		m_LightPipelines[0]->PrepareRecord(&lightingPipelineInputs);
+		m_LightPipelines[0]->Record(commandList);
 
-		m_Pipelines[1]->PrepareRecord(&lightingPipelineInputs);
-		m_Pipelines[1]->Record(commandList);
+		m_LightPipelines[1]->PrepareRecord(&lightingPipelineInputs);
+		m_LightPipelines[1]->Record(commandList);
 		
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera.get();
 
-		m_Pipelines[2]->PrepareRecord(&wireframePipelineInputs);
-		m_Pipelines[2]->Record(commandList);
+		m_Pipelines[0]->PrepareRecord(&wireframePipelineInputs);
+		m_Pipelines[0]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
 
-		m_Pipelines[3]->PrepareRecord(&cubemapPipelineInputs);
-		m_Pipelines[3]->Record(commandList);
+		m_Pipelines[1]->PrepareRecord(&cubemapPipelineInputs);
+		m_Pipelines[1]->Record(commandList);
 
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -430,6 +432,14 @@ namespace Crystal {
 		m_CommandQueue = std::make_shared<CommandQueue>(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 	}
 
+	void Renderer::RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak)
+	{
+		for (const auto& pipeline : m_LightPipelines)
+		{
+			pipeline->RegisterLightComponents(componentWeak);
+		}
+	}
+
 	void Renderer::RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak)
 	{
 		auto component = componentWeak.lock();
@@ -438,15 +448,15 @@ namespace Crystal {
 		if (materials.empty())
 			return;
 
-		std::vector<int> registeredPipelineIndex; // Component가 Register되어 있는 pipeline의 컨테이너 상의 Index
-
+		std::vector<int> registeredPipelineIndices; // Component가 Register되어 있는 pipeline의 컨테이너 상의 Index
+		std::vector<int> registeredLightPipelineIndices;
 
 		for (const auto& mat : materials)
 		{
 			for (int i = 0; i < m_Pipelines.size(); i++)
 			{
-				bool bAlreadyRegisteredInThisPipeline = std::find(registeredPipelineIndex.begin(), 
-					registeredPipelineIndex.end(), i) != registeredPipelineIndex.end();
+				bool bAlreadyRegisteredInThisPipeline = std::find(registeredPipelineIndices.begin(), 
+					registeredPipelineIndices.end(), i) != registeredPipelineIndices.end();
 
 				// 이미 Register되어 있거나 material이 이 Pipeline에서 사용되지 않으면
 				if(bAlreadyRegisteredInThisPipeline || !m_Pipelines[i]->IsValidForThisPipeline(mat)) 
@@ -454,7 +464,21 @@ namespace Crystal {
 
 
 				m_Pipelines[i]->RegisterPipelineComponents(componentWeak); // 이 파이프라인에 컴포넌트를 등록
-				registeredPipelineIndex.push_back(i);
+				registeredPipelineIndices.push_back(i);
+			}
+
+			for (int i = 0; i < m_LightPipelines.size(); i++)
+			{
+				bool bAlreadyRegisteredInThisPipeline = std::find(registeredLightPipelineIndices.begin(),
+					registeredLightPipelineIndices.end(), i) != registeredLightPipelineIndices.end();
+
+				// 이미 Register되어 있거나 material이 이 Pipeline에서 사용되지 않으면
+				if (bAlreadyRegisteredInThisPipeline || !m_LightPipelines[i]->IsValidForThisPipeline(mat))
+					continue;
+
+
+				m_LightPipelines[i]->RegisterPipelineComponents(componentWeak); // 이 파이프라인에 컴포넌트를 등록
+				registeredLightPipelineIndices.push_back(i);
 			}
 		}
 	}

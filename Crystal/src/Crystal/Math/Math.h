@@ -145,6 +145,9 @@ namespace Crystal {
 
 	namespace Vector4
 	{
+		const DirectX::XMFLOAT4 Zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+
 		namespace Quaternion {
 			const DirectX::XMFLOAT4 Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
 		}

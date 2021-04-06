@@ -12,6 +12,8 @@ namespace Crystal {
 
 		void OnCreate() override;
 
+		void RegisterComponent() override;
+
 		void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);

@@ -10,39 +10,7 @@ namespace Crystal {
 	void Actor::OnCreate()
 	{
 		Updatable::OnCreate();
-
-		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
-
-		auto level = Cast<Level>(GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
-
-
-		for (const auto& c : m_Components)
-		{
-			if (c->CanBeRendered())
-			{
-				Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(c));
-			}
-
-			if (c->IsCollisionEnabled())
-			{
-				level->RegisterPhysicsWorldComponent(c);
-			}
-			
-		}
-
-		for (const auto& tc : m_TransformHierarchy)
-		{
-			if (tc->CanBeRendered())
-			{
-				Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(tc));
-			}
-
-			if (tc->IsCollisionEnabled())
-			{
-				level->RegisterPhysicsWorldComponent(tc);
-			}
-		}
-		
+		RegisterComponents();
 	}
 
 	void Actor::UpdateComponents(float deltaTime)
@@ -55,7 +23,7 @@ namespace Crystal {
 			transformComponent->Update(deltaTime);
 	}
 
-	void Actor::RegisterComponent(const std::shared_ptr<Component>& component)
+	void Actor::AddComponent(const std::shared_ptr<Component>& component)
 	{
 		if (m_Components.end() != std::find_if(m_Components.begin(), m_Components.end(),
 			[component](const std::shared_ptr<Component>& com)->bool {return com == component; }))
@@ -66,6 +34,23 @@ namespace Crystal {
 		m_Components.emplace_back(component);
 
 		CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
+	}
+
+	void Actor::RegisterComponents()
+	{
+		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
+
+		for (const auto& c : m_Components)
+		{
+			c->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
+			c->RegisterComponent();
+		}
+
+		for (const auto& tc : m_TransformHierarchy)
+		{
+			tc->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
+			tc->RegisterComponent();
+		}
 	}
 
 	void Actor::MoveToTransformComponentHierarchy(const std::shared_ptr <TransformComponent>& component)

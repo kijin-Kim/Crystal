@@ -6,7 +6,7 @@ namespace Crystal {
 
 	void LightingSkeletalPipeline::OnCreate()
 	{
-		RenderPipeline::OnCreate();
+		LightPipeline::OnCreate();
 
 		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
 
@@ -27,7 +27,7 @@ namespace Crystal {
 
 	void LightingSkeletalPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(pipelineInputs);
+		LightPipeline::PrepareRecord(pipelineInputs);
 
 		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
 

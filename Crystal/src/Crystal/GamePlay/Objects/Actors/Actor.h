@@ -30,7 +30,8 @@ namespace Crystal {
 
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
-		void RegisterComponent(const std::shared_ptr<Component>& component);
+		void AddComponent(const std::shared_ptr<Component>& component);
+		void RegisterComponents();
 
 		/*Component를 TransformComponent들의 Hierarchy에 옮깁니다.*/
 		void MoveToTransformComponentHierarchy(const std::shared_ptr <TransformComponent>& component);
@@ -52,9 +53,7 @@ namespace Crystal {
 		{
 			/*TODO : Component만 받게 체크...*/
 			std::shared_ptr<T> newComponent = std::make_shared<T>();
-			newComponent->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
-
-			RegisterComponent(newComponent);
+			AddComponent(newComponent);
 			newComponent->OnCreate();
 			if (!name.empty())
 				newComponent->SetObjectName(name);

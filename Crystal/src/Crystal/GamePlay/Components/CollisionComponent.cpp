@@ -3,8 +3,16 @@
 #include "Crystal/GamePlay/World/World.h"
 
 namespace Crystal {
-	void CollisionComponent::OnCreate()
+
+	void CollisionComponent::RegisterComponent()
 	{
-		PrimitiveComponent::OnCreate();
+		PrimitiveComponent::RegisterComponent();
+
+		auto owner = Cast<Actor>(GetObjectOwner(Component::ComponentOwnerType::Owner_Actor));
+
+		auto level = Cast<Level>(owner->GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
+
+		level->RegisterPhysicsWorldComponent(Cast<CollisionComponent>(shared_from_this()));
 	}
+
 }

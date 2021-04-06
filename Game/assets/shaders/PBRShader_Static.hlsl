@@ -22,11 +22,21 @@ struct PS_INPUT
 };
 
 
+struct Light
+{
+    float4 WorldPosition;
+    float4 Color;
+    float Intensity;
+    float3 padding;
+};
+
+
 cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
     float4 WorldCameraPosition : packoffset(c4);
-    float4 WorldLightPosition[2] : packoffset(c5);
+    Light Lights[20] : packoffset(c5);
+    int LightCount : packoffset(c65);
 }
 
 cbuffer PerObjectData : register(b1)
@@ -36,14 +46,16 @@ cbuffer PerObjectData : register(b1)
 
 cbuffer PerMeshData : register(b2)
 {
-    float3 AlbedoColor;
-    bool bToggleAlbedoTexture;
-    bool bToggleMetallicTexture;
-    bool bToggleRoughnessTexture;
-    bool bToggleNormalTexture;
-    bool bToggleIrradianceTexture;
-    float RoughnessConstant;
-    float MetallicConstant;
+    float3 AlbedoColor : packoffset(c0);
+    float3 EmissiveColor : packoffset(c1);
+    bool bToggleAlbedoTexture : packoffset(c2.x);
+    bool bToggleMetallicTexture : packoffset(c2.y);
+    bool bToggleRoughnessTexture : packoffset(c2.z);
+    bool bToggleNormalTexture : packoffset(c2.w);
+    bool bToggleIrradianceTexture : packoffset(c3.x);
+    bool bToggleEmissivetexture : packoffset(c3.y);
+    float RoughnessConstant : packoffset(c3.z);
+    float MetallicConstant  : packoffset(c3.w);
 }
 
 PS_INPUT vsMain(VS_INPUT input)
@@ -71,6 +83,7 @@ Texture2D AlbedoTexture : register(t1);
 Texture2D MetallicTexture : register(t2);
 Texture2D RoughnessTexture : register(t3);
 Texture2D NormalTexture : register(t4);
+Texture2D EmissiveTexture : register(t5);
 
 
 SamplerState DefaultSampler : register(s0);
@@ -119,19 +132,19 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 lightColor = 3.0f;
     float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
     float metallic = bToggleMetallicTexture ? MetallicTexture.Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
+    float3 emissive = bToggleEmissivetexture ? EmissiveTexture.Sample(DefaultSampler, input.TexCoord).rgb : EmissiveColor;
     
-    const int lightCount = 2; // ÀÓ½Ã
 
-    /*³ë¸»*/
+    /*ï¿½ë¸»*/
     float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
     float3x3(normalize(input.WorldTangent), normalize(input.WorldBiTangent), normalize(input.WorldNormal))) : input.WorldNormal;
     N = normalize(N);
+
     
-    /*ºä º¤ÅÍ*/
+    /*ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½*/
     float3 V = normalize(WorldCameraPosition - input.WorldPosition).xyz;
     
     /*Base Reflectivity*/
@@ -140,13 +153,15 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 
     
     float3 Lo = 0.0f;
-    for (int i = 0; i < lightCount; i++)
-    {
+    for (int i = 0; i < LightCount; i++)
+    {  
+        float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
+
         // L()
-        float3 L = normalize(WorldLightPosition[i] - input.WorldPosition).xyz;
+        float3 L = normalize(Lights[i].WorldPosition - input.WorldPosition).xyz;
         float3 H = normalize(V + L);
-        float attenuation = 1.0f; // Directional Light
-        float3 radiance = lightColor * attenuation;
+        float attenuation = 1.0f; // No attenuation
+        float3 radiance = finalLightColor * attenuation;
         
         float dotNV = max(dot(N, V), 0.0f); // Dot ( Normal, View )
         float dotNL = max(dot(N, L), 0.0f); // Dot ( Normal, OutgoingLight )
@@ -178,8 +193,9 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 kD = 1.0f - kS;
     float3 irradiance = bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb  : 1.0f;
     float3 diffuse = irradiance * albedo;
-    float3 ambient = kD * diffuse;
-    float3 finalColor = Lo + ambient;
+    float3 ambient =  kD * diffuse;
+
+    float3 finalColor = emissive + Lo + ambient;
 
     //HDR
     float3 hdrDenom = finalColor + 1.0f;

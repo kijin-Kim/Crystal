@@ -1,16 +1,17 @@
-#include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/ConstantBuffer.h"
+#include "LightPipeline.h"
 
 namespace Crystal {
 	
-	class LightingSkeletalPipeline final : public RenderPipeline
+	class LightingSkeletalPipeline final : public LightPipeline
 	{
 	public:
 		struct PerFrameData
 		{
 			DirectX::XMFLOAT4X4 ViewProjection;
 			DirectX::XMFLOAT4 CameraPositionInWorld;
-			DirectX::XMFLOAT4 LightPositionInWorld[2];
+			DirectX::XMFLOAT4 LightPositionInWorld[20];
+			int LightCount = 2;
 		};
 
 		struct PerObjectData

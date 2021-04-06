@@ -16,6 +16,7 @@
 #include "Pipelines/RenderPipelines/LinePipeline.h"
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
+#include "Crystal/GamePlay/Components/LightComponent.h"
 
 namespace Crystal {
 	class PlayerController;
@@ -43,7 +44,9 @@ namespace Crystal {
 		bool GetIsFullScreenMode() const { return m_bIsFullScreen; }
 		void ActiveFullScreenMode(const bool bActive) { m_bIsFullScreen = bActive; }
 
+		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
 		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
+		
 		
 
 		int GetResolutionWidth() const { return m_ResWidth; }
@@ -60,7 +63,7 @@ namespace Crystal {
 		void CreateDepthStencilView();
 
 		template <class T>
-		std::unique_ptr<Pipeline> CreatePipline(std::weak_ptr<Shader> shader, const std::string& name)
+		std::unique_ptr<T> CreatePipline(std::weak_ptr<Shader> shader, const std::string& name)
 		{
 			/*Pipeline¿ª ∏∏µÏ¥œ¥Ÿ.*/
 			auto pipeline = std::make_unique<T>();
@@ -87,10 +90,6 @@ namespace Crystal {
 
 		std::shared_ptr<CommandQueue> m_CommandQueue = nullptr;
 
-		std::vector<StaticMeshComponent*> m_StaticMeshComponents;
-		std::vector<SkeletalMeshComponent*> m_SkeletalMeshComponents;
-		std::vector<CollisionComponent*> m_CollisionComponents;
-
 		int m_ResWidth = 1920;
 		int m_ResHeight = 1080;
 		bool m_bIsFullScreen = false;
@@ -113,6 +112,7 @@ namespace Crystal {
 		std::unique_ptr<DiffIrradSamplingPipeline> m_DiffIrradSamplingPipeline = nullptr;
 
 		std::vector<std::unique_ptr<Pipeline>> m_Pipelines;
+		std::vector<std::unique_ptr<LightPipeline>> m_LightPipelines;
 
 		using RenderGraph = std::vector<std::unique_ptr<Pipeline>>;
 
