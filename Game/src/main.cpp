@@ -11,6 +11,7 @@
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
 #include "actors/Sun.h"
+#include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -105,10 +106,17 @@ public:
 		testPawn->SetPosition({ 0.0f, 0.0f, -6000.0f });
 
 		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
-		sun->SetPosition({ 0.0f, 0.0f, 10000.0f });
+		sun->SetPosition({ 0.0f, 10000.0f, 0.0f });
+
+		/*sun = defaultLevel->SpawnActor<Sun>("Sun");
+		sun->SetPosition({ -10000.0f, 0.0f, 0.0f });
+
+		sun = defaultLevel->SpawnActor<Sun>("Sun");
+		sun->SetPosition({ +10000.0f, 0.0f, 0.0f });*/
 
 
 		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
+		Crystal::TonemappingActor* tonemappingActor = defaultLevel->SpawnActor<Crystal::TonemappingActor>("TonemappingActor");
 
 		/*Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");*/
 

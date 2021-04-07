@@ -17,7 +17,7 @@ public:
 		pbrMaterial->OnCreate();
 		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
-		pbrMaterial->Set("EmissiveColor", DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+		pbrMaterial->Set("EmissiveColor", DirectX::XMFLOAT3(1.0f * 5.0f, 1.0f * 5.0f, 0.4f * 5.0f));
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
@@ -30,13 +30,11 @@ public:
 		auto localLightComponent = CreateComponent<Crystal::LocalLightComponent>("LocalLightComponent");
 		localLightComponent->SetLocalPosition(Crystal::Vector3::Zero);
 		localLightComponent->SetLightColor({ 1.0f, 1.0f, 0.4f });
-		localLightComponent->SetLightIntensity(2.0f);
+		localLightComponent->SetLightIntensity(5.0f);
 		
 
 	
 		SetAttachment(localLightComponent, m_MainComponent);
-
-
 	}
 	~Sun() override = default;
 

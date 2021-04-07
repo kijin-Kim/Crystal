@@ -187,8 +187,8 @@ namespace Crystal {
 			};
 
 			uint32_t quadIndices[] = {
-				0, 1, 2,
-				0, 2, 3
+				1, 2, 3,
+				1, 3, 0
 			};
 
 			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices,

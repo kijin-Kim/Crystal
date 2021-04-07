@@ -164,7 +164,7 @@ namespace Crystal {
 		switch (uavDimension)
 		{
 		case D3D12_UAV_DIMENSION_TEXTURE2D:
-			uavDesc.Texture2D.MipSlice = m_Resource->GetDesc().MipLevels;
+			uavDesc.Texture2D.MipSlice = 0;
 			break;
 		case D3D12_UAV_DIMENSION_TEXTURE2DARRAY:
 			uavDesc.Texture2DArray.ArraySize = m_Resource->GetDesc().DepthOrArraySize;

@@ -94,8 +94,13 @@ namespace Crystal {
 		int m_ResHeight = 1080;
 		bool m_bIsFullScreen = false;
 
-		std::unique_ptr<Texture> m_RenderTargetTextures[2];
-		std::unique_ptr<Texture> m_DepthStencilBufferTexture;
+		/*std::unique_ptr<Texture> m_RenderTargetTextures[2];*/
+		/*std::unique_ptr<Texture> m_DepthStencilBufferTexture;*/
+
+		std::weak_ptr<Texture> m_ColorBufferTextures[2];
+		std::weak_ptr<Texture> m_DepthStencilBufferTexture;
+		std::weak_ptr<Texture> m_BrightColorBuffer;
+		std::weak_ptr<Texture> m_FloatingPointBuffer;
 
 		// TODO 
 		std::shared_ptr<Texture> m_PanoTexture;

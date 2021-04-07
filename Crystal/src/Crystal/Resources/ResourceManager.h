@@ -24,9 +24,9 @@ namespace Crystal {
 			return m_ShaderManager.get(name);
 		}
 
-		std::weak_ptr<Texture> CreateTextureFromFile(const std::string& fileName, const std::string& name)
+		std::weak_ptr<Texture> CreateTextureFromFile(const std::string& fileName, const std::string& name, D3D12_RESOURCE_FLAGS resourceFlags = D3D12_RESOURCE_FLAG_NONE)
 		{
-			return m_TextureManager.createFromFile(fileName, name);
+			return m_TextureManager.createFromFile(fileName, name, resourceFlags);
 		}
 
 		std::weak_ptr<Texture> CreateTexture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format,
@@ -35,6 +35,13 @@ namespace Crystal {
 			return m_TextureManager.create(width, height, depth, mipLevels, format,
 				resourceFlags, initialStates, name);
 		}
+
+		std::weak_ptr<Texture> CreateTextureByResource(ID3D12Resource* resource, const std::string& name, D3D12_RESOURCE_FLAGS resourceFlags = D3D12_RESOURCE_FLAG_NONE)
+		{
+			return m_TextureManager.createByResource(resource, name, resourceFlags);
+		}
+
+		
 
 		void DestroyTexture(const std::string& name)
 		{

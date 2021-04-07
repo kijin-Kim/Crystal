@@ -14,6 +14,9 @@
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Pipelines/RenderPipelines/LightingSkeletalPipeline.h"
+#include "Pipelines/ComputePipelines/BlurPipeline.h"
+#include "Pipelines/ComputePipelines/AdditveBlendingPipeline.h"
+#include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -25,6 +28,32 @@ namespace Crystal {
 		CreateDepthStencilView();
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
+
+		m_FloatingPointBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_RENDER_TARGET, "FloatingPointBuffer");
+		m_FloatingPointBuffer.lock()->CreateShaderResourceView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateRenderTargetView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateUnorderedAccessView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+
+
+
+		m_BrightColorBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, 
+			D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
+		m_BrightColorBuffer.lock()->CreateRenderTargetView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateUnorderedAccessView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateShaderResourceView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+
+		//=======================================================================
+
+		
 
 		//============================================================================================
 		auto panoTexture = resourceManager.CreateTextureFromFile(
@@ -60,7 +89,9 @@ namespace Crystal {
 		auto diffIrradianceShader = resourceManager.CreateShaderFromFile("assets/shaders/DiffuseIrradianceSampling.hlsl", "DiffuseIrradianceSampling").lock();
 		auto specularIrradianceShader = resourceManager.CreateShaderFromFile("assets/shaders/SpecularIrradianceSampling.hlsl", "SpecularIrradianceSampling").lock();
 		auto simpleColorShader = resourceManager.CreateShaderFromFile("assets/shaders/SimpleColorShader.hlsl", "SimpleColorShader").lock();
-
+		auto gaussianBlurShader = resourceManager.CreateShaderFromFile("assets/shaders/GaussianBlur.hlsl", "GaussianBlur").lock();
+		auto additiveBlendingHdrShader = resourceManager.CreateShaderFromFile("assets/shaders/AdditiveBlending.hlsl", "AdditiveBelndingHDR").lock();
+		auto tonemappingShader = resourceManager.CreateShaderFromFile("assets/shaders/Tonemapping.hlsl", "Tonemapping").lock();
 
 		{
 			pbrStaticShader->SetInputLayout({
@@ -149,6 +180,42 @@ namespace Crystal {
 			diffIrradianceShader->SetDispatchThreadGroupCounts({ 32 / 32, 32 / 32, 6 });
 		}
 
+		{
+			RootParameter perFrame = { 0, 0, 1 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+			
+
+			gaussianBlurShader->SetRootSignature({ perFrame, perObject, perExecute});
+			gaussianBlurShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 15 });
+		}
+
+		{
+			RootParameter perFrame = { 0, 1, 1 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+
+
+			additiveBlendingHdrShader->SetRootSignature({ perFrame, perObject, perExecute });
+			additiveBlendingHdrShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 1 });
+		}
+
+		{
+			tonemappingShader->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});
+
+			RootParameter perFrame = { 0, 1, 0 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+
+
+			tonemappingShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			tonemappingShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 1 });
+			tonemappingShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+
+		}
+
 
 
 		m_LightPipelines.push_back(CreatePipline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
@@ -159,7 +226,9 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
 		m_Pipelines.push_back(CreatePipline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
 		m_Pipelines.push_back(CreatePipline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
-
+		m_Pipelines.push_back(CreatePipline<BlurPipeline>(gaussianBlurShader, "GaussianBlurPipeline"));
+		m_Pipelines.push_back(CreatePipline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
+		m_Pipelines.push_back(CreatePipline<TonemappingPipeline>(tonemappingShader, "TonemappingPipeline"));
 	}
 
 	void Renderer::PrepareRender()
@@ -236,10 +305,11 @@ namespace Crystal {
 
 		auto commandList = m_CommandQueue->GetCommandList();
 
+
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		resourceBarrier.Transition.pResource = m_RenderTargetTextures[m_RtvIndex]->GetResource();
+		resourceBarrier.Transition.pResource = m_ColorBufferTextures[m_RtvIndex].lock()->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -250,15 +320,28 @@ namespace Crystal {
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
 		commandList->RSSetScissorRects(1, &mainCamera->GetScissorRect());
-		commandList->OMSetRenderTargets(1, &m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(), TRUE,
-			&m_DepthStencilBufferTexture->GetDepthStencilView());
+
+		D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[2] = { m_FloatingPointBuffer.lock()->GetRenderTargetView() , 
+		m_BrightColorBuffer.lock()->GetRenderTargetView() };
+
+
+		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
+			&m_DepthStencilBufferTexture.lock()->GetDepthStencilView());
 
 		float clearColorValue[4] = { 1.0f, 0.0f, 1.0f, 0.0f };
+		float clearColorBlack[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		const auto clearDepthValue = 1.0f;
 		const auto clearStencilValue = 0.0f;
-		commandList->ClearRenderTargetView(m_RenderTargetTextures[m_RtvIndex]->GetRenderTargetView(),
+
+		commandList->ClearRenderTargetView(m_ColorBufferTextures[m_RtvIndex].lock()->GetRenderTargetView(),
 			clearColorValue, 0, nullptr);
-		commandList->ClearDepthStencilView(m_DepthStencilBufferTexture->GetDepthStencilView(),
+		commandList->ClearRenderTargetView(m_FloatingPointBuffer.lock()->GetRenderTargetView(),
+			clearColorValue, 0, nullptr);
+		commandList->ClearRenderTargetView(m_BrightColorBuffer.lock()->GetRenderTargetView(),
+			clearColorBlack, 0, nullptr);
+
+
+		commandList->ClearDepthStencilView(m_DepthStencilBufferTexture.lock()->GetDepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue, clearStencilValue, 0, nullptr);
 
 		LightingStaticPipeline::LightingPipelineInputs lightingPipelineInputs = {};
@@ -280,6 +363,7 @@ namespace Crystal {
 		m_Pipelines[0]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
@@ -287,14 +371,76 @@ namespace Crystal {
 		m_Pipelines[1]->PrepareRecord(&cubemapPipelineInputs);
 		m_Pipelines[1]->Record(commandList);
 
+
+
+		resourceBarrier.Transition.pResource = m_BrightColorBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+		m_Pipelines[4]->PrepareRecord(nullptr);
+		m_Pipelines[4]->Record(commandList);
+
+		resourceBarrier.Transition.pResource = m_BrightColorBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+		resourceBarrier.Transition.pResource = m_FloatingPointBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+		
+		AdditiveBlendingPipeline::AdditiveBlendingPipelineInputs input = {};
+		m_Pipelines[5]->PrepareRecord(&input);
+		m_Pipelines[5]->Record(commandList);
+
+		resourceBarrier.Transition.pResource = m_FloatingPointBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+
+		resourceBarrier.Transition.pResource = m_BrightColorBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+
+
+		commandList->OMSetRenderTargets(1, &m_ColorBufferTextures[m_RtvIndex].lock()->GetRenderTargetView(), false,
+			&m_DepthStencilBufferTexture.lock()->GetDepthStencilView());
+
+		m_Pipelines[6]->PrepareRecord(&input);
+		m_Pipelines[6]->Record(commandList);
+
+
+		resourceBarrier.Transition.pResource = m_FloatingPointBuffer.lock()->GetResource();
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+
+
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		resourceBarrier.Transition.pResource = m_RenderTargetTextures[m_RtvIndex]->GetResource();
+		resourceBarrier.Transition.pResource = m_ColorBufferTextures[m_RtvIndex].lock()->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
-
+	
 		m_CommandQueue->Execute(commandList);
 
 		DXGI_PRESENT_PARAMETERS presentParameters;
@@ -339,10 +485,15 @@ namespace Crystal {
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
-		for (auto& rt : m_RenderTargetTextures)
-		{
-			rt.reset();
-		}
+
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+
+
+		resourceManager.DestroyTexture("ColorBuffer_0");
+		resourceManager.DestroyTexture("ColorBuffer_1");
+		resourceManager.DestroyTexture("DepthStencilBuffer");
+		resourceManager.DestroyTexture("FloatingPointBuffer");
+		resourceManager.DestroyTexture("BrightColorBuffer");
 
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
@@ -351,13 +502,45 @@ namespace Crystal {
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
+
+			m_ColorBufferTextures[i] = resourceManager.CreateTextureByResource(rtvBuffer.Get(), "ColorBuffer_" + std::to_string(i),
+				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_ColorBufferTextures[i].lock()->CreateRenderTargetView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_ColorBufferTextures[i].lock()->CreateShaderResourceView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
+				D3D12_SRV_DIMENSION_TEXTURE2D);
 		}
-		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
+
+
+		m_FloatingPointBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_RENDER_TARGET, "FloatingPointBuffer");
+		m_FloatingPointBuffer.lock()->CreateShaderResourceView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateRenderTargetView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateUnorderedAccessView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+		
+
+		m_BrightColorBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
+		m_BrightColorBuffer.lock()->CreateRenderTargetView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateUnorderedAccessView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateShaderResourceView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
+		
+
+
+		m_DepthStencilBufferTexture = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 0,
+			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE, "DepthStencilBuffer").lock();
+		m_DepthStencilBufferTexture.lock()->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
+
 
 		auto cameraComponent = ApplicationUtility::GetPlayerController().GetMainCamera().lock();
 		cameraComponent->SetViewport({ 0,0, (FLOAT)width, (FLOAT)height, 0.0f, 1.0f });
@@ -485,6 +668,7 @@ namespace Crystal {
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()
 	{
+
 		// #DirectX Swap Chain Description
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.Width = m_ResWidth;
@@ -514,22 +698,32 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
 		Renderer::Instance().GetFactory()->MakeWindowAssociation(m_Window->GetWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
 
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+
+
 		for (int i = 0; i < 2; i++)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
+		
+			m_ColorBufferTextures[i] = resourceManager.CreateTextureByResource(rtvBuffer.Get(), "ColorBuffer_" + std::to_string(i), 
+				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_ColorBufferTextures[i].lock()->CreateRenderTargetView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_ColorBufferTextures[i].lock()->CreateShaderResourceView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
+				D3D12_SRV_DIMENSION_TEXTURE2D);
 		}
+
 	}
 
 	void Renderer::CreateDepthStencilView()
 	{
-		m_DepthStencilBufferTexture = std::make_unique<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		auto& resourceManager = ResourceManager::Instance();
+
+		m_DepthStencilBufferTexture = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 0,
 			DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		m_DepthStencilBufferTexture->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
+			D3D12_RESOURCE_STATE_DEPTH_WRITE, "DepthStencilBuffer");
+		m_DepthStencilBufferTexture.lock()->CreateDepthStencilView(DXGI_FORMAT_D24_UNORM_S8_UINT, D3D12_DSV_DIMENSION_TEXTURE2D);
 	}
 
 	void Renderer::ChangeDisplayMode()
@@ -544,22 +738,53 @@ namespace Crystal {
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
-		for (auto& rt : m_RenderTargetTextures)
-		{
-			rt.reset();
-		}
+
+		auto& resourceManager = ResourceManager::Instance();
+		resourceManager.DestroyTexture("ColorBuffer_0");
+		resourceManager.DestroyTexture("ColorBuffer_1");
+		resourceManager.DestroyTexture("FloatingPointBuffer");
+		resourceManager.DestroyTexture("BrightColorBuffer");
 
 		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
+
+
 		for (int i = 0; i < 2; i++)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-			m_RenderTargetTextures[i] = std::make_unique<Texture>(rtvBuffer.Get(), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-			m_RenderTargetTextures[i]->CreateRenderTargetView(m_RenderTargetTextures[i]->GetResource()->GetDesc().Format,
+
+			m_ColorBufferTextures[i] = resourceManager.CreateTextureByResource(rtvBuffer.Get(), "ColorBuffer_" + std::to_string(i),
+				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			m_ColorBufferTextures[i].lock()->CreateRenderTargetView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
 				D3D12_RTV_DIMENSION_TEXTURE2D);
+			m_ColorBufferTextures[i].lock()->CreateShaderResourceView(m_ColorBufferTextures[i].lock()->GetResource()->GetDesc().Format,
+				D3D12_SRV_DIMENSION_TEXTURE2D);
 		}
+
+		m_FloatingPointBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_RENDER_TARGET, "FloatingPointBuffer");
+		m_FloatingPointBuffer.lock()->CreateShaderResourceView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateRenderTargetView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_FloatingPointBuffer.lock()->CreateUnorderedAccessView(m_FloatingPointBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+
+
+		m_BrightColorBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
+		m_BrightColorBuffer.lock()->CreateRenderTargetView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_RTV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateUnorderedAccessView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_UAV_DIMENSION_TEXTURE2D);
+		m_BrightColorBuffer.lock()->CreateShaderResourceView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
+			D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
+
 
 		DXGI_MODE_DESC targetParam = {};
 		targetParam.Width = m_ResWidth;

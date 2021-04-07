@@ -24,7 +24,7 @@ namespace Crystal {
 					= std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData));
 			}
 		}
-
+		
 	}
 
 	void LightingStaticPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)

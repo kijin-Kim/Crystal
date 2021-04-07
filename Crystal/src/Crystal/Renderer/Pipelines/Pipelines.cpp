@@ -112,8 +112,10 @@ namespace Crystal {
 
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 1;
-		rtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvFormat.NumRenderTargets = 2;
+		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+
 		pipelineStateStream.RTVFormats = rtvFormat;
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
