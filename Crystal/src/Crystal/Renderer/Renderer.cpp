@@ -57,7 +57,7 @@ namespace Crystal {
 
 		//============================================================================================
 		auto panoTexture = resourceManager.CreateTextureFromFile(
-			"assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr", "Pano_Skybox_Space").lock();
+			"assets/textures/cubemaps/T_Cube_Skybox_1.hdr", "Pano_Skybox_Space").lock();
 		panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
 		auto cubemap = resourceManager.CreateTexture(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,

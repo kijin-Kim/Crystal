@@ -69,6 +69,11 @@ public:
 			"assets/textures/Asteroid/AstOre_1_N.tga", "Asteroid_Blue_Normal").lock();
 		asteroidBlueNormal->CreateShaderResourceView(asteroidBlueNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 
+		auto asteroidBlueEmissive = resourceManager.CreateTextureFromFile(
+			"assets/textures/Asteroid/AstOre_1_E.tga", "Asteroid_Blue_Emissive").lock();
+		asteroidBlueEmissive->CreateShaderResourceView(asteroidBlueEmissive->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
+
+
 		//=== Kraken Textures =================================
 
 		//=== body ========
@@ -106,7 +111,9 @@ public:
 		testPawn->SetPosition({ 0.0f, 0.0f, -6000.0f });
 
 		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
-		sun->SetPosition({ 0.0f, 10000.0f, 0.0f });
+		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
+		sun = defaultLevel->SpawnActor<Sun>("Sun2");
+		sun->SetPosition({ 0.0f, -200000.0f, -200000.0f });
 
 		/*sun = defaultLevel->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ -10000.0f, 0.0f, 0.0f });

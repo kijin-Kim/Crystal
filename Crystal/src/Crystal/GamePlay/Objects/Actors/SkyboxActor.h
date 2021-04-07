@@ -15,7 +15,8 @@ namespace Crystal {
 			skyboxMaterial->SetObjectOwner(resourceManager.GetShader("Skybox"),
 				Crystal::Material::MaterialOwnerType::Owner_Shader);
 			skyboxMaterial->OnCreate();
-			skyboxMaterial->Set("CubemapTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
+			skyboxMaterial->Set("CubemapColorTexture", resourceManager.GetTexture("Cube_Skybox_Space"));
+			
 			
 			
 			//==== ComputeShader Materials ========================

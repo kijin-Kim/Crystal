@@ -31,13 +31,12 @@ PS_INPUT vsMain(VS_INPUT input)
     return output;
 }
 
-
-TextureCube CubemapTexture : register(t0);
+TextureCube CubemapColorTexture : register(t0);
 SamplerState DefaultSampler : register(s0);
 
 PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
 {
-    float3 color = CubemapTexture.Sample(DefaultSampler, input.TexCoord).rgb;
+    float3 color = CubemapColorTexture.Sample(DefaultSampler, input.TexCoord).rgb;
 
     float brightness = dot(color.rgb, float3(0.2126f, 0.7152f, 0.0722f));
 

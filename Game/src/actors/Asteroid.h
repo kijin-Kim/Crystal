@@ -25,6 +25,7 @@ public:
 		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Asteroid_Blue_Metallic"));
 		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Asteroid_Blue_Roughness"));
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Asteroid_Blue_Normal"));
+		pbrMaterial->Set("EmissiveTexture", resourceManager.GetTexture("Asteroid_Blue_Emissive"));
 
 
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");

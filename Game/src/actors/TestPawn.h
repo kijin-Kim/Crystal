@@ -51,9 +51,9 @@ public:
 
 		m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 		m_CameraComponent->SetFieldOfView(60.0f);
-		m_CameraComponent->SetNearPlane(10.0f);
+		m_CameraComponent->SetNearPlane(100.0f);
 		m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
-		m_CameraComponent->SetFarPlane(100000.0f);
+		m_CameraComponent->SetFarPlane(1000000.0f);
 		SetAttachment(m_CameraComponent, springArmComponent);
 
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
