@@ -17,9 +17,13 @@
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
+#include "Crystal/Resources/DescriptorAllocator.h"
+#include <array>
+
 
 namespace Crystal {
 	class PlayerController;
+	class DescriptorAllocation;
 
 	class Renderer final
 	{
@@ -53,6 +57,8 @@ namespace Crystal {
 		int GetResolutionHeight() const { return m_ResHeight; }
 
 		std::shared_ptr<CameraComponent> GetCamera() { return ApplicationUtility::GetPlayerController().GetMainCamera().lock(); }
+
+		DescriptorAllocation AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount);
 
 	private:
 		Renderer() = default;
@@ -118,6 +124,9 @@ namespace Crystal {
 
 		std::vector<std::unique_ptr<Pipeline>> m_Pipelines;
 		std::vector<std::unique_ptr<LightPipeline>> m_LightPipelines;
+
+		std::unique_ptr<DescriptorAllocator> m_DescriptorAllocators[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+
 
 		using RenderGraph = std::vector<std::unique_ptr<Pipeline>>;
 

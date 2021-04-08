@@ -1,9 +1,9 @@
 #pragma once
-#include "Descriptor.h"
+#include "DescriptorOld.h"
 
 namespace Crystal {
 	/*µ¿Àû Constant Buffer*/
-	class ConstantBuffer final : public DescriptorObject
+	class ConstantBuffer final : public DescriptorObjectOld
 	{
 	public:
 		ConstantBuffer(int size);
@@ -14,7 +14,7 @@ namespace Crystal {
 		D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const { return m_Resource->GetGPUVirtualAddress(); }
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Resource = nullptr;
-		Descriptor m_ConstantBufferView = {};
+		DescriptorOld m_ConstantBufferView = {};
 		UINT8* m_CpuBasePtr = nullptr;
 		unsigned int m_Size;
 	};

@@ -1,10 +1,10 @@
 #include "cspch.h"
-#include "Descriptor.h"
+#include "DescriptorOld.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
-	DescriptorHeapManager* DescriptorObject::s_DescriptorHeapManager = nullptr;
-	DescriptorHeapManager::DescriptorHeapManager()
+	DescriptorHeapManagerOld* DescriptorObjectOld::s_DescriptorHeapManager = nullptr;
+	DescriptorHeapManagerOld::DescriptorHeapManagerOld()
 	{
 		/*TODO : Page Allocator*/
 		/*WORK IN PROGRESS*/
@@ -38,7 +38,7 @@ namespace Crystal {
 		m_DSVHeapIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	}
 
-	Descriptor DescriptorHeapManager::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
+	DescriptorOld DescriptorHeapManagerOld::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 	{
 		switch (descriptorHeapType)
 		{
@@ -48,7 +48,7 @@ namespace Crystal {
 				CS_FATAL(false, "최대 Descriptor 생성 횟수를 초과하였습니다");
 			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_CBVSRVUAVHeap->GetCPUDescriptorHandleForHeapStart();
 			cpuHandle.ptr += (m_CBVSRVUAVHeapIncrementSize * m_CBVSRVUAVHeapDescriptorCount++);
-			return Descriptor(cpuHandle);
+			return DescriptorOld(cpuHandle);
 		}
 		case D3D12_DESCRIPTOR_HEAP_TYPE_RTV:
 		{
@@ -57,7 +57,7 @@ namespace Crystal {
 
 			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_RTVHeap->GetCPUDescriptorHandleForHeapStart();
 			cpuHandle.ptr += (m_RTVHeapIncrementSize * m_RTVHeapDescriptorCount++);
-			return Descriptor(cpuHandle);
+			return DescriptorOld(cpuHandle);
 		}
 		case D3D12_DESCRIPTOR_HEAP_TYPE_DSV:
 		{
@@ -65,11 +65,11 @@ namespace Crystal {
 				CS_FATAL(false, "최대 Descriptor 생성 횟수를 초과하였습니다");
 			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DSVHeap->GetCPUDescriptorHandleForHeapStart();
 			cpuHandle.ptr += (m_DSVHeapIncrementSize * m_DSVHeapDescriptorCount++);
-			return Descriptor(cpuHandle);
+			return DescriptorOld(cpuHandle);
 		}
 		default:
 			CS_FATAL(false, "아직 지원하지 않는 타입입니다.");
-			return Descriptor();
+			return DescriptorOld();
 		}
 	}
 }

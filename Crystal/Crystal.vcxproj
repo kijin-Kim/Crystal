@@ -222,11 +222,13 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
+    <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
+    <ClInclude Include="src\Crystal\Resources\DescriptorAllocator.h" />
     <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
     <ClInclude Include="src\Crystal\Resources\Renderable.h" />
     <ClInclude Include="src\Crystal\Resources\Animation.h" />
     <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
-    <ClInclude Include="src\Crystal\Resources\Descriptor.h" />
+    <ClInclude Include="src\Crystal\Resources\DescriptorOld.h" />
     <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
@@ -281,7 +283,9 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
-    <ClCompile Include="src\Crystal\Resources\Descriptor.cpp" />
+    <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
+    <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />
+    <ClCompile Include="src\Crystal\Resources\DescriptorOld.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />

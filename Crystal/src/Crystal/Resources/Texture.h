@@ -1,10 +1,11 @@
 #pragma once
 #include <unordered_map>
-#include "Descriptor.h"
+#include "DescriptorOld.h"
 #include "Crystal/Core/Logger.h"
+#include "DescriptorAllocation.h"
 
 namespace Crystal {
-	class Texture final : public DescriptorObject
+	class Texture final : public DescriptorObjectOld
 	{
 	public:
 		/*여러가지 속성들을 받고 직접 리소스를 만듭니다.*/
@@ -51,9 +52,9 @@ namespace Crystal {
 
 	public:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Resource = nullptr;
-		Descriptor m_ShaderResourceView = {};
-		Descriptor m_UnorderedAccessView = {};
-		Descriptor m_DepthStencilView = {};
-		Descriptor m_RenderTargetView = {};
+		DescriptorAllocation m_ShaderResourceView = {};
+		DescriptorAllocation m_UnorderedAccessView = {};
+		DescriptorAllocation m_DepthStencilView = {};
+		DescriptorAllocation m_RenderTargetView = {};
 	};
 }

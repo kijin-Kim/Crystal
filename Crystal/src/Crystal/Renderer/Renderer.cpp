@@ -17,6 +17,7 @@
 #include "Pipelines/ComputePipelines/BlurPipeline.h"
 #include "Pipelines/ComputePipelines/AdditveBlendingPipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
+#include "Crystal/Resources/DescriptorAllocation.h"
 
 namespace Crystal {
 	void Renderer::Init(WindowsWindow* window)
@@ -24,9 +25,18 @@ namespace Crystal {
 		m_Window = window;
 
 		CreateDevice();
+
+		for (int i = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; i++)
+		{
+			m_DescriptorAllocators[i]
+				= std::make_unique<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE(i));
+		}
+
+
 		CreateRenderTargetViewFromSwapChain();
 		CreateDepthStencilView();
 
+		
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		m_FloatingPointBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -664,6 +674,11 @@ namespace Crystal {
 				registeredLightPipelineIndices.push_back(i);
 			}
 		}
+	}
+
+	DescriptorAllocation Renderer::AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount)
+	{
+		return m_DescriptorAllocators[type]->Allocate(descriptorCount);
 	}
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()

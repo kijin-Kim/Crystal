@@ -3,11 +3,11 @@
 #include <wrl/client.h>
 
 namespace Crystal {
-	class Descriptor
+	class DescriptorOld
 	{
 	public:
-		Descriptor() { m_Handle.ptr = 0; }
-		Descriptor(D3D12_CPU_DESCRIPTOR_HANDLE handle) : m_Handle(handle) {}
+		DescriptorOld() { m_Handle.ptr = 0; }
+		DescriptorOld(D3D12_CPU_DESCRIPTOR_HANDLE handle) : m_Handle(handle) {}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDescriptorHandle() const { return m_Handle; }
 
@@ -18,14 +18,14 @@ namespace Crystal {
 	};
 
 	/*간단한 글로벌 힙*/
-	class DescriptorHeapManager final
+	class DescriptorHeapManagerOld final
 	{
-		friend class DescriptorObject;
+		friend class DescriptorObjectOld;
 	public:
-		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType);
+		DescriptorOld AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType);
 	private:
-		DescriptorHeapManager();
-		~DescriptorHeapManager() = default;
+		DescriptorHeapManagerOld();
+		~DescriptorHeapManagerOld() = default;
 	private:
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_CBVSRVUAVHeap = nullptr;
 		UINT m_CBVSRVUAVHeapIncrementSize = 0;
@@ -45,18 +45,18 @@ namespace Crystal {
 
 	/*Descriptor 를 사용하는 클래스들의 상위 클래스입니다
 	클래스들에게 DescriptorManager를 제공하기 위한 상위 클래스입니다.*/
-	class DescriptorObject
+	class DescriptorObjectOld
 	{
 	public:
-		DescriptorObject() { if (!s_DescriptorHeapManager) s_DescriptorHeapManager = new DescriptorHeapManager(); }
-		virtual ~DescriptorObject() = default;
+		DescriptorObjectOld() { if (!s_DescriptorHeapManager) s_DescriptorHeapManager = new DescriptorHeapManagerOld(); }
+		virtual ~DescriptorObjectOld() = default;
 
 	protected:
-		Descriptor AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
+		DescriptorOld AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType)
 		{
 			return s_DescriptorHeapManager->AllocateDescriptor(descriptorHeapType);
 		}
 	private:
-		static DescriptorHeapManager* s_DescriptorHeapManager;
+		static DescriptorHeapManagerOld* s_DescriptorHeapManager;
 	};
 }
