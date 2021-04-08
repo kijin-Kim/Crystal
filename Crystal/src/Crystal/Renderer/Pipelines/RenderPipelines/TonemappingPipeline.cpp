@@ -119,7 +119,9 @@ auto device = Renderer::Instance().GetDevice();
 		auto component = Cast<StaticMeshComponent>(m_Components[0]);
 		auto material = component->GetMaterials();
 
-		auto floatingPointBuffer = material[0]->GetTextureInput("FloatingPointTexture");
+		auto& resourceManager = ResourceManager::Instance();
+
+		auto floatingPointBuffer = resourceManager.GetTexture("FloatingPointBuffer").lock();
 
 		device->CopyDescriptorsSimple(1, heapHandle,
 			floatingPointBuffer->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

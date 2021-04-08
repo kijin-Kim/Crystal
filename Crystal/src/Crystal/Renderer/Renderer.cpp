@@ -524,7 +524,7 @@ namespace Crystal {
 		
 
 		m_BrightColorBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
 		m_BrightColorBuffer.lock()->CreateRenderTargetView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
 			D3D12_RTV_DIMENSION_TEXTURE2D);
 		m_BrightColorBuffer.lock()->CreateUnorderedAccessView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
@@ -732,8 +732,11 @@ namespace Crystal {
 		m_SwapChain->GetFullscreenState(&bIsFullScreen, nullptr);
 		if (m_bIsFullScreen == (bool)bIsFullScreen)
 			return;
+		
+		
 
 		CS_INFO("디스플레이 모드를 변환중...");
+
 
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
@@ -775,7 +778,7 @@ namespace Crystal {
 
 
 		m_BrightColorBuffer = resourceManager.CreateTexture(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET, "BrightColorBuffer");
 		m_BrightColorBuffer.lock()->CreateRenderTargetView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
 			D3D12_RTV_DIMENSION_TEXTURE2D);
 		m_BrightColorBuffer.lock()->CreateUnorderedAccessView(m_BrightColorBuffer.lock()->GetResource()->GetDesc().Format,
@@ -805,5 +808,8 @@ namespace Crystal {
 			CS_INFO("현재 디스플레이 모드 : 전체화면 모드");
 		else
 			CS_INFO("현재 디스플레이 모드 : 창 모드");
+
+
+
 	}
 }
