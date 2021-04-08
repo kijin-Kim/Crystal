@@ -59,7 +59,7 @@ namespace Crystal {
 		std::shared_ptr<CameraComponent> GetCamera() { return ApplicationUtility::GetPlayerController().GetMainCamera().lock(); }
 
 		DescriptorAllocation AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount);
-
+		void ReleaseStaleDescriptors();
 	private:
 		Renderer() = default;
 		~Renderer() = default;

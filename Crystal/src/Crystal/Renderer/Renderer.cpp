@@ -462,6 +462,8 @@ namespace Crystal {
 
 		m_CommandQueue->Flush();
 
+		ReleaseStaleDescriptors();
+
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
 	}
@@ -679,6 +681,14 @@ namespace Crystal {
 	DescriptorAllocation Renderer::AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount)
 	{
 		return m_DescriptorAllocators[type]->Allocate(descriptorCount);
+	}
+
+	void Renderer::ReleaseStaleDescriptors()
+	{
+		for (auto & DescriptorAllocator : m_DescriptorAllocators)
+		{
+			DescriptorAllocator->ReleaseStaleDescriptors();
+		}
 	}
 
 	void Renderer::CreateRenderTargetViewFromSwapChain()

@@ -16,10 +16,11 @@ namespace Crystal {
 	{
 		DescriptorAllocation allocation;
 		
-		for (auto it = m_FreeHeaps.begin(); it != m_FreeHeaps.end(); it++)
+		auto it = m_FreeHeaps.begin();
+
+		while (it != m_FreeHeaps.end())
 		{
 			auto allocatorPage = m_HeapPool[*it];
-
 
 			allocation = allocatorPage->Allocate(descriptorCount); // null allocation return if not available
 
@@ -27,12 +28,17 @@ namespace Crystal {
 			{
 				it = m_FreeHeaps.erase(it);
 			}
+			else
+			{
+				++it;
+			}
 
 			if (!allocation.IsNull())
 			{
 				break;
 			}
 		}
+
 
 		if (allocation.IsNull()) // 현재 Page에 descriptorCount를 충족할 만한 Page가 없으면,
 		{
