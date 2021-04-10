@@ -6,7 +6,6 @@
 #include <assimp/mesh.h>
 #include <assimp/Vertex.h>
 #include <assimp/postprocess.h>
-#include "Crystal/Renderer/CommandList.h"
 
 namespace Crystal {
 	DirectX::XMFLOAT4X4 ToDirectXMathMatrix4x4(const aiMatrix4x4& matrix)

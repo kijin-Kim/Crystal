@@ -37,7 +37,6 @@ namespace Crystal {
 
 		std::vector<std::shared_ptr<Material>> m_Materials;
 
-
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 	};
 }

@@ -26,17 +26,9 @@ namespace Crystal {
 		LinePipeline() = default;
 		~LinePipeline() override = default;
 
-		void OnCreate() override;
-
 		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		
 
 		STATIC_TYPE_IMPLE(LinePipeline)
-	private:
-
-		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-		PerFrameData m_PerFrameData = {};
-		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
-		PerObjectData m_PerObjectData = {};
 	};
 }

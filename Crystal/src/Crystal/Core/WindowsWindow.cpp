@@ -61,17 +61,18 @@ namespace Crystal {
 		wndClass.hInstance = hInstance;
 		wndClass.hIcon = nullptr;
 		wndClass.hCursor = nullptr;
-		wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+		wndClass.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 		wndClass.lpszMenuName = nullptr;
 		wndClass.lpszClassName = L"Hello Direct3d 12!";
 
 		RegisterClass(&wndClass);
 
 		/*윈도우 리사이징을 제한합니다.*/
-		auto windowStyle = WS_OVERLAPPED |
-			WS_CAPTION |
-			WS_SYSMENU |
-			WS_THICKFRAME;
+		const auto windowStyle 
+			= WS_OVERLAPPED 
+			| WS_CAPTION 
+			| WS_SYSMENU 
+			| WS_THICKFRAME;
 
 		m_Handle = CreateWindowEx(
 			NULL,

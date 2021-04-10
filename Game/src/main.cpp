@@ -39,7 +39,9 @@ public:
 		auto frigateAlbedo = resourceManager.CreateTextureFromFile(
 			"assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga", "Frigate_Albedo").lock();
 		frigateAlbedo->CreateShaderResourceView(frigateAlbedo->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
-			
+		
+
+
 		auto frigateMetallic = resourceManager.CreateTextureFromFile(
 			"assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga", "Frigate_Metallic").lock();
 		frigateMetallic->CreateShaderResourceView(frigateMetallic->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
@@ -108,7 +110,7 @@ public:
 
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
-		testPawn->SetPosition({ 0.0f, 0.0f, -6000.0f });
+		testPawn->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
 		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
@@ -127,9 +129,13 @@ public:
 
 		/*Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 30; i++)
+		for (int i = 0; i < 10; i++)
 		{
-			Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();	
+			for (int j = 0; j < 1; j++)
+			{
+				Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
+				asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 0.0f });
+			}
 		}
 
 

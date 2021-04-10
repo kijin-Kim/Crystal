@@ -46,6 +46,7 @@
     <IntDir>..\bin\Game\objs\Debug\</IntDir>
     <TargetName>Game</TargetName>
     <TargetExt>.exe</TargetExt>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -53,6 +54,7 @@
     <IntDir>..\bin\Game\objs\Release\</IntDir>
     <TargetName>Game</TargetName>
     <TargetExt>.exe</TargetExt>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

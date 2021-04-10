@@ -33,7 +33,7 @@ namespace Crystal {
 		{
 			int msgCount = 0;
 			MSG msg;
-			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
 					m_bShouldRun = false;

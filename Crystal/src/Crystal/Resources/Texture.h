@@ -1,11 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include "DescriptorOld.h"
 #include "Crystal/Core/Logger.h"
 #include "DescriptorAllocation.h"
 
 namespace Crystal {
-	class Texture final : public DescriptorObjectOld
+	class Texture
 	{
 	public:
 		/*여러가지 속성들을 받고 직접 리소스를 만듭니다.*/
@@ -24,27 +23,35 @@ namespace Crystal {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetShaderResourceView() const
 		{
 			if (m_ShaderResourceView.IsNull())
+			{
 				CS_FATAL(false, "Shader Resource View를 먼저 생성해주세요");
+			}
 			return m_ShaderResourceView.GetDescriptorHandle();
 		}
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTargetView() const
 		{
 			if (m_RenderTargetView.IsNull())
+			{
 				CS_FATAL(false, "Render Target View를 먼저 생성해주세요");
+			}
 			return m_RenderTargetView.GetDescriptorHandle();
 		}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilView() const
 		{
 			if (m_DepthStencilView.IsNull())
+			{
 				CS_FATAL(false, "Depth Stencil View를 먼저 생성해주세요");
+			}
 			return m_DepthStencilView.GetDescriptorHandle();
 		}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetUnorderedAccessView() const
 		{
 			if (m_UnorderedAccessView.IsNull())
+			{
 				CS_FATAL(false, "Unordered Access View를 먼저 생성해주세요");
+			}
 			return m_UnorderedAccessView.GetDescriptorHandle();
 		}
 

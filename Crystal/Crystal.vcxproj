@@ -44,12 +44,16 @@
     <IntDir>..\bin\Crystal\objs\Debug\</IntDir>
     <TargetName>Crystal</TargetName>
     <TargetExt>.lib</TargetExt>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\bin\Crystal\bin\Release\</OutDir>
     <IntDir>..\bin\Crystal\objs\Release\</IntDir>
     <TargetName>Crystal</TargetName>
     <TargetExt>.lib</TargetExt>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -64,6 +68,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,6 +100,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -224,11 +230,11 @@
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocator.h" />
+    <ClInclude Include="src\Crystal\Resources\DescriptorAllocatorPage.h" />
     <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
     <ClInclude Include="src\Crystal\Resources\Renderable.h" />
     <ClInclude Include="src\Crystal\Resources\Animation.h" />
     <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
-    <ClInclude Include="src\Crystal\Resources\DescriptorOld.h" />
     <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
@@ -251,7 +257,6 @@
     <ClInclude Include="src\Crystal\GamePlay\World\World.h" />
     <ClInclude Include="src\Crystal\Math\Math.h" />
     <ClInclude Include="src\Crystal\Resources\Buffers.h" />
-    <ClInclude Include="src\Crystal\Renderer\CommandList.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
     <ClInclude Include="src\Crystal\Resources\Material.h" />
     <ClInclude Include="src\Crystal\Resources\Meshes.h" />
@@ -266,6 +271,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
@@ -285,7 +291,7 @@
     <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />
-    <ClCompile Include="src\Crystal\Resources\DescriptorOld.cpp" />
+    <ClCompile Include="src\Crystal\Resources\DescriptorAllocatorPage.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
@@ -296,7 +302,6 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\InputComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponents.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffers.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\CommandList.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
     <ClCompile Include="src\Crystal\Resources\Material.cpp" />
     <ClCompile Include="src\Crystal\Resources\Meshes.cpp" />

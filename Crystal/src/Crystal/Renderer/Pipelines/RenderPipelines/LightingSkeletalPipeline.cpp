@@ -4,41 +4,25 @@
 
 namespace Crystal {
 
-	void LightingSkeletalPipeline::OnCreate()
-	{
-		LightPipeline::OnCreate();
-
-		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-
-		const int maxObjectCount = 50;
-		const int maxMaterialCount = 5;
-
-		m_PerDrawConstantBufferLists.resize(maxObjectCount);
-		for (int i = 0; i < maxObjectCount; i++)
-		{
-			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
-			for (int j = 0; j < maxMaterialCount; j++)
-			{
-				m_PerDrawConstantBufferLists[i][j]
-					= std::make_unique<ConstantBuffer>((int)sizeof(PerDrawData));
-			}
-		}
-	}
-
 	void LightingSkeletalPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		LightPipeline::PrepareRecord(pipelineInputs);
+
+
+		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
 
 		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
 
 		auto& renderer = Renderer::Instance();
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		PerFrameData perFrameData = {};
+
+		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
 		auto camPos = renderer.GetCamera()->GetWorldPosition();
-		m_PerFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
-		m_PerFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
-		m_PerFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
-		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
+		perFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
+		perFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
+		perFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
 
 		auto device = Renderer::Instance().GetDevice();
 
@@ -129,8 +113,8 @@ namespace Crystal {
 
 				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perDrawData);
-				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBufferLists[i][j]->GetCPUDescriptorHandle(), 
+				m_PerDrawConstantBuffers[i * 5 + j]->SetData((void*)&perDrawData);
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetCPUDescriptorHandle(),
 					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

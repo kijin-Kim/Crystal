@@ -8,6 +8,7 @@
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Resources/Shader.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/Resources/ConstantBuffer.h"
 
 namespace Crystal {
 	class Pipeline : public Object
@@ -26,13 +27,15 @@ namespace Crystal {
 		Pipeline() = default;
 		virtual ~Pipeline() = default;
 
-		void RegisterPipelineComponents(std::weak_ptr<PrimitiveComponent> component) { m_Components.push_back(component); }
+		void RegisterPipelineComponents(std::weak_ptr<PrimitiveComponent> component);
 	
 		virtual void PrepareRecord(const PipelineInputs* const pipelineInputs);
 		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) {}
 		virtual void EndRecord() {}
 
 		bool IsValidForThisPipeline(const std::shared_ptr<Material>& material);
+
+		void PrepareConstantBuffers(int perFrameBufferSize = 0, int perObjectBufferSize = 0, int perDrawBufferSize = 0, int perDrawBufferCount = 0);
 
 		STATIC_TYPE_IMPLE(Pipeline)
 	protected:
@@ -41,6 +44,11 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
+
+
+		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
+		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
+		std::vector<std::unique_ptr<ConstantBuffer>> m_PerDrawConstantBuffers;
 
 
 	};

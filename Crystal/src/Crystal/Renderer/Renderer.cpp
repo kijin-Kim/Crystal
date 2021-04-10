@@ -25,6 +25,7 @@ namespace Crystal {
 		m_Window = window;
 
 		CreateDevice();
+		
 
 		for (int i = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; i++)
 		{
@@ -136,7 +137,7 @@ namespace Crystal {
 			RootParameter perFrame = { 1, 1, 0 };
 			RootParameter perObject = { 1, 0, 0 };
 			RootParameter perExecute = { 1, 4, 0 };
-
+			
 			pbrSkeletalShader->SetRootSignature({ perFrame, perObject, perExecute, { CD3DX12_STATIC_SAMPLER_DESC(0) } });
 			pbrSkeletalShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}

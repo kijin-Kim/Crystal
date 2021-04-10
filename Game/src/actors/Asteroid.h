@@ -35,7 +35,7 @@ public:
 		SetAttachment(meshComponent, m_MainComponent);
 
 
-		auto randomScale = rand() % 6;
+		auto randomScale = rand() % 1 + 1;
 
 		m_MainComponent->RotateRoll(rand() % 360);
 		m_MainComponent->RotatePitch(rand() % 360);

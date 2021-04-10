@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "DescriptorAllocation.h"
 #include "DescriptorAllocator.h"
+#include "DescriptorAllocatorPage.h"
 
 namespace Crystal {
 

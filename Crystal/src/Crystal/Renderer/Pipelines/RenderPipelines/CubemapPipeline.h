@@ -20,14 +20,8 @@ namespace Crystal {
 		CubemapPipeline() = default;
 		~CubemapPipeline() override = default;
 
-		void OnCreate() override;
-
 		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 
 		STATIC_TYPE_IMPLE(CubemapPipeline)
-	private:
-		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-
-		PerFrameData m_PerFrameData = {};
 	};
 }

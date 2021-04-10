@@ -10,10 +10,10 @@ namespace Crystal {
 
 		struct Light
 		{
-			DirectX::XMFLOAT3 WorldPosition;
+			DirectX::XMFLOAT3 WorldPosition = Vector3::Zero;
 			float _pad1;
 
-			DirectX::XMFLOAT3 Color;
+			DirectX::XMFLOAT3 Color = Vector3::White;
 			float _pad2;
 
 			float Intensity;
@@ -22,9 +22,9 @@ namespace Crystal {
 
 		struct PerFrameData
 		{
-			DirectX::XMFLOAT4X4 ViewProjection;
+			DirectX::XMFLOAT4X4 ViewProjection = Matrix4x4::Identity();
 
-			DirectX::XMFLOAT3 CameraPositionInWorld;
+			DirectX::XMFLOAT3 CameraPositionInWorld = Vector3::Zero;
 			float _pad1;
 
 			Light Lights[20];
@@ -40,7 +40,7 @@ namespace Crystal {
 
 		struct PerDrawData
 		{
-			DirectX::XMFLOAT3 AlbedoColor = { 1.0f, 0.0f, 0.0f };
+			DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
 			float _pad1;
 			DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 			float _pad2;
@@ -63,16 +63,7 @@ namespace Crystal {
 		LightingStaticPipeline() = default;
 		~LightingStaticPipeline() override = default;
 
-		void OnCreate() override;
-
 		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		STATIC_TYPE_IMPLE(LightingStaticPipeline)
-	private:
-		PerFrameData m_PerFrameData = {};
-
-		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
-		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_PerDrawConstantBufferLists;
-
-		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
 	};
 }

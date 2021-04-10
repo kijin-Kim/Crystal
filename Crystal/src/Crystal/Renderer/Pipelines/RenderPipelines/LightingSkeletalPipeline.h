@@ -36,17 +36,8 @@ namespace Crystal {
 		LightingSkeletalPipeline() = default;
 		~LightingSkeletalPipeline() override = default;
 
-
-		void OnCreate() override;
 		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
 		STATIC_TYPE_IMPLE(LightingSkeletalPipeline)
-	private:
-		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
-		std::vector<std::array<std::unique_ptr<ConstantBuffer>, 5>> m_PerDrawConstantBufferLists;
-
-		PerFrameData m_PerFrameData = {};
-
 	};
 
 

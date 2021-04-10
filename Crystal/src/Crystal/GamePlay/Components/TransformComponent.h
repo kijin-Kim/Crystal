@@ -12,71 +12,48 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		~TransformComponent() override = default;
 
 		void Update(const float deltaTime) override;
-
-		void UpdateTransfromHierarchy()
-		{
-			/*Parent부터 자식 순으로 계산하여야 함*/
-			if (m_ParentComponent)
-				m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
-			else
-				m_WorldTransform = m_LocalTransform;
-		}
+		void UpdateTransfromHierarchy();
 
 
-		void SetLocalPosition(const DirectX::XMFLOAT3& position) 
-		{
-			m_LocalTransform._41 = position.x;
-			m_LocalTransform._42 = position.y;
-			m_LocalTransform._43 = position.z;
-		}
+		void SetLocalPosition(const DirectX::XMFLOAT3& position);
+		void SetWorldPosition(const DirectX::XMFLOAT3& position);
 
-		void SetWorldPosition(const DirectX::XMFLOAT3& position)
-		{
-			m_WorldTransform._41 = position.x;
-			m_WorldTransform._42 = position.y;
-			m_WorldTransform._43 = position.z;
-		}
-
-		void SetScale(const float scale) { m_Scale = scale; }
-		void SetVelocity(const DirectX::XMFLOAT3& velocity) { m_Velocity = velocity; }
-		void SetMass(const float mass) { m_InverseMass = 1.0f / mass; }
-		void SetInverseMass(const float inverseMass) { m_InverseMass = inverseMass; }
+		void SetScale(const float scale);
+		void SetVelocity(const DirectX::XMFLOAT3& velocity);
+		void SetMass(const float mass);
+		void SetInverseMass(const float inverseMass);
 
 		void RotateRoll(float angle);
 		void RotatePitch(float angle);
 		void RotateYaw(float angle);
 
-		DirectX::XMFLOAT3 GetLocalPosition() const { return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43 }; }
-		DirectX::XMFLOAT3 GetWorldPosition() const { return { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 }; }
-		const DirectX::XMFLOAT3& GetVelocity() const { return m_Velocity; }
-		float GetMass() const
-		{
-			CS_FATAL(m_InverseMass != 0, "질량이 무한대 입니다. 먼저 HasFiniteMass()로 검사되어야합니다");
-			return 1.0f / m_InverseMass;
-		}
-		float GetInverseMass() const { return m_InverseMass; }
-		bool HasFiniteMass() const { return m_InverseMass != 0; }
+		DirectX::XMFLOAT3 GetLocalPosition() const;
+		DirectX::XMFLOAT3 GetWorldPosition() const;
+		const DirectX::XMFLOAT3& GetVelocity() const;
+		float GetMass() const;
+		float GetInverseMass() const;
+		bool HasFiniteMass() const;
 
-		const DirectX::XMFLOAT3& GetLocalRightVector() const { return m_Right; }
-		const DirectX::XMFLOAT3& GetLocalUpVector()  const { return m_Up; }
-		const DirectX::XMFLOAT3& GetLocalForwardVector() const { return m_Forward; }
-		DirectX::XMFLOAT3 GetWorldRightVector() const { return { m_WorldTransform._11, m_WorldTransform._12, m_WorldTransform._13 }; }
-		DirectX::XMFLOAT3 GetWorldUpVector() const { return { m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23 }; }
-		DirectX::XMFLOAT3 GetWorldForwardVector() const { return { m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33 }; }
+		const DirectX::XMFLOAT3& GetLocalRightVector() const;
+		const DirectX::XMFLOAT3& GetLocalUpVector()  const;
+		const DirectX::XMFLOAT3& GetLocalForwardVector() const;
+		DirectX::XMFLOAT3 GetWorldRightVector() const;
+		DirectX::XMFLOAT3 GetWorldUpVector() const;
+		DirectX::XMFLOAT3 GetWorldForwardVector() const;
 
-		void SetParentComponent(const std::shared_ptr<TransformComponent> component) { m_ParentComponent = std::move(component); }
-		TransformComponent* GetParentComponent() const { return m_ParentComponent.get(); }
+		void SetParentComponent(const std::shared_ptr<TransformComponent> component);
+		TransformComponent* GetParentComponent() const;
 
-		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform) { m_WorldTransform = worldTransform; }
-		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform) { m_LocalTransform = localTransform; }
+		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform);
+		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform);
 
-		const DirectX::XMFLOAT4X4& GetWorldTransform() const { return m_WorldTransform; }
-		const DirectX::XMFLOAT4X4& GetLocalTransform() const { return m_LocalTransform; }
+		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
+		const DirectX::XMFLOAT4X4& GetLocalTransform() const;
 
-		const DirectX::XMFLOAT4& GetRotation() const { return m_Rotation; }
+		const DirectX::XMFLOAT4& GetRotation() const;
 
-		bool CanBeRendered() const override { return false; }
-		bool IsCollisionEnabled() const override { return false; }
+		bool CanBeRendered() const override;
+		bool IsCollisionEnabled() const override;
 
 		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:
@@ -96,9 +73,5 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;
 		DirectX::XMFLOAT3 m_Up = Vector3::UnitY;
 		DirectX::XMFLOAT3 m_Forward = Vector3::UnitZ;
-
-		DirectX::XMFLOAT3 m_LocalPosition = Vector3::Zero;
-
-
 	};
 }

@@ -20,8 +20,8 @@ namespace Crystal {
 		InputLayout() = default;
 		InputLayout(std::initializer_list<D3D12_INPUT_ELEMENT_DESC> inputLayout) : m_InputLayout(inputLayout) {}
 
-		const D3D12_INPUT_ELEMENT_DESC* GetData() const { return m_InputLayout.data(); }
-		UINT GetCount() { return m_InputLayout.size(); }
+		const D3D12_INPUT_ELEMENT_DESC* GetData() const noexcept { return m_InputLayout.data(); }
+		UINT GetCount() noexcept { return m_InputLayout.size(); }
 	private:
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
 	};

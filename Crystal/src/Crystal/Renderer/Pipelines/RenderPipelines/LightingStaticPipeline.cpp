@@ -5,40 +5,24 @@
 
 namespace Crystal {
 
-	void LightingStaticPipeline::OnCreate()
-	{
-		LightPipeline::OnCreate();
-
-		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-		
-		const int maxObjectCount = 80;
-		const int maxMaterialCount = 5;
-
-		m_PerDrawConstantBufferLists.resize(maxObjectCount);
-		for (int i = 0; i < maxObjectCount; i++)
-		{
-			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
-			for (int j = 0; j < maxMaterialCount; j++)
-			{
-				m_PerDrawConstantBufferLists[i][j]
-					= std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData));
-			}
-		}
-		
-	}
-
 	void LightingStaticPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		LightPipeline::PrepareRecord(pipelineInputs);
+
+
+		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
 
 		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
 
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		m_PerFrameData.CameraPositionInWorld = renderer.GetCamera()->GetWorldPosition();
-	
+
+		PerFrameData perFrameData = {};
+
+		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		perFrameData.CameraPositionInWorld = renderer.GetCamera()->GetWorldPosition();
+
 
 		const int maxLightCount = 20;
 		int lightCount = 0;
@@ -53,18 +37,18 @@ namespace Crystal {
 
 			auto lightPosition =
 
-				m_PerFrameData.Lights[lightCount].WorldPosition = localLightComponent->GetWorldPosition();
+				perFrameData.Lights[lightCount].WorldPosition = localLightComponent->GetWorldPosition();
 
-			m_PerFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
-			m_PerFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
+			perFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
+			perFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
 
 
 			lightCount++;
 		}
 
-		m_PerFrameData.LightCount = lightCount;
-		
-		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
+		perFrameData.LightCount = lightCount;
+
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
 
 
 
@@ -78,6 +62,14 @@ namespace Crystal {
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		
+
+
+		
+
+		
+		
+
+
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 		for (int i = 0; i < m_Components.size(); i++) // PerObject
 		{
@@ -167,8 +159,8 @@ namespace Crystal {
 
 				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBufferLists[i][j]->SetData((void*)&perDrawData);
-				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBufferLists[i][j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				m_PerDrawConstantBuffers[i * 5 + j]->SetData((void*)&perDrawData);
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (albedoTextureHandle.ptr)

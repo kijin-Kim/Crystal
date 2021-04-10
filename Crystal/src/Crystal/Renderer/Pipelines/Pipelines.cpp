@@ -1,8 +1,15 @@
 #include "cspch.h"
 #include "Pipelines.h"
 #include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Resources/ConstantBuffer.h"
 
 namespace Crystal {
+
+	void Pipeline::RegisterPipelineComponents(std::weak_ptr<PrimitiveComponent> component)
+	{
+		m_Components.push_back(component);
+	}
+
 	void Pipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		/*CommandList를 녹화합니다*/
@@ -20,6 +27,35 @@ namespace Crystal {
 		return thisPipelineShader == inputMaterialShader;
 	}
 
+	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/, 
+		int perDrawBufferSize /*= 0*/, int perDrawBufferCount /*= 0*/)
+	{
+		if (perFrameBufferSize && !m_PerFrameConstantBuffer)
+			m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>(perFrameBufferSize);
+
+
+		if (perObjectBufferSize)
+		{
+			const int newRequireBufferCount = m_Components.size() - m_PerObjectConstantBuffers.size();
+			if (m_Components.size() > m_PerObjectConstantBuffers.size())
+			{
+				for (int i = 0; i < newRequireBufferCount; i++)
+				{
+					m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>(perObjectBufferSize));
+
+					if (perDrawBufferSize)
+					{
+						for (int j = 0; j < perDrawBufferCount; j++)
+						{
+							m_PerDrawConstantBuffers.push_back(std::make_unique<ConstantBuffer>(perDrawBufferSize));
+						}
+					}	
+				}
+			}
+		}
+		
+	}
+
 	void RenderPipeline::OnCreate()
 	{
 		Pipeline::OnCreate();
@@ -28,7 +64,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 500;
+		descriptorHeapDesc.NumDescriptors = 1024;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 

@@ -5,28 +5,18 @@
 
 namespace Crystal {
 
-	void LinePipeline::OnCreate()
-	{
-		RenderPipeline::OnCreate();
-
-
-		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(PerFrameData));
-
-		const int maxObjectCount = 300;
-		for (int i = 0; i < maxObjectCount; i++)
-			m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>((int)sizeof(PerObjectData)));
-	}
-
 	void LinePipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		RenderPipeline::PrepareRecord(pipelineInputs);
 
+		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
+
 		auto& renderer = Renderer::Instance();
 		auto device = renderer.GetDevice();
 
-
-		m_PerFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
+		PerFrameData perFrameData = {};
+		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(),
@@ -49,9 +39,11 @@ namespace Crystal {
 
 				DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
 
-				m_PerObjectData.World = Matrix4x4::Transpose(collisionComponent->GetPostScaledTransform());
-				m_PerObjectData.Color = collisionComponent->GetLineColor();
-				m_PerObjectConstantBuffers[i]->SetData((void*)&m_PerObjectData);
+				PerObjectData perObjectData = {};
+
+				perObjectData.World = Matrix4x4::Transpose(collisionComponent->GetPostScaledTransform());
+				perObjectData.Color = collisionComponent->GetLineColor();
+				m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData);
 
 				device->CopyDescriptorsSimple(1, cpuHandle, m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle(),
 					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

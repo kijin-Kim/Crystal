@@ -6,24 +6,23 @@
 
 namespace Crystal {
 
-	void CubemapPipeline::OnCreate()
-	{
-		RenderPipeline::OnCreate();
-
-		m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>((int)sizeof(m_PerFrameData));
-	}
 
 	void CubemapPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
 	{
 		RenderPipeline::PrepareRecord(pipelineInputs);
 
+		PrepareConstantBuffers(sizeof(PerFrameData));
+
 		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)pipelineInputs;
+
+
+		PerFrameData perFrameData = {};
 
 		auto& renderer = Renderer::Instance();
 		auto viewProj = renderer.GetCamera()->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
-		m_PerFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
-		m_PerFrameConstantBuffer->SetData((void*)&m_PerFrameData);
+		perFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
 
 		auto device = renderer.GetDevice();
 

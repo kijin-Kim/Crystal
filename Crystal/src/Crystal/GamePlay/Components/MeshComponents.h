@@ -24,7 +24,6 @@ namespace Crystal {
 		virtual ~StaticMeshComponent() = default;
 
 		STATIC_TYPE_IMPLE(StaticMeshComponent)
-
 	};
 
 	class SkeletalMeshComponent : public MeshComponent
