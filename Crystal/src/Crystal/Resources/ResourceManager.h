@@ -70,7 +70,7 @@ namespace Crystal {
 			m_RenderableManager.destroy(name);
 		}
 
-		const std::shared_ptr<Renderable>& GetRenderable(const std::string& name)
+		std::weak_ptr<Renderable> GetRenderable(const std::string& name)
 		{
 			return m_RenderableManager.get(name);
 		}

@@ -215,6 +215,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\TonemappingActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
+    <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsWorld.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.h" />
@@ -276,7 +277,9 @@
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\World\Level.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\PhysicsWorld.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\World\World.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />

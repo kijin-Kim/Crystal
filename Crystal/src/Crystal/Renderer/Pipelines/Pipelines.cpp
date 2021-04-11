@@ -205,7 +205,7 @@ namespace Crystal {
 			}
 
 
-			auto renderable = meshComponent->GetRenderable();
+			auto renderable = meshComponent->GetRenderable().lock();
 			auto materials = meshComponent->GetMaterials();
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 			{
@@ -258,7 +258,6 @@ namespace Crystal {
 		ID3D12DescriptorHeap* irradianceSamplingHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(irradianceSamplingHeaps), irradianceSamplingHeaps);
 		commandList->SetComputeRootDescriptorTable(0, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
 
 		auto dispatchThreadGroupCounts = shader->GetDispatchThreadGroupCounts();
 		commandList->Dispatch(dispatchThreadGroupCounts.x, dispatchThreadGroupCounts.y, dispatchThreadGroupCounts.z);

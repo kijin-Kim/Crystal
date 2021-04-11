@@ -17,14 +17,16 @@ namespace Crystal {
 		void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
-			m_Renderable->Update(deltaTime);
+			auto renderable = m_Renderable.lock();
+			if(renderable)
+				renderable->Update(deltaTime);
 		}
 
 		void AddMaterial(std::shared_ptr<Material> material) { m_Materials.push_back(std::move(material)); }
 		const std::vector<std::shared_ptr<Material>>& GetMaterials() const { return m_Materials; }
 
-		void SetRenderable(std::shared_ptr<Renderable> renderable) { m_Renderable = std::move(renderable); }
-		const std::shared_ptr<Renderable>& GetRenderable() const { return m_Renderable; }
+		void SetRenderable(std::weak_ptr<Renderable> renderable) { m_Renderable = renderable; }
+		const std::weak_ptr<Renderable>& GetRenderable() const { return m_Renderable; }
 
 		bool CanBeRendered() const override { return true; }
 		bool IsCollisionEnabled() const override { return false; }
@@ -33,7 +35,7 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
-		std::shared_ptr<Renderable> m_Renderable = nullptr;
+		std::weak_ptr<Renderable> m_Renderable;
 
 		std::vector<std::shared_ptr<Material>> m_Materials;
 

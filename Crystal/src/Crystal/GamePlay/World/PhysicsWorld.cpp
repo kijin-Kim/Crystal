@@ -9,58 +9,6 @@ namespace Crystal {
 	{
 		Updatable::Update(deltaTime);
 
-		//// Bounding Sphere
-		//for (int i = 0; i < m_BoundingSphereComponents.size() - 1; i++)
-		//{
-		//	auto sphereComplhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[i]);
-		//	if (!sphereComplhs)
-		//		continue;
-
-		//	auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
-
-		//	// Bounding Sphere
-		//	for (int j = i + 1; j < m_BoundingSphereComponents.size() - i; j++)
-		//	{
-		//		auto sphereCompRhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[j]);
-		//		if (!sphereCompRhs)
-		//			continue;
-
-		//		auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
-
-		//		float totalDist = 0.0f;
-		//		if (sphereLhs.Intersects(sphereRhs, totalDist))
-		//		{
-		//			ResolveVelocity(sphereComplhs, sphereCompRhs, totalDist);
-		//		}
-		//	}
-		//}
-
-		//// Bounding Sphere
-		//for (int i = 0; i < m_BoundingSphereComponents.size() - 1; i++)
-		//{
-		//	auto sphereComplhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[i]);
-		//	if (!sphereComplhs)
-		//		continue;
-
-		//	auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
-
-		//	// Bounding Sphere
-		//	for (int j = i + 1; j < m_BoundingSphereComponents.size() - i; j++)
-		//	{
-		//		auto sphereCompRhs = Cast<BoundingSphereComponent>(m_BoundingSphereComponents[j]);
-		//		if (!sphereCompRhs)
-		//			continue;
-
-		//		auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
-
-		//		float totalDist = 0.0f;
-		//		if (sphereLhs.Intersects(sphereRhs, totalDist))
-		//		{
-		//			ResolvePenetration(sphereComplhs, sphereCompRhs, totalDist);
-		//		}
-		//	}
-		//}
-
 		 
 		// Bounding Sphere
 		for (const auto & lhsWeak : m_BoundingSphereComponents)

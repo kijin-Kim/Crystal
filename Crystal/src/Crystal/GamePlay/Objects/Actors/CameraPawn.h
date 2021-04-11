@@ -5,6 +5,7 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/Math/Math.h"
 #include "Crystal/Core/ApplicationUtility.h"
+#include "Crystal/GamePlay/World/Level.h"
 
 namespace Crystal {
 	class CameraPawn : public Pawn

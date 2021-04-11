@@ -64,12 +64,6 @@ namespace Crystal {
 		
 
 
-		
-
-		
-		
-
-
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 		for (int i = 0; i < m_Components.size(); i++) // PerObject
 		{
@@ -86,7 +80,7 @@ namespace Crystal {
 			device->CopyDescriptorsSimple(1, destHeapHandle, perObjectConstantBufferHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			auto staticMesh = std::static_pointer_cast<StaticMesh>(meshComponent->GetRenderable());
+			auto staticMesh = Cast<StaticMesh>(meshComponent->GetRenderable());
 
 			auto materials = meshComponent->GetMaterials();
 			auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));

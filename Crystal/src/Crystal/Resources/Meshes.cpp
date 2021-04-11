@@ -49,7 +49,7 @@ namespace Crystal {
 		}
 	}
 
-	SkeletalSubMesh::SkeletalSubMesh(aiMesh* mesh) : SubMesh()
+	SkeletalSubMesh::SkeletalSubMesh(aiMesh* mesh)
 	{
 		SkeletalVertices.reserve(mesh->mNumVertices);
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)

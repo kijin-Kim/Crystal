@@ -41,7 +41,7 @@ namespace Crystal {
 			m_Meshes.erase(name);
 		}
 
-		const std::shared_ptr<Renderable>& get(const std::string& name)
+		std::weak_ptr<Renderable> get(const std::string& name)
 		{
 			auto it = m_Meshes.find(name);
 			if (it == m_Meshes.end())
