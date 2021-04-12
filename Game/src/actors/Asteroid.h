@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 
 class Asteroid : public Crystal::Actor
 {
@@ -27,10 +28,25 @@ public:
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Asteroid_Blue_Normal"));
 		pbrMaterial->Set("EmissiveTexture", resourceManager.GetTexture("Asteroid_Blue_Emissive"));
 
+		
+		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
+		material->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
+			Crystal::Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
+		material->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
+		material->MetallicTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
+		material->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
+		material->NormalTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
+		material->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");
+		
+
+		
+
+
 
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		meshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
-		meshComponent->AddMaterial(pbrMaterial);
+		meshComponent->AddMaterialOld(pbrMaterial);
+		meshComponent->AddMaterial(std::move(material));
 		
 		SetAttachment(meshComponent, m_MainComponent);
 

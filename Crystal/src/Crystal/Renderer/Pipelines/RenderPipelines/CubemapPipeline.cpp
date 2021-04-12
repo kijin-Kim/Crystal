@@ -1,7 +1,7 @@
 #include "cspch.h"
 #include "CubemapPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
-#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Buffer.h"
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
@@ -22,7 +22,7 @@ namespace Crystal {
 		auto viewProj = renderer.GetCamera()->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		perFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
-		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		auto device = renderer.GetDevice();
 
@@ -33,14 +33,14 @@ namespace Crystal {
 			if(!component)
 				continue;
 
-			const auto& materials = component->GetMaterials();
+			const auto& materials = component->GetMaterialsOld();
 			for (const auto& mat : materials)
 			{
 				if (!IsValidForThisPipeline(mat))
 					continue;
 
 				device->CopyDescriptorsSimple(1, descHandle,
-					m_PerFrameConstantBuffer->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					m_PerFrameConstantBuffer->GetConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				device->CopyDescriptorsSimple(1, descHandle,

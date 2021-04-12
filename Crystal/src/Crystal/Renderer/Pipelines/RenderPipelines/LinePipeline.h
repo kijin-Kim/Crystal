@@ -1,7 +1,7 @@
 #pragma once
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
-#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
 	class LinePipeline : public RenderPipeline

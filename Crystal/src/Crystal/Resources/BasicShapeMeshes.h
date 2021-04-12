@@ -16,10 +16,10 @@ namespace Crystal {
 				0, 1
 			};
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)unitLineVertices,
-				sizeof(float) * 3, _countof(unitLineVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)indices,
-				sizeof(int) * _countof(indices), _countof(indices)));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)unitLineVertices,
+				sizeof(float) * 3 * _countof(unitLineVertices), _countof(unitLineVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)indices,
+				sizeof(int) * _countof(indices), _countof(indices), false, false));
 		}
 		~Line() override = default;
 	};
@@ -40,10 +40,10 @@ namespace Crystal {
 				0, 1, 1, 2, 2, 3, 3, 0
 			};
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices,
-				(UINT)(sizeof(float) * 3), (UINT)_countof(quadVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)quadIndices,
-				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices))));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)quadVertices,
+				(UINT)(sizeof(float) * 3 * _countof(quadVertices)), (UINT)_countof(quadVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
+				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
 		}
 		~LineQuad() override = default;
 	};
@@ -82,10 +82,10 @@ namespace Crystal {
 				12, 13, 14, 15
 			};
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices,
-				(UINT)(sizeof(float) * 3), (UINT)_countof(quadVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)quadIndices,
-				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices))));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)quadVertices,
+				(UINT)(sizeof(float) * 3 * _countof(quadVertices)), (UINT)_countof(quadVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
+				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
 		}
 		~LineBox() override = default;
 	};
@@ -116,10 +116,10 @@ namespace Crystal {
 			}
 			circleIndices[_countof(circleIndices) - 1] = 0;
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)circleVertices,
-				(UINT)(sizeof(float) * 3), (UINT)_countof(circleVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)circleIndices,
-				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices))));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)circleVertices,
+				(UINT)(sizeof(float) * 3 * _countof(circleVertices)), (UINT)_countof(circleVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)circleIndices,
+				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices)), false, false));
 		}
 		~LineCircle() override = default;
 	};
@@ -166,10 +166,10 @@ namespace Crystal {
 			circleIndices[_countof(circleIndices) / 3 * 2 - 1] = circleIndices[_countof(circleIndices) / 3];
 			circleIndices[_countof(circleIndices) - 1] = circleIndices[_countof(circleIndices) / 3 * 2];
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)circleVertices,
-				(UINT)(sizeof(float) * 3), (UINT)_countof(circleVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)circleIndices,
-				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices))));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)circleVertices,
+				(UINT)(sizeof(float) * 3 * _countof(circleVertices)), (UINT)_countof(circleVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)circleIndices,
+				(UINT)(sizeof(uint32_t) * _countof(circleIndices)), (UINT)(_countof(circleIndices)), false, false));
 		}
 		~LineSphere() override = default;
 	};
@@ -191,10 +191,10 @@ namespace Crystal {
 				1, 3, 0
 			};
 
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>((void*)quadVertices,
-				(UINT)(sizeof(float) * 2), (UINT)_countof(quadVertices)));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>((void*)quadIndices,
-				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices))));
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)quadVertices,
+				(UINT)(sizeof(float) * 2 * _countof(quadVertices)), (UINT)_countof(quadVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
+				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
 		}
 		~PlaneQuad() override = default;
 	};

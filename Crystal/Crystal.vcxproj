@@ -235,7 +235,7 @@
     <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
     <ClInclude Include="src\Crystal\Resources\Renderable.h" />
     <ClInclude Include="src\Crystal\Resources\Animation.h" />
-    <ClInclude Include="src\Crystal\Resources\ConstantBuffer.h" />
+    <ClInclude Include="src\Crystal\Resources\Buffer.h" />
     <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
@@ -257,7 +257,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Controllers\PlayerController.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\World.h" />
     <ClInclude Include="src\Crystal\Math\Math.h" />
-    <ClInclude Include="src\Crystal\Resources\Buffers.h" />
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
     <ClInclude Include="src\Crystal\Resources\Material.h" />
     <ClInclude Include="src\Crystal\Resources\Meshes.h" />
@@ -291,10 +290,11 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Resources\ConstantBuffer.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Buffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocatorPage.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Renderable.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
     <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
@@ -304,7 +304,6 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\CameraComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\InputComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\MeshComponents.cpp" />
-    <ClCompile Include="src\Crystal\Resources\Buffers.cpp" />
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
     <ClCompile Include="src\Crystal\Resources\Material.cpp" />
     <ClCompile Include="src\Crystal\Resources\Meshes.cpp" />

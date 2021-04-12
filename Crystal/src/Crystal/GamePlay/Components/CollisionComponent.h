@@ -19,7 +19,7 @@ namespace Crystal {
 				Crystal::Material::MaterialOwnerType::Owner_Shader);
 			simpleColorMaterial->Set("Color", Vector3::Yellow);
 
-			AddMaterial(std::move(simpleColorMaterial));
+			AddMaterialOld(std::move(simpleColorMaterial));
 
 		}
 		~CollisionComponent() override
@@ -28,11 +28,11 @@ namespace Crystal {
 
 		void SetLineColor(const DirectX::XMFLOAT3& color) 
 		{
-			m_Materials[0]->Set("Color", color); 
+			m_MaterialsOld[0]->Set("Color", color); 
 		}
 		const DirectX::XMFLOAT3& GetLineColor() const 
 		{ 
-			auto color = m_Materials[0]->GetFloatInput("Color"); 
+			auto color = m_MaterialsOld[0]->GetFloatInput("Color"); 
 			return { color.x, color.y, color.z };
 		}
 

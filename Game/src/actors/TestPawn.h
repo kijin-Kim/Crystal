@@ -5,6 +5,7 @@
 #include "Crystal/Core/Logger.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 
 class TestPawn final : public Crystal::Pawn
 {
@@ -25,6 +26,12 @@ public:
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
 		pbrMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
+		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
+		material->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		material->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		material->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		material->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+
 
 		
 
@@ -42,7 +49,8 @@ public:
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		staticMeshComponent->AddMaterial(pbrMaterial);
+		staticMeshComponent->AddMaterialOld(pbrMaterial);
+		staticMeshComponent->AddMaterial(std::move(material));
 		SetAttachment(staticMeshComponent, m_MainComponent);
 
 		auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");

@@ -17,4 +17,16 @@ namespace Crystal {
 
 	}
 
+
+	void PrimitiveComponent::AddMaterial(std::unique_ptr<Pipeline::MaterialBase> material)
+	{
+		m_Materials.push_back(std::move(material));
+	}
+
+
+	const std::vector<std::unique_ptr<Crystal::Pipeline::MaterialBase>>& PrimitiveComponent::GetMaterials() const
+	{
+		return m_Materials;
+	}
+
 }

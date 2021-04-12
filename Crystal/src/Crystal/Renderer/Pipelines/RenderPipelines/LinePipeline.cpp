@@ -16,10 +16,10 @@ namespace Crystal {
 
 		PerFrameData perFrameData = {};
 		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(),
+		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -29,7 +29,7 @@ namespace Crystal {
 			if(!component)
 				continue;
 
-			auto materials = component->GetMaterials();
+			auto materials = component->GetMaterialsOld();
 			for (const auto& mat : materials)
 			{
 				if(!IsValidForThisPipeline(mat))
@@ -43,9 +43,9 @@ namespace Crystal {
 
 				perObjectData.World = Matrix4x4::Transpose(collisionComponent->GetPostScaledTransform());
 				perObjectData.Color = collisionComponent->GetLineColor();
-				m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData);
+				m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData, 0, sizeof(perObjectData));
 
-				device->CopyDescriptorsSimple(1, cpuHandle, m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle(),
+				device->CopyDescriptorsSimple(1, cpuHandle, m_PerObjectConstantBuffers[i]->GetConstantBufferView(),
 					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			}

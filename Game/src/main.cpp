@@ -131,10 +131,14 @@ public:
 
 		for (int i = 0; i < 10; i++)
 		{
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 10; j++)
 			{
-				Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
-				asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 0.0f });
+				for (int k = 0; k < 1; k++)
+				{
+					Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
+					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
+				}
+				
 			}
 		}
 

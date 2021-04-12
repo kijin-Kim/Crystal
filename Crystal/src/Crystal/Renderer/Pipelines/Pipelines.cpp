@@ -1,7 +1,9 @@
 #include "cspch.h"
 #include "Pipelines.h"
 #include "Crystal/Renderer/Renderer.h"
-#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Buffer.h"
+#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/Resources/Material.h"
 
 namespace Crystal {
 
@@ -27,11 +29,25 @@ namespace Crystal {
 		return thisPipelineShader == inputMaterialShader;
 	}
 
-	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/, 
+	bool Pipeline::IsValidForThisPipelineNew(const std::unique_ptr<MaterialBase>& material)
+	{
+		if (!material)
+			return false;
+
+		auto thisPipelineShader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto inputMaterialShader = Cast<Shader>(material->GetObjectOwner(Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader));
+
+		return thisPipelineShader == inputMaterialShader;
+	}
+
+	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/,
 		int perDrawBufferSize /*= 0*/, int perDrawBufferCount /*= 0*/)
 	{
 		if (perFrameBufferSize && !m_PerFrameConstantBuffer)
-			m_PerFrameConstantBuffer = std::make_unique<ConstantBuffer>(perFrameBufferSize);
+		{
+			m_PerFrameConstantBuffer = std::make_unique<Buffer>(nullptr, perFrameBufferSize, 0, true, true);
+			m_PerFrameConstantBuffer->CreateConstantBuffer();
+		}
 
 
 		if (perObjectBufferSize)
@@ -41,13 +57,17 @@ namespace Crystal {
 			{
 				for (int i = 0; i < newRequireBufferCount; i++)
 				{
-					m_PerObjectConstantBuffers.push_back(std::make_unique<ConstantBuffer>(perObjectBufferSize));
+					auto buffer = std::make_unique<Buffer>(nullptr, perObjectBufferSize, 0, true, true);
+					buffer->CreateConstantBuffer();
+					m_PerObjectConstantBuffers.push_back(std::move(buffer));
 
 					if (perDrawBufferSize)
 					{
 						for (int j = 0; j < perDrawBufferCount; j++)
 						{
-							m_PerDrawConstantBuffers.push_back(std::make_unique<ConstantBuffer>(perDrawBufferSize));
+							auto buffer = std::make_unique<Buffer>(nullptr, perDrawBufferSize, 0, true, true);
+							buffer->CreateConstantBuffer();
+							m_PerDrawConstantBuffers.push_back(std::move(buffer));
 						}
 					}	
 				}
@@ -64,7 +84,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 1024;
+		descriptorHeapDesc.NumDescriptors = 20000;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -206,7 +226,7 @@ namespace Crystal {
 
 
 			auto renderable = meshComponent->GetRenderable().lock();
-			auto materials = meshComponent->GetMaterials();
+			auto materials = meshComponent->GetMaterialsOld();
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 			{
 				if (materials[j])

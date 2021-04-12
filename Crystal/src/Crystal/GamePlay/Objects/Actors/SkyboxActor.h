@@ -39,9 +39,9 @@ namespace Crystal {
 
 			auto staticMeshComponent = CreateComponent<StaticMeshComponent>("StaticMeshComponent");
 			staticMeshComponent->SetRenderable(resourceManager.GetRenderable("PlaneQuadMesh"));
-			staticMeshComponent->AddMaterial(skyboxMaterial);
-			staticMeshComponent->AddMaterial(panoToCubeMaterial);
-			staticMeshComponent->AddMaterial(diffIrradSamplingMaterial);
+			staticMeshComponent->AddMaterialOld(skyboxMaterial);
+			staticMeshComponent->AddMaterialOld(panoToCubeMaterial);
+			staticMeshComponent->AddMaterialOld(diffIrradSamplingMaterial);
 
 			m_MainComponent = staticMeshComponent;
 

@@ -117,7 +117,7 @@ auto device = Renderer::Instance().GetDevice();
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 		auto component = Cast<StaticMeshComponent>(m_Components[0]);
-		auto material = component->GetMaterials();
+		auto material = component->GetMaterialsOld();
 
 		auto& resourceManager = ResourceManager::Instance();
 

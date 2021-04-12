@@ -21,7 +21,7 @@ namespace Crystal {
 			if(!component)
 				continue;
 
-			auto materials = component->GetMaterials();
+			auto materials = component->GetMaterialsOld();
 			for (const auto& mat : materials)
 			{
 				if(!IsValidForThisPipeline(mat) 

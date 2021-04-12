@@ -1,7 +1,6 @@
 #pragma once
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
-#include "Crystal/Resources/ConstantBuffer.h"
-#include "Crystal/Resources/Buffers.h"
+#include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
 	class CubemapPipeline final : public RenderPipeline

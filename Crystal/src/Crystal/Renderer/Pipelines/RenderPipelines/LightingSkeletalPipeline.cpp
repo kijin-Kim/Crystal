@@ -22,13 +22,13 @@ namespace Crystal {
 		perFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		perFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		perFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
-		m_PerFrameConstantBuffer->SetData((void*)&perFrameData);
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		auto device = Renderer::Instance().GetDevice();
 
 		auto destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetCPUDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
@@ -50,13 +50,13 @@ namespace Crystal {
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
 			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
-			m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData);
+			m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData, 0, sizeof(perObjectData));
 
-			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_PerObjectConstantBuffers[i]->GetCPUDescriptorHandle();
+			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_PerObjectConstantBuffers[i]->GetConstantBufferView();
 			device->CopyDescriptorsSimple(1, destHeapHandle, perObjectConstantBufferHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-			auto materials = component->GetMaterials();
+			auto materials = component->GetMaterialsOld();
 			for (int j = 0; j < materials.size(); j++)
 			{
 				if (!IsValidForThisPipeline(materials[j]))
@@ -113,8 +113,8 @@ namespace Crystal {
 
 				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBuffers[i * 5 + j]->SetData((void*)&perDrawData);
-				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetCPUDescriptorHandle(),
+				m_PerDrawConstantBuffers[i * 5 + j]->SetData((void*)&perDrawData, 0, sizeof(perDrawData));
+				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetConstantBufferView(),
 					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

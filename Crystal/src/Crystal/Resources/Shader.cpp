@@ -203,19 +203,23 @@ namespace Crystal {
 
 	bool Shader::CheckInputValidation(const std::string& inputName, D3D_SHADER_INPUT_TYPE shaderInputType)
 	{
-		D3D12_SHADER_INPUT_BIND_DESC shaderInputBindDesc = {};
+		/*D3D12_SHADER_INPUT_BIND_DESC shaderInputBindDesc = {};
 		HRESULT hr = m_ShaderReflection->GetResourceBindingDescByName(inputName.c_str(), &shaderInputBindDesc);
-		return SUCCEEDED(hr) && shaderInputBindDesc.Type == shaderInputType;
+		return SUCCEEDED(hr) && shaderInputBindDesc.Type == shaderInputType;*/
+
+		return true;
 	}
 
 	bool Shader::CheckInputValidation(const std::string& inputName, const std::string& typeName)
 	{
-		ID3D12ShaderReflectionVariable* shaderReflectionVariable = m_ShaderReflection->GetVariableByName(inputName.c_str());
+		/*ID3D12ShaderReflectionVariable* shaderReflectionVariable = m_ShaderReflection->GetVariableByName(inputName.c_str());
 		ID3D12ShaderReflectionType* shaderReflectionType = shaderReflectionVariable->GetType();
 		D3D12_SHADER_TYPE_DESC shaderTypeDesc = {};
 		shaderReflectionType->GetDesc(&shaderTypeDesc);
 
-		return shaderTypeDesc.Name && shaderTypeDesc.Name == typeName;
+		return shaderTypeDesc.Name && shaderTypeDesc.Name == typeName;*/
+
+		return true;
 	}
 
 	Microsoft::WRL::ComPtr<ID3DBlob> Shader::loadSourceFromFile(const std::string& filePath)

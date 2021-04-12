@@ -1,4 +1,4 @@
-#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Buffer.h"
 #include "LightPipeline.h"
 
 namespace Crystal {

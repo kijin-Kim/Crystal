@@ -7,13 +7,29 @@
 #include "Crystal/GamePlay/Components/CameraComponent.h"
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Resources/Shader.h"
-#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
-#include "Crystal/Resources/ConstantBuffer.h"
+#include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
+
+	class PrimitiveComponent;
+	class Material;
+
 	class Pipeline : public Object
 	{
 	public:
+		struct MaterialBase : public Object
+		{
+			enum MaterialOwnerType
+			{
+				Owner_Shader = 0
+			};
+			
+			virtual bool CanBeInstancedTogether(MaterialBase* material) { return false; }
+
+			STATIC_TYPE_IMPLE(MaterialBase)
+		};
+
+
 		enum PipelineOwnerType
 		{
 			Owner_Shader = 0
@@ -34,6 +50,7 @@ namespace Crystal {
 		virtual void EndRecord() {}
 
 		bool IsValidForThisPipeline(const std::shared_ptr<Material>& material);
+		bool IsValidForThisPipelineNew(const std::unique_ptr<MaterialBase>& material);
 
 		void PrepareConstantBuffers(int perFrameBufferSize = 0, int perObjectBufferSize = 0, int perDrawBufferSize = 0, int perDrawBufferCount = 0);
 
@@ -46,9 +63,9 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 
 
-		std::unique_ptr<ConstantBuffer> m_PerFrameConstantBuffer = nullptr;
-		std::vector<std::unique_ptr<ConstantBuffer>> m_PerObjectConstantBuffers;
-		std::vector<std::unique_ptr<ConstantBuffer>> m_PerDrawConstantBuffers;
+		std::unique_ptr<Buffer> m_PerFrameConstantBuffer = nullptr;
+		std::vector<std::unique_ptr<Buffer>> m_PerObjectConstantBuffers;
+		std::vector<std::unique_ptr<Buffer>> m_PerDrawConstantBuffers;
 
 
 	};

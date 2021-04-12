@@ -35,8 +35,8 @@ public:
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(mesh);
 		skeletalMeshComponent->RotatePitch(90.0f);
-		skeletalMeshComponent->AddMaterial(bodyMaterial);
-		skeletalMeshComponent->AddMaterial(tentacleMaterial);
+		skeletalMeshComponent->AddMaterialOld(bodyMaterial);
+		skeletalMeshComponent->AddMaterialOld(tentacleMaterial);
 
 		m_MainComponent = skeletalMeshComponent;
 

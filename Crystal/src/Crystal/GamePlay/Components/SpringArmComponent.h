@@ -6,7 +6,7 @@ namespace Crystal {
 	class SpringArmComponent final : public TransformComponent
 	{
 	public:
-		SpringArmComponent() noexcept = default;
+		SpringArmComponent() = default;
 		~SpringArmComponent() override = default;
 
 		void Update(const float deltaTime) override;

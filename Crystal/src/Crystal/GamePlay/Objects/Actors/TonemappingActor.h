@@ -18,7 +18,7 @@ public:
 		tonemappingMaterial->Set("FloatingPointTexture", resourceManager.GetTexture("FloatingPointBuffer"));
 
 
-		m_StaticMeshComponent->AddMaterial(tonemappingMaterial);
+		m_StaticMeshComponent->AddMaterialOld(tonemappingMaterial);
 
 	}
 

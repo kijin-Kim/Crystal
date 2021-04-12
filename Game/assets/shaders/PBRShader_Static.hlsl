@@ -9,6 +9,26 @@ struct VS_INPUT
     float3 Normal : NORMAL;
     float3 Tangent : TANGENT;
     float3 BiTangent : BITANGENT;
+
+    float4 MatRow0 : MATROW0;
+    float4 MatRow1 : MATROW1;
+    float4 MatRow2 : MATROW2;
+    float4 MatRow3 : MATROW3;
+
+    // perinstance data for pixel shader
+    uint MaterialIndex : MATERIAL_INDEX;
+    float3 AlbedoColor : ALBEDO_COLOR;
+    float3 EmissiveColor : EMISSIVE_COLOR;
+    float RoughnessConstant : ROUGHNESS_CONSTANT;
+    float MetallicConstant : METALLIC_CONSTANT;
+
+    bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
+    bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
+    bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
+    bool bToggleNormalTexture : TOGGLE_NORMAL_TEXTURE;
+    bool bToggleIrradianceTexture : TOGGLE_IRRADIANCE_TEXTURE;
+    bool bToggleEmissivetexture : TOGGLE_EMISSIVE_TEXTURE;
+
 };
 
 struct PS_INPUT
@@ -19,6 +39,21 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD;
     float3 WorldTangent : WORLD_TANGENT;
     float3 WorldBiTangent : WORLD_BITANGENT;
+    
+    // perinstance data for pixel shader
+    nointerpolation uint MaterialIndex : MATERIAL_INDEX;
+    nointerpolation float3 AlbedoColor : ALBEDO_COLOR;
+    nointerpolation float3 EmissiveColor : EMISSIVE_COLOR;
+    nointerpolation float RoughnessConstant : ROUGHNESS_CONSTANT;
+    nointerpolation float MetallicConstant : METALLIC_CONSTANT;
+
+    nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
+    nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
+    nointerpolation bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
+    nointerpolation bool bToggleNormalTexture : TOGGLE_NORMAL_TEXTURE;
+    nointerpolation bool bToggleIrradianceTexture : TOGGLE_IRRADIANCE_TEXTURE;
+    nointerpolation bool bToggleEmissivetexture : TOGGLE_EMISSIVE_TEXTURE;
+
 };
 
 struct PS_OUTPUT
@@ -45,28 +80,12 @@ cbuffer PerFrameData : register(b0)
     int LightCount : packoffset(c65);
 }
 
-cbuffer PerObjectData : register(b1)
-{
-    float4x4 World;
-}
-
-cbuffer PerMeshData : register(b2)
-{
-    float3 AlbedoColor : packoffset(c0);
-    float3 EmissiveColor : packoffset(c1);
-    bool bToggleAlbedoTexture : packoffset(c2.x);
-    bool bToggleMetallicTexture : packoffset(c2.y);
-    bool bToggleRoughnessTexture : packoffset(c2.z);
-    bool bToggleNormalTexture : packoffset(c2.w);
-    bool bToggleIrradianceTexture : packoffset(c3.x);
-    bool bToggleEmissivetexture : packoffset(c3.y);
-    float RoughnessConstant : packoffset(c3.z);
-    float MetallicConstant  : packoffset(c3.w);
-}
-
 PS_INPUT vsMain(VS_INPUT input)
 {
     PS_INPUT output;
+
+    float4x4 World = float4x4(input.MatRow0, input.MatRow1, input.MatRow2 ,input.MatRow3);
+
     output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
     output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
@@ -76,20 +95,36 @@ PS_INPUT vsMain(VS_INPUT input)
     output.WorldTangent = mul(input.Tangent, (float3x3) World);
     output.WorldBiTangent = mul(input.BiTangent, (float3x3) World);
 
+
+    output.MaterialIndex = input.MaterialIndex;
+    output.AlbedoColor = input.AlbedoColor;
+    output.EmissiveColor = input.EmissiveColor;
+    output.bToggleAlbedoTexture = input.bToggleAlbedoTexture;
+    output.bToggleMetallicTexture = input.bToggleMetallicTexture;
+    output.bToggleRoughnessTexture = input.bToggleRoughnessTexture;
+    output.bToggleNormalTexture  = input.bToggleNormalTexture;
+    output.bToggleIrradianceTexture  = input.bToggleIrradianceTexture;
+    output.bToggleEmissivetexture  = input.bToggleEmissivetexture;
+    output.RoughnessConstant = input.RoughnessConstant;
+    output.MetallicConstant  = input.MetallicConstant;
+
     return output;
 }
 
 
 
-/*Always*/
 TextureCube IrradianceTexture : register(t0);
 
-/*PerObject*/
-Texture2D AlbedoTexture : register(t1);
-Texture2D MetallicTexture : register(t2);
-Texture2D RoughnessTexture : register(t3);
-Texture2D NormalTexture : register(t4);
-Texture2D EmissiveTexture : register(t5);
+
+#define MAX_PER_INSTANCE_TEXTURE_COUNT 10
+
+#define TEXTURE_TYPE_ALBEDO 0
+#define TEXTURE_TYPE_METALLIC 1
+#define TEXTURE_TYPE_ROUGHNESS 2
+#define TEXTURE_TYPE_NORMAL 3
+#define TEXTURE_TYPE_EMISSIVE 4
+
+Texture2D Textures[MAX_PER_INSTANCE_TEXTURE_COUNT][5] : register(t1);
 
 
 SamplerState DefaultSampler : register(s0);
@@ -138,14 +173,18 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 albedo = bToggleAlbedoTexture ? pow(AlbedoTexture.Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
-    float roughness = bToggleRoughnessTexture ? RoughnessTexture.Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
-    float metallic = bToggleMetallicTexture ? MetallicTexture.Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
-    float3 emissive = bToggleEmissivetexture ? EmissiveTexture.Sample(DefaultSampler, input.TexCoord).rgb : EmissiveColor;
+    float3 albedo = input.bToggleAlbedoTexture ? 
+    pow(Textures[input.MaterialIndex][TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : input.AlbedoColor.rgb;
+    float roughness = input.bToggleRoughnessTexture ? 
+    Textures[input.MaterialIndex][TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : input.RoughnessConstant;
+    float metallic = input.bToggleMetallicTexture ? 
+    Textures[input.MaterialIndex][TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : input.MetallicConstant;
+    float3 emissive = input.bToggleEmissivetexture ? 
+    Textures[input.MaterialIndex][TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
     
 
     /*�븻*/
-    float3 N = bToggleNormalTexture ? mul(normalize(NormalTexture.Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
+    float3 N = input.bToggleNormalTexture ? mul(normalize(Textures[input.MaterialIndex][TEXTURE_TYPE_NORMAL].Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
     float3x3(normalize(input.WorldTangent), normalize(input.WorldBiTangent), normalize(input.WorldNormal))) : input.WorldNormal;
     N = normalize(N);
 
@@ -197,7 +236,7 @@ PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
     // AMBIENT
     float3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0f), F0, roughness);
     float3 kD = 1.0f - kS;
-    float3 irradiance = bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb  : 1.0f;
+    float3 irradiance = input.bToggleIrradianceTexture ? IrradianceTexture.Sample(DefaultSampler, N).rgb  : 1.0f;
     float3 diffuse = irradiance * albedo;
     float3 ambient =  kD * diffuse;
 

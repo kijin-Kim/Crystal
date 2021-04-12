@@ -6,6 +6,7 @@
 #include <assimp/mesh.h>
 #include <assimp/Vertex.h>
 #include <assimp/postprocess.h>
+#include "Buffer.h"
 
 namespace Crystal {
 	DirectX::XMFLOAT4X4 ToDirectXMathMatrix4x4(const aiMatrix4x4& matrix)
@@ -111,11 +112,14 @@ namespace Crystal {
 		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
 		for (const auto& submesh : m_Submeshes)
 		{
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((StaticSubMesh*)(submesh.get()))->StaticVertices.data(),
-				(UINT)sizeof(StaticVertex),
-				(UINT)((StaticSubMesh*)(submesh.get()))->StaticVertices.size()));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(),
-				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
+			auto subMesh = (StaticSubMesh*)submesh.get();
+			m_VertexBuffers.push_back(std::make_unique<Buffer>(subMesh->StaticVertices.data(),
+				(UINT)sizeof(StaticVertex) * subMesh->StaticVertices.size(),
+				(UINT)subMesh->StaticVertices.size(), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>(submesh->Indices.data(),
+				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size(), false, false));
+
+			
 		}
 
 		CS_INFO("%s 메쉬 불러오기 완료", filePath.c_str());
@@ -213,11 +217,12 @@ namespace Crystal {
 
 		for (const auto& submesh : m_Submeshes)
 		{
-			m_VertexBuffers.push_back(std::make_unique<VertexBuffer>(((SkeletalSubMesh*)(submesh.get()))->SkeletalVertices.data(),
-				(UINT)sizeof(SkeletalVertex),
-				(UINT)((SkeletalSubMesh*)(submesh.get()))->SkeletalVertices.size()));
-			m_IndexBuffers.push_back(std::make_unique<IndexBuffer>(submesh->Indices.data(),
-				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size()));
+			auto subeMesh = (SkeletalSubMesh*)submesh.get();
+			m_VertexBuffers.push_back(std::make_unique<Buffer>(subeMesh->SkeletalVertices.data(),
+				(UINT)sizeof(SkeletalVertex) * subeMesh->SkeletalVertices.size(),
+				(UINT)subeMesh->SkeletalVertices.size(), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>(submesh->Indices.data(),
+				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size(), false, false));
 		}
 
 		CS_INFO("%s 스켈레탈 메쉬 불러오기 완료", meshFilePath.c_str());

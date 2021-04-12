@@ -40,6 +40,8 @@ namespace Crystal {
 		bool HasIntInput(const std::string& inputName) const { return m_IntInputs.count(inputName) != 0; }
 		bool HasBoolInput(const std::string& inputName) const { return m_BoolInputs.count(inputName) != 0; }
 
+		
+
 		std::shared_ptr<Texture> GetTextureInput(const std::string& textureName) const;
 		const DirectX::XMFLOAT4& GetFloatInput(const std::string& floatName) const;
 		const DirectX::XMINT4& GetIntInput(const std::string& intName) const;
