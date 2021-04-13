@@ -40,6 +40,8 @@ namespace Crystal {
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
 
+		std::shared_ptr<Component> GetComponent(const std::string& name);
+
 
 		void SetAttachment(const std::shared_ptr<TransformComponent>& from, 
 			const std::shared_ptr<TransformComponent>& to);
@@ -54,9 +56,9 @@ namespace Crystal {
 			/*TODO : Component만 받게 체크...*/
 			std::shared_ptr<T> newComponent = std::make_shared<T>();
 			AddComponent(newComponent);
+			newComponent->SetObjectName(name);
 			newComponent->OnCreate();
-			if (!name.empty())
-				newComponent->SetObjectName(name);
+			
 
 			return newComponent;
 		}

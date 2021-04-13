@@ -28,25 +28,16 @@ namespace Crystal {
 				SetDefaultName();
 
 			CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
-			s_ObjectCreationCountTracker[m_Name]++;
 		}
 
 
 		void SetDefaultName()
 		{
-			m_Name = StaticType() + "_";
-			m_Name += std::to_string(s_ObjectCreationCountTracker[m_Name]++);
+			m_Name = StaticType();
 		}
 
 		void SetObjectName(const std::string& name) 
 		{
-			auto it = s_ObjectNameTracker.find(name);
-			if (it != s_ObjectNameTracker.end())
-			{
-				return;
-			}
-
-			s_ObjectNameTracker.insert(name);
 			m_Name = name; 
 		}
 		void SetObjectOwner(std::weak_ptr<Object> object, int ownerType) { m_Owners[ownerType] = object; }
@@ -68,13 +59,6 @@ namespace Crystal {
 		std::string m_Name;
 		std::array<std::weak_ptr<Object>, MAX_OBJECT_OWNER_COUNT> m_Owners = {};
 
-
-		using ObjectCountTracker = std::unordered_map<std::string, int>;
-		using ObjectNameTracker = std::set<std::string>;
-
-		/*단순히 오브젝트가 Create된 횟수를 셉니다. (※ 주의 : 현재 살아있는 오브젝트의 수가 아님.)*/
-		static ObjectCountTracker  s_ObjectCreationCountTracker; 
-		static ObjectNameTracker s_ObjectNameTracker;
 
 	};
 	

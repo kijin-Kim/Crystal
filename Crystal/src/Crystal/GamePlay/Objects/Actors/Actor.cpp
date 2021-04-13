@@ -5,6 +5,7 @@
 #include "Crystal/GamePlay/World/World.h"
 #include "Crystal/Renderer/Renderer.h"
 
+
 namespace Crystal {
 
 	void Actor::OnCreate()
@@ -95,6 +96,32 @@ namespace Crystal {
 	void Actor::SetPosition(const DirectX::XMFLOAT3& position)
 	{
 		m_MainComponent->SetLocalPosition(position);
+	}
+
+	std::shared_ptr<Component> Actor::GetComponent(const std::string& name)
+	{
+		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(), 
+			[name](const std::shared_ptr<Component>& other)->bool 
+			{
+				return other->GetObjectName() == name;
+			});
+		if (componentIt != m_Components.end())
+		{
+			return *componentIt;
+		}
+
+		auto transformIt = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(), 
+			[name](const std::shared_ptr<TransformComponent>& other)->bool
+			{
+				return other->GetObjectName() == name;
+			});
+
+		if (transformIt != m_TransformHierarchy.end())
+		{
+			return *transformIt;
+		}
+
+		return nullptr;
 	}
 
 	void Actor::SetAttachment(const std::shared_ptr<TransformComponent>& from, const std::shared_ptr<TransformComponent>& to)

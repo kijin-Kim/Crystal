@@ -74,7 +74,7 @@ namespace Crystal {
 
 
 
-			bool CanBeInstancedTogether(MaterialBase* material) override
+			bool UsingSameTextures(MaterialBase* material) override
 			{
 				auto other = (Material*)material;
 

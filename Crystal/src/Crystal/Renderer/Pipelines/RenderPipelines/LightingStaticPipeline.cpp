@@ -99,7 +99,7 @@ namespace Crystal {
 
 				auto it = std::find_if(m_MaterialCache[staticMesh].begin(), m_MaterialCache[staticMesh].end(), [&mat](MaterialBase* other)
 					{
-						return mat->CanBeInstancedTogether(other);
+						return mat->UsingSameTextures(other);
 					});
 
 				bool bFindMaterial = it != m_MaterialCache[staticMesh].end();
@@ -108,13 +108,14 @@ namespace Crystal {
 					perInstanceData.MaterialIndex = it - m_MaterialCache[staticMesh].begin();
 					continue;
 				}
-				
+			
+
 				for (int j = 0; j < m_MaterialCache[staticMesh].size(); j++)
 				{
-					if(!m_MaterialCache[staticMesh][j])
+					if (m_MaterialCache[staticMesh][j])
 						continue;
 
-					perInstanceData.MaterialIndex = i;
+					perInstanceData.MaterialIndex = j;
 					m_MaterialCache[staticMesh][j] = matRow;
 					break;
 				}
@@ -125,11 +126,16 @@ namespace Crystal {
 				{
 					m_RenderableDescriptorHandleOffset[staticMesh] = 
 						device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-						* (2 + 50 * m_RenderableDescriptorHandleOffset.size() - 1);;
+						* (2 + 50 * m_RenderableDescriptorHandleOffset.size() - 1);
 				}
+
+
+
 
 				auto cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 				cpuHandle.ptr += m_RenderableDescriptorHandleOffset[staticMesh];
+				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+					*(5 * perInstanceData.MaterialIndex);
 
 				if (perInstanceData.bToggleAlbedoTexture)
 				{
@@ -166,22 +172,11 @@ namespace Crystal {
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	
-
-
-
-
 			}
 			m_PerInstanceData[staticMesh].push_back(perInstanceData);
-			m_MaterialCache.clear();
-
-
-
-
 		}
-
-
 		m_MaterialCache.clear();
+
 
 		for (const auto& pair : m_PerInstanceData)
 		{
@@ -200,7 +195,6 @@ namespace Crystal {
 		}
 
 		m_PerInstanceData.clear();
-
 	}
 
 	void LightingStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)

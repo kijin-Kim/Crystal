@@ -24,7 +24,7 @@ namespace Crystal {
 				Owner_Shader = 0
 			};
 			
-			virtual bool CanBeInstancedTogether(MaterialBase* material) { return false; }
+			virtual bool UsingSameTextures(MaterialBase* material) { return false; }
 
 			STATIC_TYPE_IMPLE(MaterialBase)
 		};

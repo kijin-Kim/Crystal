@@ -135,8 +135,21 @@ public:
 			{
 				for (int k = 0; k < 1; k++)
 				{
+					//test
+
 					Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
 					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
+					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponent("StaticMeshComponent"));
+					auto& materials = staticMeshComponent->GetMaterials();
+					auto pbrMat = (Crystal::LightingStaticPipeline::Material*)materials[0].get();
+					auto num = rand() % 3;
+					if (num == 0)
+						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
+					if (num == 1)
+						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
+					if (num == 2)
+						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
+
 				}
 				
 			}
