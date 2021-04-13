@@ -25,14 +25,6 @@ namespace Crystal {
 		struct PerFrameData
 		{
 			DirectX::XMFLOAT4X4 ViewProjection = Matrix4x4::Identity();
-
-			DirectX::XMFLOAT3 CameraPositionInWorld = Vector3::Zero;
-			float _pad1;
-
-			Light Lights[20];
-
-			uint32_t LightCount = 0;
-			float _pad2[3]; // just in case
 		};
 
 		struct PerObjectData
@@ -74,74 +66,7 @@ namespace Crystal {
 
 
 
-			bool UsingSameTextures(MaterialBase* material) override
-			{
-				auto other = (Material*)material;
-
-				if (!material)
-					return false;
-
-				bool result = true;
-				if (!AlbedoTexture.expired() && !other->AlbedoTexture.expired())
-				{
-					result &= AlbedoTexture.lock() == other->AlbedoTexture.lock();
-					if (!result)
-						return false;
-				}
-				else if((AlbedoTexture.expired() != other->AlbedoTexture.expired()))
-				{
-					return false;
-				}
-
-				if (!MetallicTexture.expired() && !other->MetallicTexture.expired())
-				{
-					result &= MetallicTexture.lock() == other->MetallicTexture.lock();
-					if (!result)
-						return false;
-				}
-				else if ((MetallicTexture.expired() != other->MetallicTexture.expired()))
-				{
-					return false;
-				}
-
-
-
-				if (!RoughnessTexture.expired() && !other->RoughnessTexture.expired())
-				{
-					result &= RoughnessTexture.lock() == other->RoughnessTexture.lock();
-					if (!result)
-						return false;
-				}
-				else if ((RoughnessTexture.expired() != other->RoughnessTexture.expired()))
-				{
-					return false;
-				}
-
-
-				if (!NormalTexture.expired() && !other->NormalTexture.expired())
-				{
-					result &= NormalTexture.lock() == other->NormalTexture.lock();
-					if (!result)
-						return false;
-				}
-				else if ((NormalTexture.expired() != other->NormalTexture.expired()))
-				{
-					return false;
-				}
-
-				if (!EmissiveTexture.expired() && !other->EmissiveTexture.expired())
-				{
-					result &= EmissiveTexture.lock() == other->EmissiveTexture.lock();
-					if (!result)
-						return false;
-				}
-				else if ((EmissiveTexture.expired() != other->EmissiveTexture.expired()))
-				{
-					return false;
-				}
-
-				return result;
-			}
+			bool UsingSameTextures(MaterialBase* material) override;
 
 			STATIC_TYPE_IMPLE(LightingStaticPipeline::Material)
 		};
@@ -168,19 +93,23 @@ namespace Crystal {
 			uint32_t bToggleEmissivetexture = false;
 		};
 
+		struct InstanceBatch
+		{
+			std::vector<PerInstanceData> PerInstanceDatas;
+			std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
+			std::array<MaterialBase*, 10> MaterialLookup;
+			UINT64 DescriptorOffset = -1;
+		};
+
 	public:
 		LightingStaticPipeline() = default;
 		~LightingStaticPipeline() override = default;
 
-		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
+		void Begin(const PipelineInputs* const pipelineInputs) override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+		void End() override;
 		STATIC_TYPE_IMPLE(LightingStaticPipeline)
 	private:
-		std::map <std::shared_ptr<Renderable>, std::vector<PerInstanceData>> m_PerInstanceData;
-		std::map<std::shared_ptr<Renderable>, std::unique_ptr<Buffer>> m_PerInstanceVertexBuffers; // should vary size
-		std::map<std::shared_ptr<Renderable>, std::array<MaterialBase*, 10>> m_MaterialCache;
-		std::map<std::shared_ptr<Renderable>, UINT64> m_RenderableDescriptorHandleOffset;
-		
-		
+		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
 	};
 }

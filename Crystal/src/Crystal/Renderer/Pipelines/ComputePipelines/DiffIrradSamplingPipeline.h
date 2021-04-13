@@ -19,7 +19,7 @@ namespace Crystal {
 		DiffIrradSamplingPipeline() = default;
 		~DiffIrradSamplingPipeline() override = default;
 
-		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
+		void Begin(const PipelineInputs* const pipelineInputs) override;
 
 
 		STATIC_TYPE_IMPLE(DiffIrradSamplingPipeline)

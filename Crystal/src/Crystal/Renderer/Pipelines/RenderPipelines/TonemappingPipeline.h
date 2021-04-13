@@ -16,7 +16,7 @@ namespace Crystal {
 		~TonemappingPipeline() override = default;
 
 		void OnCreate() override;
-		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
+		void Begin(const PipelineInputs* const pipelineInputs) override;
 
 		STATIC_TYPE_IMPLE(TonemappingPipeline)
 	};

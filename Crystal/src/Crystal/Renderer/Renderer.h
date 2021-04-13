@@ -65,8 +65,10 @@ namespace Crystal {
 		~Renderer() = default;
 
 		void CreateDevice();
-		void CreateRenderTargetViewFromSwapChain();
 		void CreateDepthStencilView();
+
+		void CreateRenderTargets();
+		void DestroyRenderTargets();
 
 		template <class T>
 		std::unique_ptr<T> CreatePipline(std::weak_ptr<Shader> shader, const std::string& name)
@@ -107,6 +109,14 @@ namespace Crystal {
 		std::weak_ptr<Texture> m_DepthStencilBufferTexture;
 		std::weak_ptr<Texture> m_BrightColorBuffer;
 		std::weak_ptr<Texture> m_FloatingPointBuffer;
+
+		//=== G-Buffers ==
+		std::weak_ptr<Texture> m_AlbedoBuffer;
+		std::weak_ptr<Texture> m_RoughnessMetallicAOBuffer;
+		std::weak_ptr<Texture> m_EmissiveBuffer;
+		std::weak_ptr<Texture> m_WorldNormalBuffer;
+		std::weak_ptr<Texture> m_IrradianceBuffer;
+		std::weak_ptr<Texture> m_WorldPositionBuffer;
 
 		// TODO 
 		std::shared_ptr<Texture> m_PanoTexture;

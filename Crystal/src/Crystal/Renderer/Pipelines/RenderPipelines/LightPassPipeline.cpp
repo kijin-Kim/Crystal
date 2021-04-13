@@ -1,18 +1,19 @@
 #include "cspch.h"
-#include "TonemappingPipeline.h"
+#include "LightPassPipeline.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
 
 
-
-	void TonemappingPipeline::OnCreate()
+	void LightPassPipeline::OnCreate()
 	{
-auto device = Renderer::Instance().GetDevice();
+		LightPipeline::OnCreate();
+
+		auto device = Renderer::Instance().GetDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 500;
+		descriptorHeapDesc.NumDescriptors = 20000;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -77,7 +78,7 @@ auto device = Renderer::Instance().GetDevice();
 		}
 
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-		depthStencilDesc.DepthEnable = false; // NO depth test just overwrite
+		depthStencilDesc.DepthEnable = false;
 		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		depthStencilDesc.StencilEnable = false;
@@ -96,8 +97,9 @@ auto device = Renderer::Instance().GetDevice();
 
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 1;
-		rtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvFormat.NumRenderTargets = 2;
+		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
@@ -107,28 +109,82 @@ auto device = Renderer::Instance().GetDevice();
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 	}
 
-	void TonemappingPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void LightPassPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::Begin(pipelineInputs);
+		LightPipeline::Begin(pipelineInputs);
 
 
-		auto device = Renderer::Instance().GetDevice();
+		PrepareConstantBuffers(sizeof(PerFrameData));
 
-		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		auto component = Cast<StaticMeshComponent>(m_Components[0]);
-		auto material = component->GetMaterialsOld();
+		auto& renderer = Renderer::Instance();
+		auto device = renderer.GetDevice();
+
+
+		PerFrameData perFrameData = {};
+
+		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		perFrameData.CameraPositionInWorld = renderer.GetCamera()->GetWorldPosition();
+
+
+		const int maxLightCount = 20;
+		int lightCount = 0;
+		for (const auto& weak : m_LocalLightComponents)
+		{
+			if (lightCount >= maxLightCount)
+				break;
+
+			auto localLightComponent = weak.lock();
+			if (!localLightComponent)
+				continue;
+
+			auto lightPosition = perFrameData.Lights[lightCount].WorldPosition = localLightComponent->GetWorldPosition();
+
+			perFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
+			perFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
+
+
+			lightCount++;
+		}
+
+		perFrameData.LightCount = lightCount;
+
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
+
+		auto destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(), 
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 
 		auto& resourceManager = ResourceManager::Instance();
 
-		auto floatingPointBuffer = resourceManager.GetTexture("FloatingPointBuffer").lock();
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("AlbedoBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, heapHandle,
-			floatingPointBuffer->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("RoughnessMetallicAOBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("EmissiveBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("WorldNormalBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("IrradianceBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("WorldPositionBuffer").lock()->GetShaderResourceView(),
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		
 
 	}
 
 }
-
-
 

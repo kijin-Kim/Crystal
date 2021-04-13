@@ -12,7 +12,7 @@ namespace Crystal {
 		PanoToCubemapPipeline() = default;
 		~PanoToCubemapPipeline() override {}
 
-		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
+		void Begin(const PipelineInputs* const pipelineInputs) override;
 		
 
 		STATIC_TYPE_IMPLE(PanoToCubemapPipeline)

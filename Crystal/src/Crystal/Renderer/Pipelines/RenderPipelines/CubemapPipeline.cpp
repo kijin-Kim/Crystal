@@ -7,9 +7,9 @@
 namespace Crystal {
 
 
-	void CubemapPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void CubemapPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(pipelineInputs);
+		RenderPipeline::Begin(pipelineInputs);
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
 

@@ -45,9 +45,9 @@ namespace Crystal {
 
 		void RegisterPipelineComponents(std::weak_ptr<PrimitiveComponent> component);
 	
-		virtual void PrepareRecord(const PipelineInputs* const pipelineInputs);
+		virtual void Begin(const PipelineInputs* const pipelineInputs);
 		virtual void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) {}
-		virtual void EndRecord() {}
+		virtual void End() {}
 
 		bool IsValidForThisPipeline(const std::shared_ptr<Material>& material);
 		bool IsValidForThisPipelineNew(const std::unique_ptr<MaterialBase>& material);
@@ -83,7 +83,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		void PrepareRecord(const PipelineInputs* const pipelineInputs) override;
+		void Begin(const PipelineInputs* const pipelineInputs) override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 
 		STATIC_TYPE_IMPLE(RenderPipeline)

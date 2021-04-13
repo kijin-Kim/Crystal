@@ -5,9 +5,9 @@
 
 namespace Crystal {
 
-	void AdditiveBlendingPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void AdditiveBlendingPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::PrepareRecord(pipelineInputs);
+		ComputePipeline::Begin(pipelineInputs);
 
 		auto input = *(AdditiveBlendingPipelineInputs*)pipelineInputs;
 

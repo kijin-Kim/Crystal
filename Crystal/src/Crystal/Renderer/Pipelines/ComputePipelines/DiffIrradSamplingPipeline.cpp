@@ -5,9 +5,9 @@
 
 namespace Crystal {
 
-	void DiffIrradSamplingPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void DiffIrradSamplingPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::PrepareRecord(pipelineInputs);
+		ComputePipeline::Begin(pipelineInputs);
 
 
 		auto device = Renderer::Instance().GetDevice();

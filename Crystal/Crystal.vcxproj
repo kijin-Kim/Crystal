@@ -227,6 +227,7 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\Pipelines.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPassPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
@@ -289,6 +290,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPassPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />

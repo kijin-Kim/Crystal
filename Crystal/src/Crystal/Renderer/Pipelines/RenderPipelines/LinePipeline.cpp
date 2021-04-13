@@ -5,9 +5,9 @@
 
 namespace Crystal {
 
-	void LinePipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void LinePipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::PrepareRecord(pipelineInputs);
+		RenderPipeline::Begin(pipelineInputs);
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 

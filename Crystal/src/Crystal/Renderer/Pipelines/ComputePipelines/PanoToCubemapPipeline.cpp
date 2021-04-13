@@ -6,9 +6,9 @@
 namespace Crystal {
 
 
-	void PanoToCubemapPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void PanoToCubemapPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::PrepareRecord(pipelineInputs);
+		ComputePipeline::Begin(pipelineInputs);
 
 
 		auto device = Renderer::Instance().GetDevice();

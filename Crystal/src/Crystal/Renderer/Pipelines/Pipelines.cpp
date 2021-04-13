@@ -12,7 +12,7 @@ namespace Crystal {
 		m_Components.push_back(component);
 	}
 
-	void Pipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void Pipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
 		/*CommandList를 녹화합니다*/
 		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
@@ -168,9 +168,13 @@ namespace Crystal {
 
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 2;
+		rtvFormat.NumRenderTargets = 6;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[2] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[3] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[4] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[5] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
@@ -180,9 +184,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 	}
 
-	void RenderPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void RenderPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		Pipeline::PrepareRecord(pipelineInputs);
+		Pipeline::Begin(pipelineInputs);
 	}
 
 	void RenderPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)

@@ -4,9 +4,9 @@
 
 namespace Crystal {
 
-	void LightingSkeletalPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void LightingSkeletalPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		LightPipeline::PrepareRecord(pipelineInputs);
+		LightPipeline::Begin(pipelineInputs);
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);

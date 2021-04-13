@@ -7,9 +7,9 @@ namespace Crystal {
 
 
 
-	void BlurPipeline::PrepareRecord(const PipelineInputs* const pipelineInputs)
+	void BlurPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		ComputePipeline::PrepareRecord(pipelineInputs);
+		ComputePipeline::Begin(pipelineInputs);
 
 		auto device = Renderer::Instance().GetDevice();
 		auto& resourceManager = ResourceManager::Instance();

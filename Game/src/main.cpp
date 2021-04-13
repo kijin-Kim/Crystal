@@ -112,6 +112,7 @@ public:
 		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
 		testPawn->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
+
 		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
 		sun = defaultLevel->SpawnActor<Sun>("Sun2");
@@ -133,7 +134,7 @@ public:
 		{
 			for (int j = 0; j < 10; j++)
 			{
-				for (int k = 0; k < 1; k++)
+				for (int k = 0; k < 10; k++)
 				{
 					//test
 
