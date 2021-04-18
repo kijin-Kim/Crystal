@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "Texture.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "DirectXTex/DirectXTex.h"
 
@@ -16,7 +18,7 @@ namespace Crystal {
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Flags = resourceFlags;
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&textureDesc, initialStates,
 			nullptr, IID_PPV_ARGS(&m_Resource));
@@ -26,9 +28,9 @@ namespace Crystal {
 	Texture::Texture(const std::string& fileName, D3D12_RESOURCE_FLAGS resourceFlags)
 	{
 		CS_INFO("%s 텍스쳐 불러오는 중...", fileName.c_str());
-		auto& renderer = Renderer::Instance();
-		auto device = renderer.GetDevice();
-		auto commandQueue = renderer.GetCommandQueue();
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
+		auto commandQueue = device.GetCommandQueue();
 
 		std::filesystem::path filePath(fileName.c_str());
 		CS_FATAL(std::filesystem::exists(filePath), "%s 파일이 존재하지 않습니다.", filePath.string().c_str());
@@ -69,7 +71,7 @@ namespace Crystal {
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
-		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+		hr = d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&textureDesc, D3D12_RESOURCE_STATE_COMMON,
 			nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
@@ -85,10 +87,10 @@ namespace Crystal {
 		}
 
 		UINT64 requiredSize = 0;
-		device->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
+		d3dDevice->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
-		hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+		hr = d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr, IID_PPV_ARGS(&textureUploadBuffer));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
@@ -125,7 +127,8 @@ namespace Crystal {
 			return;
 		}
 		/*셰이더 리소스 뷰를 생성합니다.*/
-		auto device = Renderer::Instance().GetDevice();
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 		shaderResourceViewDesc.Format = format;
@@ -146,8 +149,11 @@ namespace Crystal {
 			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
 		}
 
-		m_ShaderResourceView = Renderer::Instance().AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		device->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
+		
+		
+
+		m_ShaderResourceView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		d3dDevice->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
 	}
 
 	void Texture::CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension)
@@ -157,7 +163,8 @@ namespace Crystal {
 			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
 		}
-		auto device = Renderer::Instance().GetDevice();
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.ViewDimension = uavDimension;
@@ -176,8 +183,8 @@ namespace Crystal {
 			break;
 		}
 
-		m_UnorderedAccessView = Renderer::Instance().AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		device->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
+		m_UnorderedAccessView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		d3dDevice->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
 	}
 
 	void Texture::CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension)
@@ -187,7 +194,8 @@ namespace Crystal {
 			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
 		}
-		auto device = Renderer::Instance().GetDevice();
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 		rtvDesc.Format = format;
@@ -195,8 +203,8 @@ namespace Crystal {
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
 
-		m_RenderTargetView = Renderer::Instance().AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
-		device->CreateRenderTargetView(m_Resource.Get(), &rtvDesc, m_RenderTargetView.GetDescriptorHandle());
+		m_RenderTargetView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
+		d3dDevice->CreateRenderTargetView(m_Resource.Get(), &rtvDesc, m_RenderTargetView.GetDescriptorHandle());
 	}
 
 	void Texture::CreateDepthStencilView(DXGI_FORMAT format, D3D12_DSV_DIMENSION dsvDimension)
@@ -206,7 +214,9 @@ namespace Crystal {
 			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
 		}
-		auto device = Renderer::Instance().GetDevice();
+
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 		dsvDesc.Format = format;
@@ -214,7 +224,7 @@ namespace Crystal {
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 		dsvDesc.Texture2D.MipSlice = 0;
 
-		m_DepthStencilView = Renderer::Instance().AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-		device->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
+		m_DepthStencilView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+		d3dDevice->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
 	}
 }

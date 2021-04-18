@@ -6,7 +6,6 @@
 #include "Crystal/Core/WindowsWindow.h"
 #include "Crystal/Resources/ShaderManager.h"
 
-#include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/CubemapPipeline.h"
@@ -18,7 +17,6 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
-#include <array>
 
 
 namespace Crystal {
@@ -35,13 +33,10 @@ namespace Crystal {
 		void PrepareRender();
 		void Render();
 
-		ID3D12Device2* GetDevice() const { return m_Device.Get(); }
-		IDXGIFactory4* GetFactory() const { return m_Factory.Get(); }
+	
 		std::shared_ptr<CommandQueue> GetCommandQueue() const { return m_CommandQueue; }
 
-		/////////////////////////////////////////////////////////////////////////////////
-		//TEMP//////////////////////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////////////////////////////
+
 		void ChangeResolution(int width, int height);
 		void ChangeDisplayMode();
 
@@ -71,7 +66,7 @@ namespace Crystal {
 		void DestroyRenderTargets();
 
 		template <class T>
-		std::unique_ptr<T> CreatePipline(std::weak_ptr<Shader> shader, const std::string& name)
+		std::unique_ptr<T> CreatePipeline(std::weak_ptr<Shader> shader, const std::string& name)
 		{
 			/*Pipeline¿ª ∏∏µÏ¥œ¥Ÿ.*/
 			auto pipeline = std::make_unique<T>();
@@ -85,12 +80,8 @@ namespace Crystal {
 	private:
 
 		WindowsWindow* m_Window = nullptr;
-
-		Microsoft::WRL::ComPtr<ID3D12Device2> m_Device = nullptr;
-		Microsoft::WRL::ComPtr<IDXGIFactory4> m_Factory = nullptr;
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3d12CommandQueue = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence = nullptr;
 
 		HANDLE m_FenceEvent = nullptr;
 
@@ -112,7 +103,7 @@ namespace Crystal {
 
 		//=== G-Buffers ==
 		std::weak_ptr<Texture> m_AlbedoBuffer;
-		std::weak_ptr<Texture> m_RoughnessMetallicAOBuffer;
+		std::weak_ptr<Texture> m_RoughnessMetallicAoBuffer;
 		std::weak_ptr<Texture> m_EmissiveBuffer;
 		std::weak_ptr<Texture> m_WorldNormalBuffer;
 		std::weak_ptr<Texture> m_IrradianceBuffer;

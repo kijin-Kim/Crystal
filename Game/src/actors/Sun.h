@@ -1,10 +1,10 @@
 #pragma once
-#include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
+#include "Crystal/GamePlay/Objects/Actors/LightActor.h"
 
-class Sun : public Crystal::Actor
+class Sun : public Crystal::LocalLightActor
 {
 public:
 	Sun()
@@ -29,14 +29,14 @@ public:
 
 		m_MainComponent = staticMeshComponent;
 
-		auto localLightComponent = CreateComponent<Crystal::LocalLightComponent>("LocalLightComponent");
-		localLightComponent->SetLocalPosition(Crystal::Vector3::Zero);
-		localLightComponent->SetLightColor({ 1.0f, 1.0f, 0.4f });
-		localLightComponent->SetLightIntensity(3.0f);
+		
+		m_LightComponent->SetLocalPosition(Crystal::Vector3::Zero);
+		m_LightComponent->SetLightColor(Crystal::Vector3::White);
+		m_LightComponent->SetLightIntensity(3.0f);
 		
 
 	
-		SetAttachment(localLightComponent, m_MainComponent);
+		SetAttachment(m_LightComponent, m_MainComponent);
 	}
 	~Sun() override = default;
 

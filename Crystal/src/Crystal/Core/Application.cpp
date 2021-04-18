@@ -5,18 +5,19 @@
 #include "ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "imgui.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
 
 namespace Crystal {
-	Application::Application(HINSTANCE hInstance, int width, int height) :
-		m_Window(new WindowsWindow(hInstance, width, height))
+	Application::Application(int width, int height)
 	{
-		/////// Manual Call ////
-		auto& renderer = Renderer::Instance();
-		renderer.Init(m_Window);
+		m_Window = std::make_unique<WindowsWindow>(width, height);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
+
+
 
 		m_World = std::make_shared<World>();
 		m_World->OnCreate();
@@ -27,8 +28,6 @@ namespace Crystal {
 	void Application::Run()
 	{
 		Start();
-		auto& renderer = Renderer::Instance();
-		renderer.PrepareRender();
 		while (m_bShouldRun)
 		{
 			int msgCount = 0;
@@ -46,7 +45,6 @@ namespace Crystal {
 					break;
 			}
 			Update();
-			renderer.Render();
 		}
 	}
 
@@ -73,7 +71,7 @@ namespace Crystal {
 			}
 			if (wParam == VK_F11)
 			{
-				Renderer::Instance().ActiveFullScreenMode(!Renderer::Instance().GetIsFullScreenMode());
+				//Renderer::Instance().ActiveFullScreenMode(!Renderer::Instance().GetIsFullScreenMode());
 			}
 			return true;
 		}
@@ -81,7 +79,39 @@ namespace Crystal {
 		/*IMGUI가 처리하지 않는 일부 데이터만 Application이 처리합니다.*/
 		ImGuiIO& io = ImGui::GetIO();
 		if (!io.WantCaptureKeyboard && !io.WantCaptureMouse)
-			return ApplicationUtility::GetPlayerController().OnInputEvent(hWnd, uMsg, wParam, lParam);
+		{
+			auto currentLevel = m_World->GetCurrentLevel();
+			if(!currentLevel)
+			{
+				return false;
+			}
+
+			auto playerController = Cast<PlayerController>(currentLevel->GetActorByClass("PlayerController"));
+			
+			if (playerController)
+				return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
+		}
 		return false;
+	}
+
+	void Application::ChangeResolution(int width, int height) const
+	{
+		if(auto currentLevel = m_World->GetCurrentLevel())
+		{
+			auto renderSystem = Cast<RenderSystem>(currentLevel->GetActorByClass("RenderSystem"));
+			renderSystem->ChangeResolution(width, height);
+		}
+
+		m_Window->SetWidth(width);
+		m_Window->SetHeight(height);
+	}
+
+	void Application::ChangeDisplayMode() const
+	{
+		if (auto currentLevel = m_World->GetCurrentLevel())
+		{
+			auto renderSystem = Cast<RenderSystem>(currentLevel->GetActorByClass("RenderSystem"));
+			renderSystem->ChangeDisplayMode();
+		}
 	}
 }

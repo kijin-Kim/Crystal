@@ -26,7 +26,7 @@ namespace Crystal {
 			m_MovementComponent = CreateComponent<MovementComponent>("MovementComponent");
 			m_MovementComponent->SetTargetComponent(m_MainComponent);
 
-			ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
+			//ApplicationUtility::GetPlayerController().SetMainCamera(cameraComponent);
 		}
 		virtual ~CameraPawn() = default;
 

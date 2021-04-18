@@ -39,23 +39,13 @@ public:
 		material->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");
 		
 
-		
-
-
-
+	
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		meshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 		meshComponent->AddMaterialOld(pbrMaterial);
 		meshComponent->AddMaterial(std::move(material));
 
-		auto localLightComponent = CreateComponent<Crystal::LocalLightComponent>("LocalLightComponent");
-		localLightComponent->SetLocalPosition(Crystal::Vector3::Zero);
-		localLightComponent->SetLightColor({ 1.0f, 1.0f, 0.4f });
-		localLightComponent->SetLightIntensity(3.0f);
-
-		
-		
-		SetAttachment(localLightComponent, m_MainComponent);
+	
 		SetAttachment(meshComponent, m_MainComponent);
 
 

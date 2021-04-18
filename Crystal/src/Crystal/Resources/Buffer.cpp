@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "Buffer.h"
 
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "DirectXTex/d3dx12.h"
 
@@ -15,8 +16,7 @@ namespace Crystal {
 			m_Size = (sizeInByte + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
 		}
 
-		Renderer& renderer = Renderer::Instance();
-		auto device = renderer.GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 
 		D3D12_RESOURCE_DESC bufferResourceDesc = {};
@@ -58,7 +58,8 @@ namespace Crystal {
 					D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&intermediateBuffer));
 				CS_FATAL(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
-				auto commandQueue = Renderer::Instance().GetCommandQueue();
+				//auto commandQueue = Renderer::Instance().GetCommandQueue();
+				auto commandQueue = Device::Instance().GetCommandQueue();
 				auto cmdList = commandQueue->GetCommandList();
 
 				D3D12_SUBRESOURCE_DATA subResourceData = {};
@@ -105,16 +106,15 @@ namespace Crystal {
 			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
 		}
-		auto device = Renderer::Instance().GetDevice();
 
-		Renderer& renderer = Renderer::Instance();
-
+		auto& device = Device::Instance();
+	
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = m_Resource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = m_Size;
 
-		m_ConstantBufferView = renderer.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		device->CreateConstantBufferView(&cbvDesc, m_ConstantBufferView.GetDescriptorHandle());
+		m_ConstantBufferView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		device.GetD3DDevice()->CreateConstantBufferView(&cbvDesc, m_ConstantBufferView.GetDescriptorHandle());
 
 	}
 

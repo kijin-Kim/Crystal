@@ -33,8 +33,8 @@ cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
     float4 WorldCameraPosition : packoffset(c4);
-    Light Lights[20] : packoffset(c5);
-    int LightCount : packoffset(c65);
+    Light Lights[100] : packoffset(c5);
+    int LightCount : packoffset(c305);
 }
 
 
@@ -120,7 +120,7 @@ PS_OUTPUT psMain(PS_INPUT input)
 
     
     float3 Lo = 0.0f;
-    for (int i = 0; i < LightCount; i++)
+    [unroll(100)] for (int i = 0; i < LightCount; i++) 
     {  
         float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
 

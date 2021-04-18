@@ -6,6 +6,10 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
+
 namespace Crystal {
 	LRESULT CALLBACK WndProcProxy(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -48,7 +52,7 @@ namespace Crystal {
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	WindowsWindow::WindowsWindow(HINSTANCE hInstance, int width, int height) :
+	WindowsWindow::WindowsWindow(int width, int height) :
 		m_Width(width),
 		m_Height(height)
 	{
@@ -58,7 +62,7 @@ namespace Crystal {
 		wndClass.lpfnWndProc = WndProcProxy;
 		wndClass.cbClsExtra = 0;
 		wndClass.cbWndExtra = 0;
-		wndClass.hInstance = hInstance;
+		wndClass.hInstance = HINST_THISCOMPONENT;
 		wndClass.hIcon = nullptr;
 		wndClass.hCursor = nullptr;
 		wndClass.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
@@ -80,7 +84,7 @@ namespace Crystal {
 			L"Hello Application!",
 			windowStyle,
 			0, 0, width, height,
-			nullptr, nullptr, hInstance, this);
+			nullptr, nullptr, HINST_THISCOMPONENT, this);
 
 		CS_FATAL(m_Handle, "윈도우를 생성하는데 실패하였습니다");
 		ShowWindow(m_Handle, SW_SHOW);

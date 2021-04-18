@@ -196,7 +196,7 @@
     <ClInclude Include="external\assimp\include\assimp\vector3.h" />
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\LightActor.h" />
+    <ClInclude Include="src\Crystal\Core\Device.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
@@ -216,7 +216,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\TonemappingActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
-    <ClInclude Include="src\Crystal\GamePlay\World\PhysicsWorld.h" />
+    <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.h" />
@@ -229,6 +229,7 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPassPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\RenderSystem.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocator.h" />
@@ -246,7 +247,6 @@
     <ClInclude Include="src\Crystal\Core\Layer.h" />
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\Actor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CameraComponent.h" />
@@ -269,6 +269,7 @@
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Crystal\Core\Device.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
@@ -278,7 +279,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\Level.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\World\PhysicsWorld.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\World\PhysicsSystem.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\World.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.cpp" />
@@ -292,6 +293,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightPassPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\RenderSystem.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />

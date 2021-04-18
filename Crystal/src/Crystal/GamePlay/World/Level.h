@@ -1,9 +1,17 @@
 #pragma once
 #include "Crystal/GamePlay/Objects/Object.h"
-#include "PhysicsWorld.h"
+#include "PhysicsSystem.h"
+#include "Crystal/Renderer/RenderSystem.h"
+
+
+
 
 namespace Crystal {
+	class LightComponent;
 
+	class PlayerController;
+	class RenderSystem;
+	
 	class Level : public Updatable
 	{
 	public:
@@ -12,8 +20,10 @@ namespace Crystal {
 			Owner_World = 0
 		};
 	public:
-		Level();
+		Level() = default;
 		~Level() override = default;
+
+		void OnCreate() override;
 
 		void Update(const float deltaTime) override;
 
@@ -28,10 +38,24 @@ namespace Crystal {
 			const DirectX::XMFLOAT3& color = { 0.0f, 1.0f, 0.0f });
 
 		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> component);
+		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
+		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
+
+
+		std::shared_ptr<Actor> GetActorByName(const std::string& name);
+		std::shared_ptr<Actor> GetActorByClass(const std::string& classType);
+		std::vector<std::shared_ptr<Actor>> GetAllActorByClass(const std::string& classType);
+
 		STATIC_TYPE_IMPLE(Level)
+
+		
 	private:
-		std::unique_ptr<PhysicsWorld> m_PhysicsWorld = nullptr;
+		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
+		std::unique_ptr<RenderSystem> m_RenderSystem = nullptr;
+		
+		
 		std::vector<std::shared_ptr<Actor>> m_Actors;
+		
 	};
 
 	template<class T>

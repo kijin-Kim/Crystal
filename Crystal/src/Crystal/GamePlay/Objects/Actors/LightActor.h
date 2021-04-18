@@ -18,13 +18,37 @@ namespace Crystal {
 		std::shared_ptr<LightComponent> m_LightComponent = nullptr;
 	};
 
+
+	class LocalLightActor : public LightActor
+	{
+	public:
+		LocalLightActor()
+		{
+			m_LightComponent = CreateComponent<LocalLightComponent>("LocalLightComponent");
+			m_LightComponent->SetLocalPosition(Vector3::Zero);
+			m_LightComponent->SetLocalPosition(Vector3::White);
+
+			m_MainComponent = m_LightComponent;
+
+		}
+		~LocalLightActor() override = default;
+
+
+		STATIC_TYPE_IMPLE(LocalLightActor)
+	};
+
+	
+
 	class DirectionalLightActor : public LightActor
 	{
 	public:
 		DirectionalLightActor()
 		{
-			m_LightComponent = CreateComponent<Crystal::DirectionalLightComponent>("DirectionalLightComponent");
-			m_LightComponent->SetLocalPosition({ 0.0f, 0.0f, 0.0f });
+			m_LightComponent = CreateComponent<DirectionalLightComponent>("DirectionalLightComponent");
+			m_LightComponent->SetLocalPosition(Vector3::Zero);
+			m_LightComponent->SetLocalPosition(Vector3::White);
+
+			m_MainComponent = m_LightComponent;
 			
 		}
 		~DirectionalLightActor() override = default;

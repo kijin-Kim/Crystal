@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "LinePipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -11,11 +13,12 @@ namespace Crystal {
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 
-		auto& renderer = Renderer::Instance();
-		auto device = renderer.GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
+
+		auto inputs = (RenderPipelineInputs*)pipelineInputs;
 
 		PerFrameData perFrameData = {};
-		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		perFrameData.ViewProjection = Matrix4x4::Transpose(inputs->Camera->GetViewProjection());
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

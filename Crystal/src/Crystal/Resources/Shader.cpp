@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "Shader.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
@@ -139,7 +141,7 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_D3d12RootSignature));
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");

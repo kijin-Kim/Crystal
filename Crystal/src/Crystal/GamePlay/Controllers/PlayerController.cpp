@@ -7,6 +7,7 @@ namespace Crystal {
 		/*유저 인터페이스용 인풋 컴포넌트를 설정합니다.*/
 		m_UserInterfaceInputComponent = std::make_unique<InputComponent>();
 
+
 		m_MainComponent = CreateComponent<TransformComponent>("DefaultMainComponent");
 	}
 
@@ -22,12 +23,25 @@ namespace Crystal {
 		CS_FATAL(result.second, "ActionMapping에 실패하였습니다.");
 	}
 
-	void PlayerController::Possess(Pawn* pawn)
+	void PlayerController::Possess(std::shared_ptr<Pawn> pawn)
 	{
 		Controller::Possess(pawn);
+		const auto camera = Cast<CameraComponent>(pawn->GetComponentByClass("CameraComponent"));
+		if (!camera)
+		{
+			CS_WARN("Possess하는 Pawn에 카메라가 존재하지 않습니다");
+			return;
+		}
+		
+		SetMainCamera(camera);
+		pawn->SetObjectOwner(weak_from_this(), Actor::ActorOwnerType::Owner_Controller);
+
+			
 		m_GameInputComponent = std::make_unique<InputComponent>();
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
+		m_GameInputComponent->SetObjectOwner(pawn, Component::ComponentOwnerType::Owner_Actor);
+		m_UserInterfaceInputComponent->SetObjectOwner(pawn, Component::ComponentOwnerType::Owner_Actor);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
 	}
 

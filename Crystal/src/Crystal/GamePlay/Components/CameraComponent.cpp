@@ -8,9 +8,9 @@
 namespace Crystal {
 	CameraComponent::CameraComponent()
 	{
-		Renderer& renderer = Renderer::Instance();
-		int resolutionWidth = renderer.GetResolutionWidth();
-		int resolutionHeight = renderer.GetResolutionHeight();
+		
+		int resolutionWidth = 1920.0f;
+		int resolutionHeight = 1080.0f;
 		m_ScissorRect = { 0, 0, resolutionWidth, resolutionHeight };
 		m_Viewport = { 0.0f, 0.0f, static_cast<float>(resolutionWidth), static_cast<float>(resolutionHeight), 0.0f, 1.0f };
 	}

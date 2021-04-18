@@ -15,11 +15,11 @@ namespace Crystal {
 		enum ActorOwnerType
 		{
 			Owner_Level = 0,
-			Owner_Spawner = 1
+			Owner_Controller
 		};
 
 	public:
-		Actor() = default;
+		Actor();
 		~Actor() override = default;
 
 		void OnCreate() override;
@@ -40,7 +40,8 @@ namespace Crystal {
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
 
-		std::shared_ptr<Component> GetComponent(const std::string& name);
+		std::weak_ptr<Component> GetComponentByName(const std::string& name);
+		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
 
 
 		void SetAttachment(const std::shared_ptr<TransformComponent>& from, 

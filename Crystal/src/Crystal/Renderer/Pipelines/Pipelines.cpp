@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "Pipelines.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
@@ -80,7 +82,7 @@ namespace Crystal {
 	{
 		Pipeline::OnCreate();
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -193,7 +195,7 @@ namespace Crystal {
 	{
 		Pipeline::Record(commandList);
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
 		auto rootSignature = shader->GetRootSignature();
 
@@ -250,7 +252,7 @@ namespace Crystal {
 
 	void ComputePipeline::OnCreate()
 	{
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -270,7 +272,7 @@ namespace Crystal {
 		hr = device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "PipelineState를 생성하는데 실패하였습니다.");
 	}
-
+	
 	void ComputePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);

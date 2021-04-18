@@ -5,11 +5,11 @@
 
 namespace Crystal {
 
-	class PhysicsWorld : public Updatable
+	class PhysicsSystem : public Updatable
 	{
 	public:
-		PhysicsWorld() = default;
-		~PhysicsWorld() override = default;
+		PhysicsSystem() = default;
+		~PhysicsSystem() override = default;
 
 		void Update(const float deltaTime) override;
 

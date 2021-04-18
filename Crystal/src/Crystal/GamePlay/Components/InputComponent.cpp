@@ -70,7 +70,17 @@ namespace Crystal {
 
 	bool InputComponent::processAxisMappedInput(int64_t keyCode, float axisValue)
 	{
-		auto axisMap = ApplicationUtility::GetPlayerController().GetAxisMap();
+		auto ownerActor = Cast<Actor>(GetObjectOwner(Component::ComponentOwnerType::Owner_Actor));
+		if (!ownerActor)
+			return false;
+
+		auto playerController = Cast<PlayerController>(ownerActor->GetObjectOwner(Actor::ActorOwnerType::Owner_Controller));
+		if (!playerController)
+			return false;
+
+		auto axisMap = playerController->GetAxisMap();
+		
+
 		bool bHandledOnAxis = false;
 
 		/*Process Axis*/
@@ -93,7 +103,16 @@ namespace Crystal {
 
 	bool InputComponent::processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
 	{
-		auto actionMap = ApplicationUtility::GetPlayerController().GetActionMap();
+		auto ownerActor = Cast<Actor>(GetObjectOwner(Component::ComponentOwnerType::Owner_Actor));
+		if (!ownerActor)
+			return false;
+
+		auto playerController = Cast<PlayerController>(ownerActor->GetObjectOwner(Actor::ActorOwnerType::Owner_Controller));
+		if (!playerController)
+			return false;
+
+
+		auto actionMap = playerController->GetActionMap();
 
 		bool bHandledOnAction = false;
 

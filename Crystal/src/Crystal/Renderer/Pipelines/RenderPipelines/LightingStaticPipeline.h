@@ -32,21 +32,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 World;
 		};
 
-		struct PerDrawData
-		{
-			DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
-			float _pad1;
-			DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
-			float _pad2;
-			uint32_t bToggleAlbedoTexture = false;
-			uint32_t bToggleMetallicTexture = false;
-			uint32_t bToggleRoughnessTexture = false;
-			uint32_t bToggleNormalTexture = false;
-			uint32_t bToggleIrradianceTexture = false;
-			uint32_t bToggleEmissiveTexture = false;
-			float RoughnessConstant = 0.0f;
-			float MetallicConstant = 0.0f;
-		};
 
 		struct Material : public Pipeline::MaterialBase
 		{

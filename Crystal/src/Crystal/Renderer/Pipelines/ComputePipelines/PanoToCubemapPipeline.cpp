@@ -1,7 +1,8 @@
 #include "cspch.h"
 #include "PanoToCubemapPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
-#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -11,7 +12,7 @@ namespace Crystal {
 		ComputePipeline::Begin(pipelineInputs);
 
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		/*Compute Pipeline Resource를 복사합니다.*/
 

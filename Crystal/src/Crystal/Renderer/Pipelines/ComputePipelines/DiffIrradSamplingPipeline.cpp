@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "DiffIrradSamplingPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -10,7 +12,7 @@ namespace Crystal {
 		ComputePipeline::Begin(pipelineInputs);
 
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		for (const auto& componentWeak : m_Components)
 		{

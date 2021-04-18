@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "AdditveBlendingPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -11,7 +13,7 @@ namespace Crystal {
 
 		auto input = *(AdditiveBlendingPipelineInputs*)pipelineInputs;
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 		auto& resourceManager = ResourceManager::Instance();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

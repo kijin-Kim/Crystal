@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "LightPassPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
@@ -9,7 +11,7 @@ namespace Crystal {
 	{
 		LightPipeline::OnCreate();
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -116,18 +118,19 @@ namespace Crystal {
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
+		auto input = (RenderPipelineInputs*)pipelineInputs;
+		
 
-		auto& renderer = Renderer::Instance();
-		auto device = renderer.GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		perFrameData.CameraPositionInWorld = renderer.GetCamera()->GetWorldPosition();
+		perFrameData.ViewProjection = Matrix4x4::Transpose(input->Camera->GetViewProjection());
+		perFrameData.CameraPositionInWorld = input->Camera->GetWorldPosition();
 
 
-		const int maxLightCount = 20;
+		const int maxLightCount = 100;
 		int lightCount = 0;
 		for (const auto& weak : m_LocalLightComponents)
 		{

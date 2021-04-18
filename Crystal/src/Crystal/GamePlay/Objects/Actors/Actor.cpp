@@ -8,6 +8,11 @@
 
 namespace Crystal {
 
+	Actor::Actor()
+	{
+		m_MainComponent = CreateComponent<TransformComponent>("DefaultMain");
+	}
+
 	void Actor::OnCreate()
 	{
 		Updatable::OnCreate();
@@ -98,7 +103,7 @@ namespace Crystal {
 		m_MainComponent->SetLocalPosition(position);
 	}
 
-	std::shared_ptr<Component> Actor::GetComponent(const std::string& name)
+	std::weak_ptr<Component> Actor::GetComponentByName(const std::string& name)
 	{
 		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(), 
 			[name](const std::shared_ptr<Component>& other)->bool 
@@ -121,7 +126,32 @@ namespace Crystal {
 			return *transformIt;
 		}
 
-		return nullptr;
+		return {};
+	}
+
+	std::weak_ptr<Component> Actor::GetComponentByClass(const std::string& classType)
+	{
+		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),
+			[classType](const std::shared_ptr<Component>& other)->bool
+			{
+				return other->StaticType() == classType;
+			});
+		if (componentIt != m_Components.end())
+		{
+			return *componentIt;
+		}
+
+		auto transformIt = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
+			[classType](const std::shared_ptr<TransformComponent>& other)->bool
+			{
+				return other->StaticType() == classType;
+			});
+		if (transformIt != m_TransformHierarchy.end())
+		{
+			return *transformIt;
+		}
+
+		return {};
 	}
 
 	void Actor::SetAttachment(const std::shared_ptr<TransformComponent>& from, const std::shared_ptr<TransformComponent>& to)

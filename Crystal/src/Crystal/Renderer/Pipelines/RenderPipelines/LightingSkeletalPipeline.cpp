@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "LightingSkeletalPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
@@ -13,18 +15,17 @@ namespace Crystal {
 
 		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
 
-		auto& renderer = Renderer::Instance();
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
-		auto camPos = renderer.GetCamera()->GetWorldPosition();
+		perFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
+		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
 		perFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		perFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		perFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		auto destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 

@@ -17,37 +17,40 @@ namespace Crystal {
 	class Application
 	{
 	public:
-		Application(HINSTANCE hInstance, int width, int height);
+		Application(int width, int height);
 		virtual ~Application() = default;
 
 		virtual void Start()
 		{
 			// Default Resources
-			auto& resourceManager = Crystal::ResourceManager::Instance();
-			resourceManager.CreateRenderable<Crystal::Line>("LineMesh");
-			resourceManager.CreateRenderable<Crystal::LineBox>("LineBoxMesh");
-			resourceManager.CreateRenderable<Crystal::LineSphere>("LineSphereMesh");
-			resourceManager.CreateRenderable<Crystal::PlaneQuad>("PlaneQuadMesh");
-			resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("assets/models/Sphere.fbx", "Sphere");
+			/*auto& resourceManager = ResourceManager::Instance();
+			resourceManager.CreateRenderable<Line>("LineMesh");
+			resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
+			resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
+			resourceManager.CreateRenderable<PlaneQuad>("PlaneQuadMesh");
+			resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");*/
 		}
 
 		void Run();
 
 		virtual void Update() {}
 
-		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	
-	private:
-		bool m_bShouldRun = true;
-		WindowsWindow* m_Window;
+		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+
+		void ChangeResolution(int width, int height) const;
+		void ChangeDisplayMode() const;
+	
 	protected:
+		bool m_bShouldRun = true;
+		std::unique_ptr<WindowsWindow> m_Window;
 		std::shared_ptr<World> m_World;
 	};
 
-	Application* CreateApplication(HINSTANCE hInstance);
+	Application* CreateApplication();
 }
 
-#define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication(HINSTANCE hInstance)\
+#define Register_Application(x, width, height) Crystal::Application* Crystal::CreateApplication()\
 {\
-	return new x(hInstance, width, height);\
+	return new x(width, height);\
 }

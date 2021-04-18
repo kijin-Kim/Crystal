@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "DescriptorAllocatorPage.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
@@ -7,7 +9,7 @@ namespace Crystal {
 		: m_DescriptorHeapType(type),
 		m_DescriptorCountInHeap(descriptorCount)
 	{
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 		heapDesc.Type = m_DescriptorHeapType;

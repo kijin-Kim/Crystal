@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "CommandQueue.h"
 #include "Renderer.h"
+#include "Crystal/Core/Device.h"
 
 namespace Crystal {
 	CommandQueue::CommandQueue(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type) :
@@ -35,7 +36,7 @@ namespace Crystal {
 		}
 		else
 		{
-			auto device = Renderer::Instance().GetDevice();
+			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&d3d12CommandAllcator));
 			CS_FATAL(SUCCEEDED(hr), "CommandAllocator를 생성하는데 실패하였습니다.");
 		}
@@ -48,7 +49,7 @@ namespace Crystal {
 		}
 		else
 		{
-			auto device = Renderer::Instance().GetDevice();
+			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandList(0, m_d3d12CommandListType, d3d12CommandAllcator.Get(), nullptr, IID_PPV_ARGS(&d3d12CommandList));
 			CS_FATAL(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
 		}

@@ -1,11 +1,11 @@
 #include "cspch.h"
-#include "PhysicsWorld.h"
+#include "PhysicsSystem.h"
 
 namespace Crystal {
 
 
 
-	void PhysicsWorld::Update(const float deltaTime)
+	void PhysicsSystem::Update(const float deltaTime)
 	{
 		Updatable::Update(deltaTime);
 
@@ -106,7 +106,7 @@ namespace Crystal {
 	}
 
 
-	void PhysicsWorld::ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent, 
+	void PhysicsSystem::ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent, 
 		const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 
@@ -114,7 +114,7 @@ namespace Crystal {
 		ResolvePenetration(lhsComponent, rhsComponent, penetration);
 	}
 
-	void PhysicsWorld::ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	void PhysicsSystem::ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
 			rhsComponent->GetWorldPosition()));
@@ -147,7 +147,7 @@ namespace Crystal {
 
 	}
 
-	void PhysicsWorld::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
 			rhsComponent->GetWorldPosition()));
@@ -167,7 +167,7 @@ namespace Crystal {
 		rhsComponent->SetLocalPosition(Vector3::Add(rhsComponent->GetLocalPosition(), rhsDist));
 	}
 
-	void PhysicsWorld::RegisterPhysicsWorldComponent(std::weak_ptr<Component> compWeak)
+	void PhysicsSystem::RegisterPhysicsWorldComponent(std::weak_ptr<Component> compWeak)
 	{
 		auto component = compWeak.lock();
 		if (!component)

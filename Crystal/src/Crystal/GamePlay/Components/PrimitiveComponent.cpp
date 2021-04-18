@@ -3,6 +3,8 @@
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 
+#include "Crystal/GamePlay/World/Level.h"
+
 namespace Crystal {
 	void PrimitiveComponent::OnCreate()
 	{
@@ -13,8 +15,20 @@ namespace Crystal {
 	{
 		TransformComponent::RegisterComponent();
 
-		Renderer::Instance().RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
 
+		auto ownerActor = GetObjectOwner(Owner_Actor).lock();
+		if (!ownerActor)
+		{
+			return;
+		}
+
+		auto level = Cast<Level>(ownerActor->GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
+		if (!level)
+		{
+			return;
+		}
+
+		level->RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
 	}
 
 

@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "LightingStaticPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -80,17 +82,16 @@ namespace Crystal {
 		LightPipeline::Begin(pipelineInputs);
 
 
-		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
+		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 
-		auto& renderer = Renderer::Instance();
-		auto device = renderer.GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		LightingPipelineInputs* lightPipelineInputs = (LightingPipelineInputs*)pipelineInputs;
 
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(renderer.GetCamera()->GetViewProjection());
+		perFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
 
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
@@ -248,7 +249,7 @@ namespace Crystal {
 
 		Pipeline::Record(commandList);
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
 		auto rootSignature = shader->GetRootSignature();
 

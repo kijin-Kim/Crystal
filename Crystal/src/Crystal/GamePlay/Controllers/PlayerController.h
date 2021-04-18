@@ -46,7 +46,7 @@ namespace Crystal {
 		void AddActionMapping(const std::string& actionName, const ActionMapping& key);
 
 		/*게임컨트롤러가 특정 폰의 입력을 받게합니다*/
-		void Possess(Pawn* pawn) override;
+		void Possess(std::shared_ptr<Pawn> pawn) override;
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		void ProcessPitchInput(float value);

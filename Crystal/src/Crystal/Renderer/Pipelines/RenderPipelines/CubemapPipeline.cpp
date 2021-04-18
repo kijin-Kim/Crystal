@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "CubemapPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/Resources/ResourceManager.h"
@@ -18,13 +20,16 @@ namespace Crystal {
 
 		PerFrameData perFrameData = {};
 
-		auto& renderer = Renderer::Instance();
-		auto viewProj = renderer.GetCamera()->GetViewProjection();
+
+
+		
+
+		auto viewProj = cubemapPipelineInputs->Camera->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		perFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
-		auto device = renderer.GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		auto descHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		for (const auto& weak : m_Components)

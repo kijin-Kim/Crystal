@@ -12,6 +12,7 @@
 #include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
 #include "actors/Sun.h"
 #include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
+#include "Crystal/Renderer/RenderSystem.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -19,7 +20,7 @@
 class GameApplication : public Crystal::Application
 {
 public:
-	GameApplication(HINSTANCE hIsntance, int width, int height) : Crystal::Application(hIsntance, width, height)
+	GameApplication(int width, int height) : Crystal::Application(width, height)
 	{
 	}
 
@@ -106,29 +107,28 @@ public:
 		//=====================================================================
 
 
-		auto defaultLevel = m_World->GetLevelByName("DefaultLevel");
+		m_World->SetCurrentLevelByName("DefaultLevel");
+
+		
+
+		
 
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		TestPawn* testPawn = defaultLevel->SpawnActor<TestPawn>("TestPawn");
+		TestPawn* testPawn = m_World->SpawnActor<TestPawn>("TestPawn");
 		testPawn->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
 
-		Sun* sun = defaultLevel->SpawnActor<Sun>("Sun");
+		Sun* sun = m_World->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
-		sun = defaultLevel->SpawnActor<Sun>("Sun2");
+		sun = m_World->SpawnActor<Sun>("Sun2");
 		sun->SetPosition({ 0.0f, -200000.0f, -200000.0f });
 
-		/*sun = defaultLevel->SpawnActor<Sun>("Sun");
-		sun->SetPosition({ -10000.0f, 0.0f, 0.0f });
-
-		sun = defaultLevel->SpawnActor<Sun>("Sun");
-		sun->SetPosition({ +10000.0f, 0.0f, 0.0f });*/
 
 
-		Crystal::SkyboxActor* skyboxActor = defaultLevel->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
-		Crystal::TonemappingActor* tonemappingActor = defaultLevel->SpawnActor<Crystal::TonemappingActor>("TonemappingActor");
+		m_World->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
+		m_World->SpawnActor<Crystal::TonemappingActor>("TonemappingActor");
 
-		/*Kraken* kraken = defaultLevel->SpawnActor<Kraken>("Kraken");*/
+		/*Kraken* kraken = m_World->SpawnActor<Kraken>("Kraken");*/
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -138,9 +138,9 @@ public:
 				{
 					//test
 
-					Asteroid* asteroid = defaultLevel->SpawnActor<Asteroid>();
+					Asteroid* asteroid = m_World->SpawnActor<Asteroid>();
 					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
-					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponent("StaticMeshComponent"));
+					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = (Crystal::LightingStaticPipeline::Material*)materials[0].get();
 					auto num = rand() % 3;
@@ -156,29 +156,37 @@ public:
 			}
 		}
 
-
+		
 		/*Crystal::CameraPawn* cameraPawn = defaultLevel->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/
-		auto& playerController = Crystal::ApplicationUtility::GetPlayerController();
-		playerController.Possess(testPawn);
-		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
-		playerController.AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
-		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
-		playerController.AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
-		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
-		playerController.AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
-		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
-		playerController.AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
-		playerController.AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
-		playerController.AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
-		playerController.EnableModeSwitching(true);
+		const auto playerController = m_World->SpawnActor<Crystal::PlayerController>("PlayerController");
+		auto currentLevel = m_World->GetCurrentLevel();
+		if(currentLevel)
+		{
+			auto pawn = currentLevel->GetActorByClass("TestPawn");
+			if(pawn)
+				playerController->Possess(Crystal::Cast<Crystal::Pawn>(pawn));
+		}
+			
+		
+		playerController->AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
+		playerController->AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
+		playerController->AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
+		playerController->AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
+		playerController->AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
+		playerController->AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
+		playerController->AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
+		playerController->AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
+		playerController->AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
+		playerController->AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
+		playerController->EnableModeSwitching(true);
 
 		Crystal::ActionMapping fireActionMapping = {};
 		fireActionMapping.CrystalCode = Crystal::Mouse::Button::Left;
 		fireActionMapping.bAltDown = false;
 		fireActionMapping.bCtrlDown = false;
 		fireActionMapping.bShiftDown = false;
-		playerController.AddActionMapping("Fire", fireActionMapping);
+		playerController->AddActionMapping("Fire", fireActionMapping);
 	}
 
 	void Update() override

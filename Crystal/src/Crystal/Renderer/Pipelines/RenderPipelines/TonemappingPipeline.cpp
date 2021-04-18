@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "TonemappingPipeline.h"
+
+#include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
@@ -8,7 +10,7 @@ namespace Crystal {
 
 	void TonemappingPipeline::OnCreate()
 	{
-auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -112,7 +114,7 @@ auto device = Renderer::Instance().GetDevice();
 		RenderPipeline::Begin(pipelineInputs);
 
 
-		auto device = Renderer::Instance().GetDevice();
+		auto device = Device::Instance().GetD3DDevice();
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 

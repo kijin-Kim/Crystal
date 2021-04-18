@@ -9,7 +9,7 @@ namespace Crystal {
 	{
 	public:
 
-		WindowsWindow(HINSTANCE hInstance, int width, int height);
+		WindowsWindow(int width, int height);
 		~WindowsWindow();
 
 		int GetDisplayResolutionWidth() const { return GetSystemMetrics(SM_CXSCREEN); }

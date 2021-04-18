@@ -67,7 +67,6 @@ public:
 		m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 		m_MovementComponent->SetTargetComponent(m_MainComponent);
 		
-		Crystal::ApplicationUtility::GetPlayerController().SetMainCamera(m_CameraComponent);
 	}
 
 	~TestPawn() override = default;
@@ -153,6 +152,8 @@ public:
 		if (level)
 			level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
 	}
+
+	STATIC_TYPE_IMPLE(TestPawn)
 
 private:
 	std::shared_ptr<Crystal::MovementComponent> m_MovementComponent = nullptr;

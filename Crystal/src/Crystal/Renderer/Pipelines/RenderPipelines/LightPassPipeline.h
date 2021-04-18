@@ -26,7 +26,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 CameraPositionInWorld = Vector3::Zero;
 			float _pad1;
 
-			Light Lights[20];
+			Light Lights[100];
 
 			uint32_t LightCount = 0;
 			float _pad2[3]; // just in case

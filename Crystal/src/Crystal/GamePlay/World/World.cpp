@@ -1,6 +1,7 @@
 #include "cspch.h"
 #include "World.h"
 #include "Level.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 namespace Crystal {
 
@@ -25,7 +26,7 @@ namespace Crystal {
 
 	Level* World::GetLevelByName(const std::string& name)
 	{
-		auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [name](const std::shared_ptr<Level>& level)->bool
+		auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [&name](const std::shared_ptr<Level>& level)->bool
 			{
 				return level->GetObjectName() == name;
 			}
@@ -40,12 +41,41 @@ namespace Crystal {
 		return (*it).get();
 	}
 
+
+
+	Level* World::GetLevelByIndex(int index)
+	{
+		if (index >= m_Levels.size() || !m_Levels[index])
+			return nullptr;
+
+		return m_Levels[index].get();
+	}
+
+	Level* World::GetCurrentLevel()
+	{
+		return m_CurrentLevel;
+	}
+
+	void World::SetCurrentLevelByName(const std::string& name)
+	{
+		m_CurrentLevel = GetLevelByName(name);
+	}
+
+	void World::SetCurrentLevelByIndex(int index)
+	{
+		m_CurrentLevel = GetLevelByIndex(index);
+	}
+
+
+
 	void World::Update(const float deltaTime)
 	{
 		Updatable::Update(deltaTime);
 
-		for (const auto& level : m_Levels)
-			level->Update(deltaTime);
+		if (m_CurrentLevel)
+		{
+			m_CurrentLevel->Update(deltaTime);
+		}
 	}
 
 }
