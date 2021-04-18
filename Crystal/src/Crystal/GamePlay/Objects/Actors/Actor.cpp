@@ -3,7 +3,6 @@
 
 #include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/World/World.h"
-#include "Crystal/Renderer/Renderer.h"
 
 
 namespace Crystal {

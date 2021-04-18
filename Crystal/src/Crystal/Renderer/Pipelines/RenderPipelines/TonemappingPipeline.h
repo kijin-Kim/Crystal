@@ -2,6 +2,7 @@
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 
 namespace Crystal {
+	class StaticMeshComponent;
 
 	class TonemappingPipeline final : public RenderPipeline
 	{

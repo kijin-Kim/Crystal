@@ -1,7 +1,5 @@
 #include "cspch.h"
 #include "PrimitiveComponent.h"
-#include "Crystal/Renderer/Renderer.h"
-#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 
 #include "Crystal/GamePlay/World/Level.h"
 

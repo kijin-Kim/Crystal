@@ -21,6 +21,9 @@ namespace Crystal {
 
 		void Begin() override;
 
+		void LoadEngineContents();
+		void SpawnDefaultActors();
+		
 
 		
 		void Update(const float deltaTime) override;
@@ -38,6 +41,8 @@ namespace Crystal {
 		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
 		void RegisterPrimitiveComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 
+
+		
 		
 
 		template <class T>

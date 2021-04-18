@@ -2,7 +2,7 @@
 #include "Buffer.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Renderer/CommandQueue.h"
 #include "DirectXTex/d3dx12.h"
 
 namespace Crystal {

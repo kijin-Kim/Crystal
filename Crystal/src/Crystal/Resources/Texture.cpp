@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Renderer/CommandQueue.h"
 #include "DirectXTex/DirectXTex.h"
 
 namespace Crystal {

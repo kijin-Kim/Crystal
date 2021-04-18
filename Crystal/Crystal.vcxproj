@@ -261,7 +261,6 @@
     <ClInclude Include="src\Crystal\Renderer\CommandQueue.h" />
     <ClInclude Include="src\Crystal\Resources\Material.h" />
     <ClInclude Include="src\Crystal\Resources\Meshes.h" />
-    <ClInclude Include="src\Crystal\Renderer\Renderer.h" />
     <ClInclude Include="src\Crystal\Resources\Shader.h" />
     <ClInclude Include="src\Crystal\Resources\ShaderManager.h" />
     <ClInclude Include="src\Crystal\Resources\TextureManager.h" />
@@ -311,7 +310,6 @@
     <ClCompile Include="src\Crystal\Renderer\CommandQueue.cpp" />
     <ClCompile Include="src\Crystal\Resources\Material.cpp" />
     <ClCompile Include="src\Crystal\Resources\Meshes.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Crystal\Resources\Shader.cpp" />
     <ClCompile Include="src\Crystal\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\cspch.cpp">

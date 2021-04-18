@@ -2,8 +2,8 @@
 #include "LinePipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
-#include "Crystal/Resources/ResourceManager.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/Resources/DescriptorAllocator.h"
 
 namespace Crystal {
 
@@ -11,7 +11,7 @@ namespace Crystal {
 	{
 		RenderPipeline::Begin(pipelineInputs);
 
-		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
+		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -28,33 +28,100 @@ namespace Crystal {
 
 		for (int i = 0; i < m_Components.size(); i++)
 		{
-			auto component = m_Components[i].lock();
+			auto component = Cast<CollisionComponent>(m_Components[i]);
 			if(!component)
 				continue;
 
-			auto materials = component->GetMaterialsOld();
+			PerInstanceData perInstanceData = {};
+			perInstanceData.World = component->GetPostScaledTransform();
+
+
+
+			auto& materials = component->GetMaterials();
 			for (const auto& mat : materials)
 			{
-				if(!IsValidForThisPipeline(mat))
+				if (!IsValidForThisPipelineNew(mat.get()))
 					continue;
 
-				auto collisionComponent = Cast<CollisionComponent>(component);
-
-				DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Identity();
-
-				PerObjectData perObjectData = {};
-
-				perObjectData.World = Matrix4x4::Transpose(collisionComponent->GetPostScaledTransform());
-				perObjectData.Color = collisionComponent->GetLineColor();
-				m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData, 0, sizeof(perObjectData));
-
-				device->CopyDescriptorsSimple(1, cpuHandle, m_PerObjectConstantBuffers[i]->GetConstantBufferView(),
-					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				auto material = (LinePipeline::Material*)mat.get();
+				perInstanceData.Color = material->Color;
+				
 			}
 
+			auto renderable = component->GetRenderable().lock();
+			if(!renderable)
+			{
+				continue;
+			}
+			
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
 			
 		}
 
+
+		for (auto& pair : m_InstanceBatches)
+		{
+			auto& instanceBatches = pair.second;
+
+			if (!instanceBatches.PerInstanceVertexBuffer)
+			{
+				instanceBatches.PerInstanceVertexBuffer = std::make_unique<Buffer>(nullptr, sizeof(PerInstanceData) *
+					instanceBatches.PerInstanceDatas.size(), instanceBatches.PerInstanceDatas.size(), false, true);
+			}
+
+			instanceBatches.PerInstanceVertexBuffer->SetData((void*)instanceBatches.PerInstanceDatas.data(),
+				0, sizeof(PerInstanceData) * instanceBatches.PerInstanceDatas.size());
+
+		}
+
+	}
+
+	void LinePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	{
+
+		Pipeline::Record(commandList);
+
+		auto device = Device::Instance().GetD3DDevice();
+		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto rootSignature = shader->GetRootSignature();
+
+
+		commandList->SetPipelineState(m_PipelineState.Get());
+		commandList->SetGraphicsRootSignature(rootSignature.GetData());
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+		int rootParameterIndex = 0;
+
+		if (rootSignature.HasPerFrameParameter())
+		{
+			commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
+			descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+				* rootSignature.GetPerFrameDescriptorCount();
+		}
+
+
+		for (const auto& pair : m_InstanceBatches)
+		{
+			auto& renderable = pair.first;
+			auto& instanceBatch = pair.second;
+			auto& perInstanceVertexBuffer = instanceBatch.PerInstanceVertexBuffer;
+
+			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
+
+			//여기서부터 Texture2D Array Per Instance
+			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
+			{
+				renderable->Render(commandList, j, perInstanceVertexBuffer->GetSize() / sizeof(PerInstanceData));
+			}
+
+		}
+	}
+
+	void LinePipeline::End()
+	{
+		m_InstanceBatches.clear();
 	}
 }

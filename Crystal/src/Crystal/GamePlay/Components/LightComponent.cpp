@@ -2,7 +2,6 @@
 #include "LightComponent.h"
 
 #include "Crystal/GamePlay/World/Level.h"
-#include "Crystal/Renderer/Renderer.h"
 
 namespace Crystal {
 

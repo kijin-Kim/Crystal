@@ -140,8 +140,17 @@ namespace Crystal {
 
 
 		{
-			simpleColorShader->SetInputLayout({
+			/*simpleColorShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+				});*/
+			simpleColorShader->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+
+				{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 64, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
 				});
 
 			RootParameter perFrame = { 1, 0, 0 };
@@ -252,21 +261,15 @@ namespace Crystal {
 		
 	}
 
+
+
 	void RenderSystem::Begin()
 	{
 		Actor::Begin();
 
 
-		auto& resourceManager = ResourceManager::Instance();
-		resourceManager.CreateRenderable<Line>("LineMesh");
-		resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
-		resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
-		resourceManager.CreateRenderable<PlaneQuad>("PlaneQuadMesh");
-		resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");
-
-		auto level = Cast<Level>(GetObjectOwner(Owner_Level));
-		level->SpawnActor<SkyboxActor>("SkyboxActor");
-		level->SpawnActor<TonemappingActor>("TonemappingActor");
+		LoadEngineContents();
+		SpawnDefaultActors();
 
 		
 		/// COMPUTE
@@ -293,7 +296,7 @@ namespace Crystal {
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		/*resourceBarrier.Transition.pResource = m_IrradiancemapTexture->GetResource();
+		resourceBarrier.Transition.pResource = m_IrradiancemapTexture->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -309,13 +312,30 @@ namespace Crystal {
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		commandList->ResourceBarrier(1, &resourceBarrier);*/
+		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		commandQueue->Execute(commandList);
 		CS_INFO("HDRI로부터 Cubemap 생성중...");
 		commandQueue->Flush();
 		CS_INFO("HDRI로부터 Cubemap 생성 완료");
 		
+	}
+
+	void RenderSystem::LoadEngineContents()
+	{
+		auto& resourceManager = ResourceManager::Instance();
+		resourceManager.CreateRenderable<Line>("LineMesh");
+		resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
+		resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
+		resourceManager.CreateRenderable<PlaneQuad>("PlaneQuadMesh");
+		resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");
+	}
+
+	void RenderSystem::SpawnDefaultActors()
+	{
+		auto level = Cast<Level>(GetObjectOwner(Owner_Level));
+		level->SpawnActor<SkyboxActor>("SkyboxActor");
+		level->SpawnActor<TonemappingActor>("TonemappingActor");
 	}
 
 
@@ -436,8 +456,8 @@ namespace Crystal {
 		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
 		wireframePipelineInputs.Camera = mainCamera.get();
 
-		//m_Pipelines[0]->Begin(&wireframePipelineInputs);
-		//m_Pipelines[0]->Record(commandList);
+		m_Pipelines[0]->Begin(&wireframePipelineInputs);
+		m_Pipelines[0]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -528,6 +548,7 @@ namespace Crystal {
 
 
 		m_LightPipelines[0]->End();
+		m_Pipelines[0]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -953,5 +974,6 @@ namespace Crystal {
 			}
 		}
 	}
+
 
 }

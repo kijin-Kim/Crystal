@@ -1,8 +1,10 @@
 #include "cspch.h"
 #include "LightingSkeletalPipeline.h"
 
+#include "LightingStaticPipeline.h"
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Resources/Meshes.h"
+#include "Crystal/Resources/DescriptorAllocator.h"
 
 namespace Crystal {
 

@@ -2,9 +2,8 @@
 #include "CubemapPipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/Buffer.h"
-#include "Crystal/Resources/ResourceManager.h"
+#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 
 namespace Crystal {
 

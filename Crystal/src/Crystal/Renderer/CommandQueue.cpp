@@ -1,6 +1,5 @@
 #include "cspch.h"
 #include "CommandQueue.h"
-#include "Renderer.h"
 #include "Crystal/Core/Device.h"
 
 namespace Crystal {

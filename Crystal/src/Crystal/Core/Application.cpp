@@ -1,6 +1,5 @@
 #include "cspch.h"
 #include "Application.h"
-#include "Crystal/Renderer/Renderer.h"
 #include "DirectXTex/DirectXTex.h"
 #include "ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"

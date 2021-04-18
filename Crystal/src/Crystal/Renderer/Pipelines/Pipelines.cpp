@@ -2,7 +2,6 @@
 #include "Pipelines.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/Resources/Material.h"
@@ -31,7 +30,7 @@ namespace Crystal {
 		return thisPipelineShader == inputMaterialShader;
 	}
 
-	bool Pipeline::IsValidForThisPipelineNew(const std::unique_ptr<MaterialBase>& material)
+	bool Pipeline::IsValidForThisPipelineNew(MaterialBase* material)
 	{
 		if (!material)
 			return false;

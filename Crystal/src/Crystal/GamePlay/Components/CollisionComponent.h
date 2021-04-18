@@ -5,6 +5,7 @@
 #include "PrimitiveComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "CollisionShapes.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/LinePipeline.h"
 
 namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
@@ -19,7 +20,16 @@ namespace Crystal {
 				Crystal::Material::MaterialOwnerType::Owner_Shader);
 			simpleColorMaterial->Set("Color", Vector3::Yellow);
 
+
+			auto material = std::make_unique<LinePipeline::Material>();
+			material->SetObjectOwner(resourceManager.GetShader("SimpleColorShader"),
+			                         Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
+			material->Color = Vector3::Yellow;
+			
+
 			AddMaterialOld(std::move(simpleColorMaterial));
+
+			AddMaterial(std::move(material));
 
 		}
 		~CollisionComponent() override
@@ -28,12 +38,12 @@ namespace Crystal {
 
 		void SetLineColor(const DirectX::XMFLOAT3& color) 
 		{
-			m_MaterialsOld[0]->Set("Color", color); 
+			//m_MaterialsOld[0]->Set("Color", color); 
 		}
 		const DirectX::XMFLOAT3& GetLineColor() const 
 		{ 
-			auto color = m_MaterialsOld[0]->GetFloatInput("Color"); 
-			return { color.x, color.y, color.z };
+			/*auto color = m_MaterialsOld[0]->GetFloatInput("Color"); 
+			return { color.x, color.y, color.z };*/
 		}
 
 		void RegisterComponent() override;

@@ -50,7 +50,7 @@ namespace Crystal {
 		virtual void End() {}
 
 		bool IsValidForThisPipeline(const std::shared_ptr<Material>& material);
-		bool IsValidForThisPipelineNew(const std::unique_ptr<MaterialBase>& material);
+		bool IsValidForThisPipelineNew(MaterialBase* material);
 
 		void PrepareConstantBuffers(int perFrameBufferSize = 0, int perObjectBufferSize = 0, int perDrawBufferSize = 0, int perDrawBufferCount = 0);
 

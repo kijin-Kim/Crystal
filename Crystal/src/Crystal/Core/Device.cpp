@@ -1,7 +1,7 @@
 ﻿#include "cspch.h"
 #include "Device.h"
 #include "Crystal/Renderer/CommandQueue.h"
-#include "Crystal/Resources/DescriptorAllocator.h"
+#include "Crystal/Resources/DescriptorAllocation.h"
 
 namespace Crystal {
 

@@ -2,7 +2,8 @@
 #include "TonemappingPipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -107,6 +108,8 @@ namespace Crystal {
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+
+		
 	}
 
 	void TonemappingPipeline::Begin(const PipelineInputs* const pipelineInputs)
@@ -118,8 +121,9 @@ namespace Crystal {
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
+
+		
 		auto component = Cast<StaticMeshComponent>(m_Components[0]);
-		auto material = component->GetMaterialsOld();
 
 		auto& resourceManager = ResourceManager::Instance();
 

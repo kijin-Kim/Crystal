@@ -1,8 +1,9 @@
 #include "cspch.h"
 #include "DescriptorAllocatorPage.h"
 
+#include "DescriptorAllocation.h"
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/Renderer/CommandQueue.h"
 
 namespace Crystal {
 	DescriptorAllocatorPage::DescriptorAllocatorPage(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount)

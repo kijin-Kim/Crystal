@@ -2,8 +2,8 @@
 #include "AdditveBlendingPipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
 #include "Crystal/Resources/ResourceManager.h"
+#include "Crystal/Resources/DescriptorAllocator.h"
 
 namespace Crystal {
 

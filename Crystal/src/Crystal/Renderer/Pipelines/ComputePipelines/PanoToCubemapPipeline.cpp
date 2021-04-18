@@ -2,7 +2,7 @@
 #include "PanoToCubemapPipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/Renderer/Renderer.h"
+#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 
 namespace Crystal {
 

@@ -125,16 +125,14 @@ public:
 
 
 
-		m_World->SpawnActor<Crystal::SkyboxActor>("SkyboxActor");
-		m_World->SpawnActor<Crystal::TonemappingActor>("TonemappingActor");
 
 		/*Kraken* kraken = m_World->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 1; i++)
 		{
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 1; j++)
 			{
-				for (int k = 0; k < 10; k++)
+				for (int k = 0; k < 1; k++)
 				{
 					//test
 
