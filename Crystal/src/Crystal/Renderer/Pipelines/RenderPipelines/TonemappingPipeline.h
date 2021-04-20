@@ -18,8 +18,12 @@ namespace Crystal {
 
 		void OnCreate() override;
 		void Begin(const PipelineInputs* const pipelineInputs) override;
+		
 
 		STATIC_TYPE_IMPLE(TonemappingPipeline)
+
+	private:
+		std::shared_ptr<StaticMeshComponent> m_StaticMeshComponent = nullptr;
 	};
 
 

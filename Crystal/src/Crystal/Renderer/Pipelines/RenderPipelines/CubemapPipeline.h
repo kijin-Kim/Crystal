@@ -15,6 +15,8 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 InverseViewProjection;
 		};
 
+		
+
 	public:
 		CubemapPipeline() = default;
 		~CubemapPipeline() override = default;

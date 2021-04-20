@@ -97,6 +97,7 @@ namespace Crystal {
 
 
 
+		
 		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView(); // Per Frame
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -284,6 +285,11 @@ namespace Crystal {
 
 
 			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
+
+			if(!renderable)
+			{
+				continue;
+			}
 			
 			//여기서부터 Texture2D Array Per Instance
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)

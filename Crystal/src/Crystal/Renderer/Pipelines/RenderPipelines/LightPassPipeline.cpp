@@ -2,6 +2,7 @@
 #include "LightPassPipeline.h"
 
 #include "Crystal/Core/Device.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
@@ -109,6 +110,15 @@ namespace Crystal {
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+
+
+		auto& resourceManager = ResourceManager::Instance();
+		
+		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("PlaneQuadMesh"));
+
+		m_Components.push_back(m_StaticMeshComponent);
+		
 	}
 
 	void LightPassPipeline::Begin(const PipelineInputs* const pipelineInputs)

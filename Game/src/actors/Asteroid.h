@@ -32,16 +32,16 @@ public:
 		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
 		material->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
 			Crystal::Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
-		material->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
+		/*material->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
 		material->MetallicTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
 		material->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
 		material->NormalTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
-		material->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");
+		material->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");*/
 		
 
 	
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
-		meshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
+//		meshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 		meshComponent->AddMaterialOld(pbrMaterial);
 		meshComponent->AddMaterial(std::move(material));
 

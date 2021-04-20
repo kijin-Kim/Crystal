@@ -18,11 +18,10 @@ public:
 		pbrMaterial->Set("EmissiveColor", DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f));
 
 		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
-		material->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
-		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Sphere"));
+//		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Sphere"));
 		staticMeshComponent->AddMaterialOld(pbrMaterial);
 		staticMeshComponent->AddMaterial(std::move(material));
 		staticMeshComponent->SetScale(600.0f);

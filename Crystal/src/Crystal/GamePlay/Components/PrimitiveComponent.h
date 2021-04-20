@@ -33,6 +33,7 @@ namespace Crystal {
 
 		void AddMaterial(std::unique_ptr<Pipeline::MaterialBase> material);
 		const std::vector<std::unique_ptr<Pipeline::MaterialBase>>& GetMaterials() const;
+		const Pipeline::MaterialBase* GetMaterial(uint32_t index) const;
 
 		void SetRenderable(std::weak_ptr<Renderable> renderable) { m_Renderable = renderable; }
 		const std::weak_ptr<Renderable>& GetRenderable() const { return m_Renderable; }

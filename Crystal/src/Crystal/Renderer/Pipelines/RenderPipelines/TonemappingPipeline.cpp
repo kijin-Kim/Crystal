@@ -109,6 +109,14 @@ namespace Crystal {
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
+
+		auto& resourceManager = ResourceManager::Instance();
+		
+		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("PlaneQuadMesh"));
+		
+		m_Components.push_back(m_StaticMeshComponent);
+		
 		
 	}
 
@@ -120,10 +128,6 @@ namespace Crystal {
 		auto device = Device::Instance().GetD3DDevice();
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-
-		
-		auto component = Cast<StaticMeshComponent>(m_Components[0]);
 
 		auto& resourceManager = ResourceManager::Instance();
 

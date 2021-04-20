@@ -116,38 +116,51 @@ public:
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 		TestPawn* testPawn = m_World->SpawnActor<TestPawn>("TestPawn");
 		testPawn->SetPosition({ 0.0f, 0.0f, -2000.0f });
-
-
+		
+		auto testPawnMesh = Crystal::Cast<Crystal::StaticMeshComponent>(testPawn->GetComponentByClass("StaticMeshComponent"));
+		testPawnMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		auto testPawnMat = (Crystal::LightingStaticPipeline::Material*)testPawnMesh->GetMaterial(0);
+		testPawnMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		testPawnMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		testPawnMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		testPawnMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+		
+		
+		
 		Sun* sun = m_World->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
-		sun = m_World->SpawnActor<Sun>("Sun2");
-		sun->SetPosition({ 0.0f, -200000.0f, -200000.0f });
+		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
+		sunMesh->SetRenderable(resourceManager.GetRenderable("Sphere"));
+		auto sunMat = (Crystal::LightingStaticPipeline::Material*)sunMesh->GetMaterial(0);
+		sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
+
+
 
 
 
 
 		/*Kraken* kraken = m_World->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 5; j++)
 			{
-				for (int k = 0; k < 1; k++)
+				for (int k = 0; k < 5; k++)
 				{
 					//test
 
 					Asteroid* asteroid = m_World->SpawnActor<Asteroid>();
 					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
+					staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = (Crystal::LightingStaticPipeline::Material*)materials[0].get();
-					auto num = rand() % 3;
-					if (num == 0)
-						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
-					if (num == 1)
-						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
-					if (num == 2)
-						pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
+					pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
+					pbrMat->MetallicTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
+					pbrMat->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
+					pbrMat->NormalTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
+					pbrMat->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");
+					
 
 				}
 				

@@ -1,5 +1,6 @@
 #pragma once
 #include "LightPipeline.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
 
@@ -38,8 +39,11 @@ namespace Crystal {
 		~LightPassPipeline() override = default;
 
 
-		void OnCreate() override;;
+		void OnCreate() override;
 		void Begin(const PipelineInputs* const pipelineInputs) override;
+	
+	private:
+		std::shared_ptr<StaticMeshComponent> m_StaticMeshComponent;
 	};
 
 

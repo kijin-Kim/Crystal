@@ -61,7 +61,7 @@ namespace Crystal {
 		m_IrradiancemapTexture = resourceManager.GetTexture("Cube_Skybox_Space_Irradiance").lock();
 		//============================================================================================
 
-		auto pbrStaticShader = resourceManager.CreateShaderFromFile("assets/shaders/GeometryBuffers.hlsl", "PBRShader_Static").lock();
+		auto pbrStaticShader = resourceManager.CreateShaderFromFile("assets/shaders/GeometryPass_Static.hlsl", "PBRShader_Static").lock();
 		auto pbrSkeletalShader = resourceManager.CreateShaderFromFile("assets/shaders/PBRShader_Skeletal.hlsl", "PBRShader_Skeletal").lock();
 		auto skyboxShader = resourceManager.CreateShaderFromFile("assets/shaders/SkyboxShader.hlsl", "Skybox").lock();
 		auto panoToCubemapShader = resourceManager.CreateShaderFromFile("assets/shaders/EquirectangularToCube.hlsl", "PanoToCubemap").lock();
@@ -244,6 +244,9 @@ namespace Crystal {
 			lightingPassShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
+		LoadEngineContents();
+		
+
 
 
 		m_LightPipelines.push_back(CreatePipeline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
@@ -268,7 +271,6 @@ namespace Crystal {
 		Actor::Begin();
 
 
-		LoadEngineContents();
 		SpawnDefaultActors();
 
 		
@@ -335,7 +337,7 @@ namespace Crystal {
 	{
 		auto level = Cast<Level>(GetObjectOwner(Owner_Level));
 		level->SpawnActor<SkyboxActor>("SkyboxActor");
-		level->SpawnActor<TonemappingActor>("TonemappingActor");
+		//level->SpawnActor<TonemappingActor>("TonemappingActor");
 	}
 
 

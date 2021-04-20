@@ -41,4 +41,10 @@ namespace Crystal {
 		return m_Materials;
 	}
 
+	const Pipeline::MaterialBase* PrimitiveComponent::GetMaterial(uint32_t index) const
+	{
+		return m_Materials[index].get();
+	}
+
+
 }

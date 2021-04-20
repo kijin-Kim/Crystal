@@ -232,9 +232,15 @@ namespace Crystal {
 
 			auto renderable = meshComponent->GetRenderable().lock();
 			auto materials = meshComponent->GetMaterialsOld();
+
+			if(!renderable)
+			{
+				continue;
+			}
+			
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 			{
-				if (materials[j])
+				if (j < materials.size() && materials[j])
 				{
 					if (rootSignature.GetPerExecuteDescriptorCount())
 					{
