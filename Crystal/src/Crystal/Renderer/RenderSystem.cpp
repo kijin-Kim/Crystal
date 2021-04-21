@@ -21,6 +21,7 @@
 #include "Pipelines/RenderPipelines/LightPassPipeline.h"
 #include "Pipelines/RenderPipelines/LinePipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
+#include "Pipelines/RenderPipelines/UnlitPipeline.h"
 
 namespace Crystal {
 
@@ -72,6 +73,7 @@ namespace Crystal {
 		auto additiveBlendingHdrShader = resourceManager.CreateShaderFromFile("assets/shaders/AdditiveBlending.hlsl", "AdditiveBelndingHDR").lock();
 		auto toneMappingShader = resourceManager.CreateShaderFromFile("assets/shaders/Tonemapping.hlsl", "Tonemapping").lock();
 		auto lightingPassShader = resourceManager.CreateShaderFromFile("assets/shaders/LightingPass.hlsl", "LightingPass").lock();
+		auto unlitShader = resourceManager.CreateShaderFromFile("assets/shaders/UnlitShader.hlsl", "UnlitPass").lock();
 
 		{
 			/*		pbrStaticShader->SetInputLayout({
@@ -244,6 +246,26 @@ namespace Crystal {
 			lightingPassShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
+		{
+			unlitShader->SetInputLayout({
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+
+				{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+				{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 64, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
+				});
+
+			RootParameter perFrame = { 1, 0, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perExecute = {};
+
+			unlitShader->SetRootSignature({ perFrame, perObject, perExecute });
+			unlitShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);			
+		}
+
 		LoadEngineContents();
 		
 
@@ -252,6 +274,7 @@ namespace Crystal {
 		m_LightPipelines.push_back(CreatePipeline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<LightPassPipeline>(lightingPassShader, "LightPassPipeline"));
+		
 
 		m_Pipelines.push_back(CreatePipeline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
 		m_Pipelines.push_back(CreatePipeline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
@@ -260,7 +283,7 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<BlurPipeline>(gaussianBlurShader, "GaussianBlurPipeline"));
 		m_Pipelines.push_back(CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
-
+		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
 
 
 		
@@ -331,7 +354,9 @@ namespace Crystal {
 		resourceManager.CreateRenderable<Line>("LineMesh");
 		resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
 		resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
-		resourceManager.CreateRenderable<PlaneQuad>("PlaneQuadMesh");
+		resourceManager.CreateRenderable<PlaneQuad2D>("2DPlaneQuadMesh");
+		resourceManager.CreateRenderable<PlaneQuad3D>("3DPlaneQuadMesh");
+		resourceManager.CreateRenderable<PlaneQuad3DTextured>("3DPlaneQuadMeshTextured");
 		resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");
 	}
 
@@ -465,6 +490,9 @@ namespace Crystal {
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		m_Pipelines[7]->Begin(&wireframePipelineInputs);
+		m_Pipelines[7]->Record(commandList);
+
 
 		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
 		cubemapPipelineInputs.Camera = mainCamera.get();
@@ -553,6 +581,7 @@ namespace Crystal {
 
 		m_LightPipelines[0]->End();
 		m_Pipelines[0]->End();
+		m_Pipelines[7]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -948,7 +977,8 @@ namespace Crystal {
 		{
 			switch (mat->ShadingModel)
 			{
-			case EShadingModel::ShadingModel_Undefined: 
+			case EShadingModel::ShadingModel_Undefined:
+				m_Pipelines[7]->RegisterPipelineComponents(componentWeak);
 				break;
 			case EShadingModel::ShadingModel_Unlit:
 				m_Pipelines[0]->RegisterPipelineComponents(componentWeak);

@@ -174,10 +174,10 @@ namespace Crystal {
 		~LineSphere() override = default;
 	};
 
-	class PlaneQuad : public StaticMesh
+	class PlaneQuad2D : public StaticMesh
 	{
 	public:
-		PlaneQuad()
+		PlaneQuad2D()
 		{
 			float quadVertices[] = {
 			-1.0f, -1.0f,
@@ -196,6 +196,58 @@ namespace Crystal {
 			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
 				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
 		}
-		~PlaneQuad() override = default;
+		~PlaneQuad2D() override = default;
 	};
+
+
+	class PlaneQuad3D : public StaticMesh
+	{
+	public:
+		PlaneQuad3D()
+		{
+			float quadVertices[] = {
+			-1.0f, -1.0f, +0.0f,
+			-1.0f, +1.0f, +0.0f,
+			+1.0f, +1.0f, +0.0f,
+			+1.0f, -1.0f, +0.0f,
+			};
+
+			uint32_t quadIndices[] = {
+				1, 2, 3,
+				1, 3, 0
+			};
+
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)quadVertices,
+				(UINT)(sizeof(float) * 3 * _countof(quadVertices)), (UINT)_countof(quadVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
+				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
+		}
+		~PlaneQuad3D() override = default;
+	};
+
+	class PlaneQuad3DTextured : public StaticMesh
+	{
+	public:
+		PlaneQuad3DTextured()
+		{
+			float quadVertices[] = {
+			-1.0f, -1.0f, +0.0f, +0.0f, +1.0f,
+			-1.0f, +1.0f, +0.0f, +0.0f, +0.0f,
+			+1.0f, +1.0f, +0.0f, +1.0f, +0.0f,
+			+1.0f, -1.0f, +0.0f, +1.0f, +1.0f
+			};
+
+			uint32_t quadIndices[] = {
+				1, 2, 3,
+				1, 3, 0
+			};
+
+			m_VertexBuffers.push_back(std::make_unique<Buffer>((void*)quadVertices,
+				(UINT)(sizeof(float) * 5 * _countof(quadVertices)), (UINT)_countof(quadVertices), false, false));
+			m_IndexBuffers.push_back(std::make_unique<Buffer>((void*)quadIndices,
+				(UINT)(sizeof(uint32_t) * _countof(quadIndices)), (UINT)(_countof(quadIndices)), false, false));
+		}
+		~PlaneQuad3DTextured() override = default;
+	};
+	
 }

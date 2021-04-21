@@ -11,6 +11,7 @@
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
 #include "actors/Sun.h"
+#include "Crystal/GamePlay/Objects/Actors/ParticleActor.h"
 #include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
@@ -148,18 +149,19 @@ public:
 
 		/*Kraken* kraken = m_World->SpawnActor<Kraken>("Kraken");*/
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 0; i++)
 		{
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < 0; j++)
 			{
-				for (int k = 0; k < 5; k++)
+				for (int k = 0; k < 0; k++)
 				{
 					//test
 
 					Asteroid* asteroid = m_World->SpawnActor<Asteroid>();
 					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
-					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
+					
 #ifndef CS_NM_DEDICATED
+					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
 					staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = materials[0].get();
@@ -176,6 +178,20 @@ public:
 			}
 		}
 
+
+		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>();
+
+#ifndef CS_NM_DEDICATED
+		auto particleComponent = Crystal::Cast<Crystal::ParticleComponent>(particleActor->GetComponentByClass("ParticleComponent"));
+		particleComponent->SetRenderable(resourceManager.GetRenderable("3DPlaneQuadMeshTextured"));
+		auto& particleMats = particleComponent->GetMaterials();
+		auto particleMat = particleMats[0].get();
+		//particleMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
+		particleMat->AlbedoColor = Crystal::Vector3::Blue;
+#endif
+
+
+		
 		
 		/*Crystal::CameraPawn* cameraPawn = defaultLevel->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/

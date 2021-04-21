@@ -113,7 +113,7 @@ namespace Crystal {
 		auto& resourceManager = ResourceManager::Instance();
 		
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
-		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("PlaneQuadMesh"));
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("2DPlaneQuadMesh"));
 		
 		m_Components.push_back(m_StaticMeshComponent);
 		

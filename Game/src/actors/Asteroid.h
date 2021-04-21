@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/GamePlay/Components/ParticleComponent.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 
 class Asteroid : public Crystal::Actor
@@ -27,6 +28,9 @@ public:
 
 	
 		SetAttachment(meshComponent, m_MainComponent);
+
+
+		
 
 
 		auto randomScale = rand() % 1 + 1;

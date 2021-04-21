@@ -27,7 +27,7 @@ namespace Crystal {
 			resourceManager.CreateRenderable<Line>("LineMesh");
 			resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
 			resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
-			resourceManager.CreateRenderable<PlaneQuad>("PlaneQuadMesh");
+			resourceManager.CreateRenderable<PlaneQuad2D>("2DPlaneQuadMesh");
 			resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");*/
 		}
 
