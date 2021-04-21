@@ -80,7 +80,11 @@ namespace Crystal {
 	void Level::RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak)
 	{
 		if(m_RenderSystem)
+		{
 			m_RenderSystem->RegisterPrimitiveComponent(componentWeak);
+			//m_RenderSystem->RegisterPrimitiveComponentNew(componentWeak);
+		}
+			
 		
 	}
 

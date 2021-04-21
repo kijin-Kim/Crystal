@@ -130,7 +130,7 @@ namespace Crystal {
 			for (auto& mat : materials)
 			{
 
-				auto matRow = (LightingStaticPipeline::Material*)mat.get();
+				auto matRow = mat.get();
 				
 				perInstanceData.AlbedoColor = matRow->AlbedoColor;
 				perInstanceData.EmissiveColor = matRow->EmissiveColor;
@@ -146,7 +146,7 @@ namespace Crystal {
 				perInstanceData.bToggleIrradianceTexture = true; // TEMP
 				
 				auto it = std::find_if(m_InstanceBatches[staticMesh].MaterialLookup.begin(), 
-					m_InstanceBatches[staticMesh].MaterialLookup.end(), [&mat](MaterialBase* other)
+					m_InstanceBatches[staticMesh].MaterialLookup.end(), [&mat](NewMaterial* other)
 					{
 						return mat->UsingSameTextures(other);
 					});

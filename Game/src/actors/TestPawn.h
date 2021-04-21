@@ -26,7 +26,9 @@ public:
 		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
 		pbrMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
-		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
+		/*auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();*/
+
+		auto material = std::make_unique<Crystal::NewMaterial>();
 
 
 

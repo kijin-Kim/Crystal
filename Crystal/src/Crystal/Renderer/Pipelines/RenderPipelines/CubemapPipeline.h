@@ -3,6 +3,8 @@
 #include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
+	class StaticMeshComponent;
+
 	class CubemapPipeline final : public RenderPipeline
 	{
 	public:
@@ -21,8 +23,12 @@ namespace Crystal {
 		CubemapPipeline() = default;
 		~CubemapPipeline() override = default;
 
+		void OnCreate() override;
 		void Begin(const PipelineInputs* const pipelineInputs) override;
 
 		STATIC_TYPE_IMPLE(CubemapPipeline)
+
+	private:
+		std::shared_ptr<StaticMeshComponent> m_StaticMeshComponent = nullptr;
 	};
 }

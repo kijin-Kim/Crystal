@@ -40,11 +40,11 @@ namespace Crystal {
 			auto& materials = component->GetMaterials();
 			for (const auto& mat : materials)
 			{
-				if (!IsValidForThisPipelineNew(mat.get()))
-					continue;
+				/*if (!IsValidForThisPipelineNew(mat.get()))
+					continue;*/
 
-				auto material = (LinePipeline::Material*)mat.get();
-				perInstanceData.Color = material->Color;
+				auto material = mat.get();
+				perInstanceData.Color = material->AlbedoColor;
 				
 			}
 

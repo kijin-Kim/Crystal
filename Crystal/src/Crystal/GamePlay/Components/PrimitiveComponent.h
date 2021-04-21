@@ -31,9 +31,9 @@ namespace Crystal {
 		const std::vector<std::shared_ptr<Material>>& GetMaterialsOld() const { return m_MaterialsOld; }
 
 
-		void AddMaterial(std::unique_ptr<Pipeline::MaterialBase> material);
-		const std::vector<std::unique_ptr<Pipeline::MaterialBase>>& GetMaterials() const;
-		const Pipeline::MaterialBase* GetMaterial(uint32_t index) const;
+		void AddMaterial(std::unique_ptr<NewMaterial> material);
+		const std::vector<std::unique_ptr<NewMaterial>>& GetMaterials() const;
+		const NewMaterial* GetMaterial(uint32_t index) const;
 
 		void SetRenderable(std::weak_ptr<Renderable> renderable) { m_Renderable = renderable; }
 		const std::weak_ptr<Renderable>& GetRenderable() const { return m_Renderable; }
@@ -48,7 +48,7 @@ namespace Crystal {
 		std::weak_ptr<Renderable> m_Renderable;
 
 		std::vector<std::shared_ptr<Material>> m_MaterialsOld;
-		std::vector<std::unique_ptr<Pipeline::MaterialBase>> m_Materials;
+		std::vector<std::unique_ptr<NewMaterial>> m_Materials;
 
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 	};

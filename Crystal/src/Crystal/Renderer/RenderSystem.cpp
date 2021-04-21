@@ -261,6 +261,8 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
 
+
+
 		
 	}
 
@@ -336,7 +338,7 @@ namespace Crystal {
 	void RenderSystem::SpawnDefaultActors()
 	{
 		auto level = Cast<Level>(GetObjectOwner(Owner_Level));
-		level->SpawnActor<SkyboxActor>("SkyboxActor");
+		//level->SpawnActor<SkyboxActor>("SkyboxActor");
 		//level->SpawnActor<TonemappingActor>("TonemappingActor");
 	}
 
@@ -975,6 +977,37 @@ namespace Crystal {
 				registeredLightPipelineIndices.push_back(i);
 			}
 		}
+	}
+
+	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)
+	{
+		auto component = componentWeak.lock();
+
+		const auto& materials = component->GetMaterials();
+
+
+		if (materials.empty())
+			return;
+
+		for (const auto& mat : materials)
+		{
+			switch (mat->ShadingModel)
+			{
+			case EShadingModel::ShadingModel_Undefined: 
+				break;
+			case EShadingModel::ShadingModel_Unlit:
+				m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
+				break;
+			case EShadingModel::ShadingModel_DefaultLit: 
+				break;
+			default:;
+
+				
+			}
+
+			
+		}
+		
 	}
 
 

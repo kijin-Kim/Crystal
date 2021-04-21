@@ -82,7 +82,7 @@ namespace Crystal {
 		{
 			std::vector<PerInstanceData> PerInstanceDatas;
 			std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
-			std::array<MaterialBase*, 10> MaterialLookup;
+			std::array<NewMaterial*, 10> MaterialLookup;
 			UINT64 DescriptorOffset = -1;
 		};
 

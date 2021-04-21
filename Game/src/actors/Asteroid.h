@@ -29,14 +29,11 @@ public:
 		pbrMaterial->Set("EmissiveTexture", resourceManager.GetTexture("Asteroid_Blue_Emissive"));
 
 		
-		auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
+		auto material = std::make_unique<Crystal::NewMaterial>();
 		material->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
 			Crystal::Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
-		/*material->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
-		material->MetallicTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
-		material->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
-		material->NormalTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
-		material->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");*/
+
+		
 		
 
 	

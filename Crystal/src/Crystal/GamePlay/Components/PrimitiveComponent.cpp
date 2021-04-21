@@ -30,18 +30,18 @@ namespace Crystal {
 	}
 
 
-	void PrimitiveComponent::AddMaterial(std::unique_ptr<Pipeline::MaterialBase> material)
+	void PrimitiveComponent::AddMaterial(std::unique_ptr<NewMaterial> material)
 	{
 		m_Materials.push_back(std::move(material));
 	}
 
 
-	const std::vector<std::unique_ptr<Crystal::Pipeline::MaterialBase>>& PrimitiveComponent::GetMaterials() const
+	const std::vector<std::unique_ptr<Crystal::NewMaterial>>& PrimitiveComponent::GetMaterials() const
 	{
 		return m_Materials;
 	}
 
-	const Pipeline::MaterialBase* PrimitiveComponent::GetMaterial(uint32_t index) const
+	const NewMaterial* PrimitiveComponent::GetMaterial(uint32_t index) const
 	{
 		return m_Materials[index].get();
 	}

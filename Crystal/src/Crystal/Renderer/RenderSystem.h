@@ -40,6 +40,7 @@ namespace Crystal {
 
 		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
 		void RegisterPrimitiveComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
+		void RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak);
 
 
 		
@@ -97,6 +98,7 @@ namespace Crystal {
 		bool m_bIsFullScreen = false;
 
 
+		
 	};
 }
 
