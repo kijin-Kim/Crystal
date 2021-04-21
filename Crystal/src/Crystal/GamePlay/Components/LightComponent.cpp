@@ -22,7 +22,9 @@ namespace Crystal {
 			return;
 		}
 
+#ifndef CS_NM_DEDICATED
 		level->RegisterLightComponent(Cast<LightComponent>(shared_from_this()));
+#endif
 	
 	}
 

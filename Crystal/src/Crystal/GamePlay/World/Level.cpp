@@ -16,11 +16,13 @@ namespace Crystal {
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
 		m_PhysicsSystem->OnCreate();
 
+#ifndef CS_NM_DEDICATED
 		m_RenderSystem = std::make_unique<RenderSystem>();
 		m_RenderSystem->SetObjectOwner(weak_from_this(), Actor::Owner_Level);
 		m_RenderSystem->SetObjectName("LevelRenderSystem");
 		m_RenderSystem->OnCreate();
 		m_RenderSystem->Begin();
+#endif
 	}
 
 	void Level::Update(const float deltaTime)
@@ -35,7 +37,12 @@ namespace Crystal {
 		}
 
 		m_PhysicsSystem->Update(deltaTime);
-		m_RenderSystem->Update(deltaTime);
+
+		if(m_RenderSystem)
+		{
+			m_RenderSystem->Update(deltaTime);
+		}
+		
 
 	}
 
@@ -73,8 +80,9 @@ namespace Crystal {
 	void Level::RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak)
 	{
 		if(m_RenderSystem)
+		{
 			m_RenderSystem->RegisterLightComponent(componentWeak);
-		
+		}
 	}
 
 	void Level::RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak)

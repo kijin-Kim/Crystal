@@ -8,10 +8,6 @@ class Asteroid : public Crystal::Actor
 public:
 	Asteroid()
 	{
-		auto& resourceManager = Crystal::ResourceManager::Instance();
-
-
-		
 
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		boundingSphereComponent->SetRadius(400.0f);

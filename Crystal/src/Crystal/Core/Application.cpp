@@ -13,9 +13,13 @@
 namespace Crystal {
 	Application::Application(int width, int height)
 	{
+#ifndef CS_NM_DEDICATED
 		m_Window = std::make_unique<WindowsWindow>(width, height);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
+#else
 
+#endif
+	
 
 
 		m_World = std::make_shared<World>();

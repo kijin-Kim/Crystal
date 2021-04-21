@@ -27,7 +27,7 @@ public:
 	void Start() override
 	{
 		Crystal::Application::Start();
-
+#ifndef CS_NM_DEDICATED
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 		
 		//============ Load Renderables =======================================
@@ -106,7 +106,7 @@ public:
 		//krakenTentacleNormal->CreateShaderResourceView(krakenTentacleNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		//=====================================================================
 
-
+#endif
 		m_World->SetCurrentLevelByName("DefaultLevel");
 
 		
@@ -118,21 +118,28 @@ public:
 		testPawn->SetPosition({ 0.0f, 0.0f, -2000.0f });
 		
 		auto testPawnMesh = Crystal::Cast<Crystal::StaticMeshComponent>(testPawn->GetComponentByClass("StaticMeshComponent"));
+
+#ifndef CS_NM_DEDICATED
 		testPawnMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
 		auto testPawnMat = testPawnMesh->GetMaterial(0);
 		testPawnMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
 		testPawnMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
 		testPawnMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
 		testPawnMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+#endif
+		
 		
 		
 		
 		Sun* sun = m_World->SpawnActor<Sun>("Sun");
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
 		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
+
+#ifndef CS_NM_DEDICATED
 		sunMesh->SetRenderable(resourceManager.GetRenderable("Sphere"));
 		auto sunMat = sunMesh->GetMaterial(0);
 		sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
+#endif
 
 
 
@@ -152,6 +159,7 @@ public:
 					Asteroid* asteroid = m_World->SpawnActor<Asteroid>();
 					asteroid->SetPosition({ 1000.0f * i, 1000.0f * j, 1000.0f * k });
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
+#ifndef CS_NM_DEDICATED
 					staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = materials[0].get();
@@ -160,6 +168,7 @@ public:
 					pbrMat->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");
 					pbrMat->NormalTexture = resourceManager.GetTexture("Asteroid_Blue_Normal");
 					pbrMat->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Emissive");
+#endif
 					
 
 				}
