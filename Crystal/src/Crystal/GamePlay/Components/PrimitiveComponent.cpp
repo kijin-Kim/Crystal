@@ -11,8 +11,8 @@ namespace Crystal {
 
 	void PrimitiveComponent::RegisterComponent()
 	{
+#ifndef CS_NM_DEDICATED
 		TransformComponent::RegisterComponent();
-
 
 		auto ownerActor = GetObjectOwner(Owner_Actor).lock();
 		if (!ownerActor)
@@ -27,6 +27,7 @@ namespace Crystal {
 		}
 
 		level->RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
+#endif
 	}
 
 
