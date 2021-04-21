@@ -249,7 +249,7 @@ namespace Crystal {
 		{
 			unlitShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 
 				{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
@@ -260,10 +260,10 @@ namespace Crystal {
 
 			RootParameter perFrame = { 1, 0, 0 };
 			RootParameter perObject = { 1, 0, 0 };
-			RootParameter perExecute = {};
+			RootParameter perExecute = { 0, 10, 0};
 
-			unlitShader->SetRootSignature({ perFrame, perObject, perExecute });
-			unlitShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);			
+			unlitShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			unlitShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);	
 		}
 
 		LoadEngineContents();

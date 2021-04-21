@@ -9,53 +9,113 @@ namespace Crystal {
 
 	void UnlitPipeline::Begin(const PipelineInputs* const pipelineInputs)
 	{
-		RenderPipeline::Begin(pipelineInputs);
+		Pipeline::Begin(pipelineInputs);
+
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto inputs = (RenderPipelineInputs*)pipelineInputs;
+		UnlitPipelineInputs* lightPipelineInputs = (UnlitPipelineInputs*)pipelineInputs;
+
 
 		PerFrameData perFrameData = {};
-		perFrameData.ViewProjection = Matrix4x4::Transpose(inputs->Camera->GetViewProjection());
-		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
 
-		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		perFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
 
-		for (int i = 0; i < m_Components.size(); i++)
+		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
+
+
+
+		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+		int materialCount = 0;
+		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
+		for (int i = 0; i < m_Components.size(); i++) // PerObject
 		{
-			auto component = Cast<PrimitiveComponent>(m_Components[i]);
-			if (!component)
+			auto meshComponent = m_Components[i].lock();
+			if (!meshComponent)
 				continue;
+
+			auto renderable = meshComponent->GetRenderable().lock().get();
+
+
 
 			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetWorldTransform();
-			
+
+			perInstanceData.World = meshComponent->GetWorldTransform();
+			auto& materials = meshComponent->GetMaterials();
 
 
-
-			auto& materials = component->GetMaterials();
-			for (const auto& mat : materials)
+			for (auto& mat : materials)
 			{
-				/*if (!IsValidForThisPipelineNew(mat.get()))
-					continue;*/
 
-				auto material = mat.get();
-				perInstanceData.Color = material->AlbedoColor;
+				auto matRow = mat.get();
 
+				
+				perInstanceData.EmissiveColor = matRow->EmissiveColor;
+
+				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture.lock() ? true : false;
+
+
+
+				auto it = std::find_if(m_InstanceBatches[renderable].MaterialLookup.begin(),
+					m_InstanceBatches[renderable].MaterialLookup.end(), [&mat](NewMaterial* other)
+					{
+						return mat->UsingSameTextures(other);
+					});
+
+				bool bFindMaterial = it != m_InstanceBatches[renderable].MaterialLookup.end();
+				if (bFindMaterial)
+				{
+					perInstanceData.MaterialIndex = it - m_InstanceBatches[renderable].MaterialLookup.begin();
+					continue;
+				}
+
+
+				for (int j = 0; j < m_InstanceBatches[renderable].MaterialLookup.size(); j++)
+				{
+					if (m_InstanceBatches[renderable].MaterialLookup[j])
+						continue;
+
+					perInstanceData.MaterialIndex = j;
+					m_InstanceBatches[renderable].MaterialLookup[j] = matRow;
+					break;
+				}
+
+
+
+				if (m_InstanceBatches[renderable].DescriptorOffset == -1)
+				{
+					m_InstanceBatches[renderable].DescriptorOffset =
+						device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+						* (2 + 10 * materialCount);
+				}
+
+
+
+
+				auto cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+				cpuHandle.ptr += m_InstanceBatches[renderable].DescriptorOffset;
+				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+					* (1 * perInstanceData.MaterialIndex);
+
+
+				if (perInstanceData.bToggleEmissivetexture)
+				{
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture.lock()->GetShaderResourceView(),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				}
+				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+				materialCount++;
 			}
-
-			auto renderable = component->GetRenderable().lock();
-			if (!renderable)
-			{
-				continue;
-			}
-
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-
+			m_InstanceBatches[renderable].PerInstanceDatas.push_back(perInstanceData);
 		}
 
 
@@ -100,6 +160,7 @@ namespace Crystal {
 			commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
 			descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 				* rootSignature.GetPerFrameDescriptorCount();
+
 		}
 
 
@@ -109,13 +170,17 @@ namespace Crystal {
 			auto& instanceBatch = pair.second;
 			auto& perInstanceVertexBuffer = instanceBatch.PerInstanceVertexBuffer;
 
+			auto handle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+			handle.ptr += instanceBatch.DescriptorOffset;
+			commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(), handle);
+
+
 			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
 
 			if (!renderable)
 			{
 				continue;
 			}
-
 
 			//여기서부터 Texture2D Array Per Instance
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
