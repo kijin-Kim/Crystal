@@ -7,10 +7,7 @@
 #include "Crystal/Renderer/RenderSystem.h"
 
 
-#ifdef CS_NM_DEDICATED
-#include <fcntl.h>
-#include <io.h>
-#endif
+
 
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
