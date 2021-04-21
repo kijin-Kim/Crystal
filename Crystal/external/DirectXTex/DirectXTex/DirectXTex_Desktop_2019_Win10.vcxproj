@@ -13,6 +13,14 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="ServerDebug|x64">
+      <Configuration>ServerDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ServerRelease|x64">
+      <Configuration>ServerRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>DirectXTex</ProjectName>
@@ -28,7 +36,17 @@
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerDebug|X64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|X64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerRelease|X64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
@@ -46,7 +64,13 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ServerRelease|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ServerDebug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -56,7 +80,19 @@
     <TargetName>DirectXTex</TargetName>
     <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerDebug|X64'">
+    <OutDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>DirectXTex</TargetName>
+    <GenerateManifest>true</GenerateManifest>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|X64'">
+    <OutDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>DirectXTex</TargetName>
+    <GenerateManifest>true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerRelease|X64'">
     <OutDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Desktop_2019_Win10\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>DirectXTex</TargetName>
@@ -101,7 +137,74 @@
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ServerDebug|X64'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <OpenMPSupport>true</OpenMPSupport>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/Zc:twoPhase- /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;WIN32;_DEBUG;_LIB;_WIN32_WINNT=0x0A00;_CRT_STDIO_ARBITRARY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>DirectXTexP.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(IntDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|X64'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <OpenMPSupport>true</OpenMPSupport>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/Zc:twoPhase- /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;WIN32;NDEBUG;_LIB;_WIN32_WINNT=0x0A00;_CRT_STDIO_ARBITRARY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>DirectXTexP.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(IntDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ServerRelease|X64'">
     <ClCompile>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
@@ -207,8 +310,10 @@
     <ClCompile Include="DirectXTexTGA.cpp" />
     <ClCompile Include="DirectXTexUtil.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ServerDebug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ServerRelease|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="DirectXTexWIC.cpp" />
   </ItemGroup>
