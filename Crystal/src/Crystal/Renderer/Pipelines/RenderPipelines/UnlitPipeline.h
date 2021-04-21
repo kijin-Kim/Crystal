@@ -12,7 +12,8 @@ namespace Crystal {
 
 		struct PerFrameData
 		{
-			DirectX::XMFLOAT4X4 ViewProjection;
+			DirectX::XMFLOAT4X4 View;
+			DirectX::XMFLOAT4X4 Projection;
 		};
 
 		struct Material : public MaterialBase

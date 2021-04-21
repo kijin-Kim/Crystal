@@ -2,7 +2,8 @@
 
 cbuffer PerFrameData : register(b0)
 {
-    float4x4 ViewProjection : packoffset(c0);
+    float4x4 View : packoffset(c0);
+    float4x4 Projection : packoffset(c4);
 }
 
 
@@ -27,16 +28,40 @@ struct PS_INPUT
     nointerpolation float3 Color : COLOR;
 };
 
+
 PS_INPUT vsMain(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT)0;
 
-    float4x4 World = float4x4(input.MatRow0, input.MatRow1, input.MatRow2 ,input.MatRow3);
-    output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
+    float xScale = length(input.MatRow0);
+    float yScale = length(input.MatRow1);
+    float zScale = length(input.MatRow2);
 
-    output.Color = input.Color;
+    
+
+    float3x3 viewRotation = View;
+    float3x3 transposedViewRotation = transpose(viewRotation);
+    
+    float4 newRow0 = float4(transposedViewRotation[0], input.MatRow0[3]);
+    float4 newRow1 = float4(transposedViewRotation[1], input.MatRow1[3]);
+    float4 newRow2 = float4(transposedViewRotation[2], input.MatRow2[3]);
+    
+    float4x4 world = float4x4(newRow0, newRow1, newRow2, input.MatRow3);
+
+    float4x4 worldView = mul(world, View);
+    worldView[0][0] = xScale;
+    worldView[1][1] = yScale;
+    worldView[2][2] = zScale;
+    
+    output.Position = mul(mul(float4(input.Position, 1.0f), worldView), Projection);
+    
+
+    
+
 
     output.TexCoord = input.TexCoord;
+
+    output.Color = input.Color;
 
     return output;
 }

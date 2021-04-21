@@ -21,9 +21,11 @@ namespace Crystal {
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
+		perFrameData.View = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetView());
+		perFrameData.Projection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetProjection());
+		
 
-		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
+		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
 
 
 
@@ -129,7 +131,7 @@ namespace Crystal {
 					instanceBatches.PerInstanceDatas.size(), instanceBatches.PerInstanceDatas.size(), false, true);
 			}
 
-			instanceBatches.PerInstanceVertexBuffer->SetData((void*)instanceBatches.PerInstanceDatas.data(),
+			instanceBatches.PerInstanceVertexBuffer->SetData(instanceBatches.PerInstanceDatas.data(),
 				0, sizeof(PerInstanceData) * instanceBatches.PerInstanceDatas.size());
 
 		}

@@ -30,6 +30,8 @@ namespace Crystal {
 
 		/*VP와 InverseVP의 값은 매 프레임마다 Update가 불린 직후 어떠한 속성도 바뀌지 않았을 때만 보장됩니다.*/
 		const DirectX::XMFLOAT4X4& GetViewProjection() const { return m_ViewProjection; }
+		const DirectX::XMFLOAT4X4& GetView() const { return m_View; }
+		const DirectX::XMFLOAT4X4& GetProjection() const { return m_Projection; }
 
 		STATIC_TYPE_IMPLE(CameraComponent)
 
@@ -37,6 +39,8 @@ namespace Crystal {
 		void computeViewProjection();
 
 	private:
+		DirectX::XMFLOAT4X4 m_View = {};
+		DirectX::XMFLOAT4X4 m_Projection = {};
 		DirectX::XMFLOAT4X4 m_ViewProjection = {};
 		D3D12_VIEWPORT m_Viewport = {};
 		D3D12_RECT m_ScissorRect = {};
