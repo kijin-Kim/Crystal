@@ -19,27 +19,14 @@ public:
 		m_MainComponent = boundingSphereComponent;
 
 
-		auto pbrMaterial = std::make_shared<Crystal::Material>();
-		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
-			Crystal::Material::MaterialOwnerType::Owner_Shader);
-		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Asteroid_Blue_Albedo"));
-		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Asteroid_Blue_Metallic"));
-		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Asteroid_Blue_Roughness"));
-		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Asteroid_Blue_Normal"));
-		pbrMaterial->Set("EmissiveTexture", resourceManager.GetTexture("Asteroid_Blue_Emissive"));
 
 		
 		auto material = std::make_unique<Crystal::NewMaterial>();
-		material->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
-			Crystal::Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
+		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 		
-		
-
 	
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
-//		meshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
-		meshComponent->AddMaterialOld(pbrMaterial);
 		meshComponent->AddMaterial(std::move(material));
 
 	

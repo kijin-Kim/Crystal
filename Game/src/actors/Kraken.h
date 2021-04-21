@@ -11,7 +11,7 @@ public:
 	{
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto bodyMaterial = std::make_shared<Crystal::Material>();
+	/*	auto bodyMaterial = std::make_shared<Crystal::Material>();
 		bodyMaterial->OnCreate();
 		bodyMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
 			Crystal::Material::MaterialOwnerType::Owner_Shader);
@@ -27,7 +27,7 @@ public:
 		tentacleMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Tentacle_Albedo"));
 		tentacleMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Tentacle_Roughness"));
 		tentacleMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Tentacle_Normal"));
-		tentacleMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
+		tentacleMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));*/
 
 		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
 			"assets/models/KRAKEN_idle.fbx");
@@ -35,8 +35,8 @@ public:
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(mesh);
 		skeletalMeshComponent->RotatePitch(90.0f);
-		skeletalMeshComponent->AddMaterialOld(bodyMaterial);
-		skeletalMeshComponent->AddMaterialOld(tentacleMaterial);
+		/*skeletalMeshComponent->AddMaterialOld(bodyMaterial);
+		skeletalMeshComponent->AddMaterialOld(tentacleMaterial);*/
 
 		m_MainComponent = skeletalMeshComponent;
 

@@ -13,29 +13,10 @@ namespace Crystal {
 	public:
 		CollisionComponent()
 		{
-			auto& resourceManager = ResourceManager::Instance();
-
-			auto simpleColorMaterial = std::make_shared<Crystal::Material>();
-			simpleColorMaterial->SetObjectOwner(resourceManager.GetShader("SimpleColorShader"),
-				Crystal::Material::MaterialOwnerType::Owner_Shader);
-			simpleColorMaterial->Set("Color", Vector3::Yellow);
-
-
-			/*auto material = std::make_unique<LinePipeline::Material>();
-			material->SetObjectOwner(resourceManager.GetShader("SimpleColorShader"),
-			                         Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
-			material->Color = Vector3::Yellow;*/
-
-
 			auto material = std::make_unique<NewMaterial>();
-			material->SetObjectOwner(resourceManager.GetShader("SimpleColorShader"),
-				Pipeline::MaterialBase::MaterialOwnerType::Owner_Shader);
+			material->ShadingModel = EShadingModel::ShadingModel_Unlit;
 			material->AlbedoColor= Vector3::Yellow;
 
-
-			
-	
-			AddMaterialOld(std::move(simpleColorMaterial));
 
 			AddMaterial(std::move(material));
 

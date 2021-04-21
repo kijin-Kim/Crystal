@@ -81,8 +81,7 @@ namespace Crystal {
 	{
 		if(m_RenderSystem)
 		{
-			m_RenderSystem->RegisterPrimitiveComponent(componentWeak);
-			//m_RenderSystem->RegisterPrimitiveComponentNew(componentWeak);
+			m_RenderSystem->RegisterPrimitiveComponentNew(componentWeak);
 		}
 			
 		

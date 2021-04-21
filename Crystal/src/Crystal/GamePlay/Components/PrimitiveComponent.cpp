@@ -41,7 +41,7 @@ namespace Crystal {
 		return m_Materials;
 	}
 
-	const NewMaterial* PrimitiveComponent::GetMaterial(uint32_t index) const
+	NewMaterial* PrimitiveComponent::GetMaterial(uint32_t index) const
 	{
 		return m_Materials[index].get();
 	}

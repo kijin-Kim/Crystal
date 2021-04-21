@@ -119,7 +119,7 @@ public:
 		
 		auto testPawnMesh = Crystal::Cast<Crystal::StaticMeshComponent>(testPawn->GetComponentByClass("StaticMeshComponent"));
 		testPawnMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		auto testPawnMat = (Crystal::LightingStaticPipeline::Material*)testPawnMesh->GetMaterial(0);
+		auto testPawnMat = testPawnMesh->GetMaterial(0);
 		testPawnMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
 		testPawnMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
 		testPawnMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
@@ -131,7 +131,7 @@ public:
 		sun->SetPosition({ 0.0f, 200000.0f, 200000.0f });
 		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 		sunMesh->SetRenderable(resourceManager.GetRenderable("Sphere"));
-		auto sunMat = (Crystal::LightingStaticPipeline::Material*)sunMesh->GetMaterial(0);
+		auto sunMat = sunMesh->GetMaterial(0);
 		sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
 
 
@@ -154,7 +154,7 @@ public:
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(asteroid->GetComponentByName("StaticMeshComponent"));
 					staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
 					auto& materials = staticMeshComponent->GetMaterials();
-					auto pbrMat = (Crystal::LightingStaticPipeline::Material*)materials[0].get();
+					auto pbrMat = materials[0].get();
 					pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
 					pbrMat->MetallicTexture = resourceManager.GetTexture("Asteroid_Blue_Metallic");
 					pbrMat->RoughnessTexture = resourceManager.GetTexture("Asteroid_Blue_Roughness");

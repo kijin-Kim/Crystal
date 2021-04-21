@@ -11,19 +11,13 @@ public:
 	{
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto pbrMaterial = std::make_shared<Crystal::Material>();
-		pbrMaterial->OnCreate();
-		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
-			Crystal::Material::MaterialOwnerType::Owner_Shader);
-		pbrMaterial->Set("EmissiveColor", DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f));
-
-		//auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();
 		auto material = std::make_unique<Crystal::NewMaterial>();
+		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 //		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Sphere"));
-		staticMeshComponent->AddMaterialOld(pbrMaterial);
+		
 		staticMeshComponent->AddMaterial(std::move(material));
 		staticMeshComponent->SetScale(600.0f);
 

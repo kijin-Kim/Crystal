@@ -16,19 +16,12 @@ public:
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		auto pbrMaterial = std::make_shared<Crystal::Material>();
-		pbrMaterial->OnCreate();
-		pbrMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Static"),
-			Crystal::Material::MaterialOwnerType::Owner_Shader);
-		pbrMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Frigate_Metallic"));
-		pbrMaterial->Set("MetallicTexture", resourceManager.GetTexture("Frigate_Metallic"));
-		pbrMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Frigate_Roughness"));
-		pbrMaterial->Set("NormalTexture", resourceManager.GetTexture("Frigate_Normal"));
-		pbrMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
+
 
 		/*auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();*/
 
 		auto material = std::make_unique<Crystal::NewMaterial>();
+		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 
 
@@ -47,8 +40,6 @@ public:
 		m_MainComponent = boxComponent;
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-		//staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		staticMeshComponent->AddMaterialOld(pbrMaterial);
 		staticMeshComponent->AddMaterial(std::move(material));
 		SetAttachment(staticMeshComponent, m_MainComponent);
 

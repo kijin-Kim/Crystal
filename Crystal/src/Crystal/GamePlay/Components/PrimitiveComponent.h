@@ -33,7 +33,7 @@ namespace Crystal {
 
 		void AddMaterial(std::unique_ptr<NewMaterial> material);
 		const std::vector<std::unique_ptr<NewMaterial>>& GetMaterials() const;
-		const NewMaterial* GetMaterial(uint32_t index) const;
+		NewMaterial* GetMaterial(uint32_t index) const;
 
 		void SetRenderable(std::weak_ptr<Renderable> renderable) { m_Renderable = renderable; }
 		const std::weak_ptr<Renderable>& GetRenderable() const { return m_Renderable; }

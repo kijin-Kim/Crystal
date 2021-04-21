@@ -19,16 +19,7 @@ namespace Crystal {
 		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
 	}
 
-	bool Pipeline::IsValidForThisPipeline(const std::shared_ptr<Material>& material)
-	{
-		if (!material)
-			return false;
 
-		auto thisPipelineShader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
-		auto inputMaterialShader = Cast<Shader>(material->GetObjectOwner(Material::MaterialOwnerType::Owner_Shader));
-
-		return thisPipelineShader == inputMaterialShader;
-	}
 
 	bool Pipeline::IsValidForThisPipelineNew(MaterialBase* material)
 	{

@@ -441,8 +441,8 @@ namespace Crystal {
 		m_LightPipelines[0]->Begin(&lightingPipelineInputs);
 		m_LightPipelines[0]->Record(commandList);
 
-		m_LightPipelines[1]->Begin(&lightingPipelineInputs);
-		m_LightPipelines[1]->Record(commandList);
+		/*m_LightPipelines[1]->Begin(&lightingPipelineInputs);
+		m_LightPipelines[1]->Record(commandList);*/
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[] = {
@@ -934,51 +934,6 @@ namespace Crystal {
 		}
 	}
 
-	void RenderSystem::RegisterPrimitiveComponent(std::weak_ptr<PrimitiveComponent> componentWeak)
-	{
-		auto component = componentWeak.lock();
-
-		const auto& materials = component->GetMaterialsOld();
-
-
-		if (materials.empty())
-			return;
-
-		std::vector<int> registeredPipelineIndices; // Component가 Register되어 있는 pipeline의 컨테이너 상의 Index
-		std::vector<int> registeredLightPipelineIndices;
-
-		for (const auto& mat : materials)
-		{
-			for (int i = 0; i < m_Pipelines.size(); i++)
-			{
-				bool bAlreadyRegisteredInThisPipeline = std::find(registeredPipelineIndices.begin(),
-					registeredPipelineIndices.end(), i) != registeredPipelineIndices.end();
-
-				// 이미 Register되어 있거나 material이 이 Pipeline에서 사용되지 않으면
-				if (bAlreadyRegisteredInThisPipeline || !m_Pipelines[i]->IsValidForThisPipeline(mat))
-					continue;
-
-
-				m_Pipelines[i]->RegisterPipelineComponents(componentWeak); // 이 파이프라인에 컴포넌트를 등록
-				registeredPipelineIndices.push_back(i);
-			}
-
-			for (int i = 0; i < m_LightPipelines.size(); i++)
-			{
-				bool bAlreadyRegisteredInThisPipeline = std::find(registeredLightPipelineIndices.begin(),
-					registeredLightPipelineIndices.end(), i) != registeredLightPipelineIndices.end();
-
-				// 이미 Register되어 있거나 material이 이 Pipeline에서 사용되지 않으면
-				if (bAlreadyRegisteredInThisPipeline || !m_LightPipelines[i]->IsValidForThisPipeline(mat))
-					continue;
-
-
-				m_LightPipelines[i]->RegisterPipelineComponents(componentWeak); // 이 파이프라인에 컴포넌트를 등록
-				registeredLightPipelineIndices.push_back(i);
-			}
-		}
-	}
-
 	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)
 	{
 		auto component = componentWeak.lock();
@@ -996,9 +951,10 @@ namespace Crystal {
 			case EShadingModel::ShadingModel_Undefined: 
 				break;
 			case EShadingModel::ShadingModel_Unlit:
-				m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
+				m_Pipelines[0]->RegisterPipelineComponents(componentWeak);
 				break;
-			case EShadingModel::ShadingModel_DefaultLit: 
+			case EShadingModel::ShadingModel_DefaultLit:
+				m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
 				break;
 			default:;
 
