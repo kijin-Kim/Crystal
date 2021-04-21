@@ -2,6 +2,7 @@
 #include <debugapi.h>
 #include <cstdarg>
 #include <cstdio>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <stdexcept>
@@ -30,9 +31,14 @@ std::string string_format(const std::string fmt_str, ...) {
 namespace Crystal {
 	inline void Log(const char* prefixMsg, const char* msg)
 	{
+#ifdef CS_NM_DEDICATED
+		std::cout << prefixMsg << msg << std::endl;
+#else
 		OutputDebugStringA(prefixMsg);
 		OutputDebugStringA(msg);
 		OutputDebugStringA("\n");
+#endif
+		
 	}
 }
 

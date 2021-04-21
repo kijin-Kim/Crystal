@@ -1,11 +1,16 @@
 #include "cspch.h"
 #include "Application.h"
 #include "DirectXTex/DirectXTex.h"
-#include "ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "imgui.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
+
+
+#ifdef CS_NM_DEDICATED
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
@@ -13,11 +18,10 @@
 namespace Crystal {
 	Application::Application(int width, int height)
 	{
+
 #ifndef CS_NM_DEDICATED
 		m_Window = std::make_unique<WindowsWindow>(width, height);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
-#else
-
 #endif
 	
 
@@ -48,6 +52,7 @@ namespace Crystal {
 					break;
 			}
 			Update();
+
 		}
 	}
 
