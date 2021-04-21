@@ -10,7 +10,6 @@ cbuffer PerFrameData : register(b0)
 struct VS_INPUT
 {
     float3 Position : POSITION;
-    float2 TexCoord : TEXCOORD;
 
     float4 MatRow0 : MATROW0;
     float4 MatRow1 : MATROW1;
@@ -29,38 +28,32 @@ struct PS_INPUT
 };
 
 
+
 PS_INPUT vsMain(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT)0;
 
-    float xScale = length(input.MatRow0);
-    float yScale = length(input.MatRow1);
-    float zScale = length(input.MatRow2);
-
     
 
-    float3x3 viewRotation = View;
-    float3x3 transposedViewRotation = transpose(viewRotation);
+    float3x3 transposedView = transpose(View);
     
-    float4 newRow0 = float4(transposedViewRotation[0], input.MatRow0[3]);
-    float4 newRow1 = float4(transposedViewRotation[1], input.MatRow1[3]);
-    float4 newRow2 = float4(transposedViewRotation[2], input.MatRow2[3]);
+    float4 newRow0 = float4(transposedView[0], 0.0f);
+    float4 newRow1 = float4(transposedView[1], 0.0f);
+    float4 newRow2 = float4(transposedView[2], 0.0f);
     
     float4x4 world = float4x4(newRow0, newRow1, newRow2, input.MatRow3);
 
     float4x4 worldView = mul(world, View);
-    worldView[0][0] = xScale;
-    worldView[1][1] = yScale;
-    worldView[2][2] = zScale;
+    worldView[0][0] = length(input.MatRow0);
+    worldView[1][1] = length(input.MatRow1);
+    worldView[2][2] = length(input.MatRow2);
     
     output.Position = mul(mul(float4(input.Position, 1.0f), worldView), Projection);
     
+    output.TexCoord = (input.Position + 1.0f) / 2.0f;
+	output.TexCoord.y = -output.TexCoord.y;
 
     
-
-
-    output.TexCoord = input.TexCoord;
-
     output.Color = input.Color;
 
     return output;

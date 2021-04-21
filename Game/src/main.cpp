@@ -183,7 +183,7 @@ public:
 
 #ifndef CS_NM_DEDICATED
 		auto particleComponent = Crystal::Cast<Crystal::ParticleComponent>(particleActor->GetComponentByClass("ParticleComponent"));
-		particleComponent->SetRenderable(resourceManager.GetRenderable("3DPlaneQuadMeshTextured"));
+		particleComponent->SetRenderable(resourceManager.GetRenderable("3DPlaneQuadMesh"));
 		auto& particleMats = particleComponent->GetMaterials();
 		auto particleMat = particleMats[0].get();
 		particleMat->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
