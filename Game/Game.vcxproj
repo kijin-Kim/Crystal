@@ -137,7 +137,7 @@
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul)</Command>
+      <Command>IF EXIST "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\Debug" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.dll" "..\bin\Game\bin\$(Configuration)" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -187,7 +187,7 @@
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul)</Command>
+      <Command>IF EXIST "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll"\ (xcopy /Q /E /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\Release" &gt; nul) ELSE (xcopy /Q /Y /I "..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.dll" "..\bin\Game\bin\$(Configuration)" &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
