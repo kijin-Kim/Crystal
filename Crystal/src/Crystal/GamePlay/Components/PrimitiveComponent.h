@@ -15,8 +15,6 @@ namespace Crystal {
 		PrimitiveComponent() = default;
 		~PrimitiveComponent() override = default;
 
-		void OnCreate() override;
-
 		void RegisterComponent() override;
 
 		void Update(const float deltaTime) override

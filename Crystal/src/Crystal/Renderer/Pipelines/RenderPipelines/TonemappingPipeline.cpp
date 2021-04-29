@@ -39,7 +39,7 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto shader = Cast<Shader>(GetOwner());
 
 		pipelineStateStream.RootSignature = shader->GetRootSignature().GetData();
 		auto inputLayout = shader->GetInputLayout();

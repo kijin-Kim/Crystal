@@ -108,7 +108,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 maxDistance = { 10000.0f, 10000.0f, 10000.0f };
 			auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), maxDistance));
 
-			auto level = Crystal::Cast<Level>(GetObjectOwner(Crystal::Actor::ActorOwnerType::Owner_Level));
+			auto level = Crystal::Cast<Level>(GetOwner());
 			if(level)
 				level->DrawDebugLine(start, end);
 		}

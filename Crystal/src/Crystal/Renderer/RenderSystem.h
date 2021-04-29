@@ -22,7 +22,6 @@ namespace Crystal {
 		void Begin() override;
 
 		void LoadEngineContents();
-		void SpawnDefaultActors();
 		
 
 		
@@ -50,7 +49,7 @@ namespace Crystal {
 		{
 			/*Pipeline을 만듭니다.*/
 			auto pipeline = std::make_unique<T>();
-			pipeline->SetObjectOwner(shader, Pipeline::PipelineOwnerType::Owner_Shader);
+			pipeline->SetOwner(shader);
 			pipeline->SetObjectName(name);
 			pipeline->OnCreate();
 

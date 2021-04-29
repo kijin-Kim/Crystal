@@ -30,6 +30,8 @@ namespace Crystal {
 			CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
 		}
 
+		
+
 
 		void SetDefaultName()
 		{
@@ -40,18 +42,13 @@ namespace Crystal {
 		{
 			m_Name = name; 
 		}
-		void SetObjectOwner(std::weak_ptr<Object> object, int ownerType) { m_Owners[ownerType] = object; }
 
 		const std::string& GetObjectName() const { return m_Name; }
-		std::weak_ptr<Object> GetObjectOwner(int ownerType) const 
-		{ 
-			if (ownerType >= MAX_OBJECT_OWNER_COUNT)
-			{
-				CS_WARN("잘못된 ownerType입니다");
-				return {};
-			}
-			return m_Owners[ownerType]; 
-		}
+	
+
+		void SetOwner(const std::weak_ptr<Object>& owner) { m_Owner = owner; }
+		std::weak_ptr<Object> GetOwner() const { return m_Owner; }
+		
 
 		STATIC_TYPE_IMPLE(Object)
 
@@ -59,7 +56,7 @@ namespace Crystal {
 		std::string m_Name;
 		std::array<std::weak_ptr<Object>, MAX_OBJECT_OWNER_COUNT> m_Owners = {};
 
-
+		std::weak_ptr<Object> m_Owner;
 	};
 	
 	// Update-able

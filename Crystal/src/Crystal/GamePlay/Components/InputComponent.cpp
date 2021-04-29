@@ -2,6 +2,7 @@
 #include "InputComponent.h"
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
+#include "Crystal/GamePlay/World/Level.h"
 
 namespace Crystal {
 	void InputComponent::BindAxis(const std::string& axisName, const std::function<void(float value)>& function)
@@ -70,11 +71,13 @@ namespace Crystal {
 
 	bool InputComponent::processAxisMappedInput(int64_t keyCode, float axisValue)
 	{
-		auto ownerActor = Cast<Actor>(GetObjectOwner(Component::ComponentOwnerType::Owner_Actor));
+		auto ownerActor = Cast<Actor>(GetOwner());
 		if (!ownerActor)
 			return false;
 
-		auto playerController = Cast<PlayerController>(ownerActor->GetObjectOwner(Actor::ActorOwnerType::Owner_Controller));
+		auto level = Cast<Level>(ownerActor->GetOwner());
+		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
+		
 		if (!playerController)
 			return false;
 
@@ -103,11 +106,12 @@ namespace Crystal {
 
 	bool InputComponent::processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
 	{
-		auto ownerActor = Cast<Actor>(GetObjectOwner(Component::ComponentOwnerType::Owner_Actor));
+		auto ownerActor = Cast<Actor>(GetOwner());
 		if (!ownerActor)
 			return false;
 
-		auto playerController = Cast<PlayerController>(ownerActor->GetObjectOwner(Actor::ActorOwnerType::Owner_Controller));
+		auto level = Cast<Level>(ownerActor->GetOwner());
+		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
 		if (!playerController)
 			return false;
 

@@ -63,7 +63,7 @@ namespace Crystal {
 	{
 		// Create new actor
 		auto newActor = std::make_shared<T>();
-		newActor->SetObjectOwner(weak_from_this(), Actor::ActorOwnerType::Owner_Level);
+		newActor->SetOwner(weak_from_this());
 		newActor->OnCreate();
 		if (!name.empty())
 			newActor->SetObjectName(name);

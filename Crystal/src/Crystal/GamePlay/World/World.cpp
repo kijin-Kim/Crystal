@@ -17,7 +17,7 @@ namespace Crystal {
 		level->OnCreate();
 		if (!name.empty())
 			level->SetObjectName(name);
-		level->SetObjectOwner(weak_from_this(), Level::LevelOwnerType::Owner_World);
+		level->SetOwner(weak_from_this());
 
 		m_Levels.push_back(std::move(level));
 

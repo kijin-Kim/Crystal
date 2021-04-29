@@ -18,7 +18,7 @@ namespace Crystal {
 
 #ifndef CS_NM_DEDICATED
 		m_RenderSystem = std::make_unique<RenderSystem>();
-		m_RenderSystem->SetObjectOwner(weak_from_this(), Actor::Owner_Level);
+		m_RenderSystem->SetOwner(weak_from_this());
 		m_RenderSystem->SetObjectName("LevelRenderSystem");
 		m_RenderSystem->OnCreate();
 		m_RenderSystem->Begin();

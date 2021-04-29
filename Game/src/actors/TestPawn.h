@@ -138,7 +138,7 @@ public:
 		const auto direction = m_CameraComponent->GetWorldForwardVector();
 		const float maxDistance = 10000.0f;
 
-		auto level = Crystal::Cast<Crystal::Level>(GetObjectOwner(Actor::ActorOwnerType::Owner_Level));
+		auto level = Crystal::Cast<Crystal::Level>(GetOwner());
 		if (level)
 			level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
 	}

@@ -47,13 +47,13 @@ namespace Crystal {
 
 		for (const auto& c : m_Components)
 		{
-			c->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
+			c->SetOwner(weak_from_this());
 			c->RegisterComponent();
 		}
 
 		for (const auto& tc : m_TransformHierarchy)
 		{
-			tc->SetObjectOwner(weak_from_this(), Component::ComponentOwnerType::Owner_Actor);
+			tc->SetOwner(weak_from_this());
 			tc->RegisterComponent();
 		}
 	}

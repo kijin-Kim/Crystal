@@ -34,14 +34,13 @@ namespace Crystal {
 		}
 		
 		SetMainCamera(camera);
-		pawn->SetObjectOwner(weak_from_this(), Actor::ActorOwnerType::Owner_Controller);
-
 			
 		m_GameInputComponent = std::make_unique<InputComponent>();
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
-		m_GameInputComponent->SetObjectOwner(pawn, Component::ComponentOwnerType::Owner_Actor);
-		m_UserInterfaceInputComponent->SetObjectOwner(pawn, Component::ComponentOwnerType::Owner_Actor);
+		m_GameInputComponent->SetOwner(pawn);
+		
+		m_UserInterfaceInputComponent->SetOwner(pawn);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
 	}
 

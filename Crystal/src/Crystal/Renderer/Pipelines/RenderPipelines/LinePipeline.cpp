@@ -82,7 +82,7 @@ namespace Crystal {
 		Pipeline::Record(commandList);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto shader = Cast<Shader>(GetObjectOwner(Pipeline::PipelineOwnerType::Owner_Shader));
+		auto shader = Cast<Shader>(GetOwner());
 		auto rootSignature = shader->GetRootSignature();
 
 

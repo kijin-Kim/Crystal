@@ -294,10 +294,6 @@ namespace Crystal {
 	{
 		Actor::Begin();
 
-
-		SpawnDefaultActors();
-
-		
 		/// COMPUTE
 		auto commandQueue = Device::Instance().GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();
@@ -359,12 +355,6 @@ namespace Crystal {
 		resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");
 	}
 
-	void RenderSystem::SpawnDefaultActors()
-	{
-		auto level = Cast<Level>(GetObjectOwner(Owner_Level));
-		//level->SpawnActor<SkyboxActor>("SkyboxActor");
-		//level->SpawnActor<TonemappingActor>("TonemappingActor");
-	}
 
 
 	void RenderSystem::Update(const float deltaTime)
@@ -386,7 +376,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		const auto level = Cast<Level>(GetObjectOwner(Owner_Level));
+		const auto level = Cast<Level>(GetOwner());
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
@@ -683,7 +673,7 @@ namespace Crystal {
 		                                                           D3D12_DSV_DIMENSION_TEXTURE2D);
 
 
-		const auto level = Cast<Level>(GetObjectOwner(Owner_Level));
+		const auto level = Cast<Level>(GetOwner());
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
