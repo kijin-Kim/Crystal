@@ -376,7 +376,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		const auto level = Cast<Level>(GetOwner());
+		const auto level = Cast<Level>(GetOuter());
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
@@ -673,7 +673,7 @@ namespace Crystal {
 		                                                           D3D12_DSV_DIMENSION_TEXTURE2D);
 
 
-		const auto level = Cast<Level>(GetOwner());
+		const auto level = Cast<Level>(GetOuter());
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.

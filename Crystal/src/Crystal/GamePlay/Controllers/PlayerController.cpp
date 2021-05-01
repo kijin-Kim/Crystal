@@ -38,9 +38,9 @@ namespace Crystal {
 		m_GameInputComponent = std::make_unique<InputComponent>();
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
-		m_GameInputComponent->SetOwner(pawn);
+		m_GameInputComponent->SetOuter(pawn);
 		
-		m_UserInterfaceInputComponent->SetOwner(pawn);
+		m_UserInterfaceInputComponent->SetOuter(pawn);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
 	}
 

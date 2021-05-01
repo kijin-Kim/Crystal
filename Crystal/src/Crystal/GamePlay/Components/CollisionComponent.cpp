@@ -9,9 +9,9 @@ namespace Crystal {
 	{
 		PrimitiveComponent::RegisterComponent();
 
-		auto owner = Cast<Actor>(GetOwner());
+		auto owner = Cast<Actor>(GetOuter());
 
-		auto level = Cast<Level>(owner->GetOwner());
+		auto level = Cast<Level>(owner->GetOuter());
 
 		level->RegisterPhysicsWorldComponent(Cast<CollisionComponent>(shared_from_this()));
 	}

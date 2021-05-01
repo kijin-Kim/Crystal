@@ -5,7 +5,7 @@ namespace Crystal {
 
 	void SpringArmComponent::Update(const float deltaTime)
 	{
-		if (!m_ParentComponent)
+		if (m_ParentComponent.expired())
 		{
 			CS_WARN("Spring Arm Component에 부모가 존재하지 않습니다");
 			return;
@@ -18,7 +18,7 @@ namespace Crystal {
 			Matrix4x4::Translation(Vector3::Add(GetLocalPosition(), m_OffsetPosition)));
 
 		// Multiply parent to get world
-		m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
+		m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent.lock()->GetWorldTransform());
 		DirectX::XMFLOAT3 worldTargetPosition = { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 };
 
 		//=================================================================================================

@@ -10,7 +10,7 @@ namespace Crystal {
 	void Level::OnCreate()
 	{
 
-		Updatable::OnCreate();
+		Object::OnCreate();
 
 		m_PhysicsSystem = std::make_unique<PhysicsSystem>();
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
@@ -18,7 +18,7 @@ namespace Crystal {
 
 #ifndef CS_NM_DEDICATED
 		m_RenderSystem = std::make_unique<RenderSystem>();
-		m_RenderSystem->SetOwner(weak_from_this());
+		m_RenderSystem->SetOuter(weak_from_this());
 		m_RenderSystem->SetObjectName("LevelRenderSystem");
 		m_RenderSystem->OnCreate();
 		m_RenderSystem->Begin();
@@ -27,7 +27,7 @@ namespace Crystal {
 
 	void Level::Update(const float deltaTime)
 	{
-		Updatable::Update(deltaTime);
+		Object::Update(deltaTime);
 	
 	
 		for (const auto& actor : m_Actors)

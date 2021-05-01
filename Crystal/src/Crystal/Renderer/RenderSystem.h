@@ -49,7 +49,7 @@ namespace Crystal {
 		{
 			/*Pipeline을 만듭니다.*/
 			auto pipeline = std::make_unique<T>();
-			pipeline->SetOwner(shader);
+			pipeline->SetOuter(shader);
 			pipeline->SetObjectName(name);
 			pipeline->OnCreate();
 

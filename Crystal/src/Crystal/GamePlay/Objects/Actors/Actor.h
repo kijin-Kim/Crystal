@@ -9,7 +9,7 @@ namespace Crystal {
 
 
 	// Spawn-able object
-	class Actor : public Updatable
+	class Actor : public Object
 	{
 	public:
 		Actor();
@@ -19,7 +19,7 @@ namespace Crystal {
 
 		virtual void Begin() {}
 		virtual void End() {}
-		void Update(const float deltaTime) override { Updatable::Update(deltaTime); }
+		void Update(const float deltaTime) override { Object::Update(deltaTime); }
 
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/

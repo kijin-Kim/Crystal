@@ -2,7 +2,7 @@
 #include "TransformComponent.h"
 
 namespace Crystal {
-	void TransformComponent::Update(const float deltaTime)
+	void TransformComponent::Update(float deltaTime)
 	{
 		Component::Update(deltaTime);
 
@@ -21,8 +21,8 @@ namespace Crystal {
 	void TransformComponent::UpdateTransfromHierarchy()
 	{
 		/*Parent부터 자식 순으로 계산하여야 함*/
-		if (m_ParentComponent)
-			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent->GetWorldTransform());
+		if (!m_ParentComponent.expired())
+			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent.lock()->GetWorldTransform());
 		else
 			m_WorldTransform = m_LocalTransform;
 	}
@@ -40,7 +40,7 @@ namespace Crystal {
 	{
 		DirectX::XMFLOAT3 newLocalPosition = position;
 
-		if (m_ParentComponent)
+		if (!m_ParentComponent.expired())
 		{
 			auto newWorldTransform = m_WorldTransform;
 			newWorldTransform._41 = position.x;
@@ -48,7 +48,7 @@ namespace Crystal {
 			newWorldTransform._43 = position.z;
 
 			auto newLocalTransform = Matrix4x4::Multiply(newWorldTransform,
-				Matrix4x4::Inverse(m_ParentComponent->GetWorldTransform()));
+				Matrix4x4::Inverse(m_ParentComponent.lock()->GetWorldTransform()));
 
 			newLocalPosition = { newLocalTransform._41, newLocalTransform._42, newLocalTransform._43 };
 		}
@@ -188,14 +188,14 @@ namespace Crystal {
 		return { m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33 };
 	}
 
-	void TransformComponent::SetParentComponent(const std::shared_ptr<TransformComponent> component)
+	void TransformComponent::SetParentComponent(const std::weak_ptr<TransformComponent>& component)
 	{
-		m_ParentComponent = std::move(component);
+		m_ParentComponent = component;
 	}
 
-	Crystal::TransformComponent* TransformComponent::GetParentComponent() const
+	std::weak_ptr<TransformComponent> TransformComponent::GetParentComponent() const
 	{
-		return m_ParentComponent.get();
+		return m_ParentComponent;
 	}
 
 	void TransformComponent::SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform)

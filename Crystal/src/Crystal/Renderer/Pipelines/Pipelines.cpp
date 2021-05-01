@@ -26,8 +26,8 @@ namespace Crystal {
 		if (!material)
 			return false;
 
-		auto thisPipelineShader = Cast<Shader>(GetOwner());
-		auto inputMaterialShader = Cast<Shader>(material->GetOwner());
+		auto thisPipelineShader = Cast<Shader>(GetOuter());
+		auto inputMaterialShader = Cast<Shader>(material->GetOuter());
 
 		return thisPipelineShader == inputMaterialShader;
 	}
@@ -100,7 +100,7 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		auto shader = Cast<Shader>(GetOwner());
+		auto shader = Cast<Shader>(GetOuter());
 
 		pipelineStateStream.RootSignature = shader->GetRootSignature().GetData();
 		auto inputLayout = shader->GetInputLayout();
@@ -186,7 +186,7 @@ namespace Crystal {
 		Pipeline::Record(commandList);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto shader = Cast<Shader>(GetOwner());
+		auto shader = Cast<Shader>(GetOuter());
 		auto rootSignature = shader->GetRootSignature();
 
 
@@ -259,7 +259,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
-		auto shader = Cast<Shader>(GetOwner());
+		auto shader = Cast<Shader>(GetOuter());
 		auto& shaderDatablobs = shader->GetRaw();
 		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
 		computePipelineStateDesc.pRootSignature = shader->GetRootSignature().GetData();
@@ -273,7 +273,7 @@ namespace Crystal {
 	{
 		Pipeline::Record(commandList);
 
-		auto shader = Cast<Shader>(GetOwner());
+		auto shader = Cast<Shader>(GetOuter());
 
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetComputeRootSignature(shader->GetRootSignature().GetData());

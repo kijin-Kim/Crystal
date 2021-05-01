@@ -2,8 +2,11 @@
 #include "Component.h"
 
 namespace Crystal {
-	/*물리적인 위치를 나타내는 특성을 가지고 있는 컴포넌트들의 베이스 클래스
-MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 지님*/
+	/*
+	 * 물리적인 위치를 나타내는 특성을 가지고 있는 컴포넌트들의 베이스 클래스
+	 * MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 지님
+	 * 다른 Transform Component에 계층구조로 붙을 수 있습니다.
+	 */
 
 	class TransformComponent : public Component
 	{
@@ -11,7 +14,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		TransformComponent() = default;
 		~TransformComponent() override = default;
 
-		void Update(const float deltaTime) override;
+		void Update(float deltaTime) override;
 		void UpdateTransfromHierarchy();
 
 
@@ -41,8 +44,8 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		DirectX::XMFLOAT3 GetWorldUpVector() const;
 		DirectX::XMFLOAT3 GetWorldForwardVector() const;
 
-		void SetParentComponent(const std::shared_ptr<TransformComponent> component);
-		TransformComponent* GetParentComponent() const;
+		void SetParentComponent(const std::weak_ptr<TransformComponent>& component);
+		std::weak_ptr<TransformComponent> GetParentComponent() const;
 
 		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform);
 		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform);
@@ -58,8 +61,7 @@ MainComponent가 될 수 있고, 최대 하나의 부모를 가지고 부모의 상대적 Transform을 
 		STATIC_TYPE_IMPLE(TransformComponent)
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
-		std::shared_ptr<TransformComponent> m_ParentComponent = nullptr;
-		std::vector<TransformComponent*> m_ChildComponents;
+		std::weak_ptr<TransformComponent> m_ParentComponent;
 
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();

@@ -12,7 +12,7 @@ namespace Crystal {
 	class PlayerController;
 	class RenderSystem;
 	
-	class Level : public Updatable
+	class Level : public Object
 	{
 	public:
 		Level() = default;
@@ -58,7 +58,7 @@ namespace Crystal {
 	{
 		// Create new actor
 		auto newActor = std::make_shared<T>();
-		newActor->SetOwner(weak_from_this());
+		newActor->SetOuter(weak_from_this());
 		newActor->OnCreate();
 		if (!name.empty())
 			newActor->SetObjectName(name);

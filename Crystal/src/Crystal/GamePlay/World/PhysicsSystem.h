@@ -5,7 +5,7 @@
 
 namespace Crystal {
 
-	class PhysicsSystem : public Updatable
+	class PhysicsSystem : public Object
 	{
 	public:
 		PhysicsSystem() = default;

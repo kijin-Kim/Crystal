@@ -6,7 +6,7 @@
 #include "Crystal/Resources/Renderable.h"
 
 namespace Crystal {
-	class Component : public Updatable
+	class Component : public Object
 	{
 	public:
 		Component() = default;

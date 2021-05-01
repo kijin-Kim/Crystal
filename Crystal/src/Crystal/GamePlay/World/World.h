@@ -10,7 +10,7 @@ namespace Crystal {
 	class PlayerController;
 
 
-	class World : public Updatable
+	class World : public Object
 	{
 	public:
 		World() = default;

@@ -10,13 +10,13 @@ namespace Crystal {
 	{
 		TransformComponent::RegisterComponent();
 
-		auto ownerActor = GetOwner().lock();
+		auto ownerActor = GetOuter().lock();
 		if(!ownerActor)
 		{
 			return;
 		}
 
-		auto level = Cast<Level>(ownerActor->GetOwner());
+		auto level = Cast<Level>(ownerActor->GetOuter());
 		if (!level)
 		{
 			return;

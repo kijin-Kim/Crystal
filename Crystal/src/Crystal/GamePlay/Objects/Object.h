@@ -7,8 +7,7 @@
 
 namespace Crystal {
 #define STATIC_TYPE_IMPLE(classType) virtual std::string StaticType() const { return #classType; }
-#define MAX_OBJECT_OWNER_COUNT 5
-	// Has name
+	
 	class Object : public std::enable_shared_from_this<Object>
 	{
 	public:
@@ -31,7 +30,9 @@ namespace Crystal {
 		}
 
 		
-
+		virtual void Update(float deltaTime)
+		{
+		}
 
 		void SetDefaultName()
 		{
@@ -46,26 +47,15 @@ namespace Crystal {
 		const std::string& GetObjectName() const { return m_Name; }
 	
 
-		void SetOwner(const std::weak_ptr<Object>& owner) { m_Owner = owner; }
-		std::weak_ptr<Object> GetOwner() const { return m_Owner; }
+		void SetOuter(const std::weak_ptr<Object>& outer) { m_Outer = outer; }
+		std::weak_ptr<Object> GetOuter() const { return m_Outer; }
 		
 
 		STATIC_TYPE_IMPLE(Object)
 
 	private:
 		std::string m_Name;
-		std::weak_ptr<Object> m_Owner;
+		std::weak_ptr<Object> m_Outer;
 	};
 	
-	// Update-able
-	class Updatable : public Object
-	{
-	public:
-		Updatable() = default;
-		~Updatable() override = default;
-
-		virtual void Update(const float deltaTime) {}
-
-		STATIC_TYPE_IMPLE(Updatable)
-	};
 }

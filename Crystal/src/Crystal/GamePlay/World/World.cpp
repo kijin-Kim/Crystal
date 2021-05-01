@@ -8,7 +8,7 @@ namespace Crystal {
 
 	void World::OnCreate()
 	{
-		Updatable::OnCreate();
+		Object::OnCreate();
 	}
 
 	Level* World::CreateNewLevel(const std::string& name /*= ""*/)
@@ -17,7 +17,7 @@ namespace Crystal {
 		level->OnCreate();
 		if (!name.empty())
 			level->SetObjectName(name);
-		level->SetOwner(weak_from_this());
+		level->SetOuter(weak_from_this());
 
 		m_Levels.push_back(std::move(level));
 
@@ -70,7 +70,7 @@ namespace Crystal {
 
 	void World::Update(const float deltaTime)
 	{
-		Updatable::Update(deltaTime);
+		Object::Update(deltaTime);
 
 		if (m_CurrentLevel)
 		{

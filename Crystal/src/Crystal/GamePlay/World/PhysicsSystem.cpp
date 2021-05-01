@@ -7,7 +7,7 @@ namespace Crystal {
 
 	void PhysicsSystem::Update(const float deltaTime)
 	{
-		Updatable::Update(deltaTime);
+		Object::Update(deltaTime);
 
 		 
 		//// Bounding Sphere

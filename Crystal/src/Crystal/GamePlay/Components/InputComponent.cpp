@@ -71,11 +71,11 @@ namespace Crystal {
 
 	bool InputComponent::processAxisMappedInput(int64_t keyCode, float axisValue)
 	{
-		auto ownerActor = Cast<Actor>(GetOwner());
+		auto ownerActor = Cast<Actor>(GetOuter());
 		if (!ownerActor)
 			return false;
 
-		auto level = Cast<Level>(ownerActor->GetOwner());
+		auto level = Cast<Level>(ownerActor->GetOuter());
 		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
 		
 		if (!playerController)
@@ -106,11 +106,11 @@ namespace Crystal {
 
 	bool InputComponent::processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
 	{
-		auto ownerActor = Cast<Actor>(GetOwner());
+		auto ownerActor = Cast<Actor>(GetOuter());
 		if (!ownerActor)
 			return false;
 
-		auto level = Cast<Level>(ownerActor->GetOwner());
+		auto level = Cast<Level>(ownerActor->GetOuter());
 		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
 		if (!playerController)
 			return false;
