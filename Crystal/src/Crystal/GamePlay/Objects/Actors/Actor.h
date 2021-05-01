@@ -1,4 +1,5 @@
 #pragma once
+#include <DirectXMath.h>
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
@@ -12,8 +13,10 @@ namespace Crystal {
 	class Actor : public Object
 	{
 	public:
-		Actor();
+		Actor() = default;
 		~Actor() override = default;
+
+		void Initialize() override;
 
 		void OnCreate() override;
 
@@ -35,7 +38,7 @@ namespace Crystal {
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);
 		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
 
-
+		
 		void SetAttachment(const std::shared_ptr<TransformComponent>& from, 
 			const std::shared_ptr<TransformComponent>& to);
 

@@ -1,11 +1,10 @@
 #pragma once
-#include <debugapi.h>
+#include <Windows.h>
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <stdexcept>
 
 //https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template<typename ... Args>

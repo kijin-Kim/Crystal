@@ -34,6 +34,8 @@ namespace Crystal {
 		std::shared_ptr<T> CreateObject(const std::string& name = "", const std::weak_ptr<Object>& outer = {})
 		{
 			std::shared_ptr<T> newObject = std::make_shared<T>();
+			newObject->Initialize();
+			
 			if (!name.empty())
 			{
 				newObject->SetObjectName(name);
@@ -42,7 +44,7 @@ namespace Crystal {
 			{
 				newObject->SetOuter(outer);
 			}
-			
+
 			newObject->OnCreate();
 
 			return newObject;

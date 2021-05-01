@@ -9,10 +9,8 @@
 #include "actors/Kraken.h"
 #include "actors/Asteroid.h"
 #include "Crystal/Resources/ResourceManager.h"
-#include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
 #include "actors/Sun.h"
 #include "Crystal/GamePlay/Objects/Actors/ParticleActor.h"
-#include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
 #define WINDOW_WIDTH 1920

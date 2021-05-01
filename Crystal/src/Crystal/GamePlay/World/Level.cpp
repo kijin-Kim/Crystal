@@ -2,8 +2,6 @@
 #include "Level.h"
 #include "Crystal/GamePlay/Objects/Actors/LineActor.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
-#include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
-#include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
 
 namespace Crystal {
 
@@ -13,11 +11,13 @@ namespace Crystal {
 		Object::OnCreate();
 
 		m_PhysicsSystem = std::make_unique<PhysicsSystem>();
+		m_PhysicsSystem->Initialize();
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
 		m_PhysicsSystem->OnCreate();
 
 #ifndef CS_NM_DEDICATED
 		m_RenderSystem = std::make_unique<RenderSystem>();
+		m_RenderSystem->Initialize();
 		m_RenderSystem->SetOuter(weak_from_this());
 		m_RenderSystem->SetObjectName("LevelRenderSystem");
 		m_RenderSystem->OnCreate();

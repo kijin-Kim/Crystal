@@ -319,8 +319,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\PlaneQuadActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\SkyboxActor.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\TonemappingActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
@@ -385,6 +383,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\ParticleActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />

@@ -7,7 +7,8 @@
 
 namespace Crystal {
 
-	Actor::Actor()
+	
+	void Actor::Initialize()
 	{
 		m_MainComponent = CreateComponent<TransformComponent>("DefaultMain");
 	}
@@ -50,13 +51,11 @@ namespace Crystal {
 
 		for (const auto& c : m_Components)
 		{
-			c->SetOuter(weak_from_this());
 			c->RegisterComponent();
 		}
 
 		for (const auto& tc : m_TransformHierarchy)
 		{
-			tc->SetOuter(weak_from_this());
 			tc->RegisterComponent();
 		}
 	}

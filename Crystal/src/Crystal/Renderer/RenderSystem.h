@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <dxgi1_2.h>
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/Shader.h"

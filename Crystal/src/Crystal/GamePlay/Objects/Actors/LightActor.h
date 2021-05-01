@@ -6,10 +6,7 @@ namespace Crystal {
 	class LightActor : public Actor
 	{
 	public:
-		LightActor()
-		{
-		}
-
+		LightActor() = default;
 		~LightActor() override = default;
 
 
@@ -22,16 +19,17 @@ namespace Crystal {
 	class LocalLightActor : public LightActor
 	{
 	public:
-		LocalLightActor()
+		LocalLightActor() = default;
+		~LocalLightActor() override = default;
+
+		void Initialize() override
 		{
 			m_LightComponent = CreateComponent<LocalLightComponent>("LocalLightComponent");
 			m_LightComponent->SetLocalPosition(Vector3::Zero);
 			m_LightComponent->SetLocalPosition(Vector3::White);
 
 			m_MainComponent = m_LightComponent;
-
 		}
-		~LocalLightActor() override = default;
 
 
 		STATIC_TYPE_IMPLE(LocalLightActor)
@@ -42,16 +40,17 @@ namespace Crystal {
 	class DirectionalLightActor : public LightActor
 	{
 	public:
-		DirectionalLightActor()
+		DirectionalLightActor() = default;
+		~DirectionalLightActor() override = default;
+
+		void Initialize() override
 		{
 			m_LightComponent = CreateComponent<DirectionalLightComponent>("DirectionalLightComponent");
 			m_LightComponent->SetLocalPosition(Vector3::Zero);
 			m_LightComponent->SetLocalPosition(Vector3::White);
 
 			m_MainComponent = m_LightComponent;
-			
 		}
-		~DirectionalLightActor() override = default;
 
 
 		STATIC_TYPE_IMPLE(DirectionalLightActor)

@@ -6,21 +6,16 @@ namespace Crystal {
 	class LineActor : public Actor
 	{
 	public:
-		LineActor()
+		LineActor() = default;
+		~LineActor() override = default;
+
+		void Initialize() override
 		{
+			Actor::Initialize();
+
 			m_DebugLineComponent = CreateComponent<RayComponent>("DebugLineComponent");
 			m_MainComponent = m_DebugLineComponent;
 		}
-
-		~LineActor() override = default;
-
-		void Begin() override
-		{
-		}
-		void End() override
-		{
-		}
-		void Update(const float deltaTime) override {}
 
 		std::shared_ptr<RayComponent> GetLineComponent() const { return m_DebugLineComponent; }
 
