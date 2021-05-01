@@ -12,13 +12,6 @@ namespace Crystal {
 	class Actor : public Updatable
 	{
 	public:
-		enum ActorOwnerType
-		{
-			Owner_Level = 0,
-			Owner_Controller
-		};
-
-	public:
 		Actor();
 		~Actor() override = default;
 

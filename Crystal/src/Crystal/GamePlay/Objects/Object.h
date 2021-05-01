@@ -54,8 +54,6 @@ namespace Crystal {
 
 	private:
 		std::string m_Name;
-		std::array<std::weak_ptr<Object>, MAX_OBJECT_OWNER_COUNT> m_Owners = {};
-
 		std::weak_ptr<Object> m_Owner;
 	};
 	

@@ -15,11 +15,6 @@ namespace Crystal {
 	class Level : public Updatable
 	{
 	public:
-		enum LevelOwnerType
-		{
-			Owner_World = 0
-		};
-	public:
 		Level() = default;
 		~Level() override = default;
 

@@ -19,21 +19,13 @@ namespace Crystal {
 	public:
 		struct MaterialBase : public Object
 		{
-			enum MaterialOwnerType
-			{
-				Owner_Shader = 0
-			};
+
 			
 			virtual bool UsingSameTextures(MaterialBase* material) { return false; }
 
 			STATIC_TYPE_IMPLE(MaterialBase)
 		};
 
-
-		enum PipelineOwnerType
-		{
-			Owner_Shader = 0
-		};
 
 		struct PipelineInputs
 		{

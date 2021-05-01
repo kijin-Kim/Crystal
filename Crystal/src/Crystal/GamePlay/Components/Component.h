@@ -9,12 +9,6 @@ namespace Crystal {
 	class Component : public Updatable
 	{
 	public:
-		enum ComponentOwnerType
-		{
-			Owner_Component = 0,
-			Owner_Actor = 1
-		};
-	public:
 		Component() = default;
 		~Component() override = default;
 
