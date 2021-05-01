@@ -38,11 +38,6 @@ namespace Crystal {
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);
 		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
 
-		
-		void SetAttachment(const std::shared_ptr<TransformComponent>& from, 
-			const std::shared_ptr<TransformComponent>& to);
-
-
 		STATIC_TYPE_IMPLE(Actor)
 	protected:
 		/*Component를 생성하고 Register합니다.*/

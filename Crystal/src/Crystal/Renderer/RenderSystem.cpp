@@ -5,8 +5,6 @@
 #include "Crystal/Core/Device.h"
 #include "Crystal/Core/WindowsWindow.h"
 #include "Crystal/Gameplay/Controllers/PlayerController.h"
-#include "Crystal/GamePlay/Objects/Actors/SkyboxActor.h"
-#include "Crystal/GamePlay/Objects/Actors/TonemappingActor.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
 #include "Crystal/Resources/DescriptorAllocator.h"

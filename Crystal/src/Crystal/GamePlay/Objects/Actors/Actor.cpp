@@ -7,7 +7,7 @@
 
 namespace Crystal {
 
-	
+
 	void Actor::Initialize()
 	{
 		m_MainComponent = CreateComponent<TransformComponent>("DefaultMain");
@@ -64,14 +64,17 @@ namespace Crystal {
 	{
 		CS_FATAL(!component->GetParentComponent().expired(), "이동하려는 컴포넌트의 Parent가 존재 하지 않습니다.");
 
-		
+
 		/*Hierarchy에 이미 있는지 검사*/
-		if (m_TransformHierarchy.end() != std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
-		                                               [component](
-		                                               const std::shared_ptr<TransformComponent>& com) -> bool
-		                                               {
-			                                               return com == component;
-		                                               }))
+
+		auto hierarchyit = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
+		                                [component](
+		                                const std::shared_ptr<TransformComponent>& com) -> bool
+		                                {
+			                                return com == component;
+		                                });
+
+		if (hierarchyit != m_TransformHierarchy.end())
 		{
 			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다",
 			        component->GetObjectName().c_str());
@@ -84,6 +87,7 @@ namespace Crystal {
 		                                {
 			                                return com == component;
 		                                });
+
 		if (componentIt == m_Components.end())
 		{
 			CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
@@ -94,14 +98,12 @@ namespace Crystal {
 		m_Components.erase(componentIt);
 
 
-	
 		/*Transform Hierarchy에서의 위치를 찾아 삽입합니다..*/
 		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 		                       [component](const std::shared_ptr<TransformComponent>& com) -> bool
 		                       {
 			                       return com.get() == component->GetParentComponent().lock().get();
 		                       });
-
 
 		/*부모를 찾았을 시*/
 		if (it != m_TransformHierarchy.end())
@@ -171,13 +173,6 @@ namespace Crystal {
 		}
 
 		return {};
-	}
-
-	void Actor::SetAttachment(const std::shared_ptr<TransformComponent>& from,
-	                          const std::shared_ptr<TransformComponent>& to)
-	{
-		from->SetParentComponent(to);
-		MoveToTransformComponentHierarchy(from);
 	}
 
 }

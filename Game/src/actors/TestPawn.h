@@ -10,7 +10,7 @@
 class TestPawn final : public Crystal::Pawn
 {
 public:
-	TestPawn();
+	TestPawn() = default;
 	~TestPawn() override = default;
 
 	void Initialize() override;

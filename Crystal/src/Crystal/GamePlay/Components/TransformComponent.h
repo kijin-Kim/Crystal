@@ -17,6 +17,7 @@ namespace Crystal {
 		void Update(float deltaTime) override;
 		void UpdateTransfromHierarchy();
 
+		void AttachTo(const std::shared_ptr<TransformComponent> component);
 
 		void SetLocalPosition(const DirectX::XMFLOAT3& position);
 		void SetWorldPosition(const DirectX::XMFLOAT3& position);

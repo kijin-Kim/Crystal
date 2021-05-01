@@ -2,68 +2,14 @@
 
 #include "Crystal/GamePlay/World/Level.h"
 
-TestPawn::TestPawn()
-{
-	//////// TEMPORARY ////
-
-	//auto& resourceManager = Crystal::ResourceManager::Instance();
-
-
-	///*auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();*/
-
-	//auto material = std::make_unique<Crystal::NewMaterial>();
-	//material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
-
-
-	////===================================================================================================
-
-	///*auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	//boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });*/
-
-	//auto boxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	//boxComponent->SetRadius(908.0f / 2.0f);
-	//boxComponent->SetMass(20000.0f);
-
-	//m_MainComponent = boxComponent;
-
-	//auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-	//staticMeshComponent->AddMaterial(std::move(material));
-	//SetAttachment(staticMeshComponent, m_MainComponent);
-
-	//auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-	//springArmComponent->SetOffsetPosition({0, 450.0f, -1500.0f});
-	//SetAttachment(springArmComponent, m_MainComponent);
-
-	//m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-	//m_CameraComponent->SetFieldOfView(60.0f);
-	//m_CameraComponent->SetNearPlane(100.0f);
-	//m_CameraComponent->SetViewport({0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f});
-	//m_CameraComponent->SetFarPlane(1000000.0f);
-	//SetAttachment(m_CameraComponent, springArmComponent);
-
-	//m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
-	//m_MovementComponent->SetTargetComponent(m_MainComponent);
-}
-
 void TestPawn::Initialize()
 {
 	Pawn::Initialize();
 	
-	////// TEMPORARY ////
-
-	auto& resourceManager = Crystal::ResourceManager::Instance();
-
-
-	/*auto material = std::make_unique<Crystal::LightingStaticPipeline::Material>();*/
 
 	auto material = std::make_unique<Crystal::NewMaterial>();
 	material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
-
-	//===================================================================================================
-
-	/*auto boxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boxComponent->SetExtents({ 908.0f / 2.0f, 294.0f / 2.0f, 869.0f / 2.0f });*/
 
 	auto boxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
 	boxComponent->SetRadius(908.0f / 2.0f);
@@ -73,18 +19,19 @@ void TestPawn::Initialize()
 
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 	staticMeshComponent->AddMaterial(std::move(material));
-	SetAttachment(staticMeshComponent, m_MainComponent);
+	staticMeshComponent->AttachTo(m_MainComponent);
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({ 0, 450.0f, -1500.0f });
-	SetAttachment(springArmComponent, m_MainComponent);
+	springArmComponent->AttachTo(m_MainComponent);
+	
 
 	m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 	m_CameraComponent->SetFieldOfView(60.0f);
 	m_CameraComponent->SetNearPlane(100.0f);
 	m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 	m_CameraComponent->SetFarPlane(1000000.0f);
-	SetAttachment(m_CameraComponent, springArmComponent);
+	m_CameraComponent->AttachTo(springArmComponent);
 
 	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);

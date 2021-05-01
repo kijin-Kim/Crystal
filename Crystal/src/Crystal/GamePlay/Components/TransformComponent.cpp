@@ -27,6 +27,14 @@ namespace Crystal {
 			m_WorldTransform = m_LocalTransform;
 	}
 
+	void TransformComponent::AttachTo(const std::shared_ptr<TransformComponent> component)
+	{
+		SetParentComponent(component);
+		auto actor = Cast<Actor>(GetOuter());
+		CS_FATAL(actor, "Outer가 존재하지 않습니다.");
+		actor->MoveToTransformComponentHierarchy(Cast<TransformComponent>(shared_from_this()));
+	}
+
 
 	void TransformComponent::SetLocalPosition(const DirectX::XMFLOAT3& position)
 	{

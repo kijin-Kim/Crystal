@@ -33,10 +33,7 @@ public:
 		m_LightComponent->SetLocalPosition(Crystal::Vector3::Zero);
 		m_LightComponent->SetLightColor(Crystal::Vector3::White);
 		m_LightComponent->SetLightIntensity(3.0f);
-
-
-
-		SetAttachment(m_LightComponent, m_MainComponent);
+		m_LightComponent->AttachTo(m_MainComponent);
 	}
 
 	STATIC_TYPE_IMPLE(Sun)

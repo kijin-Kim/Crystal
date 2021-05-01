@@ -13,8 +13,6 @@
 #include "Crystal/GamePlay/Objects/Actors/ParticleActor.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
 
 class GameApplication : public Crystal::Application
 {
@@ -232,5 +230,9 @@ public:
 private:
 	Crystal::Timer m_MainTimer;
 };
+
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
+
 
 Register_Application(GameApplication, WINDOW_WIDTH, WINDOW_HEIGHT);
