@@ -7,7 +7,7 @@ namespace Crystal {
 		Component::Update(deltaTime);
 
 		const auto position = GetLocalPosition();
-		const auto scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
+		const auto scale = Matrix4x4::Scale({m_Scale, m_Scale, m_Scale});
 		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_Rotation);
 		const auto translation = Matrix4x4::Translation(position);
 
@@ -48,9 +48,10 @@ namespace Crystal {
 			newWorldTransform._43 = position.z;
 
 			auto newLocalTransform = Matrix4x4::Multiply(newWorldTransform,
-				Matrix4x4::Inverse(m_ParentComponent.lock()->GetWorldTransform()));
+			                                             Matrix4x4::Inverse(
+				                                             m_ParentComponent.lock()->GetWorldTransform()));
 
-			newLocalPosition = { newLocalTransform._41, newLocalTransform._42, newLocalTransform._43 };
+			newLocalPosition = {newLocalTransform._41, newLocalTransform._42, newLocalTransform._43};
 		}
 
 		SetLocalPosition(newLocalPosition);
@@ -123,13 +124,13 @@ namespace Crystal {
 
 	DirectX::XMFLOAT3 TransformComponent::GetLocalPosition() const
 	{
-		return { m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43 };
+		return {m_LocalTransform._41, m_LocalTransform._42, m_LocalTransform._43};
 	}
 
 
 	DirectX::XMFLOAT3 TransformComponent::GetWorldPosition() const
 	{
-		return { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 };
+		return {m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43};
 	}
 
 
@@ -175,17 +176,17 @@ namespace Crystal {
 
 	DirectX::XMFLOAT3 TransformComponent::GetWorldRightVector() const
 	{
-		return { m_WorldTransform._11, m_WorldTransform._12, m_WorldTransform._13 };
+		return {m_WorldTransform._11, m_WorldTransform._12, m_WorldTransform._13};
 	}
 
 	DirectX::XMFLOAT3 TransformComponent::GetWorldUpVector() const
 	{
-		return { m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23 };
+		return {m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23};
 	}
 
 	DirectX::XMFLOAT3 TransformComponent::GetWorldForwardVector() const
 	{
-		return { m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33 };
+		return {m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33};
 	}
 
 	void TransformComponent::SetParentComponent(const std::weak_ptr<TransformComponent>& component)

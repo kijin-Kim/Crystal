@@ -11,45 +11,43 @@ namespace Crystal {
 	class Object : public std::enable_shared_from_this<Object>
 	{
 	public:
-		Object() = default;
-		virtual ~Object()
-		{
-			CS_DEBUG_INFO("Object : [%s]가 제거되었습니다", m_Name.c_str());
-		}
+		Object();
+		virtual ~Object();
 
-		virtual void OnCreate()
+		virtual void Initialize();
+		virtual void OnCreate();
+
+
+		virtual void Update(float deltaTime);
+
+		void SetDefaultName();
+
+		void SetObjectName(const std::string& name);
+
+		const std::string& GetObjectName() const;
+
+
+		void SetOuter(const std::weak_ptr<Object>& outer);
+		std::weak_ptr<Object> GetOuter() const;
+
+		template<class T>
+		std::shared_ptr<T> CreateObject(const std::string& name = "", const std::weak_ptr<Object>& outer = {})
 		{
-			// 디폴트 이름 설정
-			// 오브젝트의 타입을 기반으로 이름을 설정
-			// 오브젝트의 카운트를 찾고 그 카운트를 기반으로 이름을 설정
+			std::shared_ptr<T> newObject = std::make_shared<T>();
+			if (!name.empty())
+			{
+				newObject->SetObjectName(name);
+			}
+			if(!outer.expired())
+			{
+				newObject->SetOuter(outer);
+			}
 			
-			if(m_Name.empty())
-				SetDefaultName();
+			newObject->OnCreate();
 
-			CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
+			return newObject;
 		}
 
-		
-		virtual void Update(float deltaTime)
-		{
-		}
-
-		void SetDefaultName()
-		{
-			m_Name = StaticType();
-		}
-
-		void SetObjectName(const std::string& name) 
-		{
-			m_Name = name; 
-		}
-
-		const std::string& GetObjectName() const { return m_Name; }
-	
-
-		void SetOuter(const std::weak_ptr<Object>& outer) { m_Outer = outer; }
-		std::weak_ptr<Object> GetOuter() const { return m_Outer; }
-		
 
 		STATIC_TYPE_IMPLE(Object)
 

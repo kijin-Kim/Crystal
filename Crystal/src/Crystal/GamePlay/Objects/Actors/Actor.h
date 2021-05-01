@@ -19,7 +19,6 @@ namespace Crystal {
 
 		virtual void Begin() {}
 		virtual void End() {}
-		void Update(const float deltaTime) override { Object::Update(deltaTime); }
 
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
@@ -48,12 +47,8 @@ namespace Crystal {
 		std::shared_ptr<T> CreateComponent(const std::string& name = "")
 		{
 			/*TODO : Component만 받게 체크...*/
-			std::shared_ptr<T> newComponent = std::make_shared<T>();
+			std::shared_ptr<T> newComponent = CreateObject<T>(name, weak_from_this());
 			AddComponent(newComponent);
-			newComponent->SetObjectName(name);
-			newComponent->OnCreate();
-			
-
 			return newComponent;
 		}
 
