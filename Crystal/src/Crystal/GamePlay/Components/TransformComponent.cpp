@@ -88,6 +88,16 @@ namespace Crystal {
 		m_InverseMass = inverseMass;
 	}
 
+	void TransformComponent::SetRotation(const DirectX::XMFLOAT4& rotation)
+	{
+		m_Rotation = rotation;
+	}
+
+	void TransformComponent::SetWorldTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		m_WorldTransform = transform;
+	}
+
 	void TransformComponent::RotateRoll(float angle)
 	{
 		angle = DirectX::XMConvertToRadians(angle);
@@ -207,15 +217,6 @@ namespace Crystal {
 		return m_ParentComponent;
 	}
 
-	void TransformComponent::SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform)
-	{
-		m_WorldTransform = worldTransform;
-	}
-
-	void TransformComponent::SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform)
-	{
-		m_LocalTransform = localTransform;
-	}
 
 	const DirectX::XMFLOAT4X4& TransformComponent::GetWorldTransform() const
 	{

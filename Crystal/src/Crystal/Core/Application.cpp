@@ -20,8 +20,9 @@ namespace Crystal {
 		m_Window = std::make_unique<WindowsWindow>(width, height);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
 #endif
-	
 
+
+	
 
 		m_World = std::make_shared<World>();
 		m_World->OnCreate();
@@ -91,6 +92,8 @@ namespace Crystal {
 				return false;
 			}
 
+			
+			
 			auto playerController = Cast<PlayerController>(currentLevel->GetActorByClass("PlayerController"));
 			
 			if (playerController)

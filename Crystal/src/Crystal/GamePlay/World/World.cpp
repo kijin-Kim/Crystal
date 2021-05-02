@@ -11,6 +11,13 @@ namespace Crystal {
 		Object::OnCreate();
 	}
 
+	void World::DestroyActor(const std::shared_ptr<Actor>& actor)
+	{
+		auto level = Cast<Level>(actor->GetOuter());
+		CS_FATAL(level, "Outer가 존재하지 않습니다");
+		level->DestroyActor(actor);
+	}
+
 	Level* World::CreateNewLevel(const std::string& name /*= ""*/)
 	{
 		auto level = std::make_shared<Level>();
@@ -65,8 +72,6 @@ namespace Crystal {
 	{
 		m_CurrentLevel = GetLevelByIndex(index);
 	}
-
-
 
 	void World::Update(const float deltaTime)
 	{

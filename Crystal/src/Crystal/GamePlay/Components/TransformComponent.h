@@ -27,6 +27,10 @@ namespace Crystal {
 		void SetMass(const float mass);
 		void SetInverseMass(const float inverseMass);
 
+		void SetRotation(const DirectX::XMFLOAT4& rotation);
+
+		void SetWorldTransform(const DirectX::XMFLOAT4X4& transform);
+
 		void RotateRoll(float angle);
 		void RotatePitch(float angle);
 		void RotateYaw(float angle);
@@ -48,13 +52,12 @@ namespace Crystal {
 		void SetParentComponent(const std::weak_ptr<TransformComponent>& component);
 		std::weak_ptr<TransformComponent> GetParentComponent() const;
 
-		void SetWorldTransform(const DirectX::XMFLOAT4X4& worldTransform);
-		void SetLocalTransform(const DirectX::XMFLOAT4X4& localTransform);
-
+		
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
 		const DirectX::XMFLOAT4X4& GetLocalTransform() const;
 
 		const DirectX::XMFLOAT4& GetRotation() const;
+
 
 		bool CanBeRendered() const override;
 		bool IsCollisionEnabled() const override;
@@ -66,12 +69,15 @@ namespace Crystal {
 
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
+
+		
 		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
+		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
+
 
 		DirectX::XMFLOAT3 m_Velocity = Vector3::Zero;
 		float m_InverseMass = 1 / 10.0f;
 
-		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
 
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;
 		DirectX::XMFLOAT3 m_Up = Vector3::UnitY;

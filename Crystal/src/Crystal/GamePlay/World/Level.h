@@ -1,4 +1,6 @@
 #pragma once
+#include <functional>
+
 #include "Crystal/GamePlay/Objects/Object.h"
 #include "PhysicsSystem.h"
 #include "Crystal/Renderer/RenderSystem.h"
@@ -18,11 +20,13 @@ namespace Crystal {
 
 		void OnCreate() override;
 
+
 		void Update(const float deltaTime) override;
 
 		template <class T>
 		T* SpawnActor(const std::string& name = "");
-		//void RemoveActor() {}
+		void DestroyActor(const std::shared_ptr<Actor>& actor);
+		void DestroyPendingActors();
 
 		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
@@ -38,6 +42,7 @@ namespace Crystal {
 		std::shared_ptr<Actor> GetActorByName(const std::string& name);
 		std::shared_ptr<Actor> GetActorByClass(const std::string& classType);
 		std::vector<std::shared_ptr<Actor>> GetAllActorByClass(const std::string& classType);
+		std::vector<std::shared_ptr<Actor>>::iterator FindActorItByDelegate(const std::function<bool(const std::shared_ptr<Actor>&)>& delegate);
 
 		STATIC_TYPE_IMPLE(Level)
 

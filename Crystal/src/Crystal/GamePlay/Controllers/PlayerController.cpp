@@ -45,7 +45,7 @@ namespace Crystal {
 	}
 
 	bool PlayerController::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
+	{		
 		switch (m_InputMode)
 		{
 		case Crystal::EInputMode::IM_Game:

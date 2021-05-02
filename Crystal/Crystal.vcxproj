@@ -312,7 +312,9 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Actor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\ActorClassOf.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\GameMode.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\LightActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\ParticleActor.h" />
@@ -383,7 +385,9 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\ActorClassOf.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\GameMode.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\ParticleActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />

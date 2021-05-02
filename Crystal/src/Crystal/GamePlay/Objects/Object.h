@@ -30,6 +30,8 @@ namespace Crystal {
 		void SetOuter(const std::weak_ptr<Object>& outer);
 		std::weak_ptr<Object> GetOuter() const;
 
+		
+
 		template<class T>
 		std::shared_ptr<T> CreateObject(const std::string& name = "", const std::weak_ptr<Object>& outer = {})
 		{
@@ -50,12 +52,12 @@ namespace Crystal {
 			return newObject;
 		}
 
-
 		STATIC_TYPE_IMPLE(Object)
 
 	private:
 		std::string m_Name;
 		std::weak_ptr<Object> m_Outer;
 	};
-	
+
+
 }

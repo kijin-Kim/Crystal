@@ -5,13 +5,11 @@
 #include "PhysicsSystem.h"
 
 namespace Crystal {
-	
 
 	class PlayerController;
 
-
 	class World : public Object
-	{
+	{	
 	public:
 		World() = default;
 		~World() override = default;
@@ -22,7 +20,8 @@ namespace Crystal {
 
 
 		template<class T>
-		T* SpawnActor(const std::string& name = "", Level* level = nullptr);
+		T* SpawnActor(const Actor::ActorSpawnParams& spawnParams);
+		void DestroyActor(const std::shared_ptr<Actor>& actor);
 
 		Level* CreateNewLevel(const std::string& name = "");
 
@@ -33,8 +32,8 @@ namespace Crystal {
 		void SetCurrentLevelByName(const std::string& name);
 		void SetCurrentLevelByIndex(int iIndex);
 
-
 		
+
 
 
 		STATIC_TYPE_IMPLE(World)
@@ -43,19 +42,21 @@ namespace Crystal {
 		std::vector<std::shared_ptr<Level>> m_Levels;
 	};
 
-	template<class T>
-	T* Crystal::World::SpawnActor(const std::string& name /*= ""*/, Level* level /*= nullptr*/)
+	template <class T>
+	T* World::SpawnActor(const Actor::ActorSpawnParams& spawnParams)
 	{
-		if (level)
+		if (spawnParams.Level)
 		{
-			return level->SpawnActor<T>(name);
+			return spawnParams.Level->SpawnActor<T>(spawnParams.Name);
 		}
 
 		if (m_CurrentLevel)
 		{
-			return m_CurrentLevel->SpawnActor<T>(name);
+			return m_CurrentLevel->SpawnActor<T>(spawnParams.Name);
 		}
 
 		CS_FATAL(false, "먼저 Level을 설정해주세요");
+		return nullptr;
 	}
+
 }

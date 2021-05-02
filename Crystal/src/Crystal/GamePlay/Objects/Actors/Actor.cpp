@@ -124,6 +124,21 @@ namespace Crystal {
 		m_MainComponent->SetLocalPosition(position);
 	}
 
+	DirectX::XMFLOAT3 Actor::GetPosition() const
+	{
+		return m_MainComponent->GetLocalPosition();
+	}
+
+	void Actor::SetRotation(const DirectX::XMFLOAT4& rotation)
+	{
+		m_MainComponent->SetRotation(rotation);
+	}
+
+	DirectX::XMFLOAT4 Actor::GetRotation() const
+	{
+		return m_MainComponent->GetRotation();
+	}
+
 	std::weak_ptr<Component> Actor::GetComponentByName(const std::string& name)
 	{
 		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),

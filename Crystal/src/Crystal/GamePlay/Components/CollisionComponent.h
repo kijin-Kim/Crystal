@@ -83,9 +83,7 @@ namespace Crystal {
 		RayComponent()
 		{
 			auto& resourceManager = ResourceManager::Instance();
-#ifndef CS_NM_DEDICATED
 			SetRenderable(resourceManager.GetRenderable("LineMesh"));
-#endif
 		}
 
 		~RayComponent() override = default;

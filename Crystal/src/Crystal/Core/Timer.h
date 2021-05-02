@@ -10,7 +10,7 @@ namespace Crystal {
 		void Tick();
 		void Reset();
 
-		float DeltaTime() const { return (float)m_DeltaTime; }
+		float GetDeltaSeconds() const { return (float)m_DeltaTime; }
 		float ElapsedTime() const { return (float)m_ElapsedTime; }
 
 	private:
