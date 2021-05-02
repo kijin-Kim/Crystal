@@ -5,6 +5,7 @@
 #include <set>
 #include <unordered_map>
 
+
 namespace Crystal {
 #define STATIC_TYPE_IMPLE(classType) virtual std::string StaticType() const { return #classType; }
 	

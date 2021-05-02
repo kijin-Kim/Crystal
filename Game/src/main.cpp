@@ -15,6 +15,9 @@
 #include "Crystal/GamePlay/Objects/Actors/PlayerStartActor.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
+#include <sstream>
+
+
 
 class GameApplication : public Crystal::Application
 {
@@ -228,7 +231,6 @@ public:
 
 
 
-		/*Crystal::CameraPawn* cameraPawn = defaultLevel->SpawnActor<Crystal::CameraPawn>();*/
 		/*키바인딩*/
 		const auto playerController = m_World->SpawnActor<Crystal::PlayerController>({ "PlayerController" });
 		auto currentLevel = m_World->GetCurrentLevel();

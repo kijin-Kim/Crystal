@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
