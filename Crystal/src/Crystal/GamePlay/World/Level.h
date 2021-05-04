@@ -44,8 +44,10 @@ namespace Crystal {
 		std::vector<std::shared_ptr<Actor>> GetAllActorByClass(const std::string& classType);
 		std::vector<std::shared_ptr<Actor>>::iterator FindActorItByDelegate(const std::function<bool(const std::shared_ptr<Actor>&)>& delegate);
 
-		STATIC_TYPE_IMPLE(Level)
+		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+		STATIC_TYPE_IMPLE(Level)
+		
 
 	private:
 		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;

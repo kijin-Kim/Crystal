@@ -73,6 +73,15 @@ namespace Crystal {
 		m_CurrentLevel = GetLevelByIndex(index);
 	}
 
+	bool World::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if(m_CurrentLevel)
+		{
+			return m_CurrentLevel->OnInputEvent(hWnd, uMsg, wParam, lParam);
+		}
+		
+	}
+
 	void World::Update(const float deltaTime)
 	{
 		Object::Update(deltaTime);

@@ -34,9 +34,10 @@ namespace Crystal {
 
 		
 
-
+		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		STATIC_TYPE_IMPLE(World)
+		
 	private:
 		Level* m_CurrentLevel = nullptr;
 		std::vector<std::shared_ptr<Level>> m_Levels;

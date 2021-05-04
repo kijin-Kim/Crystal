@@ -188,4 +188,13 @@ namespace Crystal {
 		return std::find_if(m_Actors.begin(), m_Actors.end(), delegate);
 	}
 
+	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		auto playerController = Cast<PlayerController>(GetActorByClass("PlayerController"));
+		if(playerController)
+		{
+			return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
+		}
+	}
+
 }

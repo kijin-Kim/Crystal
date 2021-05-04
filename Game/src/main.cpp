@@ -227,7 +227,6 @@ public:
 		auto& particleMats = particleComponent->GetMaterials();
 		auto particleMat = particleMats[0].get();
 		particleMat->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
-		//particleMat->AlbedoColor = Crystal::Vector3::Blue;
 
 
 

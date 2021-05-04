@@ -95,9 +95,14 @@ namespace Crystal {
 			
 			
 			auto playerController = Cast<PlayerController>(currentLevel->GetActorByClass("PlayerController"));
-			
 			if (playerController)
 				return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
+
+			if(m_World)
+			{
+				m_World->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			}
+			
 		}
 		return false;
 	}
