@@ -138,26 +138,42 @@ namespace Crystal {
 
 	void Level::OnClientConnect()
 	{
-		
-		/* 멀티플레이어 서버 이면, 
-		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
-		 * 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
-		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
-		 */
-
+#ifdef CS_NM_CLIENT
 		/* 멀티플레이어 클라이언트면,
 		 * 서버가 알아서 생성
 		 * return;
 		 *
-		 * 
+		 *
 		 */
-
+#endif
 		
-		/* 싱글 플레이어 클라이언트 면,
+#ifdef CS_NM_STANDALONE
+		/* 스탠드얼론이 면,
 		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
 		 * 1. 새로운 PlayerController를 Spawn합니다.
 		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
 		 */
+		
+
+
+		
+#endif
+
+		
+#ifdef CS_NM_DEDICATED
+		/* 멀티플레이어 서버 이면,
+		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
+		 * 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
+		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		 */
+#endif
+
+
+
+
+
+		
+		
 
 #if SERVER
 		auto& startActors = GetAllActorByClass("PlayerStartActor");
