@@ -3,6 +3,7 @@
 
 #include "Crystal/GamePlay/Objects/Object.h"
 #include "PhysicsSystem.h"
+#include "World.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
 
@@ -24,7 +25,11 @@ namespace Crystal {
 		void Update(const float deltaTime) override;
 
 		template <class T>
-		T* SpawnActor(const std::string& name = "");
+		std::weak_ptr<T> SpawnActor(const std::string& name = "");
+		template <class T>
+		T* SpawnProtoTypedActor(const std::string& prototypedActorName,
+		                        const Actor::ActorSpawnParams& spawnParams);
+
 		void DestroyActor(const std::shared_ptr<Actor>& actor);
 		void DestroyPendingActors();
 
@@ -38,16 +43,22 @@ namespace Crystal {
 		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
 		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 
+		void OnClientConnect();
 
-		std::shared_ptr<Actor> GetActorByName(const std::string& name);
-		std::shared_ptr<Actor> GetActorByClass(const std::string& classType);
-		std::vector<std::shared_ptr<Actor>> GetAllActorByClass(const std::string& classType);
-		std::vector<std::shared_ptr<Actor>>::iterator FindActorItByDelegate(const std::function<bool(const std::shared_ptr<Actor>&)>& delegate);
+
+		std::weak_ptr<Actor> GetActorByName(const std::string& name);
+		std::weak_ptr<Actor> GetActorByClass(const std::string& classType);
+		std::vector<std::weak_ptr<Actor>> GetAllActorByClass(const std::string& classType);
+		
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		STATIC_TYPE_IMPLE(Level)
-		
+
+	protected:
+		std::vector<std::shared_ptr<Actor>>::iterator FindActorItByDelegate(
+			const std::function<bool(const std::shared_ptr<Actor>&)>& delegate);
+
 
 	private:
 		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
@@ -58,15 +69,31 @@ namespace Crystal {
 	};
 
 	template <class T>
-	T* Crystal::Level::SpawnActor(const std::string& name /*= ""*/)
+	std::weak_ptr<T> Crystal::Level::SpawnActor(const std::string& name /*= ""*/)
 	{
 		// Create new actor
 		auto newActor = CreateObject<T>(name, weak_from_this());
+
 		newActor->Begin();
 
 		m_Actors.push_back(newActor);
 
-		return newActor.get();
+		return newActor;
 	}
+
+
+	template <class T>
+	T* Level::SpawnProtoTypedActor(const std::string& prototypedActorName, const Actor::ActorSpawnParams& spawnParams)
+	{
+		auto world = Cast<World>(GetOuter());
+		auto actorPrototype = world->GetProtoTypeActor(prototypedActorName);
+		if (actorPrototype)
+		{
+			/*	actorPrototype->SetObjectName(spawnParams.Name);
+				actorPrototype->Begin();
+				m_Actors.push_back(actorPrototype);*/
+		}
+	}
+
 
 }

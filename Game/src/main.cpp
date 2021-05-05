@@ -6,14 +6,12 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 #include "actors/TestPawn.h"
-#include "actors/Kraken.h"
 #include "actors/Asteroid.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "actors/Sun.h"
 #include "Crystal/GamePlay/Objects/Actors/GameMode.h"
 #include "Crystal/GamePlay/Objects/Actors/ParticleActor.h"
 #include "Crystal/GamePlay/Objects/Actors/PlayerStartActor.h"
-#include "Crystal/Renderer/RenderSystem.h"
 
 #include <sstream>
 
@@ -160,12 +158,12 @@ public:
 
 		m_World->SetCurrentLevelByName("DefaultLevel");
 
-		auto gameMode = m_World->SpawnActor<Crystal::GameMode>({ "FlightGameMode" });
-		gameMode->m_DefaultActorClass = std::make_unique<Crystal::ActorClassOf<TestPawn>>();
+		//auto gameMode = m_World->SpawnActor<Crystal::GameMode>({ "FlightGameMode" }).lock();
+		//gameMode->m_DefaultActorClass = std::make_unique<Crystal::ActorClassOf<TestPawn>>();
 
-
+		
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		TestPawn* testPawn = m_World->SpawnActor<TestPawn>({"TestPawn"});
+		auto testPawn = m_World->SpawnActor<TestPawn>({"TestPawn"}).lock();
 		testPawn->SetPosition({0.0f, 0.0f, -2000.0f});
 
 		auto testPawnMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
@@ -180,7 +178,7 @@ public:
 
 
 
-		Sun* sun = m_World->SpawnActor<Sun>({"Sun"});
+		auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 		sun->SetPosition({0.0f, 200000.0f, 200000.0f});
 		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 
@@ -200,7 +198,7 @@ public:
 				{
 					//test
 
-					Asteroid* asteroid = m_World->SpawnActor<Asteroid>({});
+					auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 					asteroid->SetPosition({1000.0f * i, 1000.0f * j, 1000.0f * k});
 
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
@@ -219,7 +217,7 @@ public:
 		}
 
 
-		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({});
+		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({}).lock();
 
 		auto particleComponent = Crystal::Cast<Crystal::ParticleComponent>(
 			particleActor->GetComponentByClass("ParticleComponent"));
@@ -231,11 +229,11 @@ public:
 
 
 		/*키바인딩*/
-		const auto playerController = m_World->SpawnActor<Crystal::PlayerController>({ "PlayerController" });
+		const auto playerController = m_World->SpawnActor<Crystal::PlayerController>({ "PlayerController" }).lock();
 		auto currentLevel = m_World->GetCurrentLevel();
 		if (currentLevel)
 		{
-			auto pawn = currentLevel->GetActorByClass("TestPawn");
+			auto pawn = currentLevel->GetActorByClass("TestPawn").lock();
 			if (pawn)
 				playerController->Possess(Crystal::Cast<Crystal::Pawn>(pawn));
 		}

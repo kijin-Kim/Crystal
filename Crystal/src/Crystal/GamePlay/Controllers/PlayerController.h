@@ -62,6 +62,9 @@ namespace Crystal {
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
+		uint8_t GetNetworkId() const { return m_NetworkId; }
+		void SetNetworkId(uint8_t id) { m_NetworkId = id; }
+
 		STATIC_TYPE_IMPLE(PlayerController)
 	private:
 
@@ -77,5 +80,7 @@ namespace Crystal {
 
 		EInputMode m_InputMode = EInputMode::IM_UI;
 		bool m_bIsSwitchableMode = false;
+
+		uint8_t m_NetworkId = -1;
 	};
 }

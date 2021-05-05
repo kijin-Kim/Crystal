@@ -1,5 +1,4 @@
 #pragma once
-#include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
@@ -7,9 +6,7 @@
 class Sun : public Crystal::LocalLightActor
 {
 public:
-	Sun()
-	{
-	}
+	Sun() = default;
 	~Sun() override = default;
 
 	void Initialize() override
@@ -22,7 +19,6 @@ public:
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
-		//		staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Sphere"));
 
 		staticMeshComponent->AddMaterial(std::move(material));
 		staticMeshComponent->SetScale(600.0f);

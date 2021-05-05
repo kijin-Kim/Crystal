@@ -34,7 +34,7 @@ namespace Crystal {
 		{
 			actor->UpdateComponents(deltaTime);
 			actor->Update(deltaTime);
-			if(actor->GetIsDead())
+			if (actor->GetIsDead())
 			{
 				actor->End();
 			}
@@ -61,22 +61,17 @@ namespace Crystal {
 
 		DestroyPendingActors();
 
-		
-		
-		
-		
+
 		if (m_RenderSystem)
 		{
 			m_RenderSystem->Update(deltaTime);
 		}
-
-
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
 	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
-		LineActor* debugLineActor = SpawnActor<LineActor>();
+		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
 		lineComponent->SetOrigin(origin);
 		lineComponent->SetDirection(direction);
@@ -91,24 +86,22 @@ namespace Crystal {
 
 	void Level::DestroyPendingActors()
 	{
-		
-		for(auto it = m_Actors.begin(); it!= m_Actors.end();)
+		for (auto it = m_Actors.begin(); it != m_Actors.end();)
 		{
-			if(!(*it)->GetIsDead())
+			if (!(*it)->GetIsDead())
 			{
 				++it;
 				continue;
 			}
-			
+
 			it = m_Actors.erase(it);
 		}
-		
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
 	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
-		LineActor* debugLineActor = SpawnActor<LineActor>();
+		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
 
 		const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
@@ -143,7 +136,51 @@ namespace Crystal {
 		}
 	}
 
-	std::shared_ptr<Actor> Level::GetActorByName(const std::string& name)
+	void Level::OnClientConnect()
+	{
+		
+		/* 멀티플레이어 서버 이면, 
+		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
+		 * 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
+		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		 */
+
+		/* 멀티플레이어 클라이언트면,
+		 * 서버가 알아서 생성
+		 * return;
+		 *
+		 * 
+		 */
+
+		
+		/* 싱글 플레이어 클라이언트 면,
+		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
+		 * 1. 새로운 PlayerController를 Spawn합니다.
+		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		 */
+
+#if SERVER
+		auto& startActors = GetAllActorByClass("PlayerStartActor");
+		if(startActors.empty())
+		{
+			// 접속 거부
+			return;
+		}
+		
+		auto newPlayerController = SpawnActor<PlayerController>();
+		// 키맵핑 here
+
+		newPlayerController->SetNetworkId();
+		DestroyActor(startActors[0]);
+		auto newActor = SpawnActor<Actor>();
+		newPlayerController->Possess(newActor);
+		m_PlayerControllers.push_back(newPlayerController);
+#endif
+
+		
+	}
+
+	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)
 	{
 		auto it = FindActorItByDelegate([&name](const std::shared_ptr<Actor>& other)-> bool
 		{
@@ -151,11 +188,11 @@ namespace Crystal {
 		});
 
 		if (it == m_Actors.end())
-			return nullptr;
+			return {};
 		return *it;
 	}
 
-	std::shared_ptr<Actor> Level::GetActorByClass(const std::string& classType)
+	std::weak_ptr<Actor> Level::GetActorByClass(const std::string& classType)
 	{
 		auto it = FindActorItByDelegate([&classType](const std::shared_ptr<Actor>& other)-> bool
 		{
@@ -163,13 +200,13 @@ namespace Crystal {
 		});
 
 		if (it == m_Actors.end())
-			return nullptr;
+			return {};
 		return *it;
 	}
 
-	std::vector<std::shared_ptr<Actor>> Level::GetAllActorByClass(const std::string& classType)
+	std::vector<std::weak_ptr<Actor>> Level::GetAllActorByClass(const std::string& classType)
 	{
-		std::vector<std::shared_ptr<Actor>> result;
+		std::vector<std::weak_ptr<Actor>> result;
 		for (auto& actor : m_Actors)
 		{
 			if (actor->StaticType() != classType)
@@ -191,7 +228,7 @@ namespace Crystal {
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		auto playerController = Cast<PlayerController>(GetActorByClass("PlayerController"));
-		if(playerController)
+		if (playerController)
 		{
 			return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
