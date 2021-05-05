@@ -1,6 +1,8 @@
 #include "cspch.h"
 #include "PlayerController.h"
 
+#include "Crystal/GamePlay/World/Level.h"
+
 namespace Crystal {
 	PlayerController::PlayerController()
 	{
@@ -9,6 +11,12 @@ namespace Crystal {
 
 
 		m_MainComponent = CreateComponent<TransformComponent>("DefaultMainComponent");
+	}
+
+	void PlayerController::Begin()
+	{
+		Actor::Begin();
+		Cast<Level>(GetOuter())->AddPlayerController(Cast<PlayerController>(shared_from_this()));
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

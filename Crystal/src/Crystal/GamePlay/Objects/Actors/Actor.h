@@ -27,9 +27,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		virtual void Begin()
-		{
-		}
+		virtual void Begin();
 
 		virtual void End()
 		{

@@ -290,8 +290,7 @@ namespace Crystal {
 
 	void RenderSystem::Begin()
 	{
-		Actor::Begin();
-
+		
 		/// COMPUTE
 		auto commandQueue = Device::Instance().GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();

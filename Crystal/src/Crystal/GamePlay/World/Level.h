@@ -30,6 +30,9 @@ namespace Crystal {
 		T* SpawnProtoTypedActor(const std::string& prototypedActorName,
 		                        const Actor::ActorSpawnParams& spawnParams);
 
+		void AddActor(const std::shared_ptr<Actor>& actor);
+		void AddPlayerController(const std::shared_ptr<PlayerController>& playerController);
+
 		void DestroyActor(const std::shared_ptr<Actor>& actor);
 		void DestroyPendingActors();
 
@@ -66,6 +69,7 @@ namespace Crystal {
 
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
+		std::vector<std::shared_ptr<PlayerController>> m_PlayerControllers;
 	};
 
 	template <class T>

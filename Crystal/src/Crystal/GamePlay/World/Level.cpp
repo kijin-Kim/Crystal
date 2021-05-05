@@ -79,6 +79,16 @@ namespace Crystal {
 		lineComponent->SetLineColor(color);
 	}
 
+	void Level::AddActor(const std::shared_ptr<Actor>& actor)
+	{
+		m_Actors.push_back(actor);
+	}
+
+	void Level::AddPlayerController(const std::shared_ptr<PlayerController>& playerController)
+	{
+		m_PlayerControllers.push_back(playerController);
+	}
+
 	void Level::DestroyActor(const std::shared_ptr<Actor>& actor)
 	{
 		actor->SetIsDead(true);

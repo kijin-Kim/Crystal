@@ -19,6 +19,11 @@ namespace Crystal {
 		RegisterComponents();
 	}
 
+	void Actor::Begin()
+	{
+		Cast<Level>(GetOuter())->AddActor(Cast<Actor>(shared_from_this()));
+	}
+
 	void Actor::UpdateComponents(float deltaTime)
 	{
 		/*Non-Hierarchy Components + Main Component*/

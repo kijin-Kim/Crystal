@@ -42,6 +42,8 @@ namespace Crystal {
 		PlayerController();
 		virtual ~PlayerController() = default;
 
+		void Begin() override;
+
 		void AddAxisMapping(const std::string& axisName, int key, float scale);
 		void AddActionMapping(const std::string& actionName, const ActionMapping& key);
 
