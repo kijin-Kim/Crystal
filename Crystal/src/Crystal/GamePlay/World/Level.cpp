@@ -163,7 +163,7 @@ namespace Crystal {
 		 */
 		return;
 #endif
-		
+
 #ifdef CS_NM_STANDALONE
 		/* 스탠드얼론이 면,
 		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return. 
@@ -181,8 +181,8 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
-		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
+		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
@@ -203,12 +203,10 @@ namespace Crystal {
 		auto playerController = SpawnActor<PlayerController>().lock();
 		playerController->Possess(newActor);
 
-		
+
 #endif
-		
-		
-		
-			
+
+
 #ifdef CS_NM_DEDICATED
 		/* 멀티플레이어 서버 이면,
 		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
@@ -255,12 +253,6 @@ namespace Crystal {
 #endif
 
 
-
-
-
-		
-		
-
 #if SERVER
 		auto& startActors = GetAllActorByClass("PlayerStartActor");
 		if(startActors.empty())
@@ -278,8 +270,6 @@ namespace Crystal {
 		newPlayerController->Possess(newActor);
 		m_PlayerControllers.push_back(newPlayerController);
 #endif
-
-		
 	}
 
 	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)
@@ -323,13 +313,29 @@ namespace Crystal {
 
 	std::weak_ptr<PlayerController> Level::GetPlayerController(int index)
 	{
-		if(m_PlayerControllers.size() <= index)
+		if (m_PlayerControllers.size() <= index)
 		{
 			CS_WARN("Index : %d에 해당하는 플레이어 컨트롤러가 존재하지 않습니다.", index);
 			return {};
 		}
 
 		return m_PlayerControllers[index];
+	}
+
+	std::weak_ptr<PlayerController> Level::GetPlayerControllerByNetworkId(int id)
+	{
+		auto it = std::find_if(m_PlayerControllers.begin(), m_PlayerControllers.end(),
+		                       [&id](const std::shared_ptr<PlayerController>& other)
+		                       {
+			                       return other->GetNetworkId() == id;
+		                       });
+
+		if (it == m_PlayerControllers.end())
+		{
+			return {};
+		}
+
+		return *it;
 	}
 
 	std::vector<std::shared_ptr<Actor>>::iterator Level::FindActorItByDelegate(
@@ -340,13 +346,28 @@ namespace Crystal {
 
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+#ifdef CS_NM_STANDALONE
 		bool bHandled = false;
-		for(const auto& playerController : m_PlayerControllers)
+		for (const auto& playerController : m_PlayerControllers)
 		{
 			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
-
 		return bHandled;
-	}
+#endif
 
-}
+#ifdef CS_NM_CLIENT // 멀티 플레이어 클라이언트
+
+		
+#endif
+
+#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버
+		bool bHandled = false;
+		for (const auto& playerController : m_PlayerControllers)
+		{
+			uint8_t id = playerController->GetNetworkId();
+			bHandled |= playerController->OnInputEvent(여기다가 데이터);
+		}
+		return bHandled;
+		
+#endif
+	}

@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Objects/Object.h"
 #include "PhysicsSystem.h"
 #include "World.h"
+#include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Renderer/RenderSystem.h"
 
 
@@ -54,6 +55,7 @@ namespace Crystal {
 		std::vector<std::weak_ptr<Actor>> GetAllActorByClass(const std::string& classType);
 
 		std::weak_ptr<PlayerController> GetPlayerController(int index);
+		std::weak_ptr<PlayerController> GetPlayerControllerByNetworkId(int id);
 		
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
