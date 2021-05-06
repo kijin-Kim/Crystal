@@ -34,6 +34,13 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
+#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버 인풋을 넘겨받은걸로 적절한 playercontroller 한테 넘겨줘야한다.
+		for (const auto& playerController : m_PlayerControllers)
+		{
+			uint8_t id = playerController->GetNetworkId();
+			playerController->OnInputEvent(여기다가 데이터);
+		}
+#endif
 
 		for (const auto& actor : m_Actors)
 		{
@@ -201,8 +208,6 @@ namespace Crystal {
 
 		auto playerController = SpawnActor<PlayerController>().lock();
 		playerController->Possess(newActor);
-
-
 #endif
 
 
@@ -226,7 +231,6 @@ namespace Crystal {
 
 
 		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
@@ -337,17 +341,6 @@ namespace Crystal {
 
 #ifdef CS_NM_CLIENT // 멀티 플레이어 클라이언트
 
-
-#endif
-
-#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버		
-		bool bHandled = false;
-		for (const auto& playerController : m_PlayerControllers)
-		{
-			uint8_t id = playerController->GetNetworkId();
-			bHandled |= playerController->OnInputEvent(여기다가 데이터);
-		}
-		return bHandled;
 
 #endif
 	}

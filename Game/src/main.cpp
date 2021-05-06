@@ -155,7 +155,6 @@ public:
 		//krakenTentacleNormal->CreateShaderResourceView(krakenTentacleNormal->GetResource()->GetDesc().Format, D3D12_SRV_DIMENSION_TEXTURE2D);
 		//=====================================================================
 
-#ifdef CS_NM_STANDALONE
 
 		m_World->SetCurrentLevelByName("DefaultLevel");
 
@@ -219,7 +218,7 @@ public:
 		auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
 		playerStart->SetPosition({ 0.0f, 0.0f, -2000.0f });
 		m_World->GetCurrentLevel()->OnClientConnect();
-#endif
+
 
 	}
 
