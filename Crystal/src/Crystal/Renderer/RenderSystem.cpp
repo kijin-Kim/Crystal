@@ -380,7 +380,7 @@ namespace Crystal {
 			return;
 		}
 
-		const auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
+		const auto playerController = level->GetPlayerController(0).lock();
 		if (!playerController)
 		{
 			//TODO : Use Default Camera
@@ -677,7 +677,7 @@ namespace Crystal {
 			return;
 		}
 
-		const auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
+		const auto playerController = level->GetPlayerController(0).lock();
 		if (!playerController)
 		{
 			//TODO : Use Default Camera

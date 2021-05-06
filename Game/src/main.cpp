@@ -163,18 +163,7 @@ public:
 
 		
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
-		auto testPawn = m_World->SpawnActor<TestPawn>({"TestPawn"}).lock();
-		testPawn->SetPosition({0.0f, 0.0f, -2000.0f});
 
-		auto testPawnMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
-			testPawn->GetComponentByClass("StaticMeshComponent"));
-
-		testPawnMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		auto testPawnMat = testPawnMesh->GetMaterial(0);
-		testPawnMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		testPawnMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		testPawnMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		testPawnMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
 
 
@@ -226,50 +215,12 @@ public:
 		auto particleMat = particleMats[0].get();
 		particleMat->EmissiveTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
 
-
-
-		/*키바인딩*/
-		const auto playerController = m_World->SpawnActor<Crystal::PlayerController>({ "PlayerController" }).lock();
-		auto currentLevel = m_World->GetCurrentLevel();
-		if (currentLevel)
-		{
-			auto pawn = currentLevel->GetActorByClass("TestPawn").lock();
-			if (pawn)
-				playerController->Possess(Crystal::Cast<Crystal::Pawn>(pawn));
-		}
-
-
-		playerController->AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
-		playerController->AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
-		playerController->AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
-		playerController->AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
-		playerController->AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
-		playerController->AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
-		playerController->AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
-		playerController->AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
-		playerController->AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
-		playerController->AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
-		playerController->EnableModeSwitching(true);
-
-		Crystal::ActionMapping fireActionMapping = {};
-		fireActionMapping.CrystalCode = Crystal::Mouse::Button::Left;
-		fireActionMapping.bAltDown = false;
-		fireActionMapping.bCtrlDown = false;
-		fireActionMapping.bShiftDown = false;
-		playerController->AddActionMapping("Fire", fireActionMapping);
-
 		
 
+		auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
+		playerStart->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"1"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"2"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"3"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"4"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"5"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"6"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"7"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"8"});
-		m_World->SpawnActor<Crystal::PlayerStartActor>({"9"});
+		m_World->GetCurrentLevel()->OnClientConnect();
 
 	}
 

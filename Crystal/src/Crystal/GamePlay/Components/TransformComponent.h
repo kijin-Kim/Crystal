@@ -38,6 +38,7 @@ namespace Crystal {
 		DirectX::XMFLOAT3 GetLocalPosition() const;
 		DirectX::XMFLOAT3 GetWorldPosition() const;
 		const DirectX::XMFLOAT3& GetVelocity() const;
+		float GetScale();
 		float GetMass() const;
 		float GetInverseMass() const;
 		bool HasFiniteMass() const;
@@ -63,6 +64,7 @@ namespace Crystal {
 		bool IsCollisionEnabled() const override;
 
 		STATIC_TYPE_IMPLE(TransformComponent)
+		
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
 		std::weak_ptr<TransformComponent> m_ParentComponent;

@@ -124,6 +124,16 @@ namespace Crystal {
 		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
 	}
 
+	void Actor::SetScale(float scale)
+	{
+		m_MainComponent->SetScale(scale);
+	}
+
+	float Actor::GetScale() const
+	{
+		return m_MainComponent->GetScale();
+	}
+
 	void Actor::SetPosition(const DirectX::XMFLOAT3& position)
 	{
 		m_MainComponent->SetLocalPosition(position);

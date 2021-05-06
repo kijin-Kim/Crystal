@@ -17,6 +17,25 @@ namespace Crystal {
 	{
 		Actor::Begin();
 		Cast<Level>(GetOuter())->AddPlayerController(Cast<PlayerController>(shared_from_this()));
+
+		// Default Mapping
+		AddAxisMapping("MoveForward", Crystal::Keyboard::W, 1.0f);
+		AddAxisMapping("MoveForward", Crystal::Keyboard::S, -1.0f);
+		AddAxisMapping("MoveRight", Crystal::Keyboard::D, 1.0f);
+		AddAxisMapping("MoveRight", Crystal::Keyboard::A, -1.0f);
+		AddAxisMapping("RollRight", Crystal::Keyboard::E, 1.0f);
+		AddAxisMapping("RollRight", Crystal::Keyboard::Q, -1.0f);
+		AddAxisMapping("MoveUp", Crystal::Keyboard::Space, 1.0f);
+		AddAxisMapping("MoveUp", Crystal::Keyboard::LControl, -1.0f);
+		AddAxisMapping("Turn", Crystal::Mouse::X, 1.0f);
+		AddAxisMapping("LookUp", Crystal::Mouse::Y, -1.0f);
+
+		Crystal::ActionMapping fireActionMapping = {};
+		fireActionMapping.CrystalCode = Crystal::Mouse::Button::Left;
+		fireActionMapping.bAltDown = false;
+		fireActionMapping.bCtrlDown = false;
+		fireActionMapping.bShiftDown = false;
+		AddActionMapping("Fire", fireActionMapping);
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
@@ -47,9 +66,13 @@ namespace Crystal {
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
 		m_GameInputComponent->SetOuter(pawn);
+		m_GameInputComponent->ReadyCursorBinding();
 		
 		m_UserInterfaceInputComponent->SetOuter(pawn);
 		pawn->SetupInputComponent(m_GameInputComponent.get());
+
+
+		
 	}
 
 	bool PlayerController::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -157,6 +157,11 @@ namespace Crystal {
 		return m_Velocity;
 	}
 
+	float TransformComponent::GetScale()
+	{
+		return m_Scale;
+	}
+
 
 	float TransformComponent::GetMass() const
 	{

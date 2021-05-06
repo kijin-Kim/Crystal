@@ -80,7 +80,7 @@ namespace Crystal {
 		std::map<ActionMapping, std::string, ActionKeyCompare> m_ActionMap;
 		std::weak_ptr<CameraComponent> m_MainCamera;
 
-		EInputMode m_InputMode = EInputMode::IM_UI;
+		EInputMode m_InputMode = EInputMode::IM_Game;
 		bool m_bIsSwitchableMode = false;
 
 		uint8_t m_NetworkId = -1;

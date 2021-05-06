@@ -73,7 +73,13 @@ namespace Crystal {
 		m_CurrentLevel = GetLevelByIndex(index);
 	}
 
-	Actor* World::GetProtoTypeActor(const std::string& name)
+	void World::RegisterPrototypeActor(const std::string& name, const std::shared_ptr<Actor>& prototype)
+	{
+		//prototype->SetObjectName(name) TODO UNIQUE NAME 
+		//m_PrototypeActors.push_back(prototype);
+	}
+
+	std::weak_ptr<Actor> World::GetProtoTypeActor(const std::string& name)
 	{
 		auto it = std::find_if(m_PrototypeActors.begin(), m_PrototypeActors.end(),
 			[&name](const std::shared_ptr<Actor>& other)-> bool
@@ -84,10 +90,10 @@ namespace Crystal {
 		if (it == m_PrototypeActors.end())
 		{
 			CS_WARN("%s 프로토타입 액터를 찾을 수 없습니다", name.c_str());
-			return nullptr;
+			return {};
 		}
 
-		return it->get();
+		return *it;
 	}
 
 	bool World::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

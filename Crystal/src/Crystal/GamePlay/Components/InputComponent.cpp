@@ -149,7 +149,6 @@ namespace Crystal {
 		std::pair<int64_t, EKeyEvent> crystalKey = std::make_pair(Keyboard::Unknown, EKeyEvent::KE_Pressed);
 		crystalKey.second = (HIWORD(lParam) & KF_REPEAT) ? EKeyEvent::KE_Repeat : EKeyEvent::KE_Pressed;
 		crystalKey.second = uMsg == WM_KEYUP ? EKeyEvent::KE_Released : crystalKey.second;
-
 		switch (wParam)
 		{
 			// Check the scancode to distinguish between left and right shift

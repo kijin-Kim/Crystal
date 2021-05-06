@@ -23,7 +23,7 @@ namespace Crystal {
 		template <class T>
 		std::weak_ptr<T> SpawnActor(const Actor::ActorSpawnParams& spawnParams);
 		template <class T>
-		T* SpawnPrototypeActor(const std::string& prototypeActorName, const Actor::ActorSpawnParams& spawnParams);
+		std::weak_ptr<T> SpawnPrototypeActor(const std::string& prototypeActorName, const Actor::ActorSpawnParams& spawnParams);
 
 		void DestroyActor(const std::shared_ptr<Actor>& actor);
 
@@ -36,7 +36,8 @@ namespace Crystal {
 		void SetCurrentLevelByName(const std::string& name);
 		void SetCurrentLevelByIndex(int iIndex);
 
-		Actor* GetProtoTypeActor(const std::string& name);
+		void RegisterPrototypeActor(const std::string& name, const std::shared_ptr<Actor>& prototype);
+		std::weak_ptr<Actor> GetProtoTypeActor(const std::string& name);
 
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -67,7 +68,7 @@ namespace Crystal {
 	}
 
 	template <class T>
-	T* World::SpawnPrototypeActor(const std::string& prototypeActorName, const Actor::ActorSpawnParams& spawnParams)
+	std::weak_ptr<T> World::SpawnPrototypeActor(const std::string& prototypeActorName, const Actor::ActorSpawnParams& spawnParams)
 	{
 		if (spawnParams.Level)
 		{

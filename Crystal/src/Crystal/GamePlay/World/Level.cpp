@@ -1,8 +1,14 @@
 #include "cspch.h"
 #include "Level.h"
+
+
 #include "Crystal/GamePlay/Objects/Actors/LineActor.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/Objects/Actors/ActorClassOf.h"
+
+
+#include "../../../../../Game/src/actors/TestPawn.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
 
@@ -155,27 +161,97 @@ namespace Crystal {
 		 *
 		 *
 		 */
+		return;
 #endif
 		
 #ifdef CS_NM_STANDALONE
 		/* 스탠드얼론이 면,
-		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
-		 * 1. 새로운 PlayerController를 Spawn합니다.
-		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return. 
+		 * 1. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		 * 2. 새로운 PlayerController를 Spawn합니다.
 		 */
-		
+		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
+		if (playerStartActors.empty())
+		{
+			CS_FATAL(false, "더 이상 클라이언트를 받을 수 없습니다");
+			return;
+		}
 
+		auto& resourceManager = ResourceManager::Instance();
+
+		auto playerStartActor = playerStartActors[0].lock();
+
+		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+
+		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
+			newActor->GetComponentByClass("StaticMeshComponent"));
+
+		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		auto newActorMat = newActorMesh->GetMaterial(0);
+		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+
+		newActor->SetScale(playerStartActor->GetScale());
+		newActor->SetRotation(playerStartActor->GetRotation());
+		newActor->SetPosition(playerStartActor->GetPosition());
+
+		playerStartActor->Destroy();
+
+		auto playerController = SpawnActor<PlayerController>().lock();
+		playerController->Possess(newActor);
 
 		
 #endif
-
 		
+		
+		
+			
 #ifdef CS_NM_DEDICATED
 		/* 멀티플레이어 서버 이면,
 		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
 		 * 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
 		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
 		 */
+
+		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
+		if (playerStartActors.empty())
+		{
+			CS_FATAL(false, "더 이상 클라이언트를 받을 수 없습니다");
+			return;
+		}
+
+		auto& resourceManager = ResourceManager::Instance();
+
+		auto playerStartActor = playerStartActors[0].lock();
+		
+
+		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+
+		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
+			newActor->GetComponentByClass("StaticMeshComponent"));
+
+		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		auto newActorMat = newActorMesh->GetMaterial(0);
+		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+
+		newActor->SetScale(playerStartActor->GetScale());
+		newActor->SetRotation(playerStartActor->GetRotation());
+		newActor->SetPosition(playerStartActor->GetPosition());
+
+		playerStartActor->Destroy();
+
+		auto playerController = SpawnActor<PlayerController>().lock();
+		playerController->SetNetworkId();
+		playerController->Possess(newActor);
+
+		
 #endif
 
 
@@ -245,6 +321,17 @@ namespace Crystal {
 		return result;
 	}
 
+	std::weak_ptr<PlayerController> Level::GetPlayerController(int index)
+	{
+		if(m_PlayerControllers.size() <= index)
+		{
+			CS_WARN("Index : %d에 해당하는 플레이어 컨트롤러가 존재하지 않습니다.", index);
+			return {};
+		}
+
+		return m_PlayerControllers[index];
+	}
+
 	std::vector<std::shared_ptr<Actor>>::iterator Level::FindActorItByDelegate(
 		const std::function<bool(const std::shared_ptr<Actor>&)>& delegate)
 	{
@@ -253,11 +340,13 @@ namespace Crystal {
 
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		auto playerController = Cast<PlayerController>(GetActorByClass("PlayerController"));
-		if (playerController)
+		bool bHandled = false;
+		for(const auto& playerController : m_PlayerControllers)
 		{
-			return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
+
+		return bHandled;
 	}
 
 }
