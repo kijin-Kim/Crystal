@@ -251,25 +251,6 @@ namespace Crystal {
 
 		
 #endif
-
-
-#if SERVER
-		auto& startActors = GetAllActorByClass("PlayerStartActor");
-		if(startActors.empty())
-		{
-			// 접속 거부
-			return;
-		}
-		
-		auto newPlayerController = SpawnActor<PlayerController>();
-		// 키맵핑 here
-
-		newPlayerController->SetNetworkId();
-		DestroyActor(startActors[0]);
-		auto newActor = SpawnActor<Actor>();
-		newPlayerController->Possess(newActor);
-		m_PlayerControllers.push_back(newPlayerController);
-#endif
 	}
 
 	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)
