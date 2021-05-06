@@ -11,7 +11,6 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-
 	void Level::OnCreate()
 	{
 		Object::OnCreate();
@@ -75,7 +74,7 @@ namespace Crystal {
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
-	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
+		const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
 		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
@@ -115,7 +114,7 @@ namespace Crystal {
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
-	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
+		const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
 		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
@@ -156,20 +155,20 @@ namespace Crystal {
 	{
 #ifdef CS_NM_CLIENT
 		/* 멀티플레이어 클라이언트면,
-		 * 서버가 알아서 생성
-		 * return;
-		 *
-		 *
-		 */
+		* 서버가 알아서 생성
+		* return;
+		*
+		*
+		*/
 		return;
 #endif
 
 #ifdef CS_NM_STANDALONE
 		/* 스탠드얼론이 면,
-		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return. 
-		 * 1. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
-		 * 2. 새로운 PlayerController를 Spawn합니다.
-		 */
+		* 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
+		* 1. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		* 2. 새로운 PlayerController를 Spawn합니다.
+		*/
 		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
 		if (playerStartActors.empty())
 		{
@@ -181,8 +180,8 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
-		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
-		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
+		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
@@ -209,10 +208,10 @@ namespace Crystal {
 
 #ifdef CS_NM_DEDICATED
 		/* 멀티플레이어 서버 이면,
-		 * 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
-		 * 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
-		 * 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
-		 */
+		* 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
+		* 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
+		* 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
+		*/
 
 		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
 		if (playerStartActors.empty())
@@ -224,7 +223,7 @@ namespace Crystal {
 		auto& resourceManager = ResourceManager::Instance();
 
 		auto playerStartActor = playerStartActors[0].lock();
-		
+
 
 		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
 		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
@@ -249,16 +248,16 @@ namespace Crystal {
 		playerController->SetNetworkId();
 		playerController->Possess(newActor);
 
-		
+
 #endif
 	}
 
 	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)
 	{
 		auto it = FindActorItByDelegate([&name](const std::shared_ptr<Actor>& other)-> bool
-		{
-			return other->GetObjectName() == name;
-		});
+			{
+				return other->GetObjectName() == name;
+			});
 
 		if (it == m_Actors.end())
 			return {};
@@ -268,9 +267,9 @@ namespace Crystal {
 	std::weak_ptr<Actor> Level::GetActorByClass(const std::string& classType)
 	{
 		auto it = FindActorItByDelegate([&classType](const std::shared_ptr<Actor>& other)-> bool
-		{
-			return other->StaticType() == classType;
-		});
+			{
+				return other->StaticType() == classType;
+			});
 
 		if (it == m_Actors.end())
 			return {};
@@ -306,10 +305,10 @@ namespace Crystal {
 	std::weak_ptr<PlayerController> Level::GetPlayerControllerByNetworkId(int id)
 	{
 		auto it = std::find_if(m_PlayerControllers.begin(), m_PlayerControllers.end(),
-		                       [&id](const std::shared_ptr<PlayerController>& other)
-		                       {
-			                       return other->GetNetworkId() == id;
-		                       });
+			[&id](const std::shared_ptr<PlayerController>& other)
+			{
+				return other->GetNetworkId() == id;
+			});
 
 		if (it == m_PlayerControllers.end())
 		{
@@ -338,10 +337,10 @@ namespace Crystal {
 
 #ifdef CS_NM_CLIENT // 멀티 플레이어 클라이언트
 
-		
+
 #endif
 
-#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버
+#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버		
 		bool bHandled = false;
 		for (const auto& playerController : m_PlayerControllers)
 		{
@@ -349,6 +348,7 @@ namespace Crystal {
 			bHandled |= playerController->OnInputEvent(여기다가 데이터);
 		}
 		return bHandled;
-		
+
 #endif
 	}
+}
