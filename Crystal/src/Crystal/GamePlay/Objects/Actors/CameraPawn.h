@@ -10,6 +10,11 @@
 namespace Crystal {
 	class CameraPawn : public Pawn
 	{
+		SERIALIZE_PROPERTIES
+		{
+			ar & *m_MovementComponent;
+		}
+
 	public:
 		CameraPawn() = default;
 		virtual ~CameraPawn() = default;
@@ -17,7 +22,7 @@ namespace Crystal {
 		void Initialize() override;
 
 		void SetupInputComponent(InputComponent* inputComponent) override;
-		
+
 		void RotateYaw(float value);
 		void RotatePitch(float value);
 		void MoveForward(float value);

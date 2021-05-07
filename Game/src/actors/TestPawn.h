@@ -8,16 +8,21 @@
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
 
 
-
 class TestPawn final : public Crystal::Pawn
 {
+	SERIALIZE_PROPERTIES
+	{
+		boost::serialization::base_object<Crystal::Pawn>(*this);
+		ar & *m_MovementComponent;
+		ar & *m_CameraComponent;
+	}
+
 public:
 	TestPawn() = default;
 	~TestPawn() override = default;
 
 	void Initialize() override;
 
-	
 
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override;
 

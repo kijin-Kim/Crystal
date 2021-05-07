@@ -6,18 +6,22 @@
 
 class Asteroid : public Crystal::Actor
 {
+	SERIALIZE_PROPERTIES
+	{
+		boost::serialization::base_object<Crystal::Actor>(*this);
+	}
+
 public:
 	Asteroid() = default;
 	~Asteroid() override = default;
 
 	void Initialize() override
 	{
-
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		boundingSphereComponent->SetRadius(400.0f);
 
 		m_MainComponent = boundingSphereComponent;
-		
+
 		auto material = std::make_unique<Crystal::NewMaterial>();
 		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
@@ -33,7 +37,7 @@ public:
 		m_MainComponent->SetScale(randomScale);
 		m_MainComponent->SetMass(5000.0f * randomScale);
 
-		SetPosition({ (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000) });
+		SetPosition({(float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000)});
 	}
 
 	STATIC_TYPE_IMPLE(Asteroid)

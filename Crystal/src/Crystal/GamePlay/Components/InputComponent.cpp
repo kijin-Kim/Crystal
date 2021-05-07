@@ -4,6 +4,8 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
 
+BOOST_CLASS_EXPORT(Crystal::InputComponent)
+
 namespace Crystal {
 	void InputComponent::BindAxis(const std::string& axisName, const std::function<void(float value)>& function)
 	{

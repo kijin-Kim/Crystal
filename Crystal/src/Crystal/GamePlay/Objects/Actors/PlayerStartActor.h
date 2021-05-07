@@ -9,6 +9,11 @@ namespace Crystal {
 	
 	class PlayerStartActor : public Actor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Actor>(*this);
+		}
+		
 	public:
 		PlayerStartActor() = default;
 		~PlayerStartActor() override = default;

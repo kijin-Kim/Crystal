@@ -5,12 +5,17 @@
 #include <array>
 
 
-
 namespace Crystal {
 	/*물리적인 위치와 눈에 보이는 렌더링 가능한 오브젝트를 가지고 있는 컴포넌트들의 베이스 클래스*/
 
 	class PrimitiveComponent : public TransformComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<TransformComponent>(*this);
+			ar & m_ForceAccum;
+		}
+
 	public:
 		PrimitiveComponent() = default;
 		~PrimitiveComponent() override = default;
@@ -21,7 +26,7 @@ namespace Crystal {
 		{
 			TransformComponent::Update(deltaTime);
 			auto renderable = m_Renderable.lock();
-			if(renderable)
+			if (renderable)
 				renderable->Update(deltaTime);
 		}
 

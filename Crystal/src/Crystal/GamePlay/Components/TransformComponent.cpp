@@ -1,6 +1,8 @@
 #include "cspch.h"
 #include "TransformComponent.h"
 
+BOOST_CLASS_EXPORT(Crystal::TransformComponent)
+
 namespace Crystal {
 	void TransformComponent::Update(float deltaTime)
 	{

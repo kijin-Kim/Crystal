@@ -3,6 +3,11 @@
 
 #include "Crystal/GamePlay/World/Level.h"
 
+BOOST_CLASS_EXPORT(Crystal::LightComponent)
+BOOST_CLASS_EXPORT(Crystal::LocalLightComponent)
+BOOST_CLASS_EXPORT(Crystal::DirectionalLightComponent)
+
+
 namespace Crystal {
 
 

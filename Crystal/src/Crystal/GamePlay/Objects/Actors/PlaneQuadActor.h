@@ -6,6 +6,12 @@
 namespace Crystal {
 	class PlaneQuadActor : public Actor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Actor>(*this);
+			ar & *m_StaticMeshComponent;
+		}
+		
 	public:
 		PlaneQuadActor()
 		{

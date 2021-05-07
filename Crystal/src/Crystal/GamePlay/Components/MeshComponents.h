@@ -5,6 +5,11 @@
 namespace Crystal {
 	class MeshComponent : public PrimitiveComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<PrimitiveComponent>(*this);
+		}
+		
 	public:
 		MeshComponent()
 		{
@@ -17,6 +22,10 @@ namespace Crystal {
 
 	class StaticMeshComponent : public MeshComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<MeshComponent>(*this);
+		}
 	public:
 		StaticMeshComponent()
 		{
@@ -28,6 +37,10 @@ namespace Crystal {
 
 	class SkeletalMeshComponent : public MeshComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<MeshComponent>(*this);
+		}
 	public:
 		SkeletalMeshComponent()
 		{

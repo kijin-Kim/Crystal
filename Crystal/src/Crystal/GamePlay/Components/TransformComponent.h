@@ -10,6 +10,25 @@ namespace Crystal {
 
 	class TransformComponent : public Component
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Component>(*this);
+			
+			ar & m_WorldTransform;
+			ar & m_LocalTransform;
+			
+			ar & m_Scale;
+
+			ar & m_Rotation;
+
+			ar & m_Velocity;
+			ar & m_InverseMass;
+
+			ar & m_Right;
+			ar & m_Up;
+			ar & m_Forward;
+		}
+
 	public:
 		TransformComponent() = default;
 		~TransformComponent() override = default;
@@ -44,7 +63,7 @@ namespace Crystal {
 		bool HasFiniteMass() const;
 
 		const DirectX::XMFLOAT3& GetLocalRightVector() const;
-		const DirectX::XMFLOAT3& GetLocalUpVector()  const;
+		const DirectX::XMFLOAT3& GetLocalUpVector() const;
 		const DirectX::XMFLOAT3& GetLocalForwardVector() const;
 		DirectX::XMFLOAT3 GetWorldRightVector() const;
 		DirectX::XMFLOAT3 GetWorldUpVector() const;
@@ -53,7 +72,7 @@ namespace Crystal {
 		void SetParentComponent(const std::weak_ptr<TransformComponent>& component);
 		std::weak_ptr<TransformComponent> GetParentComponent() const;
 
-		
+
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
 		const DirectX::XMFLOAT4X4& GetLocalTransform() const;
 
@@ -64,7 +83,7 @@ namespace Crystal {
 		bool IsCollisionEnabled() const override;
 
 		STATIC_TYPE_IMPLE(TransformComponent)
-		
+
 	protected:
 		/*OwnerShip을 가지고 있지 않음*/
 		std::weak_ptr<TransformComponent> m_ParentComponent;
@@ -72,7 +91,7 @@ namespace Crystal {
 		DirectX::XMFLOAT4X4 m_WorldTransform = Matrix4x4::Identity();
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
 
-		
+
 		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
 		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
 

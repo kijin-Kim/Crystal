@@ -6,6 +6,11 @@
 namespace Crystal {
 	class ParticleActor : public Actor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Actor>(*this);
+		}
+
 	public:
 		ParticleActor() = default;
 		~ParticleActor() override = default;
@@ -16,4 +21,3 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(ParticleActor)
 	};
 }
-

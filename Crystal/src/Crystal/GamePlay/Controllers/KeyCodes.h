@@ -12,7 +12,7 @@ namespace Crystal {
 		std::pair<int64_t, float> HWheel;
 	};
 
-	enum class EKeyEvent
+	enum class EKeyEvent : uint32_t
 	{
 		/*Keyboard Event*/
 		KE_None,

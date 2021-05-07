@@ -1,6 +1,8 @@
 ﻿#include "cspch.h"
 #include "CameraPawn.h"
 
+BOOST_CLASS_EXPORT(Crystal::CameraPawn)
+
 namespace Crystal {
 
 	void CameraPawn::Initialize()

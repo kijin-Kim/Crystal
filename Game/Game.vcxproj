@@ -290,6 +290,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\actors\Asteroid.cpp" />
+    <ClCompile Include="src\actors\Kraken.cpp" />
+    <ClCompile Include="src\actors\Sun.cpp" />
     <ClCompile Include="src\actors\TestPawn.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>

@@ -2,6 +2,8 @@
 
 #include "Crystal/GamePlay/World/Level.h"
 
+BOOST_CLASS_EXPORT(TestPawn)
+
 void TestPawn::Initialize()
 {
 	Pawn::Initialize();

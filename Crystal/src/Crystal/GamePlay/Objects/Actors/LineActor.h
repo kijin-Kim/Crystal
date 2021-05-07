@@ -5,6 +5,12 @@
 namespace Crystal {
 	class LineActor : public Actor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Actor>(*this);
+			ar & *m_DebugLineComponent;
+		}
+
 	public:
 		LineActor() = default;
 		~LineActor() override = default;

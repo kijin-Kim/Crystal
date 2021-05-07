@@ -4,7 +4,6 @@
 
 #include "Crystal/GamePlay/Objects/Actors/LineActor.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
-#include "Crystal/GamePlay/Objects/Actors/ActorClassOf.h"
 
 
 #include "../../../../../Game/src/actors/TestPawn.h"
@@ -187,27 +186,54 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
-		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+		//auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		//newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
-		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
-			newActor->GetComponentByClass("StaticMeshComponent"));
+		//auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
+		//	newActor->GetComponentByClass("StaticMeshComponent"));
 
-		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+		//newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		//auto newActorMat = newActorMesh->GetMaterial(0);
+		//newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		//newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		//newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		//newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
-		newActor->SetScale(playerStartActor->GetScale());
-		newActor->SetRotation(playerStartActor->GetRotation());
-		newActor->SetPosition(playerStartActor->GetPosition());
+		//newActor->SetScale(playerStartActor->GetScale());
+		//newActor->SetRotation(playerStartActor->GetRotation());
+		//newActor->SetPosition(playerStartActor->GetPosition());
+
+
+		//auto newActor2 = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		//auto newActorMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(
+		//	newActor2->GetComponentByClass("StaticMeshComponent"));
+
+		//newActorMesh2->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		//auto newActorMat2 = newActorMesh2->GetMaterial(0);
+		//newActorMat2->AlbedoTexture = resourceManager.GetTexture("Frigate_Normal");
+		//newActorMat2->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		//newActorMat2->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		//newActorMat2->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+
+
+		auto newActor = std::make_shared<Object>();
+		auto newActor2 = std::make_shared<Object>();
+		
+		
+		std::ostringstream oss;
+		boost::archive::text_oarchive os(oss);
+		os << *newActor;
+
+		std::istringstream iss(oss.str());
+		boost::archive::text_iarchive is(iss);
+		is >> *newActor2;
+		
+		
 
 		playerStartActor->Destroy();
 
-		auto playerController = SpawnActor<PlayerController>().lock();
-		playerController->Possess(newActor);
+		/*auto playerController = SpawnActor<PlayerController>().lock();
+		playerController->Possess(newActor);*/
 #endif
 
 

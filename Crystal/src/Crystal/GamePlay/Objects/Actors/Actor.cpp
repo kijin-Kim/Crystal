@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/World/World.h"
 
+BOOST_CLASS_EXPORT(Crystal::Actor)
 
 namespace Crystal {
 

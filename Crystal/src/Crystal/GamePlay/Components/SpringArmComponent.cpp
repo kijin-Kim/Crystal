@@ -1,6 +1,8 @@
 #include "cspch.h"
 #include "SpringArmComponent.h"
 
+BOOST_CLASS_EXPORT(Crystal::SpringArmComponent)
+
 namespace Crystal {
 
 	void SpringArmComponent::Update(const float deltaTime)

@@ -5,6 +5,11 @@
 namespace Crystal {
 	class LightActor : public Actor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			ar & *m_LightComponent;
+		}
+
 	public:
 		LightActor() = default;
 		~LightActor() override = default;
@@ -18,6 +23,11 @@ namespace Crystal {
 
 	class LocalLightActor : public LightActor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<LightActor>(*this);
+		}
+
 	public:
 		LocalLightActor() = default;
 		~LocalLightActor() override = default;
@@ -35,10 +45,14 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(LocalLightActor)
 	};
 
-	
 
 	class DirectionalLightActor : public LightActor
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<LightActor>(*this);
+		}
+
 	public:
 		DirectionalLightActor() = default;
 		~DirectionalLightActor() override = default;

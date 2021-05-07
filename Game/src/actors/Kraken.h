@@ -3,11 +3,17 @@
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/Animation.h"
+#include "Crystal/Resources/Meshes.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class Kraken : public Crystal::Pawn
 {
-public:
+	SERIALIZE_PROPERTIES
+	{
+		boost::serialization::base_object<Crystal::Pawn>(*this);
+	}
 
+public:
 	void Initialize() override
 	{
 		auto& resourceManager = Crystal::ResourceManager::Instance();
@@ -30,7 +36,8 @@ public:
 			tentacleMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Tentacle_Normal"));
 			tentacleMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));*/
 
-		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
+		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>(
+			"assets/models/KRAKEN.fbx",
 			"assets/models/KRAKEN_idle.fbx");
 
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
@@ -42,7 +49,7 @@ public:
 		m_MainComponent = skeletalMeshComponent;
 
 
-		SetPosition({ 0.0f, 0.0f, 2000.0f });
+		SetPosition({0.0f, 0.0f, 2000.0f});
 	}
 
 

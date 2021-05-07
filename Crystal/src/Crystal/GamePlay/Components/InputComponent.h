@@ -11,12 +11,23 @@ namespace Crystal {
 
 	class InputComponent : public Component
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Component>(*this);
+			ar & m_bShouldBindCursor;
+			ar & m_bIsCursorVisible;
+
+			ar & m_LastPosition;
+			ar & m_BindPosition;
+		}
+
 	public:
 		InputComponent() = default;
 		virtual ~InputComponent() = default;
 
 		void BindAxis(const std::string& axisName, const std::function<void(float value)>& function);
-		void BindAction(const std::string& actionName, EKeyEvent keyEventType, const std::function<void(void)>& function);
+		void BindAction(const std::string& actionName, EKeyEvent keyEventType,
+		                const std::function<void(void)>& function);
 		void UnBindAction(const std::string& actionName, EKeyEvent keyEventType);
 
 		bool ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

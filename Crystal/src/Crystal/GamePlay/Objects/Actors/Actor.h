@@ -13,12 +13,28 @@ namespace Crystal {
 	// Spawn-able object
 	class Actor : public Object
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Object>(*this);
+			ar & *m_MainComponent;
+			for(auto& c : m_Components)
+			{
+				ar& c;
+			}
+
+			for(auto& c : m_TransformHierarchy)
+			{
+				ar& c;
+			}
+		}
+		
 	public:
 		struct ActorSpawnParams
 		{
 			std::string Name;
 			Level* Level = nullptr;
 		};
+
 	public:
 		Actor() = default;
 		~Actor() override = default;
@@ -45,14 +61,13 @@ namespace Crystal {
 
 		void SetScale(float scale);
 		float GetScale() const;
-		
+
 		void SetPosition(const DirectX::XMFLOAT3& position);
 		DirectX::XMFLOAT3 GetPosition() const;
 
 		void SetRotation(const DirectX::XMFLOAT4& rotation);
 		DirectX::XMFLOAT4 GetRotation() const;
-		
-		
+
 
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);
 		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
@@ -60,7 +75,7 @@ namespace Crystal {
 		void SetIsDead(bool bIsDead) { m_bIsDead = bIsDead; }
 		bool GetIsDead() const { return m_bIsDead; }
 		void Destroy() { m_bIsDead = true; }
-		
+
 
 		STATIC_TYPE_IMPLE(Actor)
 	protected:
@@ -82,8 +97,6 @@ namespace Crystal {
 		std::vector<std::shared_ptr<TransformComponent>> m_TransformHierarchy;
 
 		bool m_bIsDead = false;
-
-	
 	};
 
 }

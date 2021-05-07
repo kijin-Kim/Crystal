@@ -6,6 +6,14 @@
 namespace Crystal {
 	struct ActionMapping
 	{
+		SERIALIZE_PROPERTIES
+		{
+			ar & CrystalCode;
+			ar & bAltDown;
+			ar & bCtrlDown;
+			ar & bShiftDown;
+		}
+
 		int64_t CrystalCode = 0;
 		bool bAltDown = false;
 		bool bCtrlDown = false;
@@ -14,7 +22,7 @@ namespace Crystal {
 
 	struct ActionKeyCompare
 	{
-		bool operator() (const ActionMapping& lhs, const ActionMapping& rhs) const
+		bool operator()(const ActionMapping& lhs, const ActionMapping& rhs) const
 		{
 			if (lhs.CrystalCode == rhs.CrystalCode)
 			{
@@ -30,14 +38,28 @@ namespace Crystal {
 		}
 	};
 
-	enum class EInputMode
+	enum class EInputMode : uint32_t
 	{
-		IM_Game, // 게임 만
-		IM_UI, // UI 만
+		IM_Game,
+		// 게임 만
+		IM_UI,
+		// UI 만
 	};
 
 	class PlayerController : public Controller
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Controller>(*this);
+			ar & *m_UserInterfaceInputComponent;
+			ar & *m_GameInputComponent;
+			ar & m_AxisMap;
+			ar & m_ActionMap;
+			ar & m_InputMode;
+			ar & m_bIsSwitchableMode;
+			ar & m_NetworkId;
+		}
+
 	public:
 		PlayerController();
 		virtual ~PlayerController() = default;
@@ -69,7 +91,6 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PlayerController)
 	private:
-
 		/*유저 인터페이스 인풋*/
 		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
 		/*게임모드 인풋*/

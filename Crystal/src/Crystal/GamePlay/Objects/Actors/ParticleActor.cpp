@@ -1,6 +1,8 @@
 ﻿#include "cspch.h"
 #include "ParticleActor.h"
 
+BOOST_CLASS_EXPORT(Crystal::ParticleActor)
+
 namespace Crystal {
 
 	void ParticleActor::Initialize()

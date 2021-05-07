@@ -3,7 +3,7 @@
 #include "Crystal/Math/Math.h"
 
 namespace Crystal {
-	enum class ECameraProjectionMode
+	enum class ECameraProjectionMode : uint32_t
 	{
 		CPM_Persepective,
 		CPM_Orthographic
@@ -12,6 +12,22 @@ namespace Crystal {
 	/* 게임내에서의 카메라를 나타내는 클래스입니다 */
 	class CameraComponent : public TransformComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<TransformComponent>(*this);
+			ar & m_View;
+			ar & m_Projection;
+			ar & m_ViewProjection;
+			ar & m_Viewport;
+			ar & m_ScissorRect;
+
+			ar & m_FieldOfView;
+			ar & m_NearPlane;
+			ar & m_FarPlane;
+
+			ECameraProjectionMode m_ProjectionMode = ECameraProjectionMode::CPM_Persepective;
+		}
+
 	public:
 		CameraComponent();
 		virtual ~CameraComponent() = default;

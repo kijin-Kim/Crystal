@@ -424,6 +424,7 @@
     <ClInclude Include="external\assimp\include\assimp\version.h" />
     <ClInclude Include="src\Crystal.h" />
     <ClInclude Include="src\Crystal\Core\Device.h" />
+    <ClInclude Include="src\Crystal\Core\SerializeHelper.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
@@ -435,7 +436,6 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Actor.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\ActorClassOf.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\GameMode.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\LightActor.h" />
@@ -501,17 +501,23 @@
   <ItemGroup>
     <ClCompile Include="src\Crystal\Core\Device.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\Component.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\MovementComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\ParticleComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Controllers\Controller.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />
-    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\ActorClassOf.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\GameMode.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\LightActor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\LineActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\ParticleActor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Pawn.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlaneQuadActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\Level.cpp" />

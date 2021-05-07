@@ -8,11 +8,18 @@
 namespace Crystal {
 	class Component : public Object
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<Object>(*this);
+		}
+
 	public:
 		Component() = default;
 		~Component() override = default;
 
-		virtual void RegisterComponent() {}
+		virtual void RegisterComponent()
+		{
+		}
 
 		virtual bool CanBeRendered() const { return false; }
 		virtual bool IsCollisionEnabled() const { return false; }

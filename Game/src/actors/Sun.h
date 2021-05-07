@@ -5,6 +5,11 @@
 
 class Sun : public Crystal::LocalLightActor
 {
+	SERIALIZE_PROPERTIES
+	{
+		boost::serialization::base_object<Crystal::LocalLightActor>(*this);
+	}
+
 public:
 	Sun() = default;
 	~Sun() override = default;
@@ -12,7 +17,7 @@ public:
 	void Initialize() override
 	{
 		Crystal::LocalLightActor::Initialize();
-		
+
 
 		auto material = std::make_unique<Crystal::NewMaterial>();
 		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;

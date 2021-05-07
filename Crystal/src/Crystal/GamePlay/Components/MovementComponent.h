@@ -1,14 +1,23 @@
 #pragma once
 #include "Component.h"
+#include "TransformComponent.h"
 
 namespace Crystal {
 	class MovementComponent final : public Component
 	{
+		SERIALIZE_PROPERTIES
+		{
+			ar & *m_TargetComponent;
+		}
+
 	public:
 		MovementComponent() = default;
 		~MovementComponent() override = default;
 
-		void SetTargetComponent(std::shared_ptr<TransformComponent> targetComponent) { m_TargetComponent = std::move(targetComponent); }
+		void SetTargetComponent(std::shared_ptr<TransformComponent> targetComponent)
+		{
+			m_TargetComponent = std::move(targetComponent);
+		}
 
 		void Update(const float deltaTime) override
 		{
@@ -16,7 +25,6 @@ namespace Crystal {
 
 			if (!m_TargetComponent->HasFiniteMass())
 				return;
-
 		}
 
 

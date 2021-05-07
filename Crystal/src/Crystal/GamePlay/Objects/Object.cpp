@@ -1,6 +1,8 @@
 ﻿#include "cspch.h"
 #include "Object.h"
 
+BOOST_CLASS_EXPORT(Crystal::Object)
+
 namespace Crystal {
 
 	Object::Object()

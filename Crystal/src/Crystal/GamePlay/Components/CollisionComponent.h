@@ -4,33 +4,41 @@
 #include "Crystal/Resources/Meshes.h"
 #include "PrimitiveComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
-#include "CollisionShapes.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LinePipeline.h"
+#include "CollisionShapes.h"
 
 namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
 	{
+		SERIALIZE_PROPERTIES
+		{
+			boost::serialization::base_object<PrimitiveComponent>(*this);
+			ar & m_PostScaledTransform;
+			ar & m_bCollisionEnabled;
+		}
+
 	public:
 		CollisionComponent()
 		{
 			auto material = std::make_unique<NewMaterial>();
 			material->ShadingModel = EShadingModel::ShadingModel_Unlit;
-			material->AlbedoColor= Vector3::Yellow;
+			material->AlbedoColor = Vector3::Yellow;
 
 
 			AddMaterial(std::move(material));
-
 		}
+
 		~CollisionComponent() override
 		{
 		}
 
-		void SetLineColor(const DirectX::XMFLOAT3& color) 
+		void SetLineColor(const DirectX::XMFLOAT3& color)
 		{
 			//m_MaterialsOld[0]->Set("Color", color); 
 		}
-		const DirectX::XMFLOAT3& GetLineColor() const 
-		{ 
+
+		const DirectX::XMFLOAT3& GetLineColor() const
+		{
 			/*auto color = m_MaterialsOld[0]->GetFloatInput("Color"); 
 			return { color.x, color.y, color.z };*/
 		}
@@ -39,7 +47,6 @@ namespace Crystal {
 
 		void Update(const float deltaTime) override
 		{
-		
 			auto position = GetLocalPosition();
 			auto velocity = GetVelocity();
 
@@ -66,7 +73,6 @@ namespace Crystal {
 		void SetCollisionEnabled(bool bEnable) { m_bCollisionEnabled = bEnable; }
 		bool IsCollisionEnabled() const override { return m_bCollisionEnabled; }
 
-	
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
 	protected:
@@ -93,13 +99,13 @@ namespace Crystal {
 			CollisionComponent::Update(deltaTime);
 
 			// Caculate Post Transform
-			const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
+			const DirectX::XMFLOAT3 currentDirection = {1.0f, 0.0f, 0.0f};
 
 			const auto scaleMatrix = Matrix4x4::Scale(m_MaxDistance);
 			auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, m_Direction));
 			if (Vector3::IsZero(rotationAxis))
 			{
-				rotationAxis = { 0.0f, 0.0f, -1.0f };
+				rotationAxis = {0.0f, 0.0f, -1.0f};
 			}
 			const auto rotationAngle = acosf(Vector3::Dot(currentDirection, m_Direction));
 			const auto quternion =
@@ -110,7 +116,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
 			postTransform = Matrix4x4::Multiply(postTransform, translationMatrix);
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
-
 		}
 
 		void SetOrigin(const DirectX::XMFLOAT3& origin) { m_Origin = origin; }
@@ -121,22 +126,20 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetDirection() const { return m_Direction; }
 		float GetMaxDistance() const { return m_MaxDistance; }
 
-		
 
 		STATIC_TYPE_IMPLE(RayComponent)
 	private:
-
-		DirectX::XMFLOAT3 m_Origin = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT3 m_Direction = { 1.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_Origin = {0.0f, 0.0f, 0.0f};
+		DirectX::XMFLOAT3 m_Direction = {1.0f, 0.0f, 0.0f};
 		float m_MaxDistance = 1.0f;
 	};
 
 	class BoundingBoxComponent : public CollisionComponent
 	{
+		
 	public:
 		BoundingBoxComponent()
 		{
-
 			auto& resourceManager = ResourceManager::Instance();
 #ifndef CS_NM_DEDICATED
 			SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
@@ -151,10 +154,9 @@ namespace Crystal {
 
 			// Caculate Post Transform
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
-				m_BoundingBox.Extents, { 2.0f, 2.0f, 2.0f }));
+				m_BoundingBox.Extents, {2.0f, 2.0f, 2.0f}));
 			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingBox.Center));
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
-
 		}
 
 		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingBox.Center = center; }
@@ -167,7 +169,7 @@ namespace Crystal {
 			return worldBoundingBox;
 		}
 
-	
+
 		STATIC_TYPE_IMPLE(BoundingBoxComponent)
 
 	private:
@@ -193,13 +195,11 @@ namespace Crystal {
 
 			// Caculate Post Transform
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
-				m_BoundingOrientedBox.Extents, { 2.0f, 2.0f, 2.0f }));
+				m_BoundingOrientedBox.Extents, {2.0f, 2.0f, 2.0f}));
 			postTransform = Matrix4x4::Multiply(postTransform,
-				Matrix4x4::RotationQuaternion(m_BoundingOrientedBox.Orientation));
+			                                    Matrix4x4::RotationQuaternion(m_BoundingOrientedBox.Orientation));
 			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingOrientedBox.Center));
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
-
-
 		}
 
 		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingOrientedBox.Center = center; }
@@ -243,7 +243,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(m_BoundingSphere.Radius);
 			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingSphere.Center));
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
-
 		}
 
 		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingSphere.Center = center; }
