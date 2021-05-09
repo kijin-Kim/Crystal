@@ -10,97 +10,97 @@ namespace Crystal {
 		Object::Update(deltaTime);
 
 		 
-		//// Bounding Sphere
-		//for (const auto & lhsWeak : m_BoundingSphereComponents)
-		//{
-		//	auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
-		//	if (!sphereComplhs)
-		//		continue;
+		// Bounding Sphere
+		for (const auto & lhsWeak : m_BoundingSphereComponents)
+		{
+			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
+			if (!sphereComplhs)
+				continue;
 
-		//	auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
+			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
 
-		//	// Bounding Sphere
-		//	for (const auto & rhsWeak : m_BoundingSphereComponents)
-		//	{
-		//		
-		//		auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
-		//		if (!sphereCompRhs)
-		//			continue;
+			// Bounding Sphere
+			for (const auto & rhsWeak : m_BoundingSphereComponents)
+			{
+				
+				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
+				if (!sphereCompRhs)
+					continue;
 
-		//		if (sphereComplhs == sphereCompRhs)
-		//			continue;
-
-
-		//		auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
-
-		//		
-		//		float totalDist = 0.0f;
-		//		if (sphereLhs.Intersects(sphereRhs, totalDist))
-		//		{
-		//			ResolveVelocity(sphereComplhs, sphereCompRhs, totalDist);
-		//		}
-		//	}
-		//}
-
-		//// Bounding Sphere
-		//for (const auto & lhsWeak : m_BoundingSphereComponents)
-		//{
-		//	auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
-		//	if (!sphereComplhs)
-		//		continue;
-
-		//	auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
-
-		//	// Bounding Sphere
-		//	for (const auto & rhsWeak : m_BoundingSphereComponents)
-		//	{
-		//		auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
-		//		if (!sphereCompRhs)
-		//			continue;
-
-		//		if (sphereComplhs == sphereCompRhs)
-		//			continue;
+				if (sphereComplhs == sphereCompRhs)
+					continue;
 
 
-		//		auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
+				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
 
-		//		float totalDist = 0.0f;
-		//		if (sphereLhs.Intersects(sphereRhs, totalDist))
-		//		{
-		//			ResolvePenetration(sphereComplhs, sphereCompRhs, totalDist);
-		//		}
-		//	}
-		//}
-		//
-		//
-		//
-		//
+				
+				float totalDist = 0.0f;
+				if (sphereLhs.Intersects(sphereRhs, totalDist))
+				{
+					ResolveVelocity(sphereComplhs, sphereCompRhs, totalDist);
+				}
+			}
+		}
 
-		//// Bounding Sphere
-		//for (const auto& sphereCompWeak : m_BoundingSphereComponents)
-		//{
-		//	auto sphereCompLhs = Cast<BoundingSphereComponent>(sphereCompWeak);
-		//	if (!sphereCompLhs)
-		//		continue;
+		// Bounding Sphere
+		for (const auto & lhsWeak : m_BoundingSphereComponents)
+		{
+			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
+			if (!sphereComplhs)
+				continue;
 
-		//	auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
+			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
 
-		//	// Bounding Oriented Box
-		//	for(const auto& obbCompWeak : m_BoundingOrientedBoxComponents)
-		//	{
-		//		auto obbCompRhs = Cast<BoundingOrientedBoxComponent>(obbCompWeak);
-		//		if (!obbCompRhs)
-		//			continue;
+			// Bounding Sphere
+			for (const auto & rhsWeak : m_BoundingSphereComponents)
+			{
+				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
+				if (!sphereCompRhs)
+					continue;
 
-		//		auto obbRhs = obbCompRhs->GetWorldBoundingOrientedBox();
+				if (sphereComplhs == sphereCompRhs)
+					continue;
 
-		//		if (sphereLhs.Intersects(obbRhs))
-		//		{
 
-		//		}
+				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
 
-		//	}
-		//}
+				float totalDist = 0.0f;
+				if (sphereLhs.Intersects(sphereRhs, totalDist))
+				{
+					ResolvePenetration(sphereComplhs, sphereCompRhs, totalDist);
+				}
+			}
+		}
+		
+		
+		
+		
+
+		// Bounding Sphere
+		for (const auto& sphereCompWeak : m_BoundingSphereComponents)
+		{
+			auto sphereCompLhs = Cast<BoundingSphereComponent>(sphereCompWeak);
+			if (!sphereCompLhs)
+				continue;
+
+			auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
+
+			// Bounding Oriented Box
+			for(const auto& obbCompWeak : m_BoundingOrientedBoxComponents)
+			{
+				auto obbCompRhs = Cast<BoundingOrientedBoxComponent>(obbCompWeak);
+				if (!obbCompRhs)
+					continue;
+
+				auto obbRhs = obbCompRhs->GetWorldBoundingOrientedBox();
+
+				if (sphereLhs.Intersects(obbRhs))
+				{
+
+				}
+
+			}
+		}
 
 		
 	}

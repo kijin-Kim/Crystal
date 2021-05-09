@@ -27,15 +27,14 @@ namespace Crystal {
 
 		template <class T>
 		std::weak_ptr<T> SpawnActor(const std::string& name = "");
-		template <class T>
-		std::weak_ptr<T> SpawnProtoTypedActor(const std::string& prototypedActorName,
-		                        const Actor::ActorSpawnParams& spawnParams);
+
 
 		void AddActor(const std::shared_ptr<Actor>& actor);
+		void AddPendingSpawnedActors();
 		void AddPlayerController(const std::shared_ptr<PlayerController>& playerController);
 
-		void DestroyActor(const std::shared_ptr<Actor>& actor);
-		void DestroyPendingActors();
+		void RemoveActor(const std::shared_ptr<Actor>& actor);
+		void RemovePendingActors();
 
 		void DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
@@ -73,6 +72,7 @@ namespace Crystal {
 
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
+		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;
 		std::vector<std::shared_ptr<PlayerController>> m_PlayerControllers;
 	};
 
@@ -84,23 +84,9 @@ namespace Crystal {
 
 		newActor->Begin();
 
-		m_Actors.push_back(newActor);
+		//m_Actors.push_back(newActor);
 
 		return newActor;
-	}
-
-
-	template <class T>
-	std::weak_ptr<T> Level::SpawnProtoTypedActor(const std::string& prototypedActorName, const Actor::ActorSpawnParams& spawnParams)
-	{
-		auto world = Cast<World>(GetOuter());
-		auto actorPrototype = world->GetProtoTypeActor(prototypedActorName);
-		if (actorPrototype.lock())
-		{
-			/*	actorPrototype->SetObjectName(spawnParams.Name);
-				actorPrototype->Begin();
-				m_Actors.push_back(actorPrototype);*/
-		}
 	}
 
 

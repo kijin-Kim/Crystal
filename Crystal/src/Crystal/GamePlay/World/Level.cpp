@@ -19,7 +19,7 @@ namespace Crystal {
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
 		m_PhysicsSystem->OnCreate();
 
-#ifndef CS_NM_DEDICATED
+#if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
 		m_RenderSystem = std::make_unique<RenderSystem>();
 		m_RenderSystem->Initialize();
 		m_RenderSystem->SetOuter(weak_from_this());
@@ -41,6 +41,8 @@ namespace Crystal {
 		}
 #endif
 
+		AddPendingSpawnedActors();
+		
 		for (const auto& actor : m_Actors)
 		{
 			actor->UpdateComponents(deltaTime);
@@ -53,24 +55,7 @@ namespace Crystal {
 		m_PhysicsSystem->Update(deltaTime);
 
 
-		//using Type = int;
-		//std::unordered_map<Type, int> m_CountMap;
-		//std::unordered_map<Type, int> m_CountMap2;
-		////================서버
-		//for(auto& m : m_CountMap)
-		//{
-		//	for(auto& m2 : m_CountMap2)
-		//	{				
-		//		if(m.second !=  m2.second)
-		//		{
-		//			Type->SpawnActor();
-		//			Type->DestroyActor();
-		//		}
-		//	}
-		//}
-
-
-		DestroyPendingActors();
+		RemovePendingActors();
 
 
 		if (m_RenderSystem)
@@ -88,11 +73,18 @@ namespace Crystal {
 		lineComponent->SetDirection(direction);
 		lineComponent->SetMaxDistance(maxDistance);
 		lineComponent->SetLineColor(color);
+		debugLineActor->SetLifeTime(1.5f);
 	}
 
 	void Level::AddActor(const std::shared_ptr<Actor>& actor)
 	{
-		m_Actors.push_back(actor);
+		m_PendingSpawnedActors.push_back(actor);
+	}
+
+	void Level::AddPendingSpawnedActors()
+	{
+		m_Actors.insert(m_Actors.end(), m_PendingSpawnedActors.begin(), m_PendingSpawnedActors.end());
+		m_PendingSpawnedActors.clear();
 	}
 
 	void Level::AddPlayerController(const std::shared_ptr<PlayerController>& playerController)
@@ -100,22 +92,23 @@ namespace Crystal {
 		m_PlayerControllers.push_back(playerController);
 	}
 
-	void Level::DestroyActor(const std::shared_ptr<Actor>& actor)
+	void Level::RemoveActor(const std::shared_ptr<Actor>& actor)
 	{
 		actor->SetIsDead(true);
 	}
 
-	void Level::DestroyPendingActors()
+	void Level::RemovePendingActors()
 	{
 		for (auto it = m_Actors.begin(); it != m_Actors.end();)
 		{
 			if (!(*it)->GetIsDead())
 			{
 				++it;
-				continue;
 			}
-
-			it = m_Actors.erase(it);
+			else
+			{
+				it = m_Actors.erase(it);
+			}
 		}
 	}
 
@@ -134,6 +127,7 @@ namespace Crystal {
 		lineComponent->SetDirection(direction);
 		lineComponent->SetMaxDistance(maxDistance);
 		lineComponent->SetLineColor(color);
+		debugLineActor->SetLifeTime(1.5f);
 	}
 
 	void Level::RegisterPhysicsWorldComponent(std::weak_ptr<Component> component)
@@ -159,6 +153,7 @@ namespace Crystal {
 
 	void Level::OnClientConnect()
 	{
+		AddPendingSpawnedActors();
 #ifdef CS_NM_CLIENT
 		/* 멀티플레이어 클라이언트면,
 		* 서버가 알아서 생성
@@ -186,54 +181,28 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
-		//auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		//newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
 
-		//auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
-		//	newActor->GetComponentByClass("StaticMeshComponent"));
+		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
+			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		//newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		//auto newActorMat = newActorMesh->GetMaterial(0);
-		//newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		//newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		//newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		//newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		auto newActorMat = newActorMesh->GetMaterial(0);
+		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
+		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
+		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
-		//newActor->SetScale(playerStartActor->GetScale());
-		//newActor->SetRotation(playerStartActor->GetRotation());
-		//newActor->SetPosition(playerStartActor->GetPosition());
+		newActor->SetScale(playerStartActor->GetScale());
+		newActor->SetRotation(playerStartActor->GetRotation());
+		newActor->SetPosition(playerStartActor->GetPosition());
 
-
-		//auto newActor2 = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		//auto newActorMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(
-		//	newActor2->GetComponentByClass("StaticMeshComponent"));
-
-		//newActorMesh2->SetRenderable(resourceManager.GetRenderable("Frigate"));
-		//auto newActorMat2 = newActorMesh2->GetMaterial(0);
-		//newActorMat2->AlbedoTexture = resourceManager.GetTexture("Frigate_Normal");
-		//newActorMat2->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		//newActorMat2->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		//newActorMat2->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
-
-
-		auto newActor = std::make_shared<Object>();
-		auto newActor2 = std::make_shared<Object>();
-		
-		
-		std::ostringstream oss;
-		boost::archive::text_oarchive os(oss);
-		os << *newActor;
-
-		std::istringstream iss(oss.str());
-		boost::archive::text_iarchive is(iss);
-		is >> *newActor2;
-		
-		
-
+	
 		playerStartActor->Destroy();
 
-		/*auto playerController = SpawnActor<PlayerController>().lock();
-		playerController->Possess(newActor);*/
+		auto playerController = SpawnActor<PlayerController>().lock();
+		playerController->Possess(newActor);
 #endif
 
 

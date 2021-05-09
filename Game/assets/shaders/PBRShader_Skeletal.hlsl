@@ -23,6 +23,13 @@ struct PS_INPUT
 };
 
 
+struct PS_OUTPUT
+{
+    float4 MainColor : SV_Target0;
+    float4 BrightColor : SV_Target1;
+};
+
+
 cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
@@ -130,7 +137,7 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 }
 
 
-float4 psMain(PS_INPUT input) : SV_TARGET
+PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 lightColor = 3.0f;
@@ -196,13 +203,27 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 ambient = kD * diffuse;
     float3 finalColor = Lo + ambient;
 
-    //HDR
-    float3 hdrDenom = finalColor + 1.0f;
-    finalColor = finalColor / hdrDenom;
-    //Gamma Correction
-    float3 gammaFactor = 1.0f / 2.2f;
-    finalColor = pow(finalColor, gammaFactor);
+    // //HDR
+    // float3 hdrDenom = finalColor + 1.0f;
+    // finalColor = finalColor / hdrDenom;
+    // //Gamma Correction
+    // float3 gammaFactor = 1.0f / 2.2f;
+    // finalColor = pow(finalColor, gammaFactor);
     
-    return float4(finalColor, 1.0f);
+    // return float4(finalColor, 1.0f);
+
+    
+    float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+
+    PS_OUTPUT output;
+
+    output.MainColor = float4(finalColor, 1.0f);
+
+    if(brightness > 1.0f)
+        output.BrightColor = output.MainColor;
+    else
+        output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    return output;
     
 }

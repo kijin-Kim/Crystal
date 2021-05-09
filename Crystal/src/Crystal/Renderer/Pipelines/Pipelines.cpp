@@ -222,7 +222,7 @@ namespace Crystal {
 
 
 			auto renderable = meshComponent->GetRenderable().lock();
-			auto materials = meshComponent->GetMaterialsOld();
+			auto& materials = meshComponent->GetMaterials();
 
 			if(!renderable)
 			{

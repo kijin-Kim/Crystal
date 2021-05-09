@@ -34,7 +34,7 @@ namespace Crystal {
 
 		void SetLineColor(const DirectX::XMFLOAT3& color)
 		{
-			//m_MaterialsOld[0]->Set("Color", color); 
+			GetMaterial(0)->AlbedoColor = color;
 		}
 
 		const DirectX::XMFLOAT3& GetLineColor() const

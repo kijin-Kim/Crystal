@@ -10,7 +10,8 @@ namespace Crystal {
 	{
 		ShadingModel_Undefined,
 		ShadingModel_Unlit,
-		ShadingModel_DefaultLit
+		ShadingModel_DefaultLit,
+		ShadingModelCount
 	};
 	
 

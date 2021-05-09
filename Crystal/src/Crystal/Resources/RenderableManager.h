@@ -8,18 +8,18 @@ namespace Crystal {
 	{
 		friend class ResourceManager;
 	private:
-		template<class T>
-		void createFromFile(const std::string& filePath, const std::string& alias = "")
+		template<class T, class... Args>
+		void createFromFile(const std::string& alias, Args... args)
 		{
 			std::string name;
-			name = alias.empty() ? filePath : alias;
+			name = alias;
 
 			if (m_Meshes.find(name) != m_Meshes.end())
 			{
 				CS_FATAL(false, "%s이름을 가진 Renderable이 이미 존재합니다", name.c_str());
 			}
 
-			m_Meshes[name] = std::make_shared<T>(filePath);
+			m_Meshes[name] = std::make_shared<T>(std::forward<Args>(args)...);
 		}
 
 		template<class T>

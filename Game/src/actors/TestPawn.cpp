@@ -39,6 +39,20 @@ void TestPawn::Initialize()
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
 }
 
+void TestPawn::Update(const float deltaTime)
+{
+	Pawn::Update(deltaTime);
+
+
+	m_FireTimer.Tick();
+	
+	if(m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)
+	{
+		m_FireTimer.Reset();
+		OnFire();
+	}
+}
+
 void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 {
 	Pawn::SetupInputComponent(inputComponent);
@@ -52,6 +66,7 @@ void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 	inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::RotateYaw));
 
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::BeginFire));
+	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(TestPawn::EndFire));
 }
 
 void TestPawn::RotateYaw(float value)
@@ -95,6 +110,18 @@ void TestPawn::RollRight(float value)
 void TestPawn::BeginFire()
 {
 	CS_DEBUG_INFO("BeginFire!!");
+	m_bShouldFire = true;
+}
+
+void TestPawn::EndFire()
+{
+	CS_DEBUG_INFO("EndFire!!");
+	m_bShouldFire = false;
+}
+
+void TestPawn::OnFire()
+{
+	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = m_CameraComponent->GetWorldForwardVector();
 	const float maxDistance = 10000.0f;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "Crystal/Core/Timer.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 
 namespace Crystal {
@@ -23,11 +24,16 @@ namespace Crystal {
 			m_MainComponent = m_DebugLineComponent;
 		}
 
+		void Update(float deltaTime) override;
+		void SetLifeTime(float lifeTime) { m_LifeTime = lifeTime;  }
+
 		std::shared_ptr<RayComponent> GetLineComponent() const { return m_DebugLineComponent; }
 
 
 		STATIC_TYPE_IMPLE(LineActor)
 	private:
 		std::shared_ptr<RayComponent> m_DebugLineComponent = nullptr;
+		float m_LifeTime = 0.0f;
+		Timer timer;
 	};
 }

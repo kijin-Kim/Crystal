@@ -23,12 +23,6 @@ namespace Crystal {
 		virtual void Start()
 		{
 			// Default Resources
-			/*auto& resourceManager = ResourceManager::Instance();
-			resourceManager.CreateRenderable<Line>("LineMesh");
-			resourceManager.CreateRenderable<LineBox>("LineBoxMesh");
-			resourceManager.CreateRenderable<LineSphere>("LineSphereMesh");
-			resourceManager.CreateRenderable<PlaneQuad2D>("2DPlaneQuadMesh");
-			resourceManager.CreateRenderableFromFile<StaticMesh>("assets/models/Sphere.fbx", "Sphere");*/
 		}
 
 		void Run();

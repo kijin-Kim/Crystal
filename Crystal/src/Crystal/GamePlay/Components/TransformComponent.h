@@ -34,7 +34,7 @@ namespace Crystal {
 		~TransformComponent() override = default;
 
 		void Update(float deltaTime) override;
-		void UpdateTransfromHierarchy();
+		void UpdateTransformHierarchy();
 
 		void AttachTo(const std::shared_ptr<TransformComponent> component);
 

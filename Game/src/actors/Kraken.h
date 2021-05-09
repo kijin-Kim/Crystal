@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/Animation.h"
@@ -18,35 +19,30 @@ public:
 	{
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		/*	auto bodyMaterial = std::make_shared<Crystal::Material>();
-			bodyMaterial->OnCreate();
-			bodyMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
-				Crystal::Material::MaterialOwnerType::Owner_Shader);
-			bodyMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Body_Albedo"));
-			bodyMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Body_Roughness"));
-			bodyMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Body_Normal"));
-			bodyMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));
 
-			auto tentacleMaterial = std::make_shared<Crystal::Material>();
-			tentacleMaterial->OnCreate();
-			tentacleMaterial->SetObjectOwner(resourceManager.GetShader("PBRShader_Skeletal"),
-				Crystal::Material::MaterialOwnerType::Owner_Shader);
-			tentacleMaterial->Set("AlbedoTexture", resourceManager.GetTexture("Kraken_Tentacle_Albedo"));
-			tentacleMaterial->Set("RoughnessTexture", resourceManager.GetTexture("Kraken_Tentacle_Roughness"));
-			tentacleMaterial->Set("NormalTexture", resourceManager.GetTexture("Kraken_Tentacle_Normal"));
-			tentacleMaterial->Set("IrradianceTexture", resourceManager.GetTexture("Cube_Skybox_Space_Irradiance"));*/
+		auto bodyMaterial = std::make_unique<Crystal::NewMaterial>();
+		bodyMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
-		std::shared_ptr<Crystal::SkeletalMesh> mesh = std::make_shared<Crystal::SkeletalMesh>(
-			"assets/models/KRAKEN.fbx",
-			"assets/models/KRAKEN_idle.fbx");
+		auto tentacleMaterial = std::make_unique<Crystal::NewMaterial>();
+		tentacleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
+
+		auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		sphereComponent->SetRadius(804 / 2.0f);
+		
+		sphereComponent->SetMass(40000.0f);
+		
+		
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
-		skeletalMeshComponent->SetRenderable(mesh);
 		skeletalMeshComponent->RotatePitch(90.0f);
-		/*skeletalMeshComponent->AddMaterialOld(bodyMaterial);
-		skeletalMeshComponent->AddMaterialOld(tentacleMaterial);*/
+		skeletalMeshComponent->AddMaterial(std::move(bodyMaterial));
+		skeletalMeshComponent->AddMaterial(std::move(tentacleMaterial));
+		skeletalMeshComponent->SetLocalPosition({ 0.0f, -400.0f , 0.0f });
 
-		m_MainComponent = skeletalMeshComponent;
+		
+		m_MainComponent = sphereComponent;
+
+		skeletalMeshComponent->AttachTo(m_MainComponent);
 
 
 		SetPosition({0.0f, 0.0f, 2000.0f});

@@ -96,10 +96,10 @@ namespace Crystal {
 			m_RenderableManager.create<T>(name);
 		}
 
-		template <class T>
-		void CreateRenderableFromFile(const std::string& filePath, const std::string& alias = "")
+		template <class T, class... Args>
+		void CreateRenderableFromFile(const std::string& alias, Args... args)
 		{
-			m_RenderableManager.createFromFile<T>(filePath, alias);
+			m_RenderableManager.createFromFile<T>(alias, std::forward<Args>(args)...);
 		}
 
 		void DestroyRenderable(const std::string& name)

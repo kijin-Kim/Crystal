@@ -152,7 +152,7 @@
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -184,7 +184,7 @@
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -216,7 +216,7 @@
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -251,7 +251,7 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -287,7 +287,7 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -323,7 +323,7 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -461,6 +461,7 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\RenderSystem.h" />
+    <ClInclude Include="src\Crystal\Renderer\Scene.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocator.h" />

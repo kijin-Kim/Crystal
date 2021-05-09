@@ -15,7 +15,7 @@ namespace Crystal {
 	{
 		auto level = Cast<Level>(actor->GetOuter());
 		CS_FATAL(level, "Outer가 존재하지 않습니다");
-		level->DestroyActor(actor);
+		level->RemoveActor(actor);
 	}
 
 	Level* World::CreateNewLevel(const std::string& name /*= ""*/)

@@ -16,11 +16,11 @@ namespace Crystal {
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, translation);
 
-		UpdateTransfromHierarchy();
+		UpdateTransformHierarchy();
 	}
 
 
-	void TransformComponent::UpdateTransfromHierarchy()
+	void TransformComponent::UpdateTransformHierarchy()
 	{
 		/*Parent부터 자식 순으로 계산하여야 함*/
 		if (!m_ParentComponent.expired())

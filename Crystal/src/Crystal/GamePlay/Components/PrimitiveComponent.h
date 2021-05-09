@@ -17,7 +17,11 @@ namespace Crystal {
 		}
 
 	public:
-		PrimitiveComponent() = default;
+		PrimitiveComponent()
+		{
+			m_Renderables.resize(10);
+		}
+
 		~PrimitiveComponent() override = default;
 
 		void RegisterComponent() override;
@@ -25,21 +29,29 @@ namespace Crystal {
 		void Update(const float deltaTime) override
 		{
 			TransformComponent::Update(deltaTime);
-			auto renderable = m_Renderable.lock();
-			if (renderable)
+
+			for (const auto& weak : m_Renderables)
+			{
+				auto renderable = weak.lock();
+				if (!renderable)
+					continue;
+
 				renderable->Update(deltaTime);
+			}	
 		}
-
-		void AddMaterialOld(std::shared_ptr<Material> material) { m_MaterialsOld.push_back(std::move(material)); }
-		const std::vector<std::shared_ptr<Material>>& GetMaterialsOld() const { return m_MaterialsOld; }
-
 
 		void AddMaterial(std::unique_ptr<NewMaterial> material);
 		const std::vector<std::unique_ptr<NewMaterial>>& GetMaterials() const;
 		NewMaterial* GetMaterial(uint32_t index) const;
 
-		void SetRenderable(std::weak_ptr<Renderable> renderable) { m_Renderable = renderable; }
-		const std::weak_ptr<Renderable>& GetRenderable() const { return m_Renderable; }
+
+		void SetRenderable(std::weak_ptr<Renderable> renderable, uint32_t index = 0)
+		{
+			m_Renderables[index] = renderable;
+		}
+
+		const std::weak_ptr<Renderable>& GetRenderable(uint32_t index = 0) const { return m_Renderables[0]; }
+
 
 		bool CanBeRendered() const override { return true; }
 		bool IsCollisionEnabled() const override { return false; }
@@ -48,9 +60,8 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
-		std::weak_ptr<Renderable> m_Renderable;
+		std::vector<std::weak_ptr<Renderable>> m_Renderables;
 
-		std::vector<std::shared_ptr<Material>> m_MaterialsOld;
 		std::vector<std::unique_ptr<NewMaterial>> m_Materials;
 
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;

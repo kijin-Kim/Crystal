@@ -104,6 +104,6 @@ namespace Crystal {
 		EInputMode m_InputMode = EInputMode::IM_Game;
 		bool m_bIsSwitchableMode = false;
 
-		uint8_t m_NetworkId = -1;
+		uint8_t m_NetworkId = 0;
 	};
 }
