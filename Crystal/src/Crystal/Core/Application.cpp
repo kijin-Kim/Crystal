@@ -7,22 +7,17 @@
 #include "Crystal/Renderer/RenderSystem.h"
 
 
-
-
 #define WINDOW_WIDTH 1366
 #define WINDOW_HEIGHT 768
 
 namespace Crystal {
 	Application::Application(int width, int height)
 	{
-
 #ifndef CS_NM_DEDICATED
 		m_Window = std::make_unique<WindowsWindow>(width, height);
 		m_Window->SetInputEventFunction(this, &Application::OnInputEvent);
 #endif
 
-
-	
 
 		m_World = std::make_shared<World>();
 		m_World->OnCreate();
@@ -35,6 +30,7 @@ namespace Crystal {
 		Start();
 		while (m_bShouldRun)
 		{
+			std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 			int msgCount = 0;
 			MSG msg;
 			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -49,8 +45,11 @@ namespace Crystal {
 				if (msgCount >= maxMessageCount)
 					break;
 			}
-			Update();
 
+			std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+			CS_DEBUG_INFO("%lf", sec);
+
+			Update();
 		}
 	}
 
@@ -87,29 +86,22 @@ namespace Crystal {
 		if (!io.WantCaptureKeyboard && !io.WantCaptureMouse)
 		{
 			auto currentLevel = m_World->GetCurrentLevel();
-			if(!currentLevel)
+			if (!currentLevel)
 			{
 				return false;
 			}
 
-			
-			
-			auto playerController = Cast<PlayerController>(currentLevel->GetActorByClass("PlayerController"));
-			if (playerController)
-				return playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
-
-			if(m_World)
+			if (m_World)
 			{
 				m_World->OnInputEvent(hWnd, uMsg, wParam, lParam);
 			}
-			
 		}
 		return false;
 	}
 
 	void Application::ChangeResolution(int width, int height) const
 	{
-		if(auto currentLevel = m_World->GetCurrentLevel())
+		if (auto currentLevel = m_World->GetCurrentLevel())
 		{
 			auto renderSystem = Cast<RenderSystem>(currentLevel->GetActorByClass("RenderSystem"));
 			renderSystem->ChangeResolution(width, height);

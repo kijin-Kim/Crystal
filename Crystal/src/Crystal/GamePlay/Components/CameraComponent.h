@@ -32,6 +32,8 @@ namespace Crystal {
 		CameraComponent();
 		virtual ~CameraComponent() = default;
 
+		void RegisterComponent() override;
+
 		void Update(const float deltaTime) override;
 
 		void SetViewport(const D3D12_VIEWPORT& viewport) { m_Viewport = viewport; }

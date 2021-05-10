@@ -42,21 +42,18 @@ namespace Crystal {
 #endif
 
 		AddPendingSpawnedActors();
-		
 		for (const auto& actor : m_Actors)
 		{
 			actor->UpdateComponents(deltaTime);
 			actor->Update(deltaTime);
 			if (actor->GetIsDead())
 			{
+				m_bHasDeadActors = true;
 				actor->End();
 			}
 		}
 		m_PhysicsSystem->Update(deltaTime);
-
-
 		RemovePendingActors();
-
 
 		if (m_RenderSystem)
 		{
@@ -65,7 +62,7 @@ namespace Crystal {
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
-		const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
+	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
 		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
@@ -83,6 +80,11 @@ namespace Crystal {
 
 	void Level::AddPendingSpawnedActors()
 	{
+		if (m_PendingSpawnedActors.empty())
+		{
+			return;
+		}
+
 		m_Actors.insert(m_Actors.end(), m_PendingSpawnedActors.begin(), m_PendingSpawnedActors.end());
 		m_PendingSpawnedActors.clear();
 	}
@@ -99,6 +101,11 @@ namespace Crystal {
 
 	void Level::RemovePendingActors()
 	{
+		if (!m_bHasDeadActors)
+			return;
+
+		m_bHasDeadActors = false;
+
 		for (auto it = m_Actors.begin(); it != m_Actors.end();)
 		{
 			if (!(*it)->GetIsDead())
@@ -113,7 +120,7 @@ namespace Crystal {
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
-		const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
+	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
 		auto debugLineActor = SpawnActor<LineActor>().lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
@@ -151,6 +158,7 @@ namespace Crystal {
 		}
 	}
 
+
 	void Level::OnClientConnect()
 	{
 		AddPendingSpawnedActors();
@@ -159,6 +167,7 @@ namespace Crystal {
 		* 서버가 알아서 생성
 		* return;
 		*
+		* 
 		*
 		*/
 		return;
@@ -181,8 +190,8 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
-		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
-		newActor->SetPosition({ 0.0f, 0.0f, -2000.0f });
+		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
+		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
@@ -190,7 +199,7 @@ namespace Crystal {
 		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
 		auto newActorMat = newActorMesh->GetMaterial(0);
 		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
+		//newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
 		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
 		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
@@ -198,11 +207,25 @@ namespace Crystal {
 		newActor->SetRotation(playerStartActor->GetRotation());
 		newActor->SetPosition(playerStartActor->GetPosition());
 
-	
+
 		playerStartActor->Destroy();
 
 		auto playerController = SpawnActor<PlayerController>().lock();
 		playerController->Possess(newActor);
+
+
+		// 시리얼라이즈
+		std::ostringstream oss;
+		boost::archive::text_oarchive os(oss);
+		os << *newActor;
+
+
+		// 디시리얼라이즈
+		std::istringstream iss(oss.str());
+		boost::archive::text_iarchive is(iss);
+		is >> *newActor;
+
+
 #endif
 
 
@@ -254,9 +277,9 @@ namespace Crystal {
 	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)
 	{
 		auto it = FindActorItByDelegate([&name](const std::shared_ptr<Actor>& other)-> bool
-			{
-				return other->GetObjectName() == name;
-			});
+		{
+			return other->GetObjectName() == name;
+		});
 
 		if (it == m_Actors.end())
 			return {};
@@ -266,9 +289,9 @@ namespace Crystal {
 	std::weak_ptr<Actor> Level::GetActorByClass(const std::string& classType)
 	{
 		auto it = FindActorItByDelegate([&classType](const std::shared_ptr<Actor>& other)-> bool
-			{
-				return other->StaticType() == classType;
-			});
+		{
+			return other->StaticType() == classType;
+		});
 
 		if (it == m_Actors.end())
 			return {};
@@ -304,10 +327,10 @@ namespace Crystal {
 	std::weak_ptr<PlayerController> Level::GetPlayerControllerByNetworkId(int id)
 	{
 		auto it = std::find_if(m_PlayerControllers.begin(), m_PlayerControllers.end(),
-			[&id](const std::shared_ptr<PlayerController>& other)
-			{
-				return other->GetNetworkId() == id;
-			});
+		                       [&id](const std::shared_ptr<PlayerController>& other)
+		                       {
+			                       return other->GetNetworkId() == id;
+		                       });
 
 		if (it == m_PlayerControllers.end())
 		{
@@ -326,11 +349,16 @@ namespace Crystal {
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 #ifdef CS_NM_STANDALONE
+		
+			
 		bool bHandled = false;
 		for (const auto& playerController : m_PlayerControllers)
 		{
 			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
+
+
+		
 		return bHandled;
 #endif
 

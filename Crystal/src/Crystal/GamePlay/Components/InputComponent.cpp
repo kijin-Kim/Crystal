@@ -44,8 +44,17 @@ namespace Crystal {
 		}
 
 		/*액션 매핑을 처리합니다.*/
+
+		
+		
 		auto [keyCode, keyStatus] = getCrystalKeyCode(uMsg, wParam, lParam);
+
+
+
+		
 		processActionMappedInput(uMsg, keyCode, lParam, keyStatus);
+
+		
 
 		MouseCodeWithDelta mouseCodes = getCrystalMouseCodeWithDelta(uMsg, lParam);
 		processActionMappedInput(uMsg, mouseCodes.MouseX.first, lParam, EKeyEvent::KE_Pressed);
@@ -68,6 +77,7 @@ namespace Crystal {
 		processAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
 		processAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
 
+
 		return false;
 	}
 
@@ -78,7 +88,7 @@ namespace Crystal {
 			return false;
 
 		auto level = Cast<Level>(ownerActor->GetOuter());
-		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
+		auto playerController = level->GetPlayerController(0).lock();
 		
 		if (!playerController)
 			return false;
@@ -113,7 +123,7 @@ namespace Crystal {
 			return false;
 
 		auto level = Cast<Level>(ownerActor->GetOuter());
-		auto playerController = Cast<PlayerController>(level->GetActorByClass("PlayerController"));
+		auto playerController = level->GetPlayerController(0).lock();
 		if (!playerController)
 			return false;
 

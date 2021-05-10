@@ -538,6 +538,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\RenderSystem.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Scene.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />

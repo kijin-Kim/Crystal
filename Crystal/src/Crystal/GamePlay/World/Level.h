@@ -6,6 +6,7 @@
 #include "World.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Renderer/RenderSystem.h"
+#include "Crystal/Renderer/Scene.h"
 
 
 namespace Crystal {
@@ -48,6 +49,8 @@ namespace Crystal {
 
 		void OnClientConnect();
 
+		Scene& GetScene() { return m_Scene; }
+
 
 		std::weak_ptr<Actor> GetActorByName(const std::string& name);
 		std::weak_ptr<Actor> GetActorByClass(const std::string& classType);
@@ -74,6 +77,10 @@ namespace Crystal {
 		std::vector<std::shared_ptr<Actor>> m_Actors;
 		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;
 		std::vector<std::shared_ptr<PlayerController>> m_PlayerControllers;
+
+		Scene m_Scene;
+
+		bool m_bHasDeadActors = false;
 	};
 
 	template <class T>

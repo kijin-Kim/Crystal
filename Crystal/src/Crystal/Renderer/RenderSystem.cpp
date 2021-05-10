@@ -26,7 +26,7 @@ namespace Crystal {
 	RenderSystem::RenderSystem()
 	{
 		auto d3dDevice = Device::Instance().GetD3DDevice();
-
+		//렌더시스템이 하나만 있고 Scene이 레벨마다 있는게 맞는듯 World
 
 		CreateRenderTargets();
 		CreateDepthStencilView();
@@ -35,7 +35,7 @@ namespace Crystal {
 
 		//============================================================================================
 		auto panoTexture = resourceManager.CreateTextureFromFile(
-			"assets/textures/cubemaps/T_Cube_Skybox_1.hdr", "Pano_Skybox_Space").lock();
+			"assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr", "Pano_Skybox_Space").lock();
 		panoTexture->CreateShaderResourceView(panoTexture->GetResource()->GetDesc().Format,
 		                                      D3D12_SRV_DIMENSION_TEXTURE2D);
 
@@ -239,7 +239,7 @@ namespace Crystal {
 
 
 			gaussianBlurShader->SetRootSignature({perFrame, perObject, perExecute});
-			gaussianBlurShader->SetDispatchThreadGroupCounts({1920 / 8, 1080 / 8, 15});
+			gaussianBlurShader->SetDispatchThreadGroupCounts({1920 / 8, 1080 / 8, 6});
 		}
 
 		{
@@ -478,8 +478,14 @@ namespace Crystal {
 		lightingPipelineInputs.Camera = mainCamera.get();
 		lightingPipelineInputs.IrradiancemapTexture = m_IrradiancemapTexture.get();
 
+
+
+	
+		
 		m_LightPipelines[0]->Begin(&lightingPipelineInputs);
 		m_LightPipelines[0]->Record(commandList);
+
+		// TODO : CPU 복사로 인한 퍼포먼스 이슈
 
 
 		

@@ -229,11 +229,11 @@ public:
 		
 
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int j = 0; j < 5; j++)
 			{
-				for (int k = 0; k < 2; k++)
+				for (int k = 0; k < 5; k++)
 				{
 					//test
 
@@ -290,15 +290,7 @@ public:
 		tentacleMaterial->RoughnessTexture = resourceManager.GetTexture("Kraken_Tentacle_Roughness");
 		tentacleMaterial->NormalTexture = resourceManager.GetTexture("Kraken_Tentacle_Normal");
 
-
-
-
-		/*auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");*/
-
+		
 
 #endif
 

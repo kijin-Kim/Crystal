@@ -3,6 +3,7 @@
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
+#include "Crystal/GamePlay/World/Level.h"
 
 BOOST_CLASS_EXPORT(Crystal::CameraComponent)
 
@@ -15,6 +16,14 @@ namespace Crystal {
 		m_Viewport = {
 			0.0f, 0.0f, static_cast<float>(resolutionWidth), static_cast<float>(resolutionHeight), 0.0f, 1.0f
 		};
+	}
+
+	void CameraComponent::RegisterComponent()
+	{
+		TransformComponent::RegisterComponent();
+
+		auto level = Cast<Level>(Cast<Actor>(GetOuter())->GetOuter());
+		level->GetScene().AddCamera(Cast<CameraComponent>(shared_from_this()));
 	}
 
 	void CameraComponent::Update(const float deltaTime)

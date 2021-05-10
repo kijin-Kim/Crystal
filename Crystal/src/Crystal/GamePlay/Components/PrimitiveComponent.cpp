@@ -24,6 +24,7 @@ namespace Crystal {
 			return;
 		}
 
+		level->GetScene().AddPrimitive(Cast<PrimitiveComponent>(shared_from_this()));
 		level->RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
 #endif
 	}

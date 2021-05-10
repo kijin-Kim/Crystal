@@ -120,7 +120,7 @@ PS_OUTPUT psMain(PS_INPUT input)
 
     
     float3 Lo = 0.0f;
-    [unroll(100)] for (int i = 0; i < LightCount; i++) 
+    [unroll(30)] for (int i = 0; i < LightCount; i++) 
     {  
         float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
 
