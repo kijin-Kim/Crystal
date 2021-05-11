@@ -19,7 +19,7 @@ namespace Crystal {
 
 
 			m_StaticMeshComponent = CreateComponent<StaticMeshComponent>("StaticMeshComponent");
-			m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("2DPlaneQuadMesh"));
+			//m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("2DPlaneQuadMesh"));
 
 			m_MainComponent = m_StaticMeshComponent;
 

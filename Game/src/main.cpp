@@ -204,11 +204,13 @@ public:
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 
 
+		auto& newResourceManager = Crystal::NewResourceManager::Instance();
+
 		auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 		sun->SetPosition({0.0f, 200000.0f, 200000.0f});
 		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 
-		sunMesh->SetRenderable(resourceManager.GetRenderable("Sphere"));
+		sunMesh->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		auto sunMat = sunMesh->GetMaterial(0);
 		sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
 
@@ -222,7 +224,7 @@ public:
 		lightComponent->SetLightIntensity(3.0f);
 		
 
-		sunMesh2->SetRenderable(resourceManager.GetRenderable("Sphere"));
+		sunMesh2->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		auto sunMat2 = sunMesh2->GetMaterial(0);
 		sunMat2->EmissiveColor = { 243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f };
 
@@ -240,7 +242,7 @@ public:
 
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
 						asteroid->GetComponentByName("StaticMeshComponent"));
-					staticMeshComponent->SetRenderable(resourceManager.GetRenderable("Asteroid_Mesh_1"));
+					staticMeshComponent->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = materials[0].get();
 					pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
@@ -276,7 +278,8 @@ public:
 		auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 		auto meshComponent = Crystal::Cast<Crystal::SkeletalMeshComponent>(
 			kraken->GetComponentByClass("SkeletalMeshComponent"));
-		meshComponent->SetRenderable(resourceManager.GetRenderable("Kraken"));
+		meshComponent->SetRenderable(newResourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
+			"assets/models/KRAKEN_idle.fbx"));
 		
 		auto bodyMaterial = meshComponent->GetMaterial(0);
 		bodyMaterial->AlbedoTexture = resourceManager.GetTexture("Kraken_Body_Albedo");

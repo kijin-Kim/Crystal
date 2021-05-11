@@ -41,15 +41,20 @@ namespace Crystal {
 		Shared<Shader> get(const std::string& fileName)
 		{
 			auto it = m_Shaders.find(fileName);
+
+			Shared<Shader> returnValue = nullptr;
+
 			if (it == m_Shaders.end() || it->second.expired())
 			{
-				auto newShader = CreateShared<Shader>(fileName);
-				newShader->SetObjectName(fileName);
-				newShader->OnCreate();
-				m_Shaders[fileName] = newShader;
+				returnValue = CreateShared<Shader>(fileName);
+				m_Shaders[fileName] = returnValue;
+			}
+			else
+			{
+				returnValue = m_Shaders[fileName].lock();
 			}
 
-			return m_Shaders[fileName].lock();
+			return returnValue;
 		}
 
 	private:

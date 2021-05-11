@@ -70,13 +70,20 @@ namespace Crystal {
 		Shared<Renderable> get(const std::string& fileName, Args ... args)
 		{
 			auto it = m_Meshes.find(fileName);
+
+			Shared<Renderable> returnValue = nullptr;
+			
 			if (it == m_Meshes.end() || it->second.expired())
 			{
-				auto newMesh = CreateShared<T>(std::forward<Args>(args)...);
-				m_Meshes[fileName] = newMesh;
+				returnValue = CreateShared<T>(fileName, std::forward<Args>(args)...);
+				m_Meshes[fileName] = returnValue;
+			}
+			else
+			{
+				returnValue = m_Meshes[fileName].lock();
 			}
 
-			return m_Meshes[fileName].lock();
+			return returnValue;
 		}
 		
 

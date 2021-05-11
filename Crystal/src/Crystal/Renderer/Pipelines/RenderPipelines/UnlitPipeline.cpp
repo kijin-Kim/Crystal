@@ -43,7 +43,7 @@ namespace Crystal {
 			if (!meshComponent)
 				continue;
 
-			auto renderable = meshComponent->GetRenderable().lock().get();
+			auto renderable = meshComponent->GetRenderable().get();
 
 
 

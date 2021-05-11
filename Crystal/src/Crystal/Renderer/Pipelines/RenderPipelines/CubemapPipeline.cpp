@@ -6,6 +6,7 @@
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/Resources/BasicShapeMeshes.h"
 
 namespace Crystal {
 
@@ -20,8 +21,7 @@ namespace Crystal {
 
 		auto& resourceManager = ResourceManager::Instance();
 		
-		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("2DPlaneQuadMesh"));
-
+		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
 
 		m_Components.push_back(m_StaticMeshComponent);
 	}

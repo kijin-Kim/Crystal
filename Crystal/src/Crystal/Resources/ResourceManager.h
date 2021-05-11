@@ -160,14 +160,14 @@ namespace Crystal {
 
 
 		template <class T, class... Args>
-		Shared<Renderable> GetRenderable(Args... args)
+		Shared<Renderable> GetRenderable(const std::string& fileName, Args ... args)
 		{
 			if (!m_RenderableManager)
 			{
 				return nullptr;
 			}
 
-			return m_RenderableManager->get<T>(std::forward<Args>(args)...);
+			return m_RenderableManager->get<T>(fileName, std::forward<Args>(args)...);
 		}
 
 	private:

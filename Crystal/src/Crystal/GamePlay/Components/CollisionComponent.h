@@ -7,6 +7,7 @@
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LinePipeline.h"
 #include "CollisionShapes.h"
 
+
 namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
 	{
@@ -89,10 +90,10 @@ namespace Crystal {
 		RayComponent()
 		{
 			auto& resourceManager = ResourceManager::Instance();
-			SetRenderable(resourceManager.GetRenderable("LineMesh"));
 		}
 
 		~RayComponent() override = default;
+
 
 		void Update(const float deltaTime) override
 		{
@@ -142,7 +143,7 @@ namespace Crystal {
 		{
 			auto& resourceManager = ResourceManager::Instance();
 #ifndef CS_NM_DEDICATED
-			SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
+			//SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
 #endif
 		}
 
@@ -183,7 +184,7 @@ namespace Crystal {
 		{
 			auto& resourceManager = ResourceManager::Instance();
 #ifndef CS_NM_DEDICATED
-			SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
+			//SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
 #endif
 		}
 
@@ -231,7 +232,7 @@ namespace Crystal {
 		{
 			auto& resourceManager = ResourceManager::Instance();
 #ifndef CS_NM_DEDICATED
-			SetRenderable(resourceManager.GetRenderable("LineSphereMesh"));
+			//SetRenderable(resourceManager.GetRenderable("LineSphereMesh"));
 #endif
 		}
 

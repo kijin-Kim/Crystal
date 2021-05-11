@@ -203,7 +203,9 @@ namespace Crystal {
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		auto& newResourceManager = NewResourceManager::Instance();
+		
+		newActorMesh->SetRenderable(newResourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
 		auto newActorMat = newActorMesh->GetMaterial(0);
 		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
 		//newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");

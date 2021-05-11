@@ -23,28 +23,6 @@ namespace Crystal {
 		CameraComponents.push_back(camera);
 	}
 
-	const std::vector<std::weak_ptr<LightComponent>>& Scene::GetLights()
-	{
-		return LightComponents;
-	}
-
-	const std::vector<std::weak_ptr<CameraComponent>>& Scene::GetCameras()
-	{
-		return CameraComponents;
-	}
-
-	const std::vector<std::weak_ptr<PrimitiveComponent>>& Scene::GetPrimitives(EShadingModel shadingModel,
-	                                                                           std::string type)
-	{
-		return PrimitiveComponents[shadingModel][type];
-	}
-
-	const std::unordered_map<std::string, std::vector<std::weak_ptr<PrimitiveComponent>>>& Scene::GetPrimitives(
-		EShadingModel shadingModel)
-	{
-		return PrimitiveComponents[shadingModel];
-	}
-
 	void Scene::RemoveStaledComponents()
 	{
 		for (auto& model : PrimitiveComponents)

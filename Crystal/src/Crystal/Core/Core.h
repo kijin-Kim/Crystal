@@ -1,5 +1,8 @@
 #pragma once
 
+#include "SmartPointerHelper.h"
+#include "Crystal/Core/SerializeHelper.h"
+
 namespace Crystal {
 
 	template<typename T>

@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "Crystal/Core/Logger.h"
-#include "SmartPointerHelper.h"
+
 #include <set>
 #include <unordered_map>
 #include <boost/serialization/serialization.hpp>
@@ -10,7 +10,8 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/export.hpp>
-#include "Crystal/Core/SerializeHelper.h"
+
+#include "Crystal/Core/Core.h"
 
 
 namespace Crystal {
@@ -43,6 +44,8 @@ namespace Crystal {
 
 		void SetOuter(const std::weak_ptr<Object>& outer);
 		std::weak_ptr<Object> GetOuter() const;
+
+		
 
 
 		template <class T>
