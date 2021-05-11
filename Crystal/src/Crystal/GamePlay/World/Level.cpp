@@ -55,10 +55,17 @@ namespace Crystal {
 		m_PhysicsSystem->Update(deltaTime);
 		RemovePendingActors();
 
+		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+		// TODO : 렌더링 준비과정
+
 		if (m_RenderSystem)
 		{
 			m_RenderSystem->Update(deltaTime);
 		}
+
+		std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+		CS_DEBUG_INFO("%lf", sec);
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,

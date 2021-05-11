@@ -7,6 +7,7 @@ namespace Crystal {
 	class TextureManager
 	{
 		friend class ResourceManager;
+		friend class NewResourceManager;
 	private:
 		std::weak_ptr<Texture> createFromFile(const std::string& filePath, const std::string& alias, D3D12_RESOURCE_FLAGS resourceFlags = D3D12_RESOURCE_FLAG_NONE)
 		{
@@ -65,5 +66,37 @@ namespace Crystal {
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Texture>> m_Textures;
+	};
+
+
+
+
+
+
+
+
+
+
+	class NewTextureManager
+	{
+	public:
+		NewTextureManager() = default;
+		~NewTextureManager() = default;
+		Shared<Texture> get(const std::string& fileName)
+		{
+			auto it = m_Textures.find(fileName);
+			if (it == m_Textures.end() || it->second.expired())
+			{
+				auto newTexture = CreateShared<Texture>(fileName);
+				m_Textures[fileName] = newTexture;
+			}
+
+			return m_Textures[fileName].lock();
+		}
+
+	
+
+	private:
+		std::unordered_map<std::string, Weak<Texture>> m_Textures;
 	};
 }

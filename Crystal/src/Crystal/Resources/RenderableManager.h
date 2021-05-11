@@ -7,9 +7,10 @@ namespace Crystal {
 	class RenderableManager
 	{
 		friend class ResourceManager;
+		friend class NewResourceManager;
 	private:
-		template<class T, class... Args>
-		void createFromFile(const std::string& alias, Args... args)
+		template <class T, class... Args>
+		void createFromFile(const std::string& alias, Args ... args)
 		{
 			std::string name;
 			name = alias;
@@ -22,7 +23,7 @@ namespace Crystal {
 			m_Meshes[name] = std::make_shared<T>(std::forward<Args>(args)...);
 		}
 
-		template<class T>
+		template <class T>
 		void create(const std::string& name)
 		{
 			if (m_Meshes.find(name) != m_Meshes.end())
@@ -54,6 +55,32 @@ namespace Crystal {
 		~RenderableManager() = default;
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<Renderable>> m_Meshes;
+		std::unordered_map<std::string, Shared<Renderable>> m_Meshes;
+	};
+
+
+	class NewRenderableManager
+	{
+	public:
+		NewRenderableManager() = default;
+		~NewRenderableManager() = default;
+
+		
+		template <class T, class... Args>
+		Shared<Renderable> get(const std::string& fileName, Args ... args)
+		{
+			auto it = m_Meshes.find(fileName);
+			if (it == m_Meshes.end() || it->second.expired())
+			{
+				auto newMesh = CreateShared<T>(std::forward<Args>(args)...);
+				m_Meshes[fileName] = newMesh;
+			}
+
+			return m_Meshes[fileName].lock();
+		}
+		
+
+	private:
+		std::unordered_map<std::string, Weak<Renderable>> m_Meshes;
 	};
 }

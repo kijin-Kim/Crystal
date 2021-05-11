@@ -4,14 +4,13 @@
 namespace Crystal {
 
 
-
 	void PhysicsSystem::Update(const float deltaTime)
 	{
 		Object::Update(deltaTime);
 
-#if 0
+#if 1
 		// Bounding Sphere
-		for (const auto & lhsWeak : m_BoundingSphereComponents)
+		for (const auto& lhsWeak : m_BoundingSphereComponents)
 		{
 			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
 			if (!sphereComplhs)
@@ -20,9 +19,8 @@ namespace Crystal {
 			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
 
 			// Bounding Sphere
-			for (const auto & rhsWeak : m_BoundingSphereComponents)
+			for (const auto& rhsWeak : m_BoundingSphereComponents)
 			{
-				
 				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
 				if (!sphereCompRhs)
 					continue;
@@ -33,7 +31,7 @@ namespace Crystal {
 
 				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
 
-				
+
 				float totalDist = 0.0f;
 				if (sphereLhs.Intersects(sphereRhs, totalDist))
 				{
@@ -43,7 +41,7 @@ namespace Crystal {
 		}
 
 		// Bounding Sphere
-		for (const auto & lhsWeak : m_BoundingSphereComponents)
+		for (const auto& lhsWeak : m_BoundingSphereComponents)
 		{
 			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
 			if (!sphereComplhs)
@@ -52,7 +50,7 @@ namespace Crystal {
 			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
 
 			// Bounding Sphere
-			for (const auto & rhsWeak : m_BoundingSphereComponents)
+			for (const auto& rhsWeak : m_BoundingSphereComponents)
 			{
 				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
 				if (!sphereCompRhs)
@@ -71,10 +69,7 @@ namespace Crystal {
 				}
 			}
 		}
-		
-		
-		
-		
+
 
 		// Bounding Sphere
 		for (const auto& sphereCompWeak : m_BoundingSphereComponents)
@@ -86,7 +81,7 @@ namespace Crystal {
 			auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
 
 			// Bounding Oriented Box
-			for(const auto& obbCompWeak : m_BoundingOrientedBoxComponents)
+			for (const auto& obbCompWeak : m_BoundingOrientedBoxComponents)
 			{
 				auto obbCompRhs = Cast<BoundingOrientedBoxComponent>(obbCompWeak);
 				if (!obbCompRhs)
@@ -96,28 +91,25 @@ namespace Crystal {
 
 				if (sphereLhs.Intersects(obbRhs))
 				{
-
 				}
-
 			}
 		}
 #endif
-		
 	}
 
 
-	void PhysicsSystem::ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent, 
-		const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	void PhysicsSystem::ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent,
+	                                     const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
-
 		ResolveVelocity(lhsComponent, rhsComponent, penetration);
 		ResolvePenetration(lhsComponent, rhsComponent, penetration);
 	}
 
-	void PhysicsSystem::ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	void PhysicsSystem::ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent,
+	                                    const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
-			rhsComponent->GetWorldPosition()));
+		                                                          rhsComponent->GetWorldPosition()));
 
 		float totalInverseMass = lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass();
 		if (totalInverseMass <= 0)
@@ -140,17 +132,17 @@ namespace Crystal {
 		auto impulsePerIMass = Vector3::Multiply(contactNormal, impulse); // InverseMass ´ç impulse
 
 		lhsComponent->SetVelocity(Vector3::Add(lhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-			lhsComponent->GetInverseMass())));
+			                                       lhsComponent->GetInverseMass())));
 
 		rhsComponent->SetVelocity(Vector3::Add(rhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-			-rhsComponent->GetInverseMass())));
-
+			                                       -rhsComponent->GetInverseMass())));
 	}
 
-	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent, const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
+	                                       const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
-			rhsComponent->GetWorldPosition()));
+		                                                          rhsComponent->GetWorldPosition()));
 
 		float totalInverseMass = lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass();
 		if (totalInverseMass <= 0)
@@ -192,7 +184,6 @@ namespace Crystal {
 			m_BoundingSphereComponents.push_back(Cast<BoundingSphereComponent>(component));
 		}
 	}
-
 
 
 }

@@ -227,13 +227,11 @@ public:
 		sunMat2->EmissiveColor = { 243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f };
 
 		
-
-
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 2; i++)
 		{
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < 2; j++)
 			{
-				for (int k = 0; k < 5; k++)
+				for (int k = 0; k < 2; k++)
 				{
 					//test
 

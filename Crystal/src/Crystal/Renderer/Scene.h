@@ -8,6 +8,17 @@ namespace Crystal {
 
 	struct Scene
 	{
+		/*
+		 * VertexBuffers
+		 * IndexBuffer
+		 * Transform
+		 * Material
+		 * ShadingModel
+		 */
+
+		
+
+
 		std::unordered_map<EShadingModel, std::unordered_map<
 			                   std::string, std::vector<std::weak_ptr<PrimitiveComponent>>>> PrimitiveComponents;
 
@@ -17,7 +28,6 @@ namespace Crystal {
 
 		const float MaxStaledTime = 5.0f;
 		Timer StaleComponentsTimer;
-
 
 		void AddPrimitive(const std::shared_ptr<PrimitiveComponent>& primitive);
 		void AddLight(const std::shared_ptr<LightComponent>& light);

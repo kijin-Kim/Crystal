@@ -4,16 +4,17 @@
 #include <unordered_map>
 
 #include "Shader.h"
+#include "Crystal/Core/Core.h"
 
 namespace Crystal {
 	class ShaderManager
 	{
 		friend class ResourceManager;
 	private:
-		std::weak_ptr<Shader> createFromFile(const std::string& fileName, const std::string& shaderName);
+		Weak<Shader> createFromFile(const std::string& fileName, const std::string& shaderName);
 		void destroy(const std::string& shaderName);
 
-		std::weak_ptr<Shader> get(const std::string& fileName)
+		Weak<Shader> get(const std::string& fileName)
 		{
 			auto it = m_Shaders.find(fileName);
 			if (it == m_Shaders.end())
@@ -26,6 +27,33 @@ namespace Crystal {
 		~ShaderManager() = default;
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<Shader>> m_Shaders;
+		std::unordered_map<std::string, Shared<Shader>> m_Shaders;
 	};
+
+
+	class NewShaderManager
+	{
+	public:
+		NewShaderManager() = default;
+		~NewShaderManager() = default;
+
+		
+		Shared<Shader> get(const std::string& fileName)
+		{
+			auto it = m_Shaders.find(fileName);
+			if (it == m_Shaders.end() || it->second.expired())
+			{
+				auto newShader = CreateShared<Shader>(fileName);
+				newShader->SetObjectName(fileName);
+				newShader->OnCreate();
+				m_Shaders[fileName] = newShader;
+			}
+
+			return m_Shaders[fileName].lock();
+		}
+
+	private:
+		std::unordered_map<std::string, Weak<Shader>> m_Shaders;
+	};
+
 }

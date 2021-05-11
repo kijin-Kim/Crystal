@@ -65,5 +65,6 @@ namespace Crystal {
 		std::vector<std::unique_ptr<NewMaterial>> m_Materials;
 
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
+
 	};
 }

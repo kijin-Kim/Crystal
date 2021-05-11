@@ -21,8 +21,6 @@ namespace Crystal {
 #else
 			return {};
 #endif
-
-			
 		}
 
 		void DestroyShader(const std::string& name)
@@ -97,7 +95,7 @@ namespace Crystal {
 		}
 
 		template <class T, class... Args>
-		void CreateRenderableFromFile(const std::string& alias, Args... args)
+		void CreateRenderableFromFile(const std::string& alias, Args ... args)
 		{
 			m_RenderableManager.createFromFile<T>(alias, std::forward<Args>(args)...);
 		}
@@ -125,4 +123,69 @@ namespace Crystal {
 		TextureManager m_TextureManager;
 		RenderableManager m_RenderableManager;
 	};
+
+
+	/*
+	 * 이 매니저 클래스는 파일로 부터 불러야하는 리소스를 캐싱하는 클래스입니다.
+	 */
+
+	class NewResourceManager
+	{
+	public:
+		static NewResourceManager& Instance()
+		{
+			static NewResourceManager instance;
+			return instance;
+		}
+
+		Shared<Shader> GetShader(const std::string& fileName)
+		{
+			if (!m_ShaderManager)
+			{
+				return nullptr;
+			}
+
+			return m_ShaderManager->get(fileName);
+		}
+
+		Shared<Texture> GetTexture(const std::string& fileName)
+		{
+			if (!m_TextureManager)
+			{
+				return nullptr;
+			}
+
+			return m_TextureManager->get(fileName);
+		}
+
+
+		template <class T, class... Args>
+		Shared<Renderable> GetRenderable(Args... args)
+		{
+			if (!m_RenderableManager)
+			{
+				return nullptr;
+			}
+
+			return m_RenderableManager->get<T>(std::forward<Args>(args)...);
+		}
+
+	private:
+		NewResourceManager()
+		{
+#if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
+			m_ShaderManager = CreateUnique<NewShaderManager>();
+			m_TextureManager = CreateUnique<NewTextureManager>();
+			m_RenderableManager = CreateUnique<NewRenderableManager>();
+#endif
+		}
+
+		~NewResourceManager() = default;
+
+	private:
+		Unique<NewShaderManager> m_ShaderManager = nullptr;
+		Unique<NewTextureManager> m_TextureManager = nullptr;
+		Unique<NewRenderableManager> m_RenderableManager = nullptr;
+	};
+
 }
