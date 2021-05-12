@@ -8,7 +8,6 @@
 #include "WindowsWindow.h"
 #include "Crystal/Resources/Shader.h"
 #include "Crystal/Renderer/CommandQueue.h"
-#include "Crystal/Core/Layer.h"
 #include "Crystal/GamePlay/World/World.h"
 #include "Crystal/Core/Timer.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"

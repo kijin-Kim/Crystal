@@ -25,7 +25,7 @@ namespace Crystal {
 		CameraComponents.push_back(camera);
 	}
 
-	void Scene::RemoveStaledComponents()
+	void Scene::RemoveGarbage()
 	{
 		for (auto& model : PrimitiveComponents)
 		{
@@ -44,17 +44,34 @@ namespace Crystal {
 				}
 			}
 		}
-	}
 
-	void Scene::Update()
-	{
-		StaleComponentsTimer.Tick();
-
-		if (StaleComponentsTimer.GetElapsedTime() >= MaxStaledTime)
+		for(auto it = LightComponents.begin(); it != LightComponents.end();)
 		{
-			StaleComponentsTimer.Reset();
-
-			RemoveStaledComponents();
+			if (it->expired())
+			{
+				it = LightComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
 		}
+
+
+		for (auto it = CameraComponents.begin(); it != CameraComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = CameraComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+		
+	
 	}
+
+	
 }

@@ -30,7 +30,6 @@ namespace Crystal {
 		Start();
 		while (m_bShouldRun)
 		{
-			std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 			int msgCount = 0;
 			MSG msg;
 			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -45,10 +44,6 @@ namespace Crystal {
 				if (msgCount >= maxMessageCount)
 					break;
 			}
-
-			std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
-			CS_DEBUG_INFO("%lf", sec);
-
 			Update();
 		}
 	}

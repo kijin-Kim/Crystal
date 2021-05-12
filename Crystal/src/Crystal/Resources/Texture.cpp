@@ -126,116 +126,7 @@ namespace Crystal {
 	{
 	}
 
-	void Texture::CreateShaderResourceView(DXGI_FORMAT format, D3D12_SRV_DIMENSION srvDimension)
-	{
-		if (!m_ShaderResourceView.IsNull())
-		{
-			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
-			return;
-		}
-		/*셰이더 리소스 뷰를 생성합니다.*/
-		auto& device = Device::Instance();
-		auto d3dDevice = device.GetD3DDevice();
-
-		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-		shaderResourceViewDesc.Format = format;
-		shaderResourceViewDesc.ViewDimension = srvDimension;
-		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-		switch (shaderResourceViewDesc.ViewDimension)
-		{
-		case D3D12_SRV_DIMENSION_TEXTURE2D:
-			shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-			shaderResourceViewDesc.Texture2D.MipLevels = m_Resource->GetDesc().MipLevels;
-			break;
-		case D3D12_SRV_DIMENSION_TEXTURECUBE:
-			shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
-			shaderResourceViewDesc.TextureCube.MipLevels = m_Resource->GetDesc().MipLevels;
-			break;
-		default:
-			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
-		}
-
-
-		m_ShaderResourceView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		d3dDevice->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc,
-		                                    m_ShaderResourceView.GetDescriptorHandle());
-	}
-
-	void Texture::CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension)
-	{
-		if (!m_UnorderedAccessView.IsNull())
-		{
-			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
-			return;
-		}
-		auto& device = Device::Instance();
-		auto d3dDevice = device.GetD3DDevice();
-
-		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-		uavDesc.ViewDimension = uavDimension;
-		switch (uavDimension)
-		{
-		case D3D12_UAV_DIMENSION_TEXTURE2D:
-			uavDesc.Texture2D.MipSlice = 0;
-			break;
-		case D3D12_UAV_DIMENSION_TEXTURE2DARRAY:
-			uavDesc.Texture2DArray.ArraySize = m_Resource->GetDesc().DepthOrArraySize;
-			uavDesc.Texture2DArray.FirstArraySlice = 0;
-			uavDesc.Texture2DArray.MipSlice = 0;
-			uavDesc.Texture2DArray.PlaneSlice = 0;
-			break;
-		default:
-			break;
-		}
-
-		m_UnorderedAccessView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		d3dDevice->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc,
-		                                     m_UnorderedAccessView.GetDescriptorHandle());
-	}
-
-	void Texture::CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension)
-	{
-		if (!m_RenderTargetView.IsNull())
-		{
-			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
-			return;
-		}
-		auto& device = Device::Instance();
-		auto d3dDevice = device.GetD3DDevice();
-
-		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.Format = format;
-		rtvDesc.ViewDimension = rtvDimension;
-		rtvDesc.Texture2D.MipSlice = 0;
-		rtvDesc.Texture2D.PlaneSlice = 0;
-
-		m_RenderTargetView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
-		d3dDevice->CreateRenderTargetView(m_Resource.Get(), &rtvDesc, m_RenderTargetView.GetDescriptorHandle());
-	}
-
-	void Texture::CreateDepthStencilView(DXGI_FORMAT format, D3D12_DSV_DIMENSION dsvDimension)
-	{
-		if (!m_DepthStencilView.IsNull())
-		{
-			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
-			return;
-		}
-
-		auto& device = Device::Instance();
-		auto d3dDevice = device.GetD3DDevice();
-
-		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		dsvDesc.Format = format;
-		dsvDesc.ViewDimension = dsvDimension;
-		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-		dsvDesc.Texture2D.MipSlice = 0;
-
-		m_DepthStencilView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-		d3dDevice->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
-	}
-
-	DescriptorAllocation Texture::NewCreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	DescriptorAllocation Texture::CreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
 	{
 		/*셰이더 리소스 뷰를 생성합니다.*/
 		auto& device = Device::Instance();
@@ -267,7 +158,7 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::NewCreateUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	DescriptorAllocation Texture::CreateUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
@@ -296,7 +187,7 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::NewCreateRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	DescriptorAllocation Texture::CreateRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
@@ -313,7 +204,7 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::NewCreateDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	DescriptorAllocation Texture::CreateDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
@@ -330,83 +221,44 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
 	{
 		if (m_ShaderResourceViews.count(srvDimension) == 0)
 		{
-			m_ShaderResourceViews[srvDimension] = NewCreateShaderResourceView(srvDimension);
+			m_ShaderResourceViews[srvDimension] = CreateShaderResourceView(srvDimension);
 		}
 
 		return m_ShaderResourceViews[srvDimension].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
 	{
 		if (m_UnorderedAccessViews.count(uavDimension) == 0)
 		{
-			m_UnorderedAccessViews[uavDimension] = NewCreateUnorderedAccessView(uavDimension);
+			m_UnorderedAccessViews[uavDimension] = CreateUnorderedAccessView(uavDimension);
 		}
 
 		return m_UnorderedAccessViews[uavDimension].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
 	{
 		if (m_RenderTargetViews.count(rtvDimension) == 0)
 		{
-			m_RenderTargetViews[rtvDimension] = NewCreateRenderTargetView(rtvDimension);
+			m_RenderTargetViews[rtvDimension] = CreateRenderTargetView(rtvDimension);
 		}
 
 		return m_RenderTargetViews[rtvDimension].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
 	{
 		if (m_DepthStencilViews.count(dsvDimension) == 0)
 		{
-			m_DepthStencilViews[dsvDimension] = NewCreateDepthStencilView(dsvDimension);
+			m_DepthStencilViews[dsvDimension] = CreateDepthStencilView(dsvDimension);
 		}
 
 		return m_DepthStencilViews[dsvDimension].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetShaderResourceView() const
-	{
-		if (m_ShaderResourceView.IsNull())
-		{
-			CS_FATAL(false, "Shader Resource View를 먼저 생성해주세요");
-		}
-		return m_ShaderResourceView.GetDescriptorHandle();
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRenderTargetView() const
-	{
-		if (m_RenderTargetView.IsNull())
-		{
-			CS_FATAL(false, "Render Target View를 먼저 생성해주세요");
-		}
-		return m_RenderTargetView.GetDescriptorHandle();
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDepthStencilView() const
-	{
-		if (m_DepthStencilView.IsNull())
-		{
-			CS_FATAL(false, "Depth Stencil View를 먼저 생성해주세요");
-		}
-		return m_DepthStencilView.GetDescriptorHandle();
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUnorderedAccessView() const
-	{
-		if (m_UnorderedAccessView.IsNull())
-		{
-			CS_FATAL(false, "Unordered Access View를 먼저 생성해주세요");
-		}
-		return m_UnorderedAccessView.GetDescriptorHandle();
-	}
-
-	//갯 셰이더 리소스뷰랑 크레이트 셰이더리소스뷰랑 합쳐서 하면 되잖아~ 리소스를 사용할떄
-	//바인딩을 할때 GetShaderResourceView랑 여러 플래그랑 같이 넘겨 받아서 있으면 만등고
-	//없으면 안만들면 되지~
 }

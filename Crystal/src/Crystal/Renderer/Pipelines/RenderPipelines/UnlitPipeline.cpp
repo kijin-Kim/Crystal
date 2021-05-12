@@ -109,7 +109,7 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleEmissivetexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

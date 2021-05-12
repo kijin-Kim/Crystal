@@ -156,6 +156,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,6 +190,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -222,6 +224,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -254,6 +257,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -288,6 +292,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -322,6 +327,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>26812</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -355,6 +361,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <CallingConvention>Cdecl</CallingConvention>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

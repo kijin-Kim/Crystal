@@ -44,7 +44,7 @@ namespace Crystal {
 		
 
 		
-		auto irradianceTextureHandle = scene.IrradianceTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+		auto irradianceTextureHandle = scene.IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -81,7 +81,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleAlbedoTexture = true;
-					albedoTextureHandle = materials[j]->AlbedoTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					albedoTextureHandle = materials[j]->AlbedoTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 					perDrawData.AlbedoColor = materials[j]->AlbedoColor;
@@ -98,7 +98,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleRoughnessTexture = true;
-					roughnessTextureHandle = materials[j]->RoughnessTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					roughnessTextureHandle = materials[j]->RoughnessTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 				//	perDrawData.bToggleRoughnessTexture = false;
@@ -107,7 +107,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleNormalTexture = true;
-					normalTextureHandle = materials[j]->NormalTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					normalTextureHandle = materials[j]->NormalTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 				//	perDrawData.bToggleNormalTexture = false;

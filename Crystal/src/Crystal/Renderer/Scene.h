@@ -21,25 +21,20 @@ namespace Crystal {
 		 * ShadingModel
 		 */
 
-		Scene()
-		{
-		}
-
+		Scene() = default;
+		~Scene() = default;
 
 		Scene& operator=(const Scene&) = delete;
 		Scene(const Scene&) = delete;
 
 
+		//======================== Scene Owned Objects ======================================
 		Shared<Line> LineMesh = CreateShared<Line>();
 		Shared<LineBox> LineBoxMesh = CreateShared<LineBox>();
 		Shared<LineSphere> LineSphereMesh = CreateShared<LineSphere>();
 		Shared<PlaneQuad2D> PlaneQuad2DMesh = CreateShared<PlaneQuad2D>();
 		Shared<PlaneQuad3D> PlaneQuad3DMesh = CreateShared<PlaneQuad3D>();
 		Shared<PlaneQuad3DTextured> PlaneQuad3DTexturedMesh = CreateShared<PlaneQuad3DTextured>();
-
-
-		std::unordered_map<EShadingModel, std::unordered_map<
-			                   std::string, std::vector<Weak<PrimitiveComponent>>>> PrimitiveComponents;
 
 		Shared<Texture> ColorBufferTextures[2] = {};
 		Shared<Texture> DepthStencilBufferTexture = nullptr;
@@ -56,24 +51,22 @@ namespace Crystal {
 		Shared<Texture> PanoramaTexture = nullptr;
 		Shared<Texture> CubemapTexture = nullptr;
 		Shared<Texture> IrradianceTexture = nullptr;
+		//===================================================================================
 
 
+		//=====================Not Scene Owned Objects ======================================
+		std::unordered_map<EShadingModel, std::unordered_map<
+			                   std::string, std::vector<Weak<PrimitiveComponent>>>> PrimitiveComponents;
 		std::vector<Weak<LightComponent>> LightComponents;
 		std::vector<Weak<CameraComponent>> CameraComponents;
+		//===================================================================================
 
 		void AddPrimitive(const Shared<PrimitiveComponent>& primitive);
 		void AddLight(const Shared<LightComponent>& light);
 		void AddCamera(const Shared<CameraComponent>& camera);
 
 
-		void RemoveStaledComponents();
-
-		void Update();
-
-
-	private:
-		const float MaxStaledTime = 5.0f;
-		Timer StaleComponentsTimer;
+		void RemoveGarbage();
 	};
 
 }

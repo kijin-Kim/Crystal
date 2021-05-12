@@ -55,8 +55,6 @@ namespace Crystal {
 		m_PhysicsSystem->Update(deltaTime);
 		RemovePendingActors();
 
-		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
 		// TODO : 렌더링 준비과정
 
 		if (m_RenderSystem)
@@ -64,8 +62,6 @@ namespace Crystal {
 			m_RenderSystem->Update(deltaTime);
 		}
 
-		std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
-		CS_DEBUG_INFO("%lf", sec);
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
@@ -201,14 +197,14 @@ namespace Crystal {
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		auto& newResourceManager = ResourceManager::Instance();
+		auto& resourceManager = ResourceManager::Instance();
 		
-		newActorMesh->SetRenderable(newResourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
+		newActorMesh->SetRenderable(resourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
 		auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-		newActorMat->MetallicTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-		newActorMat->RoughnessTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-		newActorMat->NormalTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
+		newActorMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
+		newActorMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
+		newActorMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
+		newActorMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
 
 		newActor->SetScale(playerStartActor->GetScale());
 		newActor->SetRotation(playerStartActor->GetRotation());

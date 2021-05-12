@@ -1,6 +1,5 @@
 #include "cspch.h"
 #include "InputComponent.h"
-#include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
 

@@ -29,6 +29,22 @@ namespace Crystal {
 			return returnValue;
 		}
 
+		void RemoveGarbage()
+		{
+			for (auto it = m_Textures.begin(); it != m_Textures.end();)
+			{
+				if (it->second.expired())
+				{
+					it = m_Textures.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+
+			}
+		}
+
 	
 
 	private:

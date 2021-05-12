@@ -135,7 +135,7 @@ namespace Crystal {
 		
 
 		device->CopyDescriptorsSimple(1, heapHandle,
-			scene.FloatingPointBuffer->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			scene.FloatingPointBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	}
 

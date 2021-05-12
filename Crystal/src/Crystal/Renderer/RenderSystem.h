@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <dxgi1_2.h>
+
+#include "Crystal/Core/Timer.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/Shader.h"
@@ -76,19 +78,6 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 
 
-		
-		//Weak<Texture> m_ColorBufferTextures[2];
-		//Weak<Texture> m_DepthStencilBufferTexture;
-		//Weak<Texture> m_BrightColorBuffer;
-		//Weak<Texture> m_FloatingPointBuffer;
-
-
-
-		// TODO 
-		/*Shared<Texture> m_PanoTexture;
-		Shared<Texture> m_CubemapTexture;
-		Shared<Texture> m_IrradiancemapTexture;*/
-
 		std::vector<Unique<Pipeline>> m_Pipelines;
 		std::vector<Unique<LightPipeline>> m_LightPipelines;
 		
@@ -100,7 +89,8 @@ namespace Crystal {
 
 		bool m_bIsFullScreen = false;
 
-
+		Timer m_CleanUpTimer;
+		const float m_CleanUpTime = 5.0f;
 		
 	};
 }

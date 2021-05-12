@@ -148,12 +148,13 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_DEBUG;CS_NM_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -166,6 +167,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -180,12 +182,13 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_NM_STANDALONE;CS_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -198,6 +201,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -212,12 +216,13 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_DEBUG;CS_NM_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -230,6 +235,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -253,6 +259,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -266,6 +273,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -289,6 +297,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -302,6 +311,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -325,6 +335,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <EnablePREfast>false</EnablePREfast>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -338,6 +349,7 @@
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -474,10 +486,8 @@
     <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
     <ClInclude Include="src\Crystal\Core\Application.h" />
-    <ClInclude Include="src\Crystal\Core\ApplicationUtility.h" />
     <ClInclude Include="src\Crystal\Core\EntryPoint.h" />
     <ClInclude Include="src\Crystal\Core\Logger.h" />
-    <ClInclude Include="src\Crystal\Core\Layer.h" />
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
@@ -547,8 +557,6 @@
     <ClCompile Include="src\Crystal\Resources\Renderable.cpp" />
     <ClCompile Include="src\Crystal\Resources\Texture.cpp" />
     <ClCompile Include="src\Crystal\Core\Application.cpp" />
-    <ClCompile Include="src\Crystal\Core\ApplicationUtility.cpp" />
-    <ClCompile Include="src\Crystal\Core\Layer.cpp" />
     <ClCompile Include="src\Crystal\Core\Timer.cpp" />
     <ClCompile Include="src\Crystal\Core\WindowsWindow.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CameraComponent.cpp" />

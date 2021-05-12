@@ -29,20 +29,20 @@ namespace Crystal {
 		CreateRenderTargets();
 		CreateDepthStencilView();
 
-		auto& newResourceManager = ResourceManager::Instance();
+		auto& resourceManager = ResourceManager::Instance();
 
-		auto pbrStaticShader = newResourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl");
-		auto pbrSkeletalShader = newResourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl");
-		auto skyboxShader = newResourceManager.GetShader("assets/shaders/SkyboxShader.hlsl");
-		auto panoToCubemapShader = newResourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl");
-		auto diffIrradianceShader = newResourceManager.GetShader("assets/shaders/DiffuseIrradianceSampling.hlsl");
-		auto specularIrradianceShader = newResourceManager.GetShader("assets/shaders/SpecularIrradianceSampling.hlsl");
-		auto simpleColorShader = newResourceManager.GetShader("assets/shaders/SimpleColorShader.hlsl");
-		auto gaussianBlurShader = newResourceManager.GetShader("assets/shaders/GaussianBlur.hlsl");
-		auto additiveBlendingHdrShader = newResourceManager.GetShader("assets/shaders/AdditiveBlending.hlsl");
-		auto toneMappingShader = newResourceManager.GetShader("assets/shaders/Tonemapping.hlsl");
-		auto lightingPassShader = newResourceManager.GetShader("assets/shaders/LightingPass.hlsl");
-		auto unlitShader = newResourceManager.GetShader("assets/shaders/UnlitShader.hlsl");
+		auto pbrStaticShader = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl");
+		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl");
+		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl");
+		auto panoToCubemapShader = resourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl");
+		auto diffIrradianceShader = resourceManager.GetShader("assets/shaders/DiffuseIrradianceSampling.hlsl");
+		auto specularIrradianceShader = resourceManager.GetShader("assets/shaders/SpecularIrradianceSampling.hlsl");
+		auto simpleColorShader = resourceManager.GetShader("assets/shaders/SimpleColorShader.hlsl");
+		auto gaussianBlurShader = resourceManager.GetShader("assets/shaders/GaussianBlur.hlsl");
+		auto additiveBlendingHdrShader = resourceManager.GetShader("assets/shaders/AdditiveBlending.hlsl");
+		auto toneMappingShader = resourceManager.GetShader("assets/shaders/Tonemapping.hlsl");
+		auto lightingPassShader = resourceManager.GetShader("assets/shaders/LightingPass.hlsl");
+		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl");
 
 
 		{
@@ -279,7 +279,7 @@ namespace Crystal {
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
 
-		scene.PanoramaTexture = newResourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr");
+		scene.PanoramaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr");
 
 		scene.CubemapTexture = CreateShared<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
@@ -383,12 +383,12 @@ namespace Crystal {
 		commandList->RSSetScissorRects(1, &mainCamera->GetScissorRect());
 
 		D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[] = {
-			scene.AlbedoBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.RoughnessMetallicAoBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.EmissiveBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.WorldNormalBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.IrradianceBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.WorldPositionBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D)
+			scene.AlbedoBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.RoughnessMetallicAoBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.EmissiveBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.WorldNormalBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.IrradianceBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.WorldPositionBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D)
 		};
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
@@ -402,7 +402,7 @@ namespace Crystal {
 
 
 		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
-		                                &scene.DepthStencilBufferTexture->NewGetDepthStencilView(
+		                                &scene.DepthStencilBufferTexture->GetDepthStencilView(
 			                                D3D12_DSV_DIMENSION_TEXTURE2D));
 
 		float clearColorValue[4] = {1.0f, 0.0f, 1.0f, 0.0f};
@@ -411,36 +411,36 @@ namespace Crystal {
 		const auto clearStencilValue = 0.0f;
 
 		commandList->ClearRenderTargetView(
-			scene.ColorBufferTextures[m_RtvIndex]->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorValue, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.FloatingPointBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.FloatingPointBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorValue, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.BrightColorBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.BrightColorBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorBlack, 0, nullptr);
 
 		//== Clear G-Buffers ========
-		commandList->ClearRenderTargetView(scene.AlbedoBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+		commandList->ClearRenderTargetView(scene.AlbedoBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 		                                   clearColorBlack, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.RoughnessMetallicAoBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.RoughnessMetallicAoBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorBlack, 0, nullptr);
-		commandList->ClearRenderTargetView(scene.EmissiveBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+		commandList->ClearRenderTargetView(scene.EmissiveBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 		                                   clearColorBlack, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.WorldNormalBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.WorldNormalBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorBlack, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.IrradianceBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.IrradianceBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorBlack, 0, nullptr);
 		commandList->ClearRenderTargetView(
-			scene.WorldPositionBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.WorldPositionBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
 			clearColorBlack, 0, nullptr);
 
 
 		commandList->ClearDepthStencilView(
-			scene.DepthStencilBufferTexture->NewGetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D),
+			scene.DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
@@ -455,11 +455,11 @@ namespace Crystal {
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[] = {
-			scene.FloatingPointBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene.BrightColorBuffer->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D)
+			scene.FloatingPointBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
+			scene.BrightColorBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D)
 		};
 		commandList->OMSetRenderTargets(_countof(rtvHandles), rtvHandles, false,
-		                                &scene.DepthStencilBufferTexture->NewGetDepthStencilView(
+		                                &scene.DepthStencilBufferTexture->GetDepthStencilView(
 			                                D3D12_DSV_DIMENSION_TEXTURE2D));
 
 		m_LightPipelines[2]->Begin(&lightingPipelineInputs);
@@ -534,8 +534,8 @@ namespace Crystal {
 
 
 		commandList->OMSetRenderTargets(
-			1, &scene.ColorBufferTextures[m_RtvIndex]->NewGetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
-			&scene.DepthStencilBufferTexture->NewGetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D));
+			1, &scene.ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
+			&scene.DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D));
 
 		m_Pipelines[6]->Begin(&input);
 		m_Pipelines[6]->Record(commandList);
@@ -575,6 +575,18 @@ namespace Crystal {
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
+
+
+		m_CleanUpTimer.Tick();
+
+		if (m_CleanUpTimer.GetElapsedTime() >= m_CleanUpTime)
+		{
+			m_CleanUpTimer.Reset();
+
+			ResourceManager::Instance().RemoveGarbage();
+			scene.RemoveGarbage();
+			CS_DEBUG_INFO("Garbage Removed");
+		}
 	}
 
 	void RenderSystem::ChangeResolution(int width, int height)
@@ -605,9 +617,6 @@ namespace Crystal {
 
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
 		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
-
-
-
 
 
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -691,11 +700,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
 
-
 		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
 		                                DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
-
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -797,7 +804,6 @@ namespace Crystal {
 		factory->MakeWindowAssociation(currentHandle, DXGI_MWA_NO_ALT_ENTER);
 
 
-
 		for (int i = 0; i < 2; i++)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
@@ -862,7 +868,6 @@ namespace Crystal {
 
 	void RenderSystem::CreateDepthStencilView()
 	{
-
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
 

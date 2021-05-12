@@ -61,6 +61,9 @@ namespace Crystal {
 			CS_WARN("Possess하는 Pawn에 카메라가 존재하지 않습니다");
 			return;
 		}
+
+		auto level = Cast<Level>(GetOuter());
+		auto& scene = level->GetScene();
 		
 		SetMainCamera(camera);
 			

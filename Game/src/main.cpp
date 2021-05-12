@@ -198,13 +198,13 @@ public:
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 
 
-		auto& newResourceManager = Crystal::ResourceManager::Instance();
+		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 		sun->SetPosition({0.0f, 200000.0f, 200000.0f});
 		auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 
-		sunMesh->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+		sunMesh->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		auto sunMat = sunMesh->GetMaterial(0);
 		sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
 
@@ -218,7 +218,7 @@ public:
 		lightComponent->SetLightIntensity(3.0f);
 		
 
-		sunMesh2->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+		sunMesh2->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		auto sunMat2 = sunMesh2->GetMaterial(0);
 		sunMat2->EmissiveColor = { 243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f };
 
@@ -236,7 +236,7 @@ public:
 
 					auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
 						asteroid->GetComponentByName("StaticMeshComponent"));
-					staticMeshComponent->SetRenderable(newResourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx"));
+					staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx"));
 					auto& materials = staticMeshComponent->GetMaterials();
 					auto pbrMat = materials[0].get();
 					pbrMat->AlbedoTexture = resourceManager.GetTexture("Asteroid_Blue_Albedo");
@@ -272,7 +272,7 @@ public:
 		auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 		auto meshComponent = Crystal::Cast<Crystal::SkeletalMeshComponent>(
 			kraken->GetComponentByClass("SkeletalMeshComponent"));
-		meshComponent->SetRenderable(newResourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
+		meshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx",
 			"assets/models/KRAKEN_idle.fbx"));
 		
 		auto bodyMaterial = meshComponent->GetMaterial(0);
@@ -293,8 +293,35 @@ public:
 
 #endif
 
-		auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({ "1" }).lock();
-		playerStart->SetPosition({ 0.0f, 0.0f, -2000.0f });
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+
+
+		{
+			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
+			sun->SetPosition({0.0f, 200000.0f, 200000.0f});
+			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
+
+			sunMesh->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+			auto sunMat = sunMesh->GetMaterial(0);
+			sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
+		}
+
+		{
+			auto sun2 = m_World->SpawnActor<Sun>({"Sun"}).lock();
+			sun2->SetPosition({+100000.0f, -200000.0f, +200000.0f});
+			auto sunMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(
+				sun2->GetComponentByClass("StaticMeshComponent"));
+			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(
+				sun2->GetComponentByClass("LocalLightComponent"));
+			lightComponent->SetLightColor({243.0f / 255.0f, 138.0f / 255.0f, 110.0f / 255.0f});
+			lightComponent->SetLightIntensity(3.0f);
+			sunMesh2->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+			auto sunMat2 = sunMesh2->GetMaterial(0);
+			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};
+		}
+
+		auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
+		playerStart->SetPosition({0.0f, 0.0f, -2000.0f});
 		m_World->GetCurrentLevel()->OnClientConnect();
 	}
 

@@ -147,17 +147,19 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>CS_DEBUG;CS_NM_CLIENT;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Crystal\src;%BOOST_ROOT%;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mtd.dll" "$(OutDir)" /y</Command>
@@ -170,17 +172,19 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>CS_DEBUG;%(PreprocessorDefinitions);CS_NM_STANDALONE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Crystal\src;%BOOST_ROOT%;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mtd.dll" "$(OutDir)" /y</Command>
@@ -193,17 +197,19 @@
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>CS_DEBUG;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;CS_NM_DEDICATED</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Crystal\src;%BOOST_ROOT%;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Debug\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mtd.dll" "$(OutDir)" /y</Command>
@@ -224,6 +230,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -231,6 +238,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mt.dll" "$(OutDir)" /y</Command>
@@ -251,6 +260,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -258,6 +268,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mt.dll" "$(OutDir)" /y</Command>
@@ -278,6 +290,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -285,6 +298,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>runtimeobject.lib;..\Crystal\external\assimp\bin\Release\assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)Crystal\external\assimp\bin\$(Configuration)\assimp-vc142-mt.dll" "$(OutDir)" /y</Command>

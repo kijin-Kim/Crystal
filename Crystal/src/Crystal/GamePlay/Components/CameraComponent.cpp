@@ -1,7 +1,6 @@
 #include "cspch.h"
 #include "CameraComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
-#include "Crystal/Core/ApplicationUtility.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
 
