@@ -29,19 +29,13 @@ public:
 	void Start() override
 	{
 		Crystal::Application::Start();
-
+		m_World->SetCurrentLevelByName("DefaultLevel");
+#if 0
 #if defined(CS_NM_STANDALONE) || defined(CS_NM_DEDICATED)
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 		//============ Load Renderables =======================================
-		resourceManager.CreateRenderableFromFile<Crystal::StaticMesh>("Frigate", "assets/models/SM_Frigate_BE2.fbx");
-		resourceManager.CreateRenderableFromFile<
-			Crystal::StaticMesh>("Asteroid_Mesh_1", "assets/models/Asteroid_1.fbx");
-
-		resourceManager.CreateRenderableFromFile<
-			Crystal::SkeletalMesh>("Kraken", "assets/models/KRAKEN.fbx",
-			                       "assets/models/KRAKEN_idle.fbx");
 
 
 		//============ Load Textures ==========================================
@@ -291,7 +285,7 @@ public:
 		tentacleMaterial->RoughnessTexture = resourceManager.GetTexture("Kraken_Tentacle_Roughness");
 		tentacleMaterial->NormalTexture = resourceManager.GetTexture("Kraken_Tentacle_Normal");
 
-		
+#endif
 
 #endif
 
@@ -299,7 +293,8 @@ public:
 
 #endif
 
-
+		auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({ "1" }).lock();
+		playerStart->SetPosition({ 0.0f, 0.0f, -2000.0f });
 		m_World->GetCurrentLevel()->OnClientConnect();
 	}
 

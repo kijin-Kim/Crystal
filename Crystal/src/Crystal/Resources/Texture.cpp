@@ -6,7 +6,8 @@
 #include "DirectXTex/DirectXTex.h"
 
 namespace Crystal {
-	Texture::Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS resourceFlags, D3D12_RESOURCE_STATES initialStates)
+	Texture::Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format,
+	                 D3D12_RESOURCE_FLAGS resourceFlags, D3D12_RESOURCE_STATES initialStates)
 	{
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -19,9 +20,10 @@ namespace Crystal {
 		textureDesc.Flags = resourceFlags;
 
 		auto device = Device::Instance().GetD3DDevice();
-		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-			&textureDesc, initialStates,
-			nullptr, IID_PPV_ARGS(&m_Resource));
+		HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		                                             D3D12_HEAP_FLAG_NONE,
+		                                             &textureDesc, initialStates,
+		                                             nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 	}
 
@@ -58,7 +60,8 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐를 로드하는데 실패하였습니다.", filePath.string().c_str());
 
 		DirectX::ScratchImage mipChain;
-		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
+		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(),
+		                     DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐의 밉 체인을 생성하는데 실패하였습니다.", filePath.string().c_str());
 
 		D3D12_RESOURCE_DESC textureDesc = {};
@@ -72,8 +75,8 @@ namespace Crystal {
 		textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
 		hr = d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-			&textureDesc, D3D12_RESOURCE_STATE_COMMON,
-			nullptr, IID_PPV_ARGS(&m_Resource));
+		                                        &textureDesc, D3D12_RESOURCE_STATE_COMMON,
+		                                        nullptr, IID_PPV_ARGS(&m_Resource));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 디폴트 버퍼를 생성하는데 실패하였습니다.");
 
 		std::vector<D3D12_SUBRESOURCE_DATA> subResources(mipChain.GetImageCount());
@@ -87,23 +90,27 @@ namespace Crystal {
 		}
 
 		UINT64 requiredSize = 0;
-		d3dDevice->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr, nullptr, &requiredSize);
+		d3dDevice->GetCopyableFootprints(&m_Resource->GetDesc(), 0, (UINT)subResources.size(), 0, nullptr, nullptr,
+		                                 nullptr, &requiredSize);
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureUploadBuffer = nullptr;
 		hr = d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&textureUploadBuffer));
+		                                        &CD3DX12_RESOURCE_DESC::Buffer(requiredSize),
+		                                        D3D12_RESOURCE_STATE_GENERIC_READ,
+		                                        nullptr, IID_PPV_ARGS(&textureUploadBuffer));
 		CS_FATAL(SUCCEEDED(hr), "텍스쳐 업로드 버퍼를 생성하는데 실패하였습니다.");
 
 		auto cmdList = commandQueue->GetCommandList();
-		UpdateSubresources(cmdList.Get(), m_Resource.Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(), subResources.data());
+		UpdateSubresources(cmdList.Get(), m_Resource.Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(),
+		                   subResources.data());
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		resourceBarrier.Transition.pResource = m_Resource.Get();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 		cmdList->ResourceBarrier(1, &resourceBarrier);
@@ -149,11 +156,10 @@ namespace Crystal {
 			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
 		}
 
-		
-		
 
 		m_ShaderResourceView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		d3dDevice->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc, m_ShaderResourceView.GetDescriptorHandle());
+		d3dDevice->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc,
+		                                    m_ShaderResourceView.GetDescriptorHandle());
 	}
 
 	void Texture::CreateUnorderedAccessView(DXGI_FORMAT format, D3D12_UAV_DIMENSION uavDimension)
@@ -184,7 +190,8 @@ namespace Crystal {
 		}
 
 		m_UnorderedAccessView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
-		d3dDevice->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, m_UnorderedAccessView.GetDescriptorHandle());
+		d3dDevice->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc,
+		                                     m_UnorderedAccessView.GetDescriptorHandle());
 	}
 
 	void Texture::CreateRenderTargetView(DXGI_FORMAT format, D3D12_RTV_DIMENSION rtvDimension)
@@ -227,4 +234,179 @@ namespace Crystal {
 		m_DepthStencilView = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
 		d3dDevice->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, m_DepthStencilView.GetDescriptorHandle());
 	}
+
+	DescriptorAllocation Texture::NewCreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	{
+		/*셰이더 리소스 뷰를 생성합니다.*/
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+		shaderResourceViewDesc.Format = m_Resource.Get()->GetDesc().Format;
+		shaderResourceViewDesc.ViewDimension = srvDimension;
+		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+		switch (shaderResourceViewDesc.ViewDimension)
+		{
+		case D3D12_SRV_DIMENSION_TEXTURE2D:
+			shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+			shaderResourceViewDesc.Texture2D.MipLevels = m_Resource->GetDesc().MipLevels;
+			break;
+		case D3D12_SRV_DIMENSION_TEXTURECUBE:
+			shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+			shaderResourceViewDesc.TextureCube.MipLevels = m_Resource->GetDesc().MipLevels;
+			break;
+		default:
+			CS_FATAL(false, "지원되지 않는 SRV DIMENSION 입니다");
+		}
+
+		DescriptorAllocation newAllocation = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		d3dDevice->CreateShaderResourceView(m_Resource.Get(), &shaderResourceViewDesc,
+		                                    newAllocation.GetDescriptorHandle());
+
+		return newAllocation;
+	}
+
+	DescriptorAllocation Texture::NewCreateUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	{
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.ViewDimension = uavDimension;
+		switch (uavDimension)
+		{
+		case D3D12_UAV_DIMENSION_TEXTURE2D:
+			uavDesc.Texture2D.MipSlice = 0;
+			break;
+		case D3D12_UAV_DIMENSION_TEXTURE2DARRAY:
+			uavDesc.Texture2DArray.ArraySize = m_Resource->GetDesc().DepthOrArraySize;
+			uavDesc.Texture2DArray.FirstArraySlice = 0;
+			uavDesc.Texture2DArray.MipSlice = 0;
+			uavDesc.Texture2DArray.PlaneSlice = 0;
+			break;
+		default:
+			break;
+		}
+
+		DescriptorAllocation newAllocation = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+		d3dDevice->CreateUnorderedAccessView(m_Resource.Get(), nullptr, &uavDesc, newAllocation.GetDescriptorHandle());
+
+
+		return newAllocation;
+	}
+
+	DescriptorAllocation Texture::NewCreateRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	{
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
+
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+		rtvDesc.Format = m_Resource.Get()->GetDesc().Format;
+		rtvDesc.ViewDimension = rtvDimension;
+		rtvDesc.Texture2D.MipSlice = 0;
+		rtvDesc.Texture2D.PlaneSlice = 0;
+
+		DescriptorAllocation newAllocation = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
+		d3dDevice->CreateRenderTargetView(m_Resource.Get(), &rtvDesc, newAllocation.GetDescriptorHandle());
+
+		return newAllocation;
+	}
+
+	DescriptorAllocation Texture::NewCreateDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	{
+		auto& device = Device::Instance();
+		auto d3dDevice = device.GetD3DDevice();
+
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		dsvDesc.Format = m_Resource.Get()->GetDesc().Format;
+		dsvDesc.ViewDimension = dsvDimension;
+		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+		dsvDesc.Texture2D.MipSlice = 0;
+
+		DescriptorAllocation newAllocation = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+		d3dDevice->CreateDepthStencilView(m_Resource.Get(), &dsvDesc, newAllocation.GetDescriptorHandle());
+
+		return newAllocation;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	{
+		if (m_ShaderResourceViews.count(srvDimension) == 0)
+		{
+			m_ShaderResourceViews[srvDimension] = NewCreateShaderResourceView(srvDimension);
+		}
+
+		return m_ShaderResourceViews[srvDimension].GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	{
+		if (m_UnorderedAccessViews.count(uavDimension) == 0)
+		{
+			m_UnorderedAccessViews[uavDimension] = NewCreateUnorderedAccessView(uavDimension);
+		}
+
+		return m_UnorderedAccessViews[uavDimension].GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	{
+		if (m_RenderTargetViews.count(rtvDimension) == 0)
+		{
+			m_RenderTargetViews[rtvDimension] = NewCreateRenderTargetView(rtvDimension);
+		}
+
+		return m_RenderTargetViews[rtvDimension].GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::NewGetDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	{
+		if (m_DepthStencilViews.count(dsvDimension) == 0)
+		{
+			m_DepthStencilViews[dsvDimension] = NewCreateDepthStencilView(dsvDimension);
+		}
+
+		return m_DepthStencilViews[dsvDimension].GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetShaderResourceView() const
+	{
+		if (m_ShaderResourceView.IsNull())
+		{
+			CS_FATAL(false, "Shader Resource View를 먼저 생성해주세요");
+		}
+		return m_ShaderResourceView.GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRenderTargetView() const
+	{
+		if (m_RenderTargetView.IsNull())
+		{
+			CS_FATAL(false, "Render Target View를 먼저 생성해주세요");
+		}
+		return m_RenderTargetView.GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDepthStencilView() const
+	{
+		if (m_DepthStencilView.IsNull())
+		{
+			CS_FATAL(false, "Depth Stencil View를 먼저 생성해주세요");
+		}
+		return m_DepthStencilView.GetDescriptorHandle();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUnorderedAccessView() const
+	{
+		if (m_UnorderedAccessView.IsNull())
+		{
+			CS_FATAL(false, "Unordered Access View를 먼저 생성해주세요");
+		}
+		return m_UnorderedAccessView.GetDescriptorHandle();
+	}
+
+	//갯 셰이더 리소스뷰랑 크레이트 셰이더리소스뷰랑 합쳐서 하면 되잖아~ 리소스를 사용할떄
+	//바인딩을 할때 GetShaderResourceView랑 여러 플래그랑 같이 넘겨 받아서 있으면 만등고
+	//없으면 안만들면 되지~
 }
