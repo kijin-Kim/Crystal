@@ -41,44 +41,52 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		auto shader = Cast<Shader>(GetOuter());
-
-		pipelineStateStream.RootSignature = shader->GetRootSignature().GetData();
-		auto inputLayout = shader->GetInputLayout();
-		pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
-		pipelineStateStream.PrimitiveTopology = shader->GetPrimitiveTopologyType();
+		pipelineStateStream.RootSignature = m_Shader->GetRootSignature().GetData();
+		auto inputLayout = m_Shader->GetInputLayout();
+		pipelineStateStream.InputLayout = {inputLayout.GetData(), inputLayout.GetCount()};
+		pipelineStateStream.PrimitiveTopology = m_Shader->GetPrimitiveTopologyType();
 
 
-		auto& shaderDatablobs = shader->GetRaw();
+		auto& shaderDatablobs = m_Shader->GetRaw();
 
-		if (shader->HasShader(ShaderType::Vertex))
+		if (m_Shader->HasShader(ShaderType::Vertex))
 		{
-			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
+			pipelineStateStream.VS = {
+				shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Vertex]->GetBufferSize()
+			};
 		}
 
-		if (shader->HasShader(ShaderType::Hull))
+		if (m_Shader->HasShader(ShaderType::Hull))
 		{
-			pipelineStateStream.HS = { shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Hull]->GetBufferSize() };
+			pipelineStateStream.HS = {
+				shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Hull]->GetBufferSize()
+			};
 		}
 
-		if (shader->HasShader(ShaderType::Domain))
+		if (m_Shader->HasShader(ShaderType::Domain))
 		{
-			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Domain]->GetBufferSize() };
+			pipelineStateStream.DS = {
+				shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Domain]->GetBufferSize()
+			};
 		}
 
-		if (shader->HasShader(ShaderType::Geometry))
+		if (m_Shader->HasShader(ShaderType::Geometry))
 		{
-			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Geometry]->GetBufferSize() };
+			pipelineStateStream.DS = {
+				shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Geometry]->GetBufferSize()
+			};
 		}
 
-		if (shader->HasShader(ShaderType::Pixel))
+		if (m_Shader->HasShader(ShaderType::Pixel))
 		{
-			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
+			pipelineStateStream.PS = {
+				shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Pixel]->GetBufferSize()
+			};
 		}
 
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
@@ -107,19 +115,18 @@ namespace Crystal {
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
+		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 
 		auto& resourceManager = ResourceManager::Instance();
-		
+
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
 		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
 
 		m_Components.push_back(m_StaticMeshComponent);
-		
 	}
 
 	void LightPassPipeline::Begin(const PipelineInputs* const pipelineInputs)
@@ -130,7 +137,7 @@ namespace Crystal {
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
 		auto input = (RenderPipelineInputs*)pipelineInputs;
-		
+
 
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -152,7 +159,8 @@ namespace Crystal {
 			if (!localLightComponent)
 				continue;
 
-			auto lightPosition = perFrameData.Lights[lightCount].WorldPosition = localLightComponent->GetWorldPosition();
+			auto lightPosition = perFrameData.Lights[lightCount].WorldPosition = localLightComponent->
+				GetWorldPosition();
 
 			perFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
 			perFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
@@ -167,38 +175,48 @@ namespace Crystal {
 
 		auto destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(), 
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 		auto& resourceManager = ResourceManager::Instance();
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("AlbedoBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+
+
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.AlbedoBuffer->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("RoughnessMetallicAOBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.RoughnessMetallicAoBuffer->
+		                                    NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("EmissiveBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.EmissiveBuffer->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("WorldNormalBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.WorldNormalBuffer->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("IrradianceBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.IrradianceTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, resourceManager.GetTexture("WorldPositionBuffer").lock()->GetShaderResourceView(),
-			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		
-
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene.WorldPositionBuffer->
+		                                    NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 }
-

@@ -1,10 +1,12 @@
 ﻿#include "cspch.h"
 #include "Scene.h"
 
+#include "Crystal/Resources/ResourceManager.h"
+
 namespace Crystal {
 
 
-	void Scene::AddPrimitive(const std::shared_ptr<PrimitiveComponent>& primitive)
+	void Scene::AddPrimitive(const Shared<PrimitiveComponent>& primitive)
 	{
 		auto shadingModel = primitive->GetMaterial(0)->ShadingModel;
 		auto type = primitive->StaticType();
@@ -13,12 +15,12 @@ namespace Crystal {
 		PrimitiveComponents[shadingModel][type].push_back(primitive);
 	}
 
-	void Scene::AddLight(const std::shared_ptr<LightComponent>& light)
+	void Scene::AddLight(const Shared<LightComponent>& light)
 	{
 		LightComponents.push_back(light);
 	}
 
-	void Scene::AddCamera(const std::shared_ptr<CameraComponent>& camera)
+	void Scene::AddCamera(const Shared<CameraComponent>& camera)
 	{
 		CameraComponents.push_back(camera);
 	}

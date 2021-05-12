@@ -3,6 +3,7 @@
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
@@ -42,15 +43,17 @@ namespace Crystal {
 		//}
 
 
-		auto& resourceManager = ResourceManager::Instance();
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		device->CopyDescriptorsSimple(1, handle, resourceManager.GetTexture("Cube_Skybox_Space").lock()->GetShaderResourceView(),
+		device->CopyDescriptorsSimple(1, handle, scene.CubemapTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, handle, resourceManager.GetTexture("Cube_Skybox_Space_Irradiance").lock()->GetUnorderedAccessView(),
+		device->CopyDescriptorsSimple(1, handle, scene.IrradianceTexture->NewGetUnorderedAccessView(D3D12_UAV_DIMENSION_TEXTURE2DARRAY),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		
 	}

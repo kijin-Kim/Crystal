@@ -7,6 +7,10 @@
 
 namespace Crystal {
 
+	/*
+	 * 렌더링에 사용되는 리소스들을 준비합니다.
+	 */
+
 	struct Scene
 	{
 		/*
@@ -16,6 +20,14 @@ namespace Crystal {
 		 * Material
 		 * ShadingModel
 		 */
+
+		Scene()
+		{
+		}
+
+
+		Scene& operator=(const Scene&) = delete;
+		Scene(const Scene&) = delete;
 
 
 		Shared<Line> LineMesh = CreateShared<Line>();
@@ -27,16 +39,31 @@ namespace Crystal {
 
 
 		std::unordered_map<EShadingModel, std::unordered_map<
-			                   std::string, std::vector<std::weak_ptr<PrimitiveComponent>>>> PrimitiveComponents;
+			                   std::string, std::vector<Weak<PrimitiveComponent>>>> PrimitiveComponents;
+
+		Shared<Texture> ColorBufferTextures[2] = {};
+		Shared<Texture> DepthStencilBufferTexture = nullptr;
+		Shared<Texture> BrightColorBuffer = nullptr;
+		Shared<Texture> FloatingPointBuffer = nullptr;
+
+		Shared<Texture> AlbedoBuffer = nullptr;
+		Shared<Texture> RoughnessMetallicAoBuffer = nullptr;
+		Shared<Texture> EmissiveBuffer = nullptr;
+		Shared<Texture> WorldNormalBuffer = nullptr;
+		Shared<Texture> IrradianceBuffer = nullptr;
+		Shared<Texture> WorldPositionBuffer = nullptr;
+
+		Shared<Texture> PanoramaTexture = nullptr;
+		Shared<Texture> CubemapTexture = nullptr;
+		Shared<Texture> IrradianceTexture = nullptr;
 
 
-		std::vector<std::weak_ptr<LightComponent>> LightComponents;
-		std::vector<std::weak_ptr<CameraComponent>> CameraComponents;
+		std::vector<Weak<LightComponent>> LightComponents;
+		std::vector<Weak<CameraComponent>> CameraComponents;
 
-
-		void AddPrimitive(const std::shared_ptr<PrimitiveComponent>& primitive);
-		void AddLight(const std::shared_ptr<LightComponent>& light);
-		void AddCamera(const std::shared_ptr<CameraComponent>& camera);
+		void AddPrimitive(const Shared<PrimitiveComponent>& primitive);
+		void AddLight(const Shared<LightComponent>& light);
+		void AddCamera(const Shared<CameraComponent>& camera);
 
 
 		void RemoveStaledComponents();

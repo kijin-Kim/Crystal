@@ -14,13 +14,13 @@ namespace Crystal {
 	{
 		Object::OnCreate();
 
-		m_PhysicsSystem = std::make_unique<PhysicsSystem>();
+		m_PhysicsSystem = CreateShared<PhysicsSystem>();
 		m_PhysicsSystem->Initialize();
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
 		m_PhysicsSystem->OnCreate();
 
 #if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
-		m_RenderSystem = std::make_unique<RenderSystem>();
+		m_RenderSystem = CreateShared<RenderSystem>();
 		m_RenderSystem->Initialize();
 		m_RenderSystem->SetOuter(weak_from_this());
 		m_RenderSystem->SetObjectName("LevelRenderSystem");
@@ -207,15 +207,14 @@ namespace Crystal {
 		
 		newActorMesh->SetRenderable(newResourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
 		auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		//newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
+		newActorMat->AlbedoTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
+		newActorMat->MetallicTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
+		newActorMat->RoughnessTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
+		newActorMat->NormalTexture = newResourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
 
 		newActor->SetScale(playerStartActor->GetScale());
 		newActor->SetRotation(playerStartActor->GetRotation());
 		newActor->SetPosition(playerStartActor->GetPosition());
-
 
 		playerStartActor->Destroy();
 

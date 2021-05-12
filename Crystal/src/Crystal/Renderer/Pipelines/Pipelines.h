@@ -45,6 +45,8 @@ namespace Crystal {
 
 		void PrepareConstantBuffers(int perFrameBufferSize = 0, int perObjectBufferSize = 0, int perDrawBufferSize = 0, int perDrawBufferCount = 0);
 
+		void SetShader(const Shared<Shader>& shader) { m_Shader = shader; }
+
 		STATIC_TYPE_IMPLE(Pipeline)
 	protected:
 		std::string m_Name;
@@ -57,6 +59,9 @@ namespace Crystal {
 		std::unique_ptr<Buffer> m_PerFrameConstantBuffer = nullptr;
 		std::vector<std::unique_ptr<Buffer>> m_PerObjectConstantBuffers;
 		std::vector<std::unique_ptr<Buffer>> m_PerDrawConstantBuffers;
+
+
+		Shared<Shader> m_Shader;
 
 
 	};

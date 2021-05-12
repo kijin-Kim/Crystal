@@ -70,15 +70,15 @@ namespace Crystal {
 
 
 	private:
-		std::unique_ptr<PhysicsSystem> m_PhysicsSystem = nullptr;
-		std::unique_ptr<RenderSystem> m_RenderSystem = nullptr;
+		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
+		Shared<RenderSystem> m_RenderSystem = nullptr;
 
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
 		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;
 		std::vector<std::shared_ptr<PlayerController>> m_PlayerControllers;
 
-		Scene m_Scene;
+		Scene m_Scene = {};
 
 		bool m_bHasDeadActors = false;
 	};

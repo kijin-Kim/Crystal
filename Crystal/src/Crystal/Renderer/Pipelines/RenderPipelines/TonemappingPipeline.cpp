@@ -40,41 +40,40 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		auto shader = Cast<Shader>(GetOuter());
 
-		pipelineStateStream.RootSignature = shader->GetRootSignature().GetData();
-		auto inputLayout = shader->GetInputLayout();
+		pipelineStateStream.RootSignature = m_Shader->GetRootSignature().GetData();
+		auto inputLayout = m_Shader->GetInputLayout();
 		pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
-		pipelineStateStream.PrimitiveTopology = shader->GetPrimitiveTopologyType();
+		pipelineStateStream.PrimitiveTopology = m_Shader->GetPrimitiveTopologyType();
 
 
-		auto& shaderDatablobs = shader->GetRaw();
+		auto& shaderDatablobs = m_Shader->GetRaw();
 
-		if (shader->HasShader(ShaderType::Vertex))
+		if (m_Shader->HasShader(ShaderType::Vertex))
 		{
 			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Hull))
+		if (m_Shader->HasShader(ShaderType::Hull))
 		{
 			pipelineStateStream.HS = { shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Hull]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Domain))
+		if (m_Shader->HasShader(ShaderType::Domain))
 		{
 			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Domain]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Geometry))
+		if (m_Shader->HasShader(ShaderType::Geometry))
 		{
 			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Geometry]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Pixel))
+		if (m_Shader->HasShader(ShaderType::Pixel))
 		{
 			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
@@ -130,12 +129,14 @@ namespace Crystal {
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		auto& resourceManager = ResourceManager::Instance();
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
 
-		auto floatingPointBuffer = resourceManager.GetTexture("FloatingPointBuffer").lock();
+		
 
 		device->CopyDescriptorsSimple(1, heapHandle,
-			floatingPointBuffer->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			scene.FloatingPointBuffer->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	}
 

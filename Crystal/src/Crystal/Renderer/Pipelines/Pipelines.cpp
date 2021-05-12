@@ -26,10 +26,12 @@ namespace Crystal {
 		if (!material)
 			return false;
 
-		auto thisPipelineShader = Cast<Shader>(GetOuter());
-		auto inputMaterialShader = Cast<Shader>(material->GetOuter());
+		/*auto thisPipelineShader = Cast<Shader>(GetOuter());
+		auto inputMaterialShader = Cast<Shader>(material->GetOuter());*/
 
-		return thisPipelineShader == inputMaterialShader;
+		return true;
+
+		/*return thisPipelineShader == inputMaterialShader;*/
 	}
 
 	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/,
@@ -100,41 +102,40 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		auto shader = Cast<Shader>(GetOuter());
-
-		pipelineStateStream.RootSignature = shader->GetRootSignature().GetData();
-		auto inputLayout = shader->GetInputLayout();
+	
+		pipelineStateStream.RootSignature = m_Shader->GetRootSignature().GetData();
+		auto inputLayout = m_Shader->GetInputLayout();
 		pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
-		pipelineStateStream.PrimitiveTopology = shader->GetPrimitiveTopologyType();
+		pipelineStateStream.PrimitiveTopology = m_Shader->GetPrimitiveTopologyType();
 
 
-		auto& shaderDatablobs = shader->GetRaw();
+		auto& shaderDatablobs = m_Shader->GetRaw();
 
-		if (shader->HasShader(ShaderType::Vertex))
+		if (m_Shader->HasShader(ShaderType::Vertex))
 		{
 			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Hull))
+		if (m_Shader->HasShader(ShaderType::Hull))
 		{
 			pipelineStateStream.HS = { shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Hull]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Domain))
+		if (m_Shader->HasShader(ShaderType::Domain))
 		{
 			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Domain]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Geometry))
+		if (m_Shader->HasShader(ShaderType::Geometry))
 		{
 			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Geometry]->GetBufferSize() };
 		}
 
-		if (shader->HasShader(ShaderType::Pixel))
+		if (m_Shader->HasShader(ShaderType::Pixel))
 		{
 			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
 			shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
@@ -186,8 +187,7 @@ namespace Crystal {
 		Pipeline::Record(commandList);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto shader = Cast<Shader>(GetOuter());
-		auto rootSignature = shader->GetRootSignature();
+		auto rootSignature = m_Shader->GetRootSignature();
 
 
 		commandList->SetPipelineState(m_PipelineState.Get());
@@ -259,10 +259,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
-		auto shader = Cast<Shader>(GetOuter());
-		auto& shaderDatablobs = shader->GetRaw();
+		auto& shaderDatablobs = m_Shader->GetRaw();
 		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
-		computePipelineStateDesc.pRootSignature = shader->GetRootSignature().GetData();
+		computePipelineStateDesc.pRootSignature = m_Shader->GetRootSignature().GetData();
 		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };
 
 		hr = device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&m_PipelineState));
@@ -273,15 +272,14 @@ namespace Crystal {
 	{
 		Pipeline::Record(commandList);
 
-		auto shader = Cast<Shader>(GetOuter());
 
 		commandList->SetPipelineState(m_PipelineState.Get());
-		commandList->SetComputeRootSignature(shader->GetRootSignature().GetData());
+		commandList->SetComputeRootSignature(m_Shader->GetRootSignature().GetData());
 		ID3D12DescriptorHeap* irradianceSamplingHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(irradianceSamplingHeaps), irradianceSamplingHeaps);
 		commandList->SetComputeRootDescriptorTable(0, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		auto dispatchThreadGroupCounts = shader->GetDispatchThreadGroupCounts();
+		auto dispatchThreadGroupCounts = m_Shader->GetDispatchThreadGroupCounts();
 		commandList->Dispatch(dispatchThreadGroupCounts.x, dispatchThreadGroupCounts.y, dispatchThreadGroupCounts.z);
 	}
 

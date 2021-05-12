@@ -6,6 +6,7 @@
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
 
 namespace Crystal {
@@ -55,10 +56,13 @@ namespace Crystal {
 			m_PerFrameConstantBuffer->GetConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		auto& resourceManager = ResourceManager::Instance();
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
 		
+;		
 		device->CopyDescriptorsSimple(1, descHandle,
-			resourceManager.GetTexture("Cube_Skybox_Space").lock()->GetShaderResourceView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			scene.CubemapTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		

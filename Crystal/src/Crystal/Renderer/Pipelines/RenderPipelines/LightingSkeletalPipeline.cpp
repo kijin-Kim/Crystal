@@ -3,6 +3,8 @@
 
 #include "LightingStaticPipeline.h"
 #include "Crystal/Core/Device.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/Meshes.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
 
@@ -35,7 +37,14 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-		auto irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView();
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+
+		
+
+		
+		auto irradianceTextureHandle = scene.IrradianceTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -72,7 +81,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleAlbedoTexture = true;
-					albedoTextureHandle = materials[j]->AlbedoTexture.lock()->GetShaderResourceView();
+					albedoTextureHandle = materials[j]->AlbedoTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 					perDrawData.AlbedoColor = materials[j]->AlbedoColor;
@@ -89,7 +98,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleRoughnessTexture = true;
-					roughnessTextureHandle = materials[j]->RoughnessTexture.lock()->GetShaderResourceView();
+					roughnessTextureHandle = materials[j]->RoughnessTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 				//	perDrawData.bToggleRoughnessTexture = false;
@@ -98,7 +107,7 @@ namespace Crystal {
 
 				{
 					perDrawData.bToggleNormalTexture = true;
-					normalTextureHandle = materials[j]->NormalTexture.lock()->GetShaderResourceView();
+					normalTextureHandle = materials[j]->NormalTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
 				{
 				//	perDrawData.bToggleNormalTexture = false;

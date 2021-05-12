@@ -46,5 +46,4 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
     const float4 finalColor = EquiTexture.SampleLevel(DefaultSampler, finalUV, 0.0f);
     
     OutputTexture[dispatchThreadID] = finalColor;
-    
 }

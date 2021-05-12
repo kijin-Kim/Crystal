@@ -11,60 +11,60 @@ namespace Crystal {
 			return false;
 
 		bool result = true;
-		if (!AlbedoTexture.expired() && !other->AlbedoTexture.expired())
+		if (!AlbedoTexture && !other->AlbedoTexture)
 		{
-			result &= AlbedoTexture.lock() == other->AlbedoTexture.lock();
+			result &= AlbedoTexture == other->AlbedoTexture;
 			if (!result)
 				return false;
 		}
-		else if ((AlbedoTexture.expired() != other->AlbedoTexture.expired()))
+		else if ((AlbedoTexture != other->AlbedoTexture))
 		{
 			return false;
 		}
 
-		if (!MetallicTexture.expired() && !other->MetallicTexture.expired())
+		if (!MetallicTexture && !other->MetallicTexture)
 		{
-			result &= MetallicTexture.lock() == other->MetallicTexture.lock();
+			result &= MetallicTexture == other->MetallicTexture;
 			if (!result)
 				return false;
 		}
-		else if ((MetallicTexture.expired() != other->MetallicTexture.expired()))
-		{
-			return false;
-		}
-
-
-
-		if (!RoughnessTexture.expired() && !other->RoughnessTexture.expired())
-		{
-			result &= RoughnessTexture.lock() == other->RoughnessTexture.lock();
-			if (!result)
-				return false;
-		}
-		else if ((RoughnessTexture.expired() != other->RoughnessTexture.expired()))
+		else if ((MetallicTexture != other->MetallicTexture))
 		{
 			return false;
 		}
 
 
-		if (!NormalTexture.expired() && !other->NormalTexture.expired())
+
+		if (!RoughnessTexture && !other->RoughnessTexture)
 		{
-			result &= NormalTexture.lock() == other->NormalTexture.lock();
+			result &= RoughnessTexture == other->RoughnessTexture;
 			if (!result)
 				return false;
 		}
-		else if ((NormalTexture.expired() != other->NormalTexture.expired()))
+		else if ((RoughnessTexture != other->RoughnessTexture))
 		{
 			return false;
 		}
 
-		if (!EmissiveTexture.expired() && !other->EmissiveTexture.expired())
+
+		if (!NormalTexture && !other->NormalTexture)
 		{
-			result &= EmissiveTexture.lock() == other->EmissiveTexture.lock();
+			result &= NormalTexture == other->NormalTexture;
 			if (!result)
 				return false;
 		}
-		else if ((EmissiveTexture.expired() != other->EmissiveTexture.expired()))
+		else if ((NormalTexture != other->NormalTexture))
+		{
+			return false;
+		}
+
+		if (!EmissiveTexture && !other->EmissiveTexture)
+		{
+			result &= EmissiveTexture == other->EmissiveTexture;
+			if (!result)
+				return false;
+		}
+		else if ((EmissiveTexture != other->EmissiveTexture))
 		{
 			return false;
 		}

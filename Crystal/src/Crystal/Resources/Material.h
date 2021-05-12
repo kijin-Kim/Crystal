@@ -17,18 +17,18 @@ namespace Crystal {
 
 	struct NewMaterial : public Object
 	{
-		Weak<Texture> AlbedoTexture;
+		Shared<Texture> AlbedoTexture = nullptr;
 		DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
 
-		Weak<Texture> MetallicTexture;
+		Shared<Texture> MetallicTexture = nullptr;
 		float MetallicConstant = 0.0f;
 
-		Weak<Texture> RoughnessTexture;
+		Shared<Texture> RoughnessTexture = nullptr;
 		float RoughnessConstant = 0.0f;
 
-		Weak<Texture> NormalTexture;
+		Shared<Texture> NormalTexture = nullptr;
 
-		Weak<Texture> EmissiveTexture;
+		Shared<Texture> EmissiveTexture = nullptr;
 		DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 
 		EShadingModel ShadingModel = EShadingModel::ShadingModel_Undefined;

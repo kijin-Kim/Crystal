@@ -61,7 +61,7 @@ namespace Crystal {
 				
 				perInstanceData.EmissiveColor = matRow->EmissiveColor;
 
-				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture.lock() ? true : false;
+				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture ? true : false;
 
 
 
@@ -109,7 +109,7 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleEmissivetexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -144,8 +144,7 @@ namespace Crystal {
 		Pipeline::Record(commandList);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto shader = Cast<Shader>(GetOuter());
-		auto rootSignature = shader->GetRootSignature();
+		auto rootSignature = m_Shader->GetRootSignature();
 
 
 		commandList->SetPipelineState(m_PipelineState.Get());

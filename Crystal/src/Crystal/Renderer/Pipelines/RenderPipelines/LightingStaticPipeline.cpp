@@ -2,6 +2,8 @@
 #include "LightingStaticPipeline.h"
 
 #include "Crystal/Core/Device.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/Meshes.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -97,8 +99,12 @@ namespace Crystal {
 
 
 
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
 		
-		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = lightPipelineInputs->IrradiancemapTexture->GetShaderResourceView(); // Per Frame
+		
+		
+		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = level->GetScene().IrradianceTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D); // Per Frame
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -137,11 +143,11 @@ namespace Crystal {
 				perInstanceData.RoughnessConstant = matRow->RoughnessConstant;
 				perInstanceData.MetallicConstant = matRow->MetallicConstant;
 
-				perInstanceData.bToggleAlbedoTexture = matRow->AlbedoTexture.lock() ? true : false;
-				perInstanceData.bToggleMetallicTexture = matRow->MetallicTexture.lock() ? true : false;
-				perInstanceData.bToggleRoughnessTexture = matRow->RoughnessTexture.lock() ? true : false;
-				perInstanceData.bToggleNormalTexture = matRow->NormalTexture.lock() ? true : false;
-				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture.lock() ? true : false;
+				perInstanceData.bToggleAlbedoTexture = matRow->AlbedoTexture ? true : false;
+				perInstanceData.bToggleMetallicTexture = matRow->MetallicTexture ? true : false;
+				perInstanceData.bToggleRoughnessTexture = matRow->RoughnessTexture ? true : false;
+				perInstanceData.bToggleNormalTexture = matRow->NormalTexture ? true : false;
+				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture ? true : false;
 
 				perInstanceData.bToggleIrradianceTexture = true; // TEMP
 				
@@ -188,35 +194,35 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleAlbedoTexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->AlbedoTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->AlbedoTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perInstanceData.bToggleMetallicTexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->MetallicTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->MetallicTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perInstanceData.bToggleRoughnessTexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->RoughnessTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->RoughnessTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perInstanceData.bToggleNormalTexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->NormalTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->NormalTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perInstanceData.bToggleEmissivetexture)
 				{
-					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture.lock()->GetShaderResourceView(),
+					device->CopyDescriptorsSimple(1, cpuHandle, matRow->EmissiveTexture->NewGetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -251,8 +257,7 @@ namespace Crystal {
 		Pipeline::Record(commandList);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto shader = Cast<Shader>(GetOuter());
-		auto rootSignature = shader->GetRootSignature();
+		auto rootSignature = m_Shader->GetRootSignature();
 
 
 		commandList->SetPipelineState(m_PipelineState.Get());

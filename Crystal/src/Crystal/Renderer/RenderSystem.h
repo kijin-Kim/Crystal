@@ -17,12 +17,11 @@ namespace Crystal {
 	class RenderSystem : public Actor
 	{		
 	public:
-		RenderSystem();
+		RenderSystem() = default;
 		~RenderSystem() override = default;
 
 		void Begin() override;
 
-		void LoadEngineContents();
 		
 
 		
@@ -38,19 +37,32 @@ namespace Crystal {
 		
 
 
-		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
-		void RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak);
+		void RegisterLightComponent(Weak<LightComponent> componentWeak);
+		void RegisterPrimitiveComponentNew(Weak<PrimitiveComponent> componentWeak);
 
 
 		
 		
 
 		template <class T>
-		std::unique_ptr<T> CreatePipeline(std::weak_ptr<Shader> shader, const std::string& name)
+		Unique<T> CreatePipeline(Weak<Shader> shader, const std::string& name)
 		{
 			/*Pipeline을 만듭니다.*/
 			auto pipeline = std::make_unique<T>();
 			pipeline->SetOuter(shader);
+			pipeline->SetObjectName(name);
+			pipeline->OnCreate();
+
+			return pipeline;
+		}
+
+		template <class T>
+		Unique<T> NewCreatePipeline(Shared<Shader> shader, const std::string& name)
+		{
+			/*Pipeline을 만듭니다.*/
+			auto pipeline = std::make_unique<T>();
+			pipeline->SetShader(shader);
+			pipeline->SetOuter(weak_from_this());
 			pipeline->SetObjectName(name);
 			pipeline->OnCreate();
 
@@ -66,27 +78,20 @@ namespace Crystal {
 
 
 		
-		std::weak_ptr<Texture> m_ColorBufferTextures[2];
-		std::weak_ptr<Texture> m_DepthStencilBufferTexture;
-		std::weak_ptr<Texture> m_BrightColorBuffer;
-		std::weak_ptr<Texture> m_FloatingPointBuffer;
+		//Weak<Texture> m_ColorBufferTextures[2];
+		//Weak<Texture> m_DepthStencilBufferTexture;
+		//Weak<Texture> m_BrightColorBuffer;
+		//Weak<Texture> m_FloatingPointBuffer;
 
-		//=== G-Buffers ==
-		std::weak_ptr<Texture> m_AlbedoBuffer;
-		std::weak_ptr<Texture> m_RoughnessMetallicAoBuffer;
-		std::weak_ptr<Texture> m_EmissiveBuffer;
-		std::weak_ptr<Texture> m_WorldNormalBuffer;
-		std::weak_ptr<Texture> m_IrradianceBuffer;
-		std::weak_ptr<Texture> m_WorldPositionBuffer;
 
 
 		// TODO 
-		std::shared_ptr<Texture> m_PanoTexture;
-		std::shared_ptr<Texture> m_CubemapTexture;
-		std::shared_ptr<Texture> m_IrradiancemapTexture;
+		/*Shared<Texture> m_PanoTexture;
+		Shared<Texture> m_CubemapTexture;
+		Shared<Texture> m_IrradiancemapTexture;*/
 
-		std::vector<std::unique_ptr<Pipeline>> m_Pipelines;
-		std::vector<std::unique_ptr<LightPipeline>> m_LightPipelines;
+		std::vector<Unique<Pipeline>> m_Pipelines;
+		std::vector<Unique<LightPipeline>> m_LightPipelines;
 		
 		uint32_t m_RtvIndex = 0;
 
