@@ -193,8 +193,6 @@ namespace Crystal {
 			return;
 		}
 
-		auto& resourceManager = ResourceManager::Instance();
-
 		auto playerStartActor = playerStartActors[0].lock();
 
 		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
@@ -203,7 +201,7 @@ namespace Crystal {
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		auto& newResourceManager = NewResourceManager::Instance();
+		auto& newResourceManager = ResourceManager::Instance();
 		
 		newActorMesh->SetRenderable(newResourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
 		auto newActorMat = newActorMesh->GetMaterial(0);

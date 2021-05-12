@@ -15,9 +15,6 @@ namespace Crystal {
 	public:
 		PlaneQuadActor()
 		{
-			auto& resourceManager = ResourceManager::Instance();
-
-
 			m_StaticMeshComponent = CreateComponent<StaticMeshComponent>("StaticMeshComponent");
 			//m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable("2DPlaneQuadMesh"));
 

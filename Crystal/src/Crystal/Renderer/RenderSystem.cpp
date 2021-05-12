@@ -29,7 +29,7 @@ namespace Crystal {
 		CreateRenderTargets();
 		CreateDepthStencilView();
 
-		auto& newResourceManager = NewResourceManager::Instance();
+		auto& newResourceManager = ResourceManager::Instance();
 
 		auto pbrStaticShader = newResourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl");
 		auto pbrSkeletalShader = newResourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl");
@@ -607,10 +607,8 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
 
-		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 
-		DestroyRenderTargets();
 
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
 		                                DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
@@ -692,7 +690,6 @@ namespace Crystal {
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
-		DestroyRenderTargets();
 
 
 		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -700,7 +697,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
-		auto& resourceManager = ResourceManager::Instance();
 
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
@@ -800,7 +796,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
 		factory->MakeWindowAssociation(currentHandle, DXGI_MWA_NO_ALT_ENTER);
 
-		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 
 		for (int i = 0; i < 2; i++)
@@ -864,18 +859,9 @@ namespace Crystal {
 		                                                  D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
-	void RenderSystem::DestroyRenderTargets()
-	{
-		auto& resourceManager = ResourceManager::Instance();
-		resourceManager.DestroyTexture("ColorBuffer_0");
-		resourceManager.DestroyTexture("ColorBuffer_1");
-		resourceManager.DestroyTexture("FloatingPointBuffer");
-		resourceManager.DestroyTexture("BrightColorBuffer");
-	}
 
 	void RenderSystem::CreateDepthStencilView()
 	{
-		auto& resourceManager = ResourceManager::Instance();
 
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();

@@ -110,7 +110,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 
-		auto& resourceManager = ResourceManager::Instance();
 		
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
 		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());

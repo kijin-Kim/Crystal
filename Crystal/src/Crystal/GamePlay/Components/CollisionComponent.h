@@ -87,10 +87,7 @@ namespace Crystal {
 	class RayComponent : public CollisionComponent
 	{
 	public:
-		RayComponent()
-		{
-			auto& resourceManager = ResourceManager::Instance();
-		}
+		RayComponent() = default;
 
 		~RayComponent() override = default;
 
@@ -139,14 +136,7 @@ namespace Crystal {
 	{
 		
 	public:
-		BoundingBoxComponent()
-		{
-			auto& resourceManager = ResourceManager::Instance();
-#ifndef CS_NM_DEDICATED
-			//SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
-#endif
-		}
-
+		BoundingBoxComponent() = default;
 		~BoundingBoxComponent() override = default;
 
 		void Update(const float deltaTime) override
@@ -182,7 +172,7 @@ namespace Crystal {
 	public:
 		BoundingOrientedBoxComponent()
 		{
-			auto& resourceManager = ResourceManager::Instance();
+			
 #ifndef CS_NM_DEDICATED
 			//SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
 #endif
@@ -228,13 +218,7 @@ namespace Crystal {
 	class BoundingSphereComponent : public CollisionComponent
 	{
 	public:
-		BoundingSphereComponent()
-		{
-			auto& resourceManager = ResourceManager::Instance();
-#ifndef CS_NM_DEDICATED
-			//SetRenderable(resourceManager.GetRenderable("LineSphereMesh"));
-#endif
-		}
+		BoundingSphereComponent() = default;
 
 		void Update(const float deltaTime) override
 		{

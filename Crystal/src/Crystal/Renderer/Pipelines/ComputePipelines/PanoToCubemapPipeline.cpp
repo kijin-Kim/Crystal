@@ -15,13 +15,12 @@ namespace Crystal {
 
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto& newResourceManager = NewResourceManager::Instance();
+		auto& newResourceManager = ResourceManager::Instance();
 
 		auto renderSystem = Cast<RenderSystem>(GetOuter());
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 
-		auto& resourceManager = ResourceManager::Instance();
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

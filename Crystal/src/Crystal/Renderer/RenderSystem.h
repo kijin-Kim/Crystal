@@ -32,7 +32,6 @@ namespace Crystal {
 		void ChangeDisplayMode();
 
 		void CreateRenderTargets();
-		void DestroyRenderTargets();
 		void CreateDepthStencilView();
 		
 

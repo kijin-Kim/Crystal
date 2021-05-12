@@ -20,7 +20,6 @@ namespace Crystal {
 		m_StaticMeshComponent->OnCreate();
 
 
-		auto& resourceManager = ResourceManager::Instance();
 		
 		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
 

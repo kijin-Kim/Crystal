@@ -121,7 +121,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 
-		auto& resourceManager = ResourceManager::Instance();
 
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
 		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
@@ -180,7 +179,6 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-		auto& resourceManager = ResourceManager::Instance();
 
 		auto renderSystem = Cast<RenderSystem>(GetOuter());
 		auto level = Cast<Level>(renderSystem->GetOuter());

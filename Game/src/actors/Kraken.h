@@ -17,7 +17,6 @@ class Kraken : public Crystal::Pawn
 public:
 	void Initialize() override
 	{
-		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 
 		auto bodyMaterial = std::make_unique<Crystal::NewMaterial>();

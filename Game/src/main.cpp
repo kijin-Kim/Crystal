@@ -198,7 +198,7 @@ public:
 		/*Spawn된 Actor의 Ownership은 World에 있음*/
 
 
-		auto& newResourceManager = Crystal::NewResourceManager::Instance();
+		auto& newResourceManager = Crystal::ResourceManager::Instance();
 
 		auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 		sun->SetPosition({0.0f, 200000.0f, 200000.0f});
