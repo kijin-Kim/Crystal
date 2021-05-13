@@ -97,7 +97,7 @@ namespace Crystal {
 		virtual void ProcessNode(aiNode* rootNode, const aiScene* scene) {};
 
 	protected:
-		std::vector <std::unique_ptr<SubMesh>> m_Submeshes;
+		std::vector <Unique<SubMesh>> m_Submeshes;
 		const aiScene* m_MeshScene = nullptr;
 
 	private:

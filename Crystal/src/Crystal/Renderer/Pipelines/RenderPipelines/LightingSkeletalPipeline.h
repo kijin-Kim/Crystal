@@ -36,7 +36,7 @@ namespace Crystal {
 		LightingSkeletalPipeline() = default;
 		~LightingSkeletalPipeline() override = default;
 
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 		STATIC_TYPE_IMPLE(LightingSkeletalPipeline)
 	};
 

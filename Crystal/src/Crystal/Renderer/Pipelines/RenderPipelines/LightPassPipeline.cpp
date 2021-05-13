@@ -128,28 +128,33 @@ namespace Crystal {
 		m_Components.push_back(m_StaticMeshComponent);
 	}
 
-	void LightPassPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void LightPassPipeline::Begin()
 	{
-		LightPipeline::Begin(pipelineInputs);
+		LightPipeline::Begin();
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
-		auto input = (RenderPipelineInputs*)pipelineInputs;
 
 
 		auto device = Device::Instance().GetD3DDevice();
 
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+		
+		auto camera = scene.Cameras[0].lock();
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(input->Camera->GetViewProjection());
-		perFrameData.CameraPositionInWorld = input->Camera->GetWorldPosition();
+		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
+		perFrameData.CameraPositionInWorld = camera->GetWorldPosition();
 
 
 		const int maxLightCount = 100;
 		int lightCount = 0;
-		for (const auto& weak : m_LocalLightComponents)
+
+		for (const auto& weak : scene.Lights)
 		{
 			if (lightCount >= maxLightCount)
 				break;
@@ -178,11 +183,6 @@ namespace Crystal {
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-
-
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
 
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,

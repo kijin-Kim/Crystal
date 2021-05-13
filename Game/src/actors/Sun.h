@@ -19,7 +19,7 @@ public:
 		Crystal::LocalLightActor::Initialize();
 
 
-		auto material = std::make_unique<Crystal::NewMaterial>();
+		auto material = std::make_unique<Crystal::Material>();
 		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 

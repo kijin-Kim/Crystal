@@ -113,10 +113,10 @@ namespace Crystal {
 		for (const auto& submesh : m_Submeshes)
 		{
 			auto subMesh = (StaticSubMesh*)submesh.get();
-			m_VertexBuffers.push_back(std::make_unique<Buffer>(subMesh->StaticVertices.data(),
+			m_VertexBuffers.push_back(CreateShared<Buffer>(subMesh->StaticVertices.data(),
 				(UINT)sizeof(StaticVertex) * subMesh->StaticVertices.size(),
 				(UINT)subMesh->StaticVertices.size(), false, false));
-			m_IndexBuffers.push_back(std::make_unique<Buffer>(submesh->Indices.data(),
+			m_IndexBuffers.push_back(CreateShared<Buffer>(submesh->Indices.data(),
 				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size(), false, false));
 
 			
@@ -218,10 +218,10 @@ namespace Crystal {
 		for (const auto& submesh : m_Submeshes)
 		{
 			auto subeMesh = (SkeletalSubMesh*)submesh.get();
-			m_VertexBuffers.push_back(std::make_unique<Buffer>(subeMesh->SkeletalVertices.data(),
+			m_VertexBuffers.push_back(CreateShared<Buffer>(subeMesh->SkeletalVertices.data(),
 				(UINT)sizeof(SkeletalVertex) * subeMesh->SkeletalVertices.size(),
 				(UINT)subeMesh->SkeletalVertices.size(), false, false));
-			m_IndexBuffers.push_back(std::make_unique<Buffer>(submesh->Indices.data(),
+			m_IndexBuffers.push_back(CreateShared<Buffer>(submesh->Indices.data(),
 				(UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size(), false, false));
 		}
 

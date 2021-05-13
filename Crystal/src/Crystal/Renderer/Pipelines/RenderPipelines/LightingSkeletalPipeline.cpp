@@ -10,20 +10,25 @@
 
 namespace Crystal {
 
-	void LightingSkeletalPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void LightingSkeletalPipeline::Begin()
 	{
-		LightPipeline::Begin(pipelineInputs);
+		LightPipeline::Begin();
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
 
-		LightingStaticPipeline::LightingPipelineInputs* lightPipelineInputs = (LightingStaticPipeline::LightingPipelineInputs*)pipelineInputs;
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+
+		auto camera = scene.Cameras[0].lock();
+
 
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetViewProjection());
-		auto camPos = lightPipelineInputs->Camera->GetWorldPosition();
+		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
+		auto camPos = camera->GetWorldPosition();
 		perFrameData.CameraPositionInWorld = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.0f);
 		perFrameData.LightPositionInWorld[0] = DirectX::XMFLOAT4(20000.0f, 20000.0f, 0.0f, 0.0f);
 		perFrameData.LightPositionInWorld[1] = DirectX::XMFLOAT4(-20000.0f, 20000.0f, 0.0f, 0.0f);
@@ -37,9 +42,6 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
 
 		
 
@@ -49,9 +51,9 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-		for (int i = 0; i < m_Components.size(); i++)
+		for (int i = 0; i < scene.SkeletalMeshes.size(); i++)
 		{
-			auto component = m_Components[i].lock();
+			auto component = scene.SkeletalMeshes[i].lock();
 			if(!component)
 				continue;
 

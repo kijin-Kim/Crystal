@@ -22,7 +22,7 @@ public:
 
 		m_MainComponent = boundingSphereComponent;
 
-		auto material = std::make_unique<Crystal::NewMaterial>();
+		auto material = std::make_unique<Crystal::Material>();
 		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");

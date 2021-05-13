@@ -15,7 +15,7 @@ namespace Crystal {
 	};
 	
 
-	struct NewMaterial : public Object
+	struct Material : public Object
 	{
 		Shared<Texture> AlbedoTexture = nullptr;
 		DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
@@ -33,7 +33,7 @@ namespace Crystal {
 
 		EShadingModel ShadingModel = EShadingModel::ShadingModel_Undefined;
 
-		bool UsingSameTextures(NewMaterial* material);
+		bool UsingSameTextures(Material* material);
 
 		STATIC_TYPE_IMPLE(NewMaterial)
 	};

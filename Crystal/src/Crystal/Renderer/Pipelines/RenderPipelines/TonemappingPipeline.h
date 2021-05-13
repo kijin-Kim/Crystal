@@ -6,18 +6,13 @@ namespace Crystal {
 
 	class TonemappingPipeline final : public RenderPipeline
 	{
-	public:
-		struct TonemappingPipelineInputs : public RenderPipelineInputs
-		{
-		};
-
 
 	public:
 		TonemappingPipeline() = default;
 		~TonemappingPipeline() override = default;
 
 		void OnCreate() override;
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 
 		
 		STATIC_TYPE_IMPLE(TonemappingPipeline)

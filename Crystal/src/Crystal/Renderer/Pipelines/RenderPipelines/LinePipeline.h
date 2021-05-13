@@ -6,9 +6,6 @@ namespace Crystal {
 	class LinePipeline : public RenderPipeline
 	{
 	public:
-		struct LinePipelineInputs : public RenderPipelineInputs
-		{
-		};
 
 		struct PerFrameData
 		{
@@ -22,18 +19,12 @@ namespace Crystal {
 		};
 
 
-		struct Material : public MaterialBase
-		{
-			DirectX::XMFLOAT3 Color = {};
-		};
-
-		
 
 	public:
 		LinePipeline() = default;
 		~LinePipeline() override = default;
 
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 		void End() override;
 		

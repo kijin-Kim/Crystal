@@ -8,9 +8,9 @@
 
 namespace Crystal {
 
-	void DiffIrradSamplingPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void DiffIrradSamplingPipeline::Begin()
 	{
-		ComputePipeline::Begin(pipelineInputs);
+		ComputePipeline::Begin();
 
 
 		auto device = Device::Instance().GetD3DDevice();

@@ -119,9 +119,9 @@ namespace Crystal {
 		
 	}
 
-	void TonemappingPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void TonemappingPipeline::Begin()
 	{
-		RenderPipeline::Begin(pipelineInputs);
+		RenderPipeline::Begin();
 
 
 		auto device = Device::Instance().GetD3DDevice();

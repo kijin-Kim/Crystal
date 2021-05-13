@@ -80,9 +80,6 @@ namespace Crystal {
 		/*UI모드와 Game모드를 특정 키를 통하여 스위치 할 수 있게 합니다. 디폴트 오른쪽 마우스 키*/
 		void EnableModeSwitching(bool bEnable, int64_t keyCode = Crystal::Mouse::Right);
 
-		void SetMainCamera(std::weak_ptr<CameraComponent> cameraComponent) { m_MainCamera = cameraComponent; }
-		std::weak_ptr<CameraComponent> GetMainCamera() const { return m_MainCamera; }
-
 		const std::map<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
 		const std::map<ActionMapping, std::string, ActionKeyCompare>& GetActionMap() const { return m_ActionMap; }
 
@@ -99,7 +96,6 @@ namespace Crystal {
 		std::map<int64_t, std::pair<std::string, float>> m_AxisMap;
 		/* KeyCode, ActionName */
 		std::map<ActionMapping, std::string, ActionKeyCompare> m_ActionMap;
-		std::weak_ptr<CameraComponent> m_MainCamera;
 
 		EInputMode m_InputMode = EInputMode::IM_Game;
 		bool m_bIsSwitchableMode = false;

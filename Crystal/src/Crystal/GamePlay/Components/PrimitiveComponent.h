@@ -19,7 +19,6 @@ namespace Crystal {
 	public:
 		PrimitiveComponent()
 		{
-			m_Renderables.resize(10);
 		}
 
 		~PrimitiveComponent() override = default;
@@ -30,28 +29,22 @@ namespace Crystal {
 		{
 			TransformComponent::Update(deltaTime);
 
-			for (const auto& renderable : m_Renderables)
-			{
-				if (!renderable)
-				{
-					continue;
-				}
-
-				renderable->Update(deltaTime);
-			}
+			if (m_Renderable)
+				m_Renderable->Update(deltaTime);
 		}
 
-		void AddMaterial(Unique<NewMaterial> material);
-		const std::vector<Unique<NewMaterial>>& GetMaterials() const;
-		NewMaterial* GetMaterial(uint32_t index) const;
+		void AddMaterial(Shared<Material> material);
+		const std::vector<Shared<Material>>& GetMaterials() const;
+		Material* GetMaterial(uint32_t index) const;
+		
 
 
-		void SetRenderable(Shared<Renderable> renderable, uint32_t index = 0)
+		void SetRenderable(Shared<Renderable> renderable)
 		{
-			m_Renderables[index] = renderable;
+			m_Renderable = renderable;
 		}
 
-		const Shared<Renderable>& GetRenderable(uint32_t index = 0) const { return m_Renderables[0]; }
+		const Shared<Renderable>& GetRenderable() const { return m_Renderable; }
 
 
 		bool CanBeRendered() const override { return true; }
@@ -61,10 +54,11 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
-		std::vector<Shared<Renderable>> m_Renderables;
+		Shared<Renderable> m_Renderable = nullptr;
 
-		std::vector<Unique<NewMaterial>> m_Materials;
+		std::vector<Shared<Material>> m_Materials;
 
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
+
 	};
 }

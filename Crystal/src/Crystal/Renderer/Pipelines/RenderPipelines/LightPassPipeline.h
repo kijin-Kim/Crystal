@@ -40,7 +40,7 @@ namespace Crystal {
 
 
 		void OnCreate() override;
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 	
 	private:
 		std::shared_ptr<StaticMeshComponent> m_StaticMeshComponent;

@@ -14,8 +14,12 @@ namespace Crystal {
 		auto owner = Cast<Actor>(GetOuter());
 
 		auto level = Cast<Level>(owner->GetOuter());
+		auto& scene = level->GetScene();
 
 		level->RegisterPhysicsWorldComponent(Cast<CollisionComponent>(shared_from_this()));
+		scene.CollisionComponents.push_back(Cast<CollisionComponent>(shared_from_this()));
 	}
+
+	
 
 }

@@ -28,8 +28,7 @@ namespace Crystal {
 		}
 
 #ifndef CS_NM_DEDICATED
-		level->GetScene().AddLight(Cast<LightComponent>(shared_from_this()));
-		level->RegisterLightComponent(Cast<LightComponent>(shared_from_this()));
+		level->GetScene().Lights.push_back(Cast<LightComponent>(shared_from_this()));
 #endif
 	
 	}

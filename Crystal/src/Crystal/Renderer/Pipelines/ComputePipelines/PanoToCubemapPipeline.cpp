@@ -9,9 +9,9 @@
 namespace Crystal {
 
 
-	void PanoToCubemapPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void PanoToCubemapPipeline::Begin()
 	{
-		ComputePipeline::Begin(pipelineInputs);
+		ComputePipeline::Begin();
 
 
 		auto device = Device::Instance().GetD3DDevice();

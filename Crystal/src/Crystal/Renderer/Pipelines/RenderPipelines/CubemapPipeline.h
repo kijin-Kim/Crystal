@@ -8,9 +8,7 @@ namespace Crystal {
 	class CubemapPipeline final : public RenderPipeline
 	{
 	public:
-		struct CubemapPipelineInputs : public RenderPipelineInputs
-		{
-		};
+
 
 		struct PerFrameData
 		{
@@ -24,7 +22,7 @@ namespace Crystal {
 		~CubemapPipeline() override = default;
 
 		void OnCreate() override;
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 
 		STATIC_TYPE_IMPLE(CubemapPipeline)
 

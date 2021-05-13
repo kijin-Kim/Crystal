@@ -1,6 +1,9 @@
 #pragma once
 #include "Crystal/Core/Timer.h"
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/GamePlay/Components/ParticleComponent.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/GamePlay/Components/TransformComponent.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
@@ -12,15 +15,7 @@ namespace Crystal {
 	 */
 
 	struct Scene
-	{
-		/*
-		 * VertexBuffers
-		 * IndexBuffer
-		 * Transform
-		 * Material
-		 * ShadingModel
-		 */
-
+	{		
 		Scene() = default;
 		~Scene() = default;
 
@@ -51,19 +46,24 @@ namespace Crystal {
 		Shared<Texture> PanoramaTexture = nullptr;
 		Shared<Texture> CubemapTexture = nullptr;
 		Shared<Texture> IrradianceTexture = nullptr;
+
+		
+		
 		//===================================================================================
 
 
 		//=====================Not Scene Owned Objects ======================================
-		std::unordered_map<EShadingModel, std::unordered_map<
-			                   std::string, std::vector<Weak<PrimitiveComponent>>>> PrimitiveComponents;
-		std::vector<Weak<LightComponent>> LightComponents;
-		std::vector<Weak<CameraComponent>> CameraComponents;
+		std::vector<Weak<StaticMeshComponent>> StaticMeshes;
+		std::vector<Weak<SkeletalMeshComponent>> SkeletalMeshes;
+		std::vector<Weak<ParticleComponent>> Particles;
+		std::vector<Weak<CollisionComponent>> CollisionComponents;
+		
+
+		std::vector<Weak<LightComponent>> Lights;
+		std::vector<Weak<CameraComponent>> Cameras;
 		//===================================================================================
 
-		void AddPrimitive(const Shared<PrimitiveComponent>& primitive);
-		void AddLight(const Shared<LightComponent>& light);
-		void AddCamera(const Shared<CameraComponent>& camera);
+		void SetMainCamera(const Shared<CameraComponent>& camera);
 
 
 		void RemoveGarbage();

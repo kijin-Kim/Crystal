@@ -3,22 +3,30 @@
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
 
 namespace Crystal {
 
-	void LinePipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void LinePipeline::Begin()
 	{
-		RenderPipeline::Begin(pipelineInputs);
+		RenderPipeline::Begin();
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto inputs = (RenderPipelineInputs*)pipelineInputs;
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+
+		auto camera = scene.Cameras[0].lock();
+
+
 
 		PerFrameData perFrameData = {};
-		perFrameData.ViewProjection = Matrix4x4::Transpose(inputs->Camera->GetViewProjection());
+		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -26,9 +34,9 @@ namespace Crystal {
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		for (int i = 0; i < m_Components.size(); i++)
+		for (int i = 0; i < scene.CollisionComponents.size(); i++)
 		{
-			auto component = Cast<CollisionComponent>(m_Components[i]);
+			auto component = Cast<CollisionComponent>(scene.CollisionComponents[i]);
 			if(!component)
 				continue;
 

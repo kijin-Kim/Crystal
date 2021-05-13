@@ -3,7 +3,7 @@
 
 namespace Crystal {
 
-	bool NewMaterial::UsingSameTextures(NewMaterial* material)
+	bool Material::UsingSameTextures(Material* material)
 	{
 		auto other = material;
 

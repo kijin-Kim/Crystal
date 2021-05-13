@@ -11,7 +11,7 @@ namespace Crystal {
 
 		auto particleComponent = CreateComponent<ParticleComponent>("DebugLineComponent");
 
-		auto particleMaterial = std::make_unique<Crystal::NewMaterial>();
+		auto particleMaterial = std::make_unique<Crystal::Material>();
 		particleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_Undefined;
 
 		particleComponent->AddMaterial(std::move(particleMaterial));

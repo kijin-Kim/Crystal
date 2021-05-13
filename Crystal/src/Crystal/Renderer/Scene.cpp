@@ -6,50 +6,63 @@
 namespace Crystal {
 
 
-	void Scene::AddPrimitive(const Shared<PrimitiveComponent>& primitive)
+	void Scene::SetMainCamera(const Shared<CameraComponent>& camera)
 	{
-		auto shadingModel = primitive->GetMaterial(0)->ShadingModel;
-		auto type = primitive->StaticType();
+		auto it = std::find_if(Cameras.begin(), Cameras.end(), [&camera](const Weak<CameraComponent>& other)-> bool
+		{
+			return other.lock() == camera;
+		});
 
+		if(it != Cameras.begin())
+		{
+			// 카메라가 이미 존재하고 메인 카메라(Camera[0])이므로 아무것도 할 필요가 없음.
+			return;
+		}
 
-		PrimitiveComponents[shadingModel][type].push_back(primitive);
-	}
+		
+		if (it == Cameras.end())
+		{
+			Cameras.insert(Cameras.begin(), camera);
+		}
+		else 
+		{
+			Cameras[0] = camera;
+		}
 
-	void Scene::AddLight(const Shared<LightComponent>& light)
-	{
-		LightComponents.push_back(light);
-	}
-
-	void Scene::AddCamera(const Shared<CameraComponent>& camera)
-	{
-		CameraComponents.push_back(camera);
+		
 	}
 
 	void Scene::RemoveGarbage()
 	{
-		for (auto& model : PrimitiveComponents)
-		{
-			for (auto& type : model.second)
-			{
-				for (auto it = type.second.begin(); it != type.second.end();)
-				{
-					if (it->expired())
-					{
-						it = type.second.erase(it);
-					}
-					else
-					{
-						++it;
-					}
-				}
-			}
-		}
-
-		for(auto it = LightComponents.begin(); it != LightComponents.end();)
+		for (auto it = StaticMeshes.begin(); it != StaticMeshes.end();)
 		{
 			if (it->expired())
 			{
-				it = LightComponents.erase(it);
+				it = StaticMeshes.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = SkeletalMeshes.begin(); it != SkeletalMeshes.end();)
+		{
+			if (it->expired())
+			{
+				it = SkeletalMeshes.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = Particles.begin(); it != Particles.end();)
+		{
+			if (it->expired())
+			{
+				it = Particles.erase(it);
 			}
 			else
 			{
@@ -58,20 +71,31 @@ namespace Crystal {
 		}
 
 
-		for (auto it = CameraComponents.begin(); it != CameraComponents.end();)
+		for (auto it = Lights.begin(); it != Lights.end();)
 		{
 			if (it->expired())
 			{
-				it = CameraComponents.erase(it);
+				it = Lights.erase(it);
 			}
 			else
 			{
 				++it;
 			}
 		}
-		
-	
+
+
+		for (auto it = Cameras.begin(); it != Cameras.end();)
+		{
+			if (it->expired())
+			{
+				it = Cameras.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
 
-	
+
 }

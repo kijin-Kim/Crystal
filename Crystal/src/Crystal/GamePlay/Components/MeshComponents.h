@@ -11,10 +11,8 @@ namespace Crystal {
 		}
 		
 	public:
-		MeshComponent()
-		{
-		}
-		virtual ~MeshComponent() = default;
+		MeshComponent() = default;
+		~MeshComponent() override = default;
 
 
 		STATIC_TYPE_IMPLE(MeshComponent)
@@ -27,11 +25,10 @@ namespace Crystal {
 			boost::serialization::base_object<MeshComponent>(*this);
 		}
 	public:
-		StaticMeshComponent()
-		{
-		};
-		virtual ~StaticMeshComponent() = default;
+		StaticMeshComponent() = default;
+		~StaticMeshComponent() override = default;
 
+		void RegisterComponent() override;
 		STATIC_TYPE_IMPLE(StaticMeshComponent)
 	};
 
@@ -42,11 +39,10 @@ namespace Crystal {
 			boost::serialization::base_object<MeshComponent>(*this);
 		}
 	public:
-		SkeletalMeshComponent()
-		{
-		};
-		virtual ~SkeletalMeshComponent() = default;
+		SkeletalMeshComponent() = default;
+		~SkeletalMeshComponent() override = default;
 
+		void RegisterComponent() override;
 		STATIC_TYPE_IMPLE(SkeletalMeshComponent)
 	};
 }

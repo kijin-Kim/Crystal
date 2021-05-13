@@ -258,22 +258,22 @@ namespace Crystal {
 		}
 
 
-		m_LightPipelines.push_back(NewCreatePipeline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
+		m_LightPipelines.push_back(CreatePipeline<LightingStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
 		m_LightPipelines.push_back(
-			NewCreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
-		m_LightPipelines.push_back(NewCreatePipeline<LightPassPipeline>(lightingPassShader, "LightPassPipeline"));
+			CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+		m_LightPipelines.push_back(CreatePipeline<LightPassPipeline>(lightingPassShader, "LightPassPipeline"));
 
 
-		m_Pipelines.push_back(NewCreatePipeline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
-		m_Pipelines.push_back(NewCreatePipeline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
-		m_Pipelines.push_back(NewCreatePipeline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
+		m_Pipelines.push_back(CreatePipeline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
+		m_Pipelines.push_back(CreatePipeline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
+		m_Pipelines.push_back(CreatePipeline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
 		m_Pipelines.push_back(
-			NewCreatePipeline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
-		m_Pipelines.push_back(NewCreatePipeline<BlurPipeline>(gaussianBlurShader, "GaussianBlurPipeline"));
+			CreatePipeline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
+		m_Pipelines.push_back(CreatePipeline<BlurPipeline>(gaussianBlurShader, "GaussianBlurPipeline"));
 		m_Pipelines.push_back(
-			NewCreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
-		m_Pipelines.push_back(NewCreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
-		m_Pipelines.push_back(NewCreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
+			CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
+		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
+		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -309,8 +309,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		PanoToCubemapPipeline::PanoToCubemapPipelineInputs panoToCubemapPipelineInputs = {};
-		m_Pipelines[2]->Begin(&panoToCubemapPipelineInputs);
+		m_Pipelines[2]->Begin();
 		m_Pipelines[2]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -325,9 +324,8 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		DiffIrradSamplingPipeline::DiffIrradSamplingPipelineInputs diffIrradSamplingPipelineInputs = {};
 
-		m_Pipelines[3]->Begin(&diffIrradSamplingPipelineInputs);
+		m_Pipelines[3]->Begin();
 		m_Pipelines[3]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -353,27 +351,22 @@ namespace Crystal {
 
 
 		const auto level = Cast<Level>(GetOuter());
+		auto& scene = level->GetScene();
+
+
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
 			return;
 		}
 
-		const auto playerController = level->GetPlayerController(0).lock();
-		if (!playerController)
-		{
-			//TODO : Use Default Camera
-			return;
-		}
 
-		const auto mainCamera = playerController->GetMainCamera().lock();
+		const auto mainCamera = scene.Cameras[0].lock();
 		if (!mainCamera)
 		{
 			//TODO : Use Default Camera
 			return;
 		}
-
-		auto& scene = level->GetScene();
 
 
 		// const auto mainCamera
@@ -444,11 +437,8 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
-		LightingStaticPipeline::LightingPipelineInputs lightingPipelineInputs = {};
-		lightingPipelineInputs.Camera = mainCamera.get();
 
-
-		m_LightPipelines[0]->Begin(&lightingPipelineInputs);
+		m_LightPipelines[0]->Begin();
 		m_LightPipelines[0]->Record(commandList);
 
 		// TODO : CPU 복사로 인한 퍼포먼스 이슈
@@ -462,31 +452,27 @@ namespace Crystal {
 		                                &scene.DepthStencilBufferTexture->GetDepthStencilView(
 			                                D3D12_DSV_DIMENSION_TEXTURE2D));
 
-		m_LightPipelines[2]->Begin(&lightingPipelineInputs);
+		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
 
-		m_LightPipelines[1]->Begin(&lightingPipelineInputs);
+		m_LightPipelines[1]->Begin();
 		m_LightPipelines[1]->Record(commandList);
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-		LinePipeline::LinePipelineInputs wireframePipelineInputs = {};
-		wireframePipelineInputs.Camera = mainCamera.get();
 
-		m_Pipelines[0]->Begin(&wireframePipelineInputs);
+
+		m_Pipelines[0]->Begin();
 		m_Pipelines[0]->Record(commandList);
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		m_Pipelines[7]->Begin(&wireframePipelineInputs);
+		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
 
 
-		CubemapPipeline::CubemapPipelineInputs cubemapPipelineInputs = {};
-		cubemapPipelineInputs.Camera = mainCamera.get();
-
-		m_Pipelines[1]->Begin(&cubemapPipelineInputs);
+		m_Pipelines[1]->Begin();
 		m_Pipelines[1]->Record(commandList);
 
 
@@ -496,7 +482,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		m_Pipelines[4]->Begin(nullptr);
+		m_Pipelines[4]->Begin();
 		m_Pipelines[4]->Record(commandList);
 
 		resourceBarrier.Transition.pResource = scene.BrightColorBuffer->GetResource();
@@ -513,8 +499,7 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 
-		AdditiveBlendingPipeline::AdditiveBlendingPipelineInputs input = {};
-		m_Pipelines[5]->Begin(&input);
+		m_Pipelines[5]->Begin();
 		m_Pipelines[5]->Record(commandList);
 
 		resourceBarrier.Transition.pResource = scene.FloatingPointBuffer->GetResource();
@@ -537,7 +522,7 @@ namespace Crystal {
 			1, &scene.ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
 			&scene.DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D));
 
-		m_Pipelines[6]->Begin(&input);
+		m_Pipelines[6]->Begin();
 		m_Pipelines[6]->Record(commandList);
 
 
@@ -669,7 +654,7 @@ namespace Crystal {
 			return;
 		}
 
-		const auto cameraComponent = playerController->GetMainCamera().lock();
+		const auto cameraComponent = scene.Cameras[0].lock();
 		if (!cameraComponent)
 		{
 			//TODO : Use Default Camera
@@ -877,14 +862,6 @@ namespace Crystal {
 		                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	}
 
-	void RenderSystem::RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak)
-	{
-		for (const auto& pipeline : m_LightPipelines)
-		{
-			pipeline->RegisterLightComponents(componentWeak);
-		}
-	}
-
 	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)
 	{
 		auto component = componentWeak.lock();
@@ -895,35 +872,34 @@ namespace Crystal {
 		if (materials.empty())
 			return;
 
-		for (const auto& mat : materials)
+		switch (materials[0]->ShadingModel)
 		{
-			switch (mat->ShadingModel)
+		case EShadingModel::ShadingModel_Undefined:
+			m_Pipelines[7]->RegisterPipelineComponents(componentWeak);
+			break;
+		case EShadingModel::ShadingModel_Unlit:
+			m_Pipelines[0]->RegisterPipelineComponents(componentWeak);
+			break;
+		case EShadingModel::ShadingModel_DefaultLit:
+		{
+			auto type = component->StaticType();
+			if (type == "StaticMeshComponent")
 			{
-			case EShadingModel::ShadingModel_Undefined:
-				m_Pipelines[7]->RegisterPipelineComponents(componentWeak);
-				break;
-			case EShadingModel::ShadingModel_Unlit:
-				m_Pipelines[0]->RegisterPipelineComponents(componentWeak);
-				break;
-			case EShadingModel::ShadingModel_DefaultLit:
-				{
-					auto type = component->StaticType();
-					if (type == "StaticMeshComponent")
-					{
-						m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
-					}
-
-					if (type == "SkeletalMeshComponent")
-					{
-						m_LightPipelines[1]->RegisterPipelineComponents(componentWeak);
-					}
-
-					break;
-				}
-
-			default: ;
+				m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
 			}
+
+			if (type == "SkeletalMeshComponent")
+			{
+				m_LightPipelines[1]->RegisterPipelineComponents(componentWeak);
+			}
+
+			break;
 		}
+
+		default:;
+		}
+		
+
 	}
 
 

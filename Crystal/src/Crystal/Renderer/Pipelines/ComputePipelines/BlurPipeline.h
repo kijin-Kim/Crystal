@@ -6,14 +6,11 @@ namespace Crystal {
 	class BlurPipeline : public ComputePipeline
 	{
 	public:
-		struct BlurPipelineInputs : public ComputePipelineInputs
-		{
-		};
-
+	
 		BlurPipeline() = default;
 		~BlurPipeline() override {}
 
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 
 
 		STATIC_TYPE_IMPLE(BlurPipeline)

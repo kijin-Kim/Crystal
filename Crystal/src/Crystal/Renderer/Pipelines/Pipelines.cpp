@@ -13,26 +13,13 @@ namespace Crystal {
 		m_Components.push_back(component);
 	}
 
-	void Pipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void Pipeline::Begin()
 	{
 		/*CommandList를 녹화합니다*/
 		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
 	}
 
 
-
-	bool Pipeline::IsValidForThisPipelineNew(MaterialBase* material)
-	{
-		if (!material)
-			return false;
-
-		/*auto thisPipelineShader = Cast<Shader>(GetOuter());
-		auto inputMaterialShader = Cast<Shader>(material->GetOuter());*/
-
-		return true;
-
-		/*return thisPipelineShader == inputMaterialShader;*/
-	}
 
 	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/,
 		int perDrawBufferSize /*= 0*/, int perDrawBufferCount /*= 0*/)
@@ -177,9 +164,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 	}
 
-	void RenderPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void RenderPipeline::Begin()
 	{
-		Pipeline::Begin(pipelineInputs);
+		Pipeline::Begin();
 	}
 
 	void RenderPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)

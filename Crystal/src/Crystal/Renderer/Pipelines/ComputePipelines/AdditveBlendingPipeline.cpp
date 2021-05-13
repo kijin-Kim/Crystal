@@ -9,11 +9,10 @@
 
 namespace Crystal {
 
-	void AdditiveBlendingPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void AdditiveBlendingPipeline::Begin()
 	{
-		ComputePipeline::Begin(pipelineInputs);
+		ComputePipeline::Begin();
 
-		auto input = *(AdditiveBlendingPipelineInputs*)pipelineInputs;
 
 		auto device = Device::Instance().GetD3DDevice();
 		

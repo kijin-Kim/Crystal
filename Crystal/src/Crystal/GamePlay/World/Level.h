@@ -44,7 +44,6 @@ namespace Crystal {
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
 
 		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> component);
-		void RegisterLightComponent(std::weak_ptr<LightComponent> componentWeak);
 		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 
 		void OnClientConnect();

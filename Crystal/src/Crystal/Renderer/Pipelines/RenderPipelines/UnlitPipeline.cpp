@@ -3,26 +3,34 @@
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 
 
 namespace Crystal {
 
-	void UnlitPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void UnlitPipeline::Begin()
 	{
-		Pipeline::Begin(pipelineInputs);
+		Pipeline::Begin();
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		UnlitPipelineInputs* lightPipelineInputs = (UnlitPipelineInputs*)pipelineInputs;
+
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+
+		auto camera = scene.Cameras[0].lock();
+
 
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.View = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetView());
-		perFrameData.Projection = Matrix4x4::Transpose(lightPipelineInputs->Camera->GetProjection());
+		perFrameData.View = Matrix4x4::Transpose(camera->GetView());
+		perFrameData.Projection = Matrix4x4::Transpose(camera->GetProjection());
 		
 
 		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
@@ -66,7 +74,7 @@ namespace Crystal {
 
 
 				auto it = std::find_if(m_InstanceBatches[renderable].MaterialLookup.begin(),
-					m_InstanceBatches[renderable].MaterialLookup.end(), [&mat](NewMaterial* other)
+					m_InstanceBatches[renderable].MaterialLookup.end(), [&mat](Material* other)
 					{
 						return mat->UsingSameTextures(other);
 					});

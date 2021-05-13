@@ -8,6 +8,7 @@
 #include "CollisionShapes.h"
 
 
+
 namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
 	{
@@ -21,10 +22,9 @@ namespace Crystal {
 	public:
 		CollisionComponent()
 		{
-			auto material = std::make_unique<NewMaterial>();
+			auto material = std::make_unique<Material>();
 			material->ShadingModel = EShadingModel::ShadingModel_Unlit;
 			material->AlbedoColor = Vector3::Yellow;
-
 
 			AddMaterial(std::move(material));
 		}
@@ -92,6 +92,7 @@ namespace Crystal {
 		~RayComponent() override = default;
 
 
+
 		void Update(const float deltaTime) override
 		{
 			CollisionComponent::Update(deltaTime);
@@ -138,6 +139,7 @@ namespace Crystal {
 	public:
 		BoundingBoxComponent() = default;
 		~BoundingBoxComponent() override = default;
+
 
 		void Update(const float deltaTime) override
 		{
@@ -219,6 +221,8 @@ namespace Crystal {
 	{
 	public:
 		BoundingSphereComponent() = default;
+
+
 
 		void Update(const float deltaTime) override
 		{

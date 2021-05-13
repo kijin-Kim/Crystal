@@ -38,27 +38,13 @@ namespace Crystal {
 		
 
 
-		void RegisterLightComponent(Weak<LightComponent> componentWeak);
 		void RegisterPrimitiveComponentNew(Weak<PrimitiveComponent> componentWeak);
 
 
-		
-		
+	
 
 		template <class T>
-		Unique<T> CreatePipeline(Weak<Shader> shader, const std::string& name)
-		{
-			/*Pipeline을 만듭니다.*/
-			auto pipeline = std::make_unique<T>();
-			pipeline->SetOuter(shader);
-			pipeline->SetObjectName(name);
-			pipeline->OnCreate();
-
-			return pipeline;
-		}
-
-		template <class T>
-		Unique<T> NewCreatePipeline(Shared<Shader> shader, const std::string& name)
+		Unique<T> CreatePipeline(Shared<Shader> shader, const std::string& name)
 		{
 			/*Pipeline을 만듭니다.*/
 			auto pipeline = std::make_unique<T>();

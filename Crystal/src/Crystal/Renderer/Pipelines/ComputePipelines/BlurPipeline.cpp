@@ -10,9 +10,9 @@
 namespace Crystal {
 
 
-	void BlurPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void BlurPipeline::Begin()
 	{
-		ComputePipeline::Begin(pipelineInputs);
+		ComputePipeline::Begin();
 
 		auto device = Device::Instance().GetD3DDevice();
 

@@ -18,11 +18,10 @@ public:
 	void Initialize() override
 	{
 
-
-		auto bodyMaterial = std::make_unique<Crystal::NewMaterial>();
+		auto bodyMaterial = std::make_unique<Crystal::Material>();
 		bodyMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
-		auto tentacleMaterial = std::make_unique<Crystal::NewMaterial>();
+		auto tentacleMaterial = std::make_unique<Crystal::Material>();
 		tentacleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 

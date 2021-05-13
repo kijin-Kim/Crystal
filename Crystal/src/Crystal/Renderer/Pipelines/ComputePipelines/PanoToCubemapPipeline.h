@@ -5,14 +5,12 @@ namespace Crystal {
 	class PanoToCubemapPipeline : public ComputePipeline
 	{
 	public:
-		struct PanoToCubemapPipelineInputs : public ComputePipelineInputs
-		{
-		};
+
 
 		PanoToCubemapPipeline() = default;
 		~PanoToCubemapPipeline() override {}
 
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 		
 
 		STATIC_TYPE_IMPLE(PanoToCubemapPipeline)

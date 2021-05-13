@@ -24,24 +24,24 @@ namespace Crystal {
 			return;
 		}
 
-		level->GetScene().AddPrimitive(Cast<PrimitiveComponent>(shared_from_this()));
+		
 		level->RegisterRendererComponent(Cast<PrimitiveComponent>(shared_from_this()));
 #endif
 	}
 
 
-	void PrimitiveComponent::AddMaterial(std::unique_ptr<NewMaterial> material)
+	void PrimitiveComponent::AddMaterial(Shared<Material> material)
 	{
 		m_Materials.push_back(std::move(material));
 	}
 
 
-	const std::vector<std::unique_ptr<Crystal::NewMaterial>>& PrimitiveComponent::GetMaterials() const
+	const std::vector<Shared<Crystal::Material>>& PrimitiveComponent::GetMaterials() const
 	{
 		return m_Materials;
 	}
 
-	NewMaterial* PrimitiveComponent::GetMaterial(uint32_t index) const
+	Material* PrimitiveComponent::GetMaterial(uint32_t index) const
 	{
 		return m_Materials[index].get();
 	}

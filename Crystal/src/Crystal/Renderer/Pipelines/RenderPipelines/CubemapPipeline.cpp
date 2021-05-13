@@ -26,21 +26,24 @@ namespace Crystal {
 		m_Components.push_back(m_StaticMeshComponent);
 	}
 
-	void CubemapPipeline::Begin(const PipelineInputs* const pipelineInputs)
+	void CubemapPipeline::Begin()
 	{
-		RenderPipeline::Begin(pipelineInputs);
+		RenderPipeline::Begin();
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
-		CubemapPipelineInputs* cubemapPipelineInputs = (CubemapPipelineInputs*)pipelineInputs;
 
 
 		PerFrameData perFrameData = {};
 
 
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		auto& scene = level->GetScene();
+		auto camera = scene.Cameras[0].lock();
 
 
-		auto viewProj = cubemapPipelineInputs->Camera->GetViewProjection();
+		auto viewProj = camera->GetViewProjection();
 		viewProj._41 = 0.0f; viewProj._42 = 0.0f; viewProj._43 = 0.0f;
 		perFrameData.InverseViewProjection = Matrix4x4::Transpose(Matrix4x4::Inverse(viewProj));
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
@@ -55,9 +58,6 @@ namespace Crystal {
 			m_PerFrameConstantBuffer->GetConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
 		
 ;		
 		device->CopyDescriptorsSimple(1, descHandle,

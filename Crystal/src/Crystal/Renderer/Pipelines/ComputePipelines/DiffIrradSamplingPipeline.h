@@ -12,14 +12,11 @@ namespace Crystal {
 			DIFF_IRRAD_SAMPLING_INPUT_COUNT
 		};
 
-		struct DiffIrradSamplingPipelineInputs : public ComputePipelineInputs
-		{
-		};
 
 		DiffIrradSamplingPipeline() = default;
 		~DiffIrradSamplingPipeline() override = default;
 
-		void Begin(const PipelineInputs* const pipelineInputs) override;
+		void Begin() override;
 
 
 		STATIC_TYPE_IMPLE(DiffIrradSamplingPipeline)

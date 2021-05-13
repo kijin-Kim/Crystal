@@ -22,7 +22,7 @@ namespace Crystal {
 		TransformComponent::RegisterComponent();
 
 		auto level = Cast<Level>(Cast<Actor>(GetOuter())->GetOuter());
-		level->GetScene().AddCamera(Cast<CameraComponent>(shared_from_this()));
+		level->GetScene().Cameras.push_back(Cast<CameraComponent>(shared_from_this()));
 	}
 
 	void CameraComponent::Update(const float deltaTime)
