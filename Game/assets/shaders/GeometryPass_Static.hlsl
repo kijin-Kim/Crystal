@@ -111,7 +111,7 @@ PS_INPUT vsMain(VS_INPUT input)
 #define TEXTURE_TYPE_EMISSIVE 4
 
 TextureCube IrradianceTexture : register(t0);
-Texture2D Textures[MAX_PER_INSTANCE_TEXTURE_COUNT][5] : register(t1);
+Texture2D Textures[5] : register(t1);
 
 SamplerState DefaultSampler : register(s0);
 
@@ -120,16 +120,16 @@ PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
 {
     
     float3 albedo = input.bToggleAlbedoTexture ? 
-    pow(Textures[input.MaterialIndex][TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : input.AlbedoColor.rgb;
+    pow(Textures[TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : input.AlbedoColor.rgb;
     float roughness = input.bToggleRoughnessTexture ? 
-    Textures[input.MaterialIndex][TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : input.RoughnessConstant;
+    Textures[TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : input.RoughnessConstant;
     float metallic = input.bToggleMetallicTexture ? 
-    Textures[input.MaterialIndex][TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : input.MetallicConstant;
+    Textures[TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : input.MetallicConstant;
     float3 emissive = input.bToggleEmissivetexture ? 
-    Textures[input.MaterialIndex][TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
+    Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
     
     
-    float3 N = input.bToggleNormalTexture ? mul(normalize(Textures[input.MaterialIndex][TEXTURE_TYPE_NORMAL].Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
+    float3 N = input.bToggleNormalTexture ? mul(normalize(Textures[TEXTURE_TYPE_NORMAL].Sample(DefaultSampler, input.TexCoord).rgb * 2.0f - 1.0f),
     float3x3(normalize(input.WorldTangent), normalize(input.WorldBiTangent), normalize(input.WorldNormal))) : input.WorldNormal;
     N = normalize(N);
 

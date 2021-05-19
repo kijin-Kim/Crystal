@@ -60,6 +60,7 @@ namespace Crystal {
 		GeometryStaticPipeline() = default;
 		~GeometryStaticPipeline() override = default;
 
+		void OnCreate() override;
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 		void End() override;
@@ -67,6 +68,7 @@ namespace Crystal {
 	private:
 		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
 
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 	};
 }

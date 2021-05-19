@@ -60,6 +60,7 @@ namespace Crystal {
 
 		//===================================================================================
 
+		void SetIrradianceTexture(const Shared<Texture>& texture);
 		
 
 		void AddStaticMesh(const Shared<StaticMeshComponent>& staticMesh);

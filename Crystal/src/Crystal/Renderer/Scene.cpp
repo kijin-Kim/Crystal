@@ -41,6 +41,16 @@ namespace Crystal {
 		return returnValue;
 	}
 
+	void Scene::SetIrradianceTexture(const Shared<Texture>& texture)
+	{
+		IrradianceTexture = texture;
+		
+		if(ShouldAddTexture(texture))
+		{
+			AddTexture(texture);
+		}
+	}
+
 	void Scene::AddStaticMesh(const Shared<StaticMeshComponent>& staticMesh)
 	{
 		auto device = Device::Instance().GetD3DDevice();
