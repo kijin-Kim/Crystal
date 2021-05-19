@@ -1,9 +1,9 @@
 #include "Crystal/Resources/Buffer.h"
-#include "LightPipeline.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
 
 namespace Crystal {
 	
-	class LightingSkeletalPipeline final : public LightPipeline
+	class LightingSkeletalPipeline final : public RenderPipeline
 	{
 	public:
 		struct PerFrameData

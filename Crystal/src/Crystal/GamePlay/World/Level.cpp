@@ -20,6 +20,9 @@ namespace Crystal {
 		m_PhysicsSystem->OnCreate();
 
 #if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
+
+		m_Scene = CreateShared<Scene>();
+		
 		m_RenderSystem = CreateShared<RenderSystem>();
 		m_RenderSystem->Initialize();
 		m_RenderSystem->SetOuter(weak_from_this());
@@ -206,19 +209,6 @@ namespace Crystal {
 
 		auto playerController = SpawnActor<PlayerController>().lock();
 		playerController->Possess(newActor);
-
-
-		// 시리얼라이즈
-		std::ostringstream oss;
-		boost::archive::text_oarchive os(oss);
-		os << *newActor;
-
-
-		// 디시리얼라이즈
-		std::istringstream iss(oss.str());
-		boost::archive::text_iarchive is(iss);
-		is >> *newActor;
-
 
 #endif
 

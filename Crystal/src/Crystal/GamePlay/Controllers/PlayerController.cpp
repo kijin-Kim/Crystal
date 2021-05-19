@@ -65,7 +65,7 @@ namespace Crystal {
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
 		
-		scene.SetMainCamera(camera);
+		scene->SetMainCamera(camera);
 			
 		m_GameInputComponent = std::make_unique<InputComponent>();
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.

@@ -1,10 +1,9 @@
 #pragma once
-#include "LightPipeline.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 
 namespace Crystal {
 
-	class LightPassPipeline : public LightPipeline
+	class LightingPipeline : public RenderPipeline
 	{
 	public:
 
@@ -35,8 +34,8 @@ namespace Crystal {
 
 
 	public:
-		LightPassPipeline() = default;
-		~LightPassPipeline() override = default;
+		LightingPipeline() = default;
+		~LightingPipeline() override = default;
 
 
 		void OnCreate() override;

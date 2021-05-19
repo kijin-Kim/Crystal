@@ -21,7 +21,7 @@ namespace Crystal {
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 
-		auto camera = scene.Cameras[0].lock();
+		auto camera = scene->Cameras[0].lock();
 
 
 
@@ -34,9 +34,9 @@ namespace Crystal {
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		for (int i = 0; i < scene.CollisionComponents.size(); i++)
+		for (int i = 0; i < scene->CollisionComponents.size(); i++)
 		{
-			auto component = Cast<CollisionComponent>(scene.CollisionComponents[i]);
+			auto component = Cast<CollisionComponent>(scene->CollisionComponents[i]);
 			if(!component)
 				continue;
 

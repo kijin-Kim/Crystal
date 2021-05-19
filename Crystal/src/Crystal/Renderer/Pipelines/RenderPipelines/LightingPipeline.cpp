@@ -1,5 +1,5 @@
 #include "cspch.h"
-#include "LightPassPipeline.h"
+#include "LightingPipeline.h"
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
@@ -9,9 +9,9 @@
 namespace Crystal {
 
 
-	void LightPassPipeline::OnCreate()
+	void LightingPipeline::OnCreate()
 	{
-		LightPipeline::OnCreate();
+		RenderPipeline::OnCreate();
 
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -128,9 +128,9 @@ namespace Crystal {
 		m_Components.push_back(m_StaticMeshComponent);
 	}
 
-	void LightPassPipeline::Begin()
+	void LightingPipeline::Begin()
 	{
-		LightPipeline::Begin();
+		RenderPipeline::Begin();
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
@@ -143,7 +143,7 @@ namespace Crystal {
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 		
-		auto camera = scene.Cameras[0].lock();
+		auto camera = scene->Cameras[0].lock();
 
 		PerFrameData perFrameData = {};
 
@@ -154,7 +154,7 @@ namespace Crystal {
 		const int maxLightCount = 100;
 		int lightCount = 0;
 
-		for (const auto& weak : scene.Lights)
+		for (const auto& weak : scene->Lights)
 		{
 			if (lightCount >= maxLightCount)
 				break;
@@ -186,33 +186,33 @@ namespace Crystal {
 
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.AlbedoBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              scene->AlbedoBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.RoughnessMetallicAoBuffer->
+		                              scene->RoughnessMetallicAoBuffer->
 		                                    GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.EmissiveBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              scene->EmissiveBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.WorldNormalBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              scene->WorldNormalBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              scene->IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
-		                              scene.WorldPositionBuffer->
+		                              scene->WorldPositionBuffer->
 		                                    GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}

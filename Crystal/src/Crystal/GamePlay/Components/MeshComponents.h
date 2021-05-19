@@ -5,6 +5,8 @@
 namespace Crystal {
 	class MeshComponent : public PrimitiveComponent
 	{
+		using Super = PrimitiveComponent;
+		
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<PrimitiveComponent>(*this);
@@ -20,6 +22,8 @@ namespace Crystal {
 
 	class StaticMeshComponent : public MeshComponent
 	{
+		using Super = MeshComponent;
+		
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<MeshComponent>(*this);
@@ -29,11 +33,18 @@ namespace Crystal {
 		~StaticMeshComponent() override = default;
 
 		void RegisterComponent() override;
+
 		STATIC_TYPE_IMPLE(StaticMeshComponent)
+
+
+	private:
+		
 	};
 
 	class SkeletalMeshComponent : public MeshComponent
 	{
+		using Super = MeshComponent;
+		
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<MeshComponent>(*this);

@@ -103,5 +103,7 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;
 		DirectX::XMFLOAT3 m_Up = Vector3::UnitY;
 		DirectX::XMFLOAT3 m_Forward = Vector3::UnitZ;
+
+
 	};
 }

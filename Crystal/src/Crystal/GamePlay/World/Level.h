@@ -48,7 +48,7 @@ namespace Crystal {
 
 		void OnClientConnect();
 
-		Scene& GetScene() { return m_Scene; }
+		const Shared<Scene>& GetScene() { return m_Scene; }
 
 
 		std::weak_ptr<Actor> GetActorByName(const std::string& name);
@@ -70,14 +70,15 @@ namespace Crystal {
 
 	private:
 		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
+		Shared<Scene> m_Scene = nullptr;
 		Shared<RenderSystem> m_RenderSystem = nullptr;
+		
 
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
 		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;
 		std::vector<std::shared_ptr<PlayerController>> m_PlayerControllers;
 
-		Scene m_Scene = {};
 
 		bool m_bHasDeadActors = false;
 	};

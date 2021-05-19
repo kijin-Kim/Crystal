@@ -65,7 +65,7 @@ namespace Crystal {
 
 
 		std::vector<Unique<Pipeline>> m_Pipelines;
-		std::vector<Unique<LightPipeline>> m_LightPipelines;
+		std::vector<Unique<RenderPipeline>> m_LightPipelines;
 		
 		uint32_t m_RtvIndex = 0;
 

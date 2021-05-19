@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "LightPipeline.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/Material.h"
 
 namespace Crystal {

@@ -17,9 +17,7 @@ namespace Crystal {
 		}
 
 	public:
-		PrimitiveComponent()
-		{
-		}
+		PrimitiveComponent() = default;
 
 		~PrimitiveComponent() override = default;
 
@@ -51,6 +49,7 @@ namespace Crystal {
 		bool IsCollisionEnabled() const override { return false; }
 
 		void AddForce(const DirectX::XMFLOAT3& force) { m_ForceAccum = Vector3::Add(m_ForceAccum, force); }
+
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:

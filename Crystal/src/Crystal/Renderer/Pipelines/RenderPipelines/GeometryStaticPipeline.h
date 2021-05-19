@@ -1,15 +1,13 @@
 #pragma once
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
-#include "LightPipeline.h"
 #include <vector>
 
 
 namespace Crystal {
-	class LightingStaticPipeline final : public LightPipeline
+	class GeometryStaticPipeline final : public RenderPipeline
 	{
 	public:
-
 		struct Light
 		{
 			DirectX::XMFLOAT3 WorldPosition = Vector3::Zero;
@@ -32,8 +30,6 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 World;
 		};
 
-
-		
 
 		struct PerInstanceData
 		{
@@ -61,14 +57,16 @@ namespace Crystal {
 		};
 
 	public:
-		LightingStaticPipeline() = default;
-		~LightingStaticPipeline() override = default;
+		GeometryStaticPipeline() = default;
+		~GeometryStaticPipeline() override = default;
 
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 		void End() override;
-		STATIC_TYPE_IMPLE(LightingStaticPipeline)
+		STATIC_TYPE_IMPLE(GeometryStaticPipeline)
 	private:
 		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
+
+
 	};
 }

@@ -1,5 +1,5 @@
 #include "cspch.h"
-#include "LightingStaticPipeline.h"
+#include "GeometryStaticPipeline.h"
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/World/Level.h"
@@ -8,27 +8,28 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 namespace Crystal {
-	void LightingStaticPipeline::Begin()
+	void GeometryStaticPipeline::Begin()
 	{
-		LightPipeline::Begin();
+		RenderPipeline::Begin();
+
+		
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+
+		auto& scene = GetScene();
 
 
 		PerFrameData perFrameData = {};
 
-		perFrameData.ViewProjection = Matrix4x4::Transpose(scene.Cameras[0].lock()->GetViewProjection());
+		perFrameData.ViewProjection = Matrix4x4::Transpose(scene->Cameras[0].lock()->GetViewProjection());
 
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 
-		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = scene.IrradianceTexture->GetShaderResourceView(
+		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(
 			D3D12_SRV_DIMENSION_TEXTURE2D); // Per Frame
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -45,9 +46,9 @@ namespace Crystal {
 		int materialCount = 0;
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
 
-		for (int i = 0; i < scene.StaticMeshes.size(); i++) // PerObject
+		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject
 		{
-			auto meshComponent = scene.StaticMeshes[i].lock();
+			auto meshComponent = scene->StaticMeshes[i].lock();
 			if (!meshComponent)
 				continue;
 
@@ -177,13 +178,13 @@ namespace Crystal {
 					instanceBatches.PerInstanceDatas.size(), instanceBatches.PerInstanceDatas.size(), false, true);
 			}
 
-			instanceBatches.PerInstanceVertexBuffer->SetData((void*)instanceBatches.PerInstanceDatas.data(),
+			instanceBatches.PerInstanceVertexBuffer->SetData(instanceBatches.PerInstanceDatas.data(),
 			                                                 0, sizeof(PerInstanceData) * instanceBatches.
 			                                                 PerInstanceDatas.size());
 		}
 	}
 
-	void LightingStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void GeometryStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
 
@@ -235,7 +236,7 @@ namespace Crystal {
 		}
 	}
 
-	void LightingStaticPipeline::End()
+	void GeometryStaticPipeline::End()
 	{
 		m_InstanceBatches.clear();
 	}

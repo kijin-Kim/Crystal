@@ -4,6 +4,8 @@
 #include "Crystal/Core/Device.h"
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/Material.h"
 
 namespace Crystal {
@@ -20,9 +22,8 @@ namespace Crystal {
 	}
 
 
-
 	void Pipeline::PrepareConstantBuffers(int perFrameBufferSize /*= 0*/, int perObjectBufferSize /*= 0*/,
-		int perDrawBufferSize /*= 0*/, int perDrawBufferCount /*= 0*/)
+	                                      int perDrawBufferSize /*= 0*/, int perDrawBufferCount /*= 0*/)
 	{
 		if (perFrameBufferSize && !m_PerFrameConstantBuffer)
 		{
@@ -50,11 +51,17 @@ namespace Crystal {
 							buffer->CreateConstantBuffer();
 							m_PerDrawConstantBuffers.push_back(std::move(buffer));
 						}
-					}	
+					}
 				}
 			}
 		}
-		
+	}
+
+	const Shared<Scene>& Pipeline::GetScene()
+	{
+		auto renderSystem = Cast<RenderSystem>(GetOuter());
+		auto level = Cast<Level>(renderSystem->GetOuter());
+		return level->GetScene();
 	}
 
 	void RenderPipeline::OnCreate()
@@ -89,10 +96,9 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-	
 		pipelineStateStream.RootSignature = m_Shader->GetRootSignature().GetData();
 		auto inputLayout = m_Shader->GetInputLayout();
-		pipelineStateStream.InputLayout = { inputLayout.GetData(), inputLayout.GetCount() };
+		pipelineStateStream.InputLayout = {inputLayout.GetData(), inputLayout.GetCount()};
 		pipelineStateStream.PrimitiveTopology = m_Shader->GetPrimitiveTopologyType();
 
 
@@ -100,32 +106,42 @@ namespace Crystal {
 
 		if (m_Shader->HasShader(ShaderType::Vertex))
 		{
-			pipelineStateStream.VS = { shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Vertex]->GetBufferSize() };
+			pipelineStateStream.VS = {
+				shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Vertex]->GetBufferSize()
+			};
 		}
 
 		if (m_Shader->HasShader(ShaderType::Hull))
 		{
-			pipelineStateStream.HS = { shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Hull]->GetBufferSize() };
+			pipelineStateStream.HS = {
+				shaderDatablobs[ShaderType::Hull]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Hull]->GetBufferSize()
+			};
 		}
 
 		if (m_Shader->HasShader(ShaderType::Domain))
 		{
-			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Domain]->GetBufferSize() };
+			pipelineStateStream.DS = {
+				shaderDatablobs[ShaderType::Domain]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Domain]->GetBufferSize()
+			};
 		}
 
 		if (m_Shader->HasShader(ShaderType::Geometry))
 		{
-			pipelineStateStream.DS = { shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Geometry]->GetBufferSize() };
+			pipelineStateStream.DS = {
+				shaderDatablobs[ShaderType::Geometry]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Geometry]->GetBufferSize()
+			};
 		}
 
 		if (m_Shader->HasShader(ShaderType::Pixel))
 		{
-			pipelineStateStream.PS = { shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Pixel]->GetBufferSize() };
+			pipelineStateStream.PS = {
+				shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
+				shaderDatablobs[ShaderType::Pixel]->GetBufferSize()
+			};
 		}
 
 		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
@@ -158,7 +174,7 @@ namespace Crystal {
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
+		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
@@ -179,7 +195,7 @@ namespace Crystal {
 
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetGraphicsRootSignature(rootSignature.GetData());
-		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
 		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
 
 		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -188,10 +204,10 @@ namespace Crystal {
 
 		if (rootSignature.HasPerFrameParameter())
 		{
-			commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
+			commandList->
+				SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
 			descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 				* rootSignature.GetPerFrameDescriptorCount();
-
 		}
 
 		for (const auto& component : m_Components)
@@ -202,8 +218,10 @@ namespace Crystal {
 
 			if (rootSignature.HasPerObjectParameter())
 			{
-				commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerObjectParameterIndex(), descriptorHeapHandle); // PerObject
-				descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+				commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerObjectParameterIndex(),
+				                                            descriptorHeapHandle); // PerObject
+				descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 					* rootSignature.GetPerObjectDescriptorCount();
 			}
 
@@ -211,22 +229,23 @@ namespace Crystal {
 			auto renderable = meshComponent->GetRenderable();
 			auto& materials = meshComponent->GetMaterials();
 
-			if(!renderable)
+			if (!renderable)
 			{
 				continue;
 			}
-			
+
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 			{
 				if (j < materials.size() && materials[j])
 				{
 					if (rootSignature.GetPerExecuteDescriptorCount())
 					{
-						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(), descriptorHeapHandle); // PerMaterial
-						descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(),
+						                                            descriptorHeapHandle); // PerMaterial
+						descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
+								D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 							* rootSignature.GetPerExecuteDescriptorCount();
 					}
-
 				}
 				renderable->Render(commandList, j);
 			}
@@ -249,12 +268,15 @@ namespace Crystal {
 		auto& shaderDatablobs = m_Shader->GetRaw();
 		D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc = {};
 		computePipelineStateDesc.pRootSignature = m_Shader->GetRootSignature().GetData();
-		computePipelineStateDesc.CS = { shaderDatablobs[ShaderType::Compute]->GetBufferPointer(), shaderDatablobs[ShaderType::Compute]->GetBufferSize() };
+		computePipelineStateDesc.CS = {
+			shaderDatablobs[ShaderType::Compute]->GetBufferPointer(),
+			shaderDatablobs[ShaderType::Compute]->GetBufferSize()
+		};
 
 		hr = device->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "PipelineState를 생성하는데 실패하였습니다.");
 	}
-	
+
 	void ComputePipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
@@ -262,7 +284,7 @@ namespace Crystal {
 
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetComputeRootSignature(m_Shader->GetRootSignature().GetData());
-		ID3D12DescriptorHeap* irradianceSamplingHeaps[] = { m_DescriptorHeap.Get() };
+		ID3D12DescriptorHeap* irradianceSamplingHeaps[] = {m_DescriptorHeap.Get()};
 		commandList->SetDescriptorHeaps(_countof(irradianceSamplingHeaps), irradianceSamplingHeaps);
 		commandList->SetComputeRootDescriptorTable(0, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 

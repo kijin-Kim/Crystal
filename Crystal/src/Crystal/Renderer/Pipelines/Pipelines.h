@@ -10,6 +10,7 @@
 #include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
+	struct Scene;
 
 	class PrimitiveComponent;
 
@@ -31,6 +32,8 @@ namespace Crystal {
 		void PrepareConstantBuffers(int perFrameBufferSize = 0, int perObjectBufferSize = 0, int perDrawBufferSize = 0, int perDrawBufferCount = 0);
 
 		void SetShader(const Shared<Shader>& shader) { m_Shader = shader; }
+
+		const Shared<Scene>& GetScene();
 
 		STATIC_TYPE_IMPLE(Pipeline)
 	protected:

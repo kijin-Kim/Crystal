@@ -23,7 +23,7 @@ namespace Crystal {
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 
-		auto camera = scene.Cameras[0].lock();
+		auto camera = scene->Cameras[0].lock();
 
 
 

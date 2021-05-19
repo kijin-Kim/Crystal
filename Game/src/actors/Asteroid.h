@@ -2,7 +2,7 @@
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
-#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
 class Asteroid : public Crystal::Actor
 {

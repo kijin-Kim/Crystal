@@ -6,7 +6,7 @@
 #include "Crystal/Core/Timer.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
-#include "Crystal/Renderer/Pipelines/RenderPipelines/LightingStaticPipeline.h"
+#include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
 
 class TestPawn final : public Crystal::Pawn

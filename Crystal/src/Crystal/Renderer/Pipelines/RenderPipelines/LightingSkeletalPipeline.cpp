@@ -1,7 +1,7 @@
 #include "cspch.h"
 #include "LightingSkeletalPipeline.h"
 
-#include "LightingStaticPipeline.h"
+#include "GeometryStaticPipeline.h"
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
@@ -12,7 +12,7 @@ namespace Crystal {
 
 	void LightingSkeletalPipeline::Begin()
 	{
-		LightPipeline::Begin();
+		RenderPipeline::Begin();
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
@@ -21,7 +21,7 @@ namespace Crystal {
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 
-		auto camera = scene.Cameras[0].lock();
+		auto camera = scene->Cameras[0].lock();
 
 
 
@@ -46,14 +46,14 @@ namespace Crystal {
 		
 
 		
-		auto irradianceTextureHandle = scene.IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+		auto irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
-		for (int i = 0; i < scene.SkeletalMeshes.size(); i++)
+		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)
 		{
-			auto component = scene.SkeletalMeshes[i].lock();
+			auto component = scene->SkeletalMeshes[i].lock();
 			if(!component)
 				continue;
 

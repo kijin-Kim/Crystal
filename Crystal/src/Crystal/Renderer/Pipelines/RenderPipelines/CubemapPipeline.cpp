@@ -40,7 +40,7 @@ namespace Crystal {
 		auto renderSystem = Cast<RenderSystem>(GetOuter());
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
-		auto camera = scene.Cameras[0].lock();
+		auto camera = scene->Cameras[0].lock();
 
 
 		auto viewProj = camera->GetViewProjection();
@@ -61,7 +61,7 @@ namespace Crystal {
 		
 ;		
 		device->CopyDescriptorsSimple(1, descHandle,
-			scene.CubemapTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			scene->CubemapTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		

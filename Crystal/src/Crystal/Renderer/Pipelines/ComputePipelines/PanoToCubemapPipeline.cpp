@@ -34,7 +34,7 @@ namespace Crystal {
 		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		device->CopyDescriptorsSimple(
-			1, handle, scene.CubemapTexture->GetUnorderedAccessView(D3D12_UAV_DIMENSION_TEXTURE2DARRAY),
+			1, handle, scene->CubemapTexture->GetUnorderedAccessView(D3D12_UAV_DIMENSION_TEXTURE2DARRAY),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV
 		);
 	}
