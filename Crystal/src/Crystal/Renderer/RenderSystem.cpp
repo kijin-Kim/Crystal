@@ -361,6 +361,11 @@ namespace Crystal {
 		}
 
 
+		if(scene->Cameras.empty())
+		{
+			return;
+		}
+	
 		const auto mainCamera = scene->Cameras[0].lock();
 		if (!mainCamera)
 		{
@@ -369,6 +374,7 @@ namespace Crystal {
 		}
 
 
+		
 		// const auto mainCamera
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

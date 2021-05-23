@@ -16,7 +16,7 @@ namespace Crystal {
 
 	struct Scene
 	{
-		Scene();
+		Scene() = default;
 		~Scene() = default;
 
 		Scene& operator=(const Scene&) = delete;
@@ -46,29 +46,9 @@ namespace Crystal {
 		Shared<Texture> PanoramaTexture = nullptr;
 		Shared<Texture> CubemapTexture = nullptr;
 		Shared<Texture> IrradianceTexture = nullptr;
-
-		using OffsetType = uint64_t;
-
-		std::map<Weak<TransformComponent>, Shared<Buffer>, std::owner_less<Weak<TransformComponent>>> ConstantBuffers;
-		
-		std::map<Weak<Texture>, OffsetType, std::owner_less<Weak<Texture>>> TextureHandleOffsets; // 이미 복사된 Textures
-		std::queue<OffsetType> FreeTextureHandleOffsets;
-
-
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SceneDescriptorHeap = nullptr;
-		const uint64_t MaxSceneDescriptorCount = 1024;
-
 		//===================================================================================
 
 		void SetIrradianceTexture(const Shared<Texture>& texture);
-		
-
-		void AddStaticMesh(const Shared<StaticMeshComponent>& staticMesh);
-		void AddConstantBuffer(const Shared<TransformComponent>& component, uint64_t size);
-		void AddTexture(const Shared<Texture>& texture);
-
-		OffsetType GetNewTextureHandleOffset();
-		bool ShouldAddTexture(const Shared<Texture>& texture);
 		
 		
 
