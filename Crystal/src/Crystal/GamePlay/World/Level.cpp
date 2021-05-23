@@ -19,9 +19,11 @@ namespace Crystal {
 		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
 		m_PhysicsSystem->OnCreate();
 
+		m_Scene = CreateShared<Scene>();
+
+
 #if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
 
-		m_Scene = CreateShared<Scene>();
 		
 		m_RenderSystem = CreateShared<RenderSystem>();
 		m_RenderSystem->Initialize();
@@ -37,11 +39,7 @@ namespace Crystal {
 		Object::Update(deltaTime);
 
 #ifdef CS_NM_DEDICATED // 멀티 플레이어 서버 인풋을 넘겨받은걸로 적절한 playercontroller 한테 넘겨줘야한다.
-		for (const auto& playerController : m_PlayerControllers)
-		{
-			uint8_t id = playerController->GetNetworkId();
-			playerController->OnInputEvent(여기다가 데이터);
-		}
+
 #endif
 
 		AddPendingSpawnedActors();
@@ -237,7 +235,7 @@ namespace Crystal {
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		newActorMesh->SetRenderable(resourceManager.GetRenderable("Frigate"));
+		newActorMesh->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("Frigate"));
 		auto newActorMat = newActorMesh->GetMaterial(0);
 		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
 		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
@@ -250,9 +248,9 @@ namespace Crystal {
 
 		playerStartActor->Destroy();
 
-		auto playerController = SpawnActor<PlayerController>().lock();
+		/*auto playerController = SpawnActor<PlayerController>().lock();
 		playerController->SetNetworkId();
-		playerController->Possess(newActor);
+		playerController->Possess(newActor);*/
 
 
 #endif
@@ -347,8 +345,10 @@ namespace Crystal {
 #endif
 
 #ifdef CS_NM_CLIENT // 멀티 플레이어 클라이언트
-
+		return false;
 
 #endif
+
+		return false;
 	}
 }
