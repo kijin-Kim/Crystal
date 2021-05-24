@@ -24,7 +24,6 @@ namespace Crystal {
 		auto camera = scene->Cameras[0].lock();
 
 
-
 		PerFrameData perFrameData = {};
 
 		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
@@ -42,10 +41,6 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-
-		
-
-		
 		auto irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -54,7 +49,7 @@ namespace Crystal {
 		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)
 		{
 			auto component = scene->SkeletalMeshes[i].lock();
-			if(!component)
+			if (!component)
 				continue;
 
 			PerObjectData perObjectData = {};
@@ -63,7 +58,7 @@ namespace Crystal {
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
-			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones);			// TODO : 최적화 매우매우매우매우 비효율적
+			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : 최적화 매우매우매우매우 비효율적
 			m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData, 0, sizeof(perObjectData));
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_PerObjectConstantBuffers[i]->GetConstantBufferView();
@@ -73,7 +68,6 @@ namespace Crystal {
 			auto& materials = component->GetMaterials();
 			for (int j = 0; j < materials.size(); j++)
 			{
-				
 				PerDrawData perDrawData = {};
 
 				D3D12_CPU_DESCRIPTOR_HANDLE albedoTextureHandle = {}; // PerMaterial
@@ -81,46 +75,59 @@ namespace Crystal {
 				D3D12_CPU_DESCRIPTOR_HANDLE roughnessTextureHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
 
+				auto albedoTexture = materials[j]->AlbedoTexture.lock();
+				auto metallicTexture = materials[j]->MetallicTexture.lock();
+				auto roughnessTexture = materials[j]->RoughnessTexture.lock();
+				auto normalTexture = materials[j]->NormalTexture.lock();
+
+				if (albedoTexture)
 				{
 					perDrawData.bToggleAlbedoTexture = true;
-					albedoTextureHandle = materials[j]->AlbedoTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					albedoTextureHandle = albedoTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
+				else
 				{
 					perDrawData.AlbedoColor = materials[j]->AlbedoColor;
 				}
 
+				if(metallicTexture)
 				{
-					/*perDrawData.bToggleMetallicTexture = true;
-					metallicTextureHandle = materials[j]->MetallicTexture.lock()->GetShaderResourceView();*/
+					perDrawData.bToggleMetallicTexture = true;
+					metallicTextureHandle = materials[j]->MetallicTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
+				else
 				{
-					//perDrawData.bToggleMetallicTexture = false;
+					perDrawData.bToggleMetallicTexture = false;
 					perDrawData.MetallicConstant = materials[j]->MetallicConstant;
 				}
 
+				if(roughnessTexture)
 				{
 					perDrawData.bToggleRoughnessTexture = true;
-					roughnessTextureHandle = materials[j]->RoughnessTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					roughnessTextureHandle = roughnessTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
+				else
 				{
-				//	perDrawData.bToggleRoughnessTexture = false;
+					perDrawData.bToggleRoughnessTexture = false;
 					perDrawData.RoughnessConstant = materials[j]->RoughnessConstant;
 				}
 
+				if(normalTexture)
 				{
 					perDrawData.bToggleNormalTexture = true;
-					normalTextureHandle = materials[j]->NormalTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
+					normalTextureHandle = normalTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D);
 				}
+				else
 				{
-				//	perDrawData.bToggleNormalTexture = false;
+					perDrawData.bToggleNormalTexture = false;
 				}
-				
+
 
 				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBuffers[i * 5 + j]->SetData((void*)&perDrawData, 0, sizeof(perDrawData));
+				m_PerDrawConstantBuffers[i * 5 + j]->SetData(&perDrawData, 0, sizeof(perDrawData));
 				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetConstantBufferView(),
-					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (albedoTextureHandle.ptr)
@@ -137,10 +144,6 @@ namespace Crystal {
 				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			}
 		}
-
 	}
 
 }
-
-
-

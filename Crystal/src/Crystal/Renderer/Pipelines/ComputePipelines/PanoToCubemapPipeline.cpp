@@ -26,7 +26,7 @@ namespace Crystal {
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		device->CopyDescriptorsSimple(
 			1, handle,
-			resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr")->
+			resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr").lock()->
 			                   GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

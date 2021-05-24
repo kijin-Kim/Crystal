@@ -112,7 +112,9 @@ namespace Crystal {
 
 		
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
-		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
+
+		auto& scene = GetScene();
+		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
 		
 		m_Components.push_back(m_StaticMeshComponent);
 		

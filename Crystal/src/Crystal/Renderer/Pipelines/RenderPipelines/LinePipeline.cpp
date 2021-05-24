@@ -56,7 +56,7 @@ namespace Crystal {
 				
 			}
 
-			auto renderable = component->GetRenderable();
+			auto renderable = component->GetRenderable().lock();
 			if(!renderable)
 			{
 				continue;

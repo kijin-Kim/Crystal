@@ -70,11 +70,11 @@ namespace Crystal {
 				perInstanceData.RoughnessConstant = matRow->RoughnessConstant;
 				perInstanceData.MetallicConstant = matRow->MetallicConstant;
 
-				perInstanceData.bToggleAlbedoTexture = matRow->AlbedoTexture ? true : false;
-				perInstanceData.bToggleMetallicTexture = matRow->MetallicTexture ? true : false;
-				perInstanceData.bToggleRoughnessTexture = matRow->RoughnessTexture ? true : false;
-				perInstanceData.bToggleNormalTexture = matRow->NormalTexture ? true : false;
-				perInstanceData.bToggleEmissivetexture = matRow->EmissiveTexture ? true : false;
+				perInstanceData.bToggleAlbedoTexture = !matRow->AlbedoTexture.expired() ? true : false;
+				perInstanceData.bToggleMetallicTexture = !matRow->MetallicTexture.expired() ? true : false;
+				perInstanceData.bToggleRoughnessTexture = !matRow->RoughnessTexture.expired() ? true : false;
+				perInstanceData.bToggleNormalTexture = !matRow->NormalTexture.expired() ? true : false;
+				perInstanceData.bToggleEmissivetexture = !matRow->EmissiveTexture.expired() ? true : false;
 
 				perInstanceData.bToggleIrradianceTexture = true; // TEMP
 
@@ -116,10 +116,15 @@ namespace Crystal {
 				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 					* (5 * perInstanceData.MaterialIndex);
 
+
+				
+				
+
 				if (perInstanceData.bToggleAlbedoTexture)
 				{
+					auto albedoTexture = matRow->AlbedoTexture.lock();
 					device->CopyDescriptorsSimple(1, cpuHandle,
-					                              matRow->AlbedoTexture->GetShaderResourceView(
+					                              albedoTexture->GetShaderResourceView(
 						                              D3D12_SRV_DIMENSION_TEXTURE2D),
 					                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
@@ -127,8 +132,9 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleMetallicTexture)
 				{
+					auto metallicTexture = matRow->MetallicTexture.lock();
 					device->CopyDescriptorsSimple(1, cpuHandle,
-					                              matRow->MetallicTexture->GetShaderResourceView(
+					                              metallicTexture->GetShaderResourceView(
 						                              D3D12_SRV_DIMENSION_TEXTURE2D),
 					                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
@@ -136,8 +142,9 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleRoughnessTexture)
 				{
+					auto roughnessTexture = matRow->RoughnessTexture.lock();
 					device->CopyDescriptorsSimple(1, cpuHandle,
-					                              matRow->RoughnessTexture->GetShaderResourceView(
+					                              roughnessTexture->GetShaderResourceView(
 						                              D3D12_SRV_DIMENSION_TEXTURE2D),
 					                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
@@ -145,8 +152,9 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleNormalTexture)
 				{
+					auto normalTexture = matRow->NormalTexture.lock();
 					device->CopyDescriptorsSimple(1, cpuHandle,
-					                              matRow->NormalTexture->GetShaderResourceView(
+					                              normalTexture->GetShaderResourceView(
 						                              D3D12_SRV_DIMENSION_TEXTURE2D),
 					                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
@@ -154,8 +162,9 @@ namespace Crystal {
 
 				if (perInstanceData.bToggleEmissivetexture)
 				{
+					auto emissiveTexture = matRow->EmissiveTexture.lock();
 					device->CopyDescriptorsSimple(1, cpuHandle,
-					                              matRow->EmissiveTexture->GetShaderResourceView(
+					                              emissiveTexture->GetShaderResourceView(
 						                              D3D12_SRV_DIMENSION_TEXTURE2D),
 					                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}

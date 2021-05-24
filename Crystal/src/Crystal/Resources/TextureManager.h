@@ -24,9 +24,8 @@ namespace Crystal {
 		}
 
 
-	
 
 	private:
-		std::unordered_map<std::string, Weak<Texture>> m_Textures;
+		std::unordered_map<std::string, Shared<Texture>> m_Textures;
 	};
 }

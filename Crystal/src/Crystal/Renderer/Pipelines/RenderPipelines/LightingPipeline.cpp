@@ -123,7 +123,11 @@ namespace Crystal {
 
 
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
-		m_StaticMeshComponent->SetRenderable(CreateShared<PlaneQuad2D>());
+
+
+		auto& scene = GetScene();
+		
+		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
 
 		m_Components.push_back(m_StaticMeshComponent);
 	}
@@ -216,5 +220,8 @@ namespace Crystal {
 		                                    GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
+
+	
+
 
 }

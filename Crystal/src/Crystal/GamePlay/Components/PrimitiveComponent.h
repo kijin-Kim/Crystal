@@ -27,8 +27,10 @@ namespace Crystal {
 		{
 			TransformComponent::Update(deltaTime);
 
-			if (m_Renderable)
-				m_Renderable->Update(deltaTime);
+			if (auto renderable = m_Renderable.lock())
+			{
+				renderable->Update(deltaTime);
+			}
 		}
 
 		void AddMaterial(Shared<Material> material);
@@ -37,12 +39,12 @@ namespace Crystal {
 		
 
 
-		void SetRenderable(Shared<Renderable> renderable)
+		void SetRenderable(Weak<Renderable> renderable)
 		{
 			m_Renderable = renderable;
 		}
 
-		const Shared<Renderable>& GetRenderable() const { return m_Renderable; }
+		Weak<Renderable> GetRenderable() const { return m_Renderable; }
 
 
 		bool CanBeRendered() const override { return true; }
@@ -53,7 +55,7 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
-		Shared<Renderable> m_Renderable = nullptr;
+		Weak<Renderable> m_Renderable = {};
 
 		std::vector<Shared<Material>> m_Materials;
 

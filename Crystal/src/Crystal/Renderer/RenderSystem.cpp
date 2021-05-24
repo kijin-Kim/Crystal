@@ -31,18 +31,18 @@ namespace Crystal {
 
 		auto& resourceManager = ResourceManager::Instance();
 
-		auto pbrStaticShader = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl");
-		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl");
-		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl");
-		auto panoToCubemapShader = resourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl");
-		auto diffIrradianceShader = resourceManager.GetShader("assets/shaders/DiffuseIrradianceSampling.hlsl");
-		auto specularIrradianceShader = resourceManager.GetShader("assets/shaders/SpecularIrradianceSampling.hlsl");
-		auto simpleColorShader = resourceManager.GetShader("assets/shaders/SimpleColorShader.hlsl");
-		auto gaussianBlurShader = resourceManager.GetShader("assets/shaders/GaussianBlur.hlsl");
-		auto additiveBlendingHdrShader = resourceManager.GetShader("assets/shaders/AdditiveBlending.hlsl");
-		auto toneMappingShader = resourceManager.GetShader("assets/shaders/Tonemapping.hlsl");
-		auto lightingPassShader = resourceManager.GetShader("assets/shaders/LightingPass.hlsl");
-		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl");
+		auto pbrStaticShader = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
+		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl").lock();
+		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl").lock();
+		auto panoToCubemapShader = resourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl").lock();
+		auto diffIrradianceShader = resourceManager.GetShader("assets/shaders/DiffuseIrradianceSampling.hlsl").lock();
+		auto specularIrradianceShader = resourceManager.GetShader("assets/shaders/SpecularIrradianceSampling.hlsl").lock();
+		auto simpleColorShader = resourceManager.GetShader("assets/shaders/SimpleColorShader.hlsl").lock();
+		auto gaussianBlurShader = resourceManager.GetShader("assets/shaders/GaussianBlur.hlsl").lock();
+		auto additiveBlendingHdrShader = resourceManager.GetShader("assets/shaders/AdditiveBlending.hlsl").lock();
+		auto toneMappingShader = resourceManager.GetShader("assets/shaders/Tonemapping.hlsl").lock();
+		auto lightingPassShader = resourceManager.GetShader("assets/shaders/LightingPass.hlsl").lock();
+		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl").lock();
 
 
 		{
@@ -279,7 +279,7 @@ namespace Crystal {
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
 
-		scene->PanoramaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr");
+		scene->PanoramaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr").lock();
 
 		scene->CubemapTexture = CreateShared<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
