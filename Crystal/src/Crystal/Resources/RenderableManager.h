@@ -13,28 +13,23 @@ namespace Crystal {
 
 		
 		template <class T, class... Args>
-		Shared<Renderable> get(const std::string& fileName, Args ... args)
-		{
+		Weak<Renderable> get(const std::string& fileName, Args ... args)
+		{			
 			auto it = m_Meshes.find(fileName);
-
-			Shared<Renderable> returnValue = nullptr;
 			
-			if (it == m_Meshes.end() || it->second.expired())
+			if (it != m_Meshes.end())
 			{
-				returnValue = CreateShared<T>(fileName, std::forward<Args>(args)...);
-				m_Meshes[fileName] = returnValue;
-			}
-			else
-			{
-				returnValue = m_Meshes[fileName].lock();
+				return it->second;
 			}
 
-			return returnValue;
+			m_Meshes[fileName] = CreateShared<T>(fileName, std::forward<Args>(args)...);
+			return m_Meshes[fileName];
+
 		}
 
 	
 
 	private:
-		std::unordered_map<std::string, Weak<Renderable>> m_Meshes;
+		std::unordered_map<std::string, Shared<Renderable>> m_Meshes;
 	};
 }

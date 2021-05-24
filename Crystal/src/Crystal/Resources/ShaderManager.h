@@ -15,28 +15,22 @@ namespace Crystal {
 		~ShaderManager() = default;
 
 		
-		Shared<Shader> get(const std::string& fileName)
+		Weak<Shader> get(const std::string& fileName)
 		{
 			auto it = m_Shaders.find(fileName);
 
-			Shared<Shader> returnValue = nullptr;
-
-			if (it == m_Shaders.end() || it->second.expired())
+			if (it != m_Shaders.end())
 			{
-				returnValue = CreateShared<Shader>(fileName);
-				m_Shaders[fileName] = returnValue;
+				return it->second;
 			}
-			else
-			{
-				returnValue = m_Shaders[fileName].lock();
-			}
-
-			return returnValue;
+		
+			m_Shaders[fileName] = CreateShared<Shader>(fileName);
+			return m_Shaders[fileName];
 		}
 
 
 	private:
-		std::unordered_map<std::string, Weak<Shader>> m_Shaders;
+		std::unordered_map<std::string, Shared<Shader>> m_Shaders;
 	};
 
 }

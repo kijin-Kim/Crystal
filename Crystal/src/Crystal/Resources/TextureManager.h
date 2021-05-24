@@ -10,23 +10,17 @@ namespace Crystal {
 	public:
 		TextureManager() = default;
 		~TextureManager() = default;
-		Shared<Texture> get(const std::string& fileName)
+		Weak<Texture> get(const std::string& fileName)
 		{
 			auto it = m_Textures.find(fileName);
 
-			Shared<Texture> returnValue = nullptr;
-
-			if (it == m_Textures.end() || it->second.expired())
+			if (it != m_Textures.end())
 			{
-				returnValue = CreateShared<Texture>(fileName);
-				m_Textures[fileName] = returnValue;
+				it->second;
 			}
-			else
-			{
-				returnValue = m_Textures[fileName].lock();
-			}
-
-			return returnValue;
+			
+			m_Textures[fileName] = CreateShared<Texture>(fileName);
+			return m_Textures[fileName];
 		}
 
 

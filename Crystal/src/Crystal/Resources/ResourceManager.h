@@ -18,21 +18,21 @@ namespace Crystal {
 			return instance;
 		}
 
-		Shared<Shader> GetShader(const std::string& fileName)
+		Weak<Shader> GetShader(const std::string& fileName)
 		{
 			if (!m_ShaderManager)
 			{
-				return nullptr;
+				return {};
 			}
 
 			return m_ShaderManager->get(fileName);
 		}
 
-		Shared<Texture> GetTexture(const std::string& fileName)
+		Weak<Texture> GetTexture(const std::string& fileName)
 		{
 			if (!m_TextureManager)
 			{
-				return nullptr;
+				return {};
 			}
 
 			return m_TextureManager->get(fileName);
@@ -40,11 +40,11 @@ namespace Crystal {
 
 
 		template <class T, class... Args>
-		Shared<Renderable> GetRenderable(const std::string& fileName, Args ... args)
+		Weak<Renderable> GetRenderable(const std::string& fileName, Args ... args)
 		{
 			if (!m_RenderableManager)
 			{
-				return nullptr;
+				return {};
 			}
 
 			return m_RenderableManager->get<T>(fileName, std::forward<Args>(args)...);
