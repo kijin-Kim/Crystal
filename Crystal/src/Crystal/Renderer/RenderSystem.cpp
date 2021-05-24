@@ -109,7 +109,7 @@ namespace Crystal {
 
 			RootParameter perFrame = {1, 1, 0};
 			RootParameter perObject = {0, 0, 0};
-			RootParameter perExecute = {0, 50, 0};
+			RootParameter perExecute = {0, 5, 0};
 
 			pbrStaticShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
 			pbrStaticShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);

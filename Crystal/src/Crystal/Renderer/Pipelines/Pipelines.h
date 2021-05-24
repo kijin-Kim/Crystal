@@ -36,6 +36,8 @@ namespace Crystal {
 		const Shared<Scene>& GetScene();
 
 		STATIC_TYPE_IMPLE(Pipeline)
+
+	
 	protected:
 		std::vector<std::weak_ptr<PrimitiveComponent>> m_Components;
 
@@ -64,6 +66,7 @@ namespace Crystal {
 
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
+
 
 		STATIC_TYPE_IMPLE(RenderPipeline)
 

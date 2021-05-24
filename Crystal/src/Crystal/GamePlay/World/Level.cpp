@@ -21,10 +21,8 @@ namespace Crystal {
 
 		m_Scene = CreateShared<Scene>();
 
-
 #if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
-
-		
+	
 		m_RenderSystem = CreateShared<RenderSystem>();
 		m_RenderSystem->Initialize();
 		m_RenderSystem->SetOuter(weak_from_this());

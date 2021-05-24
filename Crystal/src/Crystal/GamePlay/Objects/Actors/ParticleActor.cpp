@@ -9,9 +9,9 @@ namespace Crystal {
 	{
 		Actor::Initialize();
 
-		auto particleComponent = CreateComponent<ParticleComponent>("DebugLineComponent");
+		auto particleComponent = CreateComponent<ParticleComponent>("ParticleComponent");
 
-		auto particleMaterial = std::make_unique<Crystal::Material>();
+		auto particleMaterial = CreateShared<Crystal::Material>();
 		particleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_Undefined;
 
 		particleComponent->AddMaterial(std::move(particleMaterial));

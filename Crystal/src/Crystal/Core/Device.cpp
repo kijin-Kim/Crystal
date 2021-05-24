@@ -23,6 +23,11 @@ namespace Crystal {
 		}
 	}
 
+	UINT Device::GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE type)
+	{
+		return m_IncrementSizes[type];
+	}
+
 	Device::Device()
 	{
 		HRESULT hr = E_FAIL;
@@ -66,7 +71,7 @@ namespace Crystal {
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
 			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
 
-			D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
+			D3D12_MESSAGE_SEVERITY severities[] = {D3D12_MESSAGE_SEVERITY_INFO};
 
 			D3D12_MESSAGE_ID denyIDs[] = {
 				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
@@ -93,8 +98,11 @@ namespace Crystal {
 				= std::make_unique<DescriptorAllocator>(static_cast<D3D12_DESCRIPTOR_HEAP_TYPE>(i));
 		}
 
+
+		for (int i = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; i++)
+		{
+			m_IncrementSizes[i] = m_Device->GetDescriptorHandleIncrementSize(static_cast<D3D12_DESCRIPTOR_HEAP_TYPE>(i));
+		}
 	}
-	
+
 }
-
-

@@ -34,7 +34,6 @@ namespace Crystal {
 		struct PerInstanceData
 		{
 			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
-			uint32_t MaterialIndex = 0;
 			DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
 			DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 			float RoughnessConstant = 0.0f;
@@ -60,6 +59,8 @@ namespace Crystal {
 		GeometryStaticPipeline() = default;
 		~GeometryStaticPipeline() override = default;
 
+
+		void OnCreate() override;
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 		void End() override;
@@ -67,6 +68,8 @@ namespace Crystal {
 	private:
 		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
 
+
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 	};
 }

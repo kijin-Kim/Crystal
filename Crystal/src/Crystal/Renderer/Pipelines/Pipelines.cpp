@@ -17,8 +17,6 @@ namespace Crystal {
 
 	void Pipeline::Begin()
 	{
-		/*CommandList를 녹화합니다*/
-		//CS_DEBUG_INFO("Pipeline : %s Record", m_Name.c_str());
 	}
 
 

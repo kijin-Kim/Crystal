@@ -31,6 +31,8 @@ namespace Crystal {
 		DescriptorAllocation AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t descriptorCount);
 		void ReleaseStaleDescriptors();
 
+		UINT GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE type);
+
 
 	private:
 		Device();
@@ -47,5 +49,9 @@ namespace Crystal {
 		std::unique_ptr<DescriptorAllocator> m_DescriptorAllocators[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
 		HANDLE m_FenceEvent;
+
+
+		UINT m_IncrementSizes[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+		
 	};
 }
