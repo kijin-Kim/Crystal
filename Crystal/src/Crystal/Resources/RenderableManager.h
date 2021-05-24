@@ -32,22 +32,7 @@ namespace Crystal {
 			return returnValue;
 		}
 
-		void RemoveGarbage()
-		{
-			for (auto it = m_Meshes.begin(); it != m_Meshes.end();)
-			{
-				if (it->second.expired())
-				{
-					it = m_Meshes.erase(it);
-				}
-				else
-				{
-					++it;
-				}
-
-			}
-		}
-		
+	
 
 	private:
 		std::unordered_map<std::string, Weak<Renderable>> m_Meshes;

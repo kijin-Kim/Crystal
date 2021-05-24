@@ -129,6 +129,9 @@ public:
 		m_World->GetCurrentLevel()->OnClientConnect();
 
 
+		m_World->SpawnActor<Crystal::ParticleActor>({ "" });
+
+
 #endif
 
 #ifdef CS_NM_CLIENT

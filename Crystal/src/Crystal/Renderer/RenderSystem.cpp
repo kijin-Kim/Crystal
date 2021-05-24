@@ -574,7 +574,6 @@ namespace Crystal {
 		{
 			m_CleanUpTimer.Reset();
 
-			ResourceManager::Instance().RemoveGarbage();
 			scene->RemoveGarbage();
 			CS_DEBUG_INFO("Garbage Removed");
 		}

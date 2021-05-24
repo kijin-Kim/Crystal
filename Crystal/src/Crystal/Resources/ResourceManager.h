@@ -50,25 +50,6 @@ namespace Crystal {
 			return m_RenderableManager->get<T>(fileName, std::forward<Args>(args)...);
 		}
 
-
-		void RemoveGarbage()
-		{
-			if (m_ShaderManager)
-			{
-				m_ShaderManager->RemoveGarbage();
-			}
-
-			if (m_TextureManager)
-			{
-				m_TextureManager->RemoveGarbage();
-			}
-
-			if (m_RenderableManager)
-			{
-				m_RenderableManager->RemoveGarbage();
-			}
-		}
-
 	private:
 		ResourceManager()
 		{
@@ -86,5 +67,6 @@ namespace Crystal {
 		Unique<TextureManager> m_TextureManager = nullptr;
 		Unique<RenderableManager> m_RenderableManager = nullptr;
 	};
+
 
 }

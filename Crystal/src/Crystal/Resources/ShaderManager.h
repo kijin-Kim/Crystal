@@ -34,21 +34,6 @@ namespace Crystal {
 			return returnValue;
 		}
 
-		void RemoveGarbage()
-		{
-			for(auto it = m_Shaders.begin(); it != m_Shaders.end();)
-			{
-				if(it->second.expired())
-				{
-					it = m_Shaders.erase(it);
-				}
-				else
-				{
-					++it;
-				}
-					
-			}
-		}
 
 	private:
 		std::unordered_map<std::string, Weak<Shader>> m_Shaders;

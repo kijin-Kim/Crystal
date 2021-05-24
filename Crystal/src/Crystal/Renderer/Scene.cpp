@@ -6,7 +6,6 @@
 
 namespace Crystal {
 
-
 	void Scene::SetMainCamera(const Shared<CameraComponent>& camera)
 	{
 		auto it = std::find_if(Cameras.begin(), Cameras.end(), [&camera](const Weak<CameraComponent>& other)-> bool
