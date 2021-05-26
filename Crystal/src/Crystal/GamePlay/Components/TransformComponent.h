@@ -27,12 +27,15 @@ namespace Crystal {
 			ar & m_Right;
 			ar & m_Up;
 			ar & m_Forward;
+
+			ar& m_ForceAccum;
 		}
 
 	public:
 		TransformComponent() = default;
 		~TransformComponent() override = default;
 
+		void UpdateTransformByForce(float deltaTime);
 		void Update(float deltaTime) override;
 		void UpdateTransformHierarchy();
 
@@ -82,6 +85,8 @@ namespace Crystal {
 		bool CanBeRendered() const override;
 		bool IsCollisionEnabled() const override;
 
+		void AddForce(const DirectX::XMFLOAT3& force) { m_ForceAccum = Vector3::Add(m_ForceAccum, force); }
+
 		STATIC_TYPE_IMPLE(TransformComponent)
 
 	protected:
@@ -103,6 +108,9 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;
 		DirectX::XMFLOAT3 m_Up = Vector3::UnitY;
 		DirectX::XMFLOAT3 m_Forward = Vector3::UnitZ;
+
+		
+		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 
 
 	};

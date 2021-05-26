@@ -16,15 +16,12 @@ struct VS_INPUT
     float4 MatRow2 : MATROW2;
     float4 MatRow3 : MATROW3;
 
-    float3 Color : COLOR;
 };
 
 struct PS_INPUT
 {
     float4 Position : SV_Position;
     float2 TexCoord : TEXCOORD;
-
-    nointerpolation float3 Color : COLOR;
 };
 
 
@@ -54,19 +51,22 @@ PS_INPUT vsMain(VS_INPUT input)
 	output.TexCoord.y = -output.TexCoord.y;
 
     
-    output.Color = input.Color;
 
     return output;
 }
 
 
 SamplerState DefualtSampler : register(s0);
-#define MAX_PER_INSTANCE_TEXTURE_COUNT 10
-Texture2D Textures[MAX_PER_INSTANCE_TEXTURE_COUNT][1] : register(t0);
+Texture2D Texture : register(t0);
 
 float4 psMain(PS_INPUT input) : SV_Target
 {
-    float3 color = Textures[0][0].Sample(DefualtSampler, input.TexCoord).rgb;
-    return float4(color, 1.0f);
+    float4 color = Texture.Sample(DefualtSampler, input.TexCoord);
+    if(color.a == 0.0f)
+    {
+        discard;
+    }
+
+    return float4(color.rgb, 1.0f);
 }
 

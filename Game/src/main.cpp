@@ -59,7 +59,7 @@ public:
 			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};
 		}
 
-
+		if(false)
 		{
 			for (int i = 0; i < 1; i++)
 			{
@@ -89,6 +89,7 @@ public:
 			}
 		}
 
+		if(false)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			auto meshComponent = Crystal::Cast<Crystal::SkeletalMeshComponent>(
@@ -129,7 +130,8 @@ public:
 		m_World->GetCurrentLevel()->OnClientConnect();
 
 
-		m_World->SpawnActor<Crystal::ParticleActor>({ "" });
+		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({ "" }).lock();
+		
 
 
 #endif

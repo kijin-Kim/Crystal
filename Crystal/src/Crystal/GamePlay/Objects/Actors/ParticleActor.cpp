@@ -1,6 +1,8 @@
 ﻿#include "cspch.h"
 #include "ParticleActor.h"
 
+#include "Crystal/Resources/ResourceManager.h"
+
 BOOST_CLASS_EXPORT(Crystal::ParticleActor)
 
 namespace Crystal {
@@ -13,6 +15,7 @@ namespace Crystal {
 
 		auto particleMaterial = CreateShared<Crystal::Material>();
 		particleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_Undefined;
+		particleMaterial->AlbedoTexture = ResourceManager::Instance().GetTexture("assets/textures/DefaultParticle.tga");
 
 		particleComponent->AddMaterial(std::move(particleMaterial));
 		particleComponent->SetLocalPosition({0.0f, 300.0f, 0.0f});

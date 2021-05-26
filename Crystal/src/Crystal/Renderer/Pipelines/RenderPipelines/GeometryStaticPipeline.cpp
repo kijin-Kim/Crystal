@@ -9,11 +9,8 @@
 
 namespace Crystal {
 
-
 	void GeometryStaticPipeline::OnCreate()
 	{
-		Pipeline::OnCreate();
-
 		auto device = Device::Instance().GetD3DDevice();
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};

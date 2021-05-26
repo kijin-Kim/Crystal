@@ -46,29 +46,6 @@ namespace Crystal {
 
 		void RegisterComponent() override;
 
-		void Update(const float deltaTime) override
-		{
-			auto position = GetLocalPosition();
-			auto velocity = GetVelocity();
-
-			position = Vector3::Add(position, Vector3::Multiply(velocity, deltaTime));
-			SetLocalPosition(position);
-
-			float inverseMass = GetInverseMass();
-			auto accelertion = Vector3::Multiply(m_ForceAccum, inverseMass);
-
-			velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
-
-			// Drag
-			const float damping = 0.3f;
-			velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
-			SetVelocity(velocity);
-
-			m_ForceAccum = Vector3::Zero;
-
-			PrimitiveComponent::Update(deltaTime);
-		}
-
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
 		void SetCollisionEnabled(bool bEnable) { m_bCollisionEnabled = bEnable; }

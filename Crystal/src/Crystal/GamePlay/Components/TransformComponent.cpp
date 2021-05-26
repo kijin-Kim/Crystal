@@ -4,9 +4,32 @@
 BOOST_CLASS_EXPORT(Crystal::TransformComponent)
 
 namespace Crystal {
+	void TransformComponent::UpdateTransformByForce(float deltaTime)
+	{
+		auto position = GetLocalPosition();
+		auto velocity = GetVelocity();
+
+		position = Vector3::Add(position, Vector3::Multiply(velocity, deltaTime));
+		SetLocalPosition(position);
+
+		float inverseMass = GetInverseMass();
+		auto accelertion = Vector3::Multiply(m_ForceAccum, inverseMass);
+
+		velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
+
+		// Drag
+		const float damping = 0.3f;
+		velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
+		SetVelocity(velocity);
+
+		m_ForceAccum = Vector3::Zero;
+	}
+
 	void TransformComponent::Update(float deltaTime)
 	{
 		Component::Update(deltaTime);
+
+		UpdateTransformByForce(deltaTime);
 
 		const auto position = GetLocalPosition();
 		const auto scale = Matrix4x4::Scale({m_Scale, m_Scale, m_Scale});

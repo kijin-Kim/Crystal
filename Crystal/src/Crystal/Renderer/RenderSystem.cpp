@@ -443,7 +443,8 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
-
+		
+	
 		m_LightPipelines[0]->Begin();
 		m_LightPipelines[0]->Record(commandList);
 
@@ -464,6 +465,10 @@ namespace Crystal {
 		m_LightPipelines[1]->Begin();
 		m_LightPipelines[1]->Record(commandList);
 
+		m_Pipelines[7]->Begin();
+		m_Pipelines[7]->Record(commandList);
+		
+
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -474,8 +479,7 @@ namespace Crystal {
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		m_Pipelines[7]->Begin();
-		m_Pipelines[7]->Record(commandList);
+
 
 
 		m_Pipelines[1]->Begin();

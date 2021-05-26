@@ -6,9 +6,9 @@ RWTexture2D<float4> OutputTexture : register(u0);
 void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
 {  
 
-    float3 finalColor = OutputTexture[dispatchThreadID.xy];
+    float4 finalColor = OutputTexture[dispatchThreadID.xy];
     finalColor += SourceTexture1[dispatchThreadID.xy];
    
 
-    OutputTexture[dispatchThreadID.xy] = float4(finalColor, 1.0f);
+    OutputTexture[dispatchThreadID.xy] = finalColor;
 }

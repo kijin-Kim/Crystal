@@ -13,7 +13,6 @@ namespace Crystal {
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<TransformComponent>(*this);
-			ar & m_ForceAccum;
 		}
 
 	public:
@@ -50,16 +49,12 @@ namespace Crystal {
 		bool CanBeRendered() const override { return true; }
 		bool IsCollisionEnabled() const override { return false; }
 
-		void AddForce(const DirectX::XMFLOAT3& force) { m_ForceAccum = Vector3::Add(m_ForceAccum, force); }
-
-
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
 		Weak<Renderable> m_Renderable = {};
 
 		std::vector<Shared<Material>> m_Materials;
 
-		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 
 	};
 }
