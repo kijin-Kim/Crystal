@@ -24,8 +24,6 @@ namespace Crystal {
 
 			float LifeTime = 0.0f;
 			
-			Timer LifeTimeTimer = {};
-
 			Particle() = default;
 			~Particle() = default;
 			Particle(const Particle&) = default;
@@ -40,14 +38,19 @@ namespace Crystal {
 
 		void Update(float deltaTime) override;
 
+		void SpawnNewParticle();
+
 
 		std::vector<Particle>& GetParticles() { return m_Particles; }
 
 		STATIC_TYPE_IMPLE(ParticleComponent)
 
 	private:
+		float m_InitScale = 100.0f;
+		DirectX::XMFLOAT3 m_InitPosition = Vector3::Zero;
+		DirectX::XMFLOAT3 m_InitVelocity = Vector3::Zero;
+
 		
-		Timer m_ParticleSpawnTimer = {};
 		std::vector<Particle> m_Particles;
 	};
 }

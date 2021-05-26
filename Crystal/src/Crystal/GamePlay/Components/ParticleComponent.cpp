@@ -11,6 +11,8 @@ namespace Crystal {
 
 	ParticleComponent::ParticleComponent()
 	{
+
+		m_InitVelocity = {0.0f, 100.0f, 0.0f};
 	}
 
 	void ParticleComponent::RegisterComponent()
@@ -30,9 +32,10 @@ namespace Crystal {
 	{
 		PrimitiveComponent::Update(deltaTime);
 
+		TimerManager::Instance().SetTimer("ParticleSpawnTimer", CS_TIMER_FN(ParticleComponent::SpawnNewParticle), 3.0f, true);
 		
 		
-		
+	
 		
 		for(auto& particle : m_Particles)
 		{			
@@ -46,5 +49,16 @@ namespace Crystal {
 		}*/
 		
 	}
+
+	void ParticleComponent::SpawnNewParticle()
+	{
+		Particle newParticle = {};
+		newParticle.Position = m_InitPosition;
+		newParticle.Scale = m_InitScale;
+		newParticle.Velocity = m_InitVelocity;
+		
+		m_Particles.push_back(newParticle);
+	}
+	
 }
 
