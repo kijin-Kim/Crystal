@@ -24,6 +24,8 @@ namespace Crystal {
 		m_World->SetObjectName("DefaultWorld");
 		m_World->CreateNewLevel("DefaultLevel");
 		m_World->SetCurrentLevelByName("DefaultLevel");
+
+		m_MainTimer = TimerManager::Instance().SetTimer("MainGameUpdate", CS_TIMER_FN(Application::Update), 0.0f, true);
 	}
 
 	void Application::Run()
@@ -45,8 +47,13 @@ namespace Crystal {
 				if (msgCount >= maxMessageCount)
 					break;
 			}
-			Update();
+			TimerManager::Instance().Update();
 		}
+	}
+
+	void Application::Update()
+	{		
+		m_World->Update(m_MainTimer->GetDeltaSeconds());
 	}
 
 	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

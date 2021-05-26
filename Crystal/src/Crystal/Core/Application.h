@@ -26,7 +26,7 @@ namespace Crystal {
 
 		void Run();
 
-		virtual void Update() {}
+		virtual void Update();
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -38,6 +38,8 @@ namespace Crystal {
 		bool m_bShouldRun = true;
 		std::unique_ptr<WindowsWindow> m_Window;
 		std::shared_ptr<World> m_World;
+
+		Shared<Timer> m_MainTimer = nullptr;
 	};
 
 	Application* CreateApplication();

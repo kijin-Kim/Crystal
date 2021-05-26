@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "PrimitiveComponent.h"
+#include "Crystal/Core/Timer.h"
 
 
 namespace Crystal {
@@ -20,6 +21,10 @@ namespace Crystal {
 			DirectX::XMFLOAT3 Velocity = Vector3::Zero;
 			float Scale = 100.0f;
 			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
+
+			float LifeTime = 0.0f;
+			
+			Timer LifeTimeTimer = {};
 
 			Particle() = default;
 			~Particle() = default;
@@ -42,7 +47,7 @@ namespace Crystal {
 
 	private:
 		
-
+		Timer m_ParticleSpawnTimer = {};
 		std::vector<Particle> m_Particles;
 	};
 }

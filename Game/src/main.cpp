@@ -140,15 +140,6 @@ public:
 
 #endif
 	}
-
-	void Update() override
-	{
-		m_MainTimer.Tick();
-		m_World->Update(m_MainTimer.GetDeltaSeconds());
-	}
-
-private:
-	Crystal::Timer m_MainTimer;
 };
 
 #define WINDOW_WIDTH 1920
