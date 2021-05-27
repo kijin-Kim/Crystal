@@ -1,6 +1,9 @@
 ﻿#include "cspch.h"
 #include "ParticleComponent.h"
 
+#include <random>
+
+
 #include "Crystal/GamePlay/World/Level.h"
 
 BOOST_CLASS_EXPORT(Crystal::ParticleComponent)
@@ -8,11 +11,14 @@ BOOST_CLASS_EXPORT(Crystal::ParticleComponent)
 
 namespace Crystal {
 
-
 	ParticleComponent::ParticleComponent()
 	{
 
-		m_InitVelocity = {0.0f, 100.0f, 0.0f};
+
+	}
+
+	ParticleComponent::~ParticleComponent()
+	{
 	}
 
 	void ParticleComponent::RegisterComponent()
@@ -32,33 +38,41 @@ namespace Crystal {
 	{
 		PrimitiveComponent::Update(deltaTime);
 
-		TimerManager::Instance().SetTimer("ParticleSpawnTimer", CS_TIMER_FN(ParticleComponent::SpawnNewParticle), 3.0f, true);
-		
+
+		SpawnNewParticle();
 		
 	
-		
-		for(auto& particle : m_Particles)
-		{			
-			particle.Position = Vector3::Add(particle.Position, Vector3::Multiply(particle.Velocity, deltaTime));
-			particle.World = Matrix4x4::Multiply(Matrix4x4::Scale(particle.Scale), Matrix4x4::Translation(particle.Position));
+		for (auto& particle : m_Particles)
+		{
+			particle.Update(deltaTime);
 		}
 
-		/*for(auto it = m_Particles.begin(); it!= m_Particles.end();)
+		for (auto it = m_Particles.begin(); it != m_Particles.end();)
 		{
-			
-		}*/
-		
+			if (it->bIsDead)
+			{
+				it = m_Particles.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
 
 	void ParticleComponent::SpawnNewParticle()
 	{
-		Particle newParticle = {};
-		newParticle.Position = m_InitPosition;
-		newParticle.Scale = m_InitScale;
-		newParticle.Velocity = m_InitVelocity;
-		
-		m_Particles.push_back(newParticle);
-	}
-	
-}
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<> disxz(-100.0f, 100.0f);
 
+		std::uniform_real_distribution<> disy(500.0f, 1000.0f);
+
+		if (m_Particles.size() <= m_ParticleSpawnCount)
+		{
+			DirectX::XMFLOAT3 velocity = { (float)disxz(gen), (float)disy(gen), (float)disxz(gen) };
+			m_Particles.emplace_back(m_InitPosition, velocity, m_InitScale, m_InitLifeTime);
+		}
+	}
+
+}

@@ -165,10 +165,10 @@ namespace Crystal {
 				continue;
 			}
 
-			auto particles = particleComponent->GetParticles();
+			auto& particles = particleComponent->GetParticles();
 
 
-			for(auto particle : particles)
+			for(auto& particle : particles)
 			{
 				PerInstanceData perInstanceData = {};
 				perInstanceData.World = particle.World;

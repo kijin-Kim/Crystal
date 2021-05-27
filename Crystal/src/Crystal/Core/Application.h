@@ -17,7 +17,7 @@ namespace Crystal {
 	{
 	public:
 		Application(int width, int height);
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		virtual void Start()
 		{
@@ -39,7 +39,8 @@ namespace Crystal {
 		std::unique_ptr<WindowsWindow> m_Window;
 		std::shared_ptr<World> m_World;
 
-		Shared<Timer> m_MainTimer = nullptr;
+		
+		Timer m_Timer = {};
 	};
 
 	Application* CreateApplication();

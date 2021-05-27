@@ -34,9 +34,6 @@ namespace Crystal {
 		}
 
 		m_ElapsedTime += m_DeltaTime;
-
-		HandleCallback();
-
 	}
 
 	void Timer::Reset()
@@ -44,25 +41,7 @@ namespace Crystal {
 		m_ElapsedTime = 0.0f;
 	}
 
-	void Timer::HandleCallback()
-	{
-		
-		if (m_ElapsedTime >= m_Rate)
-		{
-			Reset();
-			
-			if(m_Callback)
-			{
-				m_Callback();
-			}
-
-			if(!m_bShouldLoop)
-			{
-				Pause();
-			}
-		}
-	}
-
+	
 	void Timer::Pause()
 	{
 		m_bIsStopped = true;
@@ -72,4 +51,5 @@ namespace Crystal {
 	{
 		m_bIsStopped = false;
 	}
+
 }
