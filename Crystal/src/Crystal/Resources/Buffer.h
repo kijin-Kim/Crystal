@@ -19,7 +19,7 @@ namespace Crystal {
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const;
 
-		void CreateConstantBuffer();
+		void CreateConstantBufferView();
 
 
 		uint32_t GetElementCount() const;

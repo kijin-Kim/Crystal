@@ -34,10 +34,12 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
+			CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendDesc;
 		} pipelineStateStream;
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
+			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1},
 			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
 		};
 
@@ -49,6 +51,15 @@ namespace Crystal {
 		CD3DX12_STATIC_SAMPLER_DESC staticSamplers[] = {
 			CD3DX12_STATIC_SAMPLER_DESC(0)
 		};
+
+		CD3DX12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(CD3DX12_DEFAULT());
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_COLOR;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+
+
+		pipelineStateStream.BlendDesc = blendDesc;
 
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
@@ -69,12 +80,12 @@ namespace Crystal {
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 
 			{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"SUBUV_INDEX", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 		};
 
 
@@ -122,9 +133,7 @@ namespace Crystal {
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
-		
-		
-			
+
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
@@ -132,6 +141,8 @@ namespace Crystal {
 
 
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
+		m_PerDrawCallConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
+		m_PerDrawCallConstantBuffer->CreateConstantBufferView();
 	}
 
 	void UnlitPipeline::Begin()
@@ -156,7 +167,7 @@ namespace Crystal {
 
 		m_InstanceBatches.clear();
 
-		
+
 		for (auto& p : scene->Particles)
 		{
 			auto particleComponent = p.lock();
@@ -168,10 +179,13 @@ namespace Crystal {
 			auto& particles = particleComponent->GetParticles();
 
 
-			for(auto& particle : particles)
+			for (auto& particle : particles)
 			{
 				PerInstanceData perInstanceData = {};
 				perInstanceData.World = particle.World;
+				perInstanceData.SubUVIndex = particle.SubImageIndex;
+
+				
 
 
 				// 같은 텍스쳐를 쓰면 ㅂ묶을 수 있음
@@ -179,6 +193,13 @@ namespace Crystal {
 				auto& materials = particleComponent->GetMaterials();
 				for (auto& mat : materials)
 				{
+					PerDrawCallData perDrawCallData = {};
+					perDrawCallData.HorizontalSubImageCount = 6;
+					perDrawCallData.VerticalSubImageCount = 6;
+
+					m_PerDrawCallConstantBuffer->SetData(&perDrawCallData, 0, sizeof(perDrawCallData));
+
+
 					auto texture = mat->AlbedoTexture.lock();
 					if (!texture)
 					{
@@ -194,22 +215,24 @@ namespace Crystal {
 						continue;
 					}
 
-					auto result = m_InstanceBatches.insert({ texture.get(), InstanceBatch() });
+					auto result = m_InstanceBatches.insert({texture.get(), InstanceBatch()});
 					auto& newInstanceBatch = result.first->second;
 
-					newInstanceBatch.TextureOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+					newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 
+
+					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->GetConstantBufferView(),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					// 텍스쳐를 Heap에 Copy
 					d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 					newInstanceBatch.PerInstanceDatas.push_back(perInstanceData);
 				}
 			}
-
-			
 		}
 
 		m_DrawDatas.clear();
@@ -219,7 +242,7 @@ namespace Crystal {
 			DrawData drawData = {};
 
 			drawData.InstanceCount = batch.second.InstanceCount;
-			drawData.TextureOffset = batch.second.TextureOffset;
+			drawData.DescriptorHeapOffset = batch.second.DescriptorHeapOffset;
 
 			drawData.InstanceVertexBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size(),
 			                                                     batch.second.PerInstanceDatas.size(), false, true);
@@ -227,7 +250,6 @@ namespace Crystal {
 
 			m_DrawDatas.push_back(std::move(drawData));
 		}
-
 	}
 
 	void UnlitPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
@@ -250,7 +272,7 @@ namespace Crystal {
 		for (const auto& drawData : m_DrawDatas)
 		{
 			D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-			descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * drawData.TextureOffset;
+			descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * drawData.DescriptorHeapOffset;
 			commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapHandle);
 
 

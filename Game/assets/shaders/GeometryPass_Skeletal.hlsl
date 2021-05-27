@@ -112,7 +112,6 @@ PS_INPUT vsMain(VS_INPUT input)
 
 TextureCube IrradianceTexture : register(t0);
 Texture2D Textures[MAX_PER_INSTANCE_TEXTURE_COUNT][5] : register(t1);
-StructuredBuffer<float4x4> Bones[300 * 100];
 SamplerState DefaultSampler : register(s0);
 
 

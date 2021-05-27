@@ -99,7 +99,7 @@ namespace Crystal {
 		return m_Resource->GetGPUVirtualAddress();
 	}
 
-	void Buffer::CreateConstantBuffer()
+	void Buffer::CreateConstantBufferView()
 	{
 		if (!m_ConstantBufferView.IsNull())
 		{

@@ -26,7 +26,7 @@ namespace Crystal {
 		if (perFrameBufferSize && !m_PerFrameConstantBuffer)
 		{
 			m_PerFrameConstantBuffer = std::make_unique<Buffer>(nullptr, perFrameBufferSize, 0, true, true);
-			m_PerFrameConstantBuffer->CreateConstantBuffer();
+			m_PerFrameConstantBuffer->CreateConstantBufferView();
 		}
 
 
@@ -38,7 +38,7 @@ namespace Crystal {
 				for (int i = 0; i < newRequireBufferCount; i++)
 				{
 					auto buffer = std::make_unique<Buffer>(nullptr, perObjectBufferSize, 0, true, true);
-					buffer->CreateConstantBuffer();
+					buffer->CreateConstantBufferView();
 					m_PerObjectConstantBuffers.push_back(std::move(buffer));
 
 					if (perDrawBufferSize)
@@ -46,7 +46,7 @@ namespace Crystal {
 						for (int j = 0; j < perDrawBufferCount; j++)
 						{
 							auto buffer = std::make_unique<Buffer>(nullptr, perDrawBufferSize, 0, true, true);
-							buffer->CreateConstantBuffer();
+							buffer->CreateConstantBufferView();
 							m_PerDrawConstantBuffers.push_back(std::move(buffer));
 						}
 					}

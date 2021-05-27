@@ -33,15 +33,24 @@ namespace Crystal {
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
+		struct PerDrawCallData
+		{
+			uint32_t HorizontalSubImageCount = 0;
+			uint32_t VerticalSubImageCount = 0;
+		};
+		
+
 		struct PerInstanceData
 		{
 			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
+			uint32_t SubUVIndex = 0;
 		};
+
 
 		struct InstanceBatch
 		{		
 			uint64_t InstanceCount = 1;
-			uint64_t TextureOffset = 0;
+			uint64_t DescriptorHeapOffset = 0;
 			std::vector<PerInstanceData> PerInstanceDatas;
 			
 		};
@@ -49,7 +58,7 @@ namespace Crystal {
 		struct DrawData
 		{
 			uint64_t InstanceCount = 1;
-			uint64_t TextureOffset = 0;
+			uint64_t DescriptorHeapOffset = 0;
 			Unique<Buffer> InstanceVertexBuffer = nullptr;
 		};
 		
@@ -58,6 +67,7 @@ namespace Crystal {
 
 
 		Unique<Buffer> m_PerFrameConstantBuffer = nullptr;
+		Unique<Buffer> m_PerDrawCallConstantBuffer = nullptr;
 		
 	};
 	

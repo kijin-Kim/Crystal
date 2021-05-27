@@ -58,6 +58,9 @@ namespace Crystal {
 			bool bIsDead = false;
 
 			Timer LifeTimeTimer = {};
+
+			uint32_t SubImageIndex = 0;
+			float subImageIndexCounter = 0.0f;
 		
 		};
 
@@ -78,10 +81,11 @@ namespace Crystal {
 
 	private:
 		float m_InitScale = 100.0f;
-		DirectX::XMFLOAT3 m_InitPosition = Vector3::Zero;
 		DirectX::XMFLOAT3 m_InitVelocity = { 0.0f, 500.0f, 0.0f };
 		float m_InitLifeTime = 1.0f;
-		uint64_t m_ParticleSpawnCount = 100;
+		uint64_t m_ParticleSpawnCount = 1;
+		uint32_t m_HorizontalSubImageCount = 0;
+		uint32_t m_VerticalSubImageCount = 0;
 		
 		std::vector<Particle> m_Particles;
 

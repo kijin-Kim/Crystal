@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include <random>
 
 namespace Crystal {
 	namespace Vector3
@@ -17,6 +18,20 @@ namespace Crystal {
 		const DirectX::XMFLOAT3 Cyan = { 0.0f, 1.0f, 1.0f };
 		const DirectX::XMFLOAT3 Magenta = { 1.0f, 0.0f, 1.0f };
 		const DirectX::XMFLOAT3 Yellow = { 1.0f, 1.0f, 0.0f };
+
+
+		
+
+		inline DirectX::XMFLOAT3 Random(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
+		{
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_real_distribution<> disx(v1.x, v2.x);
+			std::uniform_real_distribution<> disy(v1.y, v2.y);
+			std::uniform_real_distribution<> disz(v1.z, v2.z);
+
+			return { static_cast<float>(disx(gen)), static_cast<float>(disy(gen)), static_cast<float>(disz(gen)) };
+		}
 
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{

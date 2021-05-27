@@ -48,7 +48,7 @@ struct PS_INPUT
     nointerpolation float MetallicConstant : METALLIC_CONSTANT;
 
     nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
-    nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
+    nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE; 
     nointerpolation bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
     nointerpolation bool bToggleNormalTexture : TOGGLE_NORMAL_TEXTURE;
     nointerpolation bool bToggleIrradianceTexture : TOGGLE_IRRADIANCE_TEXTURE;

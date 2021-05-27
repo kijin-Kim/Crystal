@@ -1,8 +1,6 @@
 ﻿#include "cspch.h"
 #include "ParticleComponent.h"
 
-#include <random>
-
 
 #include "Crystal/GamePlay/World/Level.h"
 
@@ -13,8 +11,6 @@ namespace Crystal {
 
 	ParticleComponent::ParticleComponent()
 	{
-
-
 	}
 
 	ParticleComponent::~ParticleComponent()
@@ -40,11 +36,13 @@ namespace Crystal {
 
 
 		SpawnNewParticle();
-		
-	
+
+
 		for (auto& particle : m_Particles)
 		{
 			particle.Update(deltaTime);
+			particle.subImageIndexCounter += 36.0f * deltaTime;
+			particle.SubImageIndex = (int)particle.subImageIndexCounter % (6 * 6);
 		}
 
 		for (auto it = m_Particles.begin(); it != m_Particles.end();)
@@ -62,16 +60,14 @@ namespace Crystal {
 
 	void ParticleComponent::SpawnNewParticle()
 	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_real_distribution<> disxz(-100.0f, 100.0f);
+		DirectX::XMFLOAT3 minVel = {-100.0f, 500.0f, -100.0f};
+		DirectX::XMFLOAT3 maxVel = {+100.0f, 1000.0f, +100.0f};
 
-		std::uniform_real_distribution<> disy(500.0f, 1000.0f);
 
-		if (m_Particles.size() <= m_ParticleSpawnCount)
+		if (m_Particles.size() < m_ParticleSpawnCount)
 		{
-			DirectX::XMFLOAT3 velocity = { (float)disxz(gen), (float)disy(gen), (float)disxz(gen) };
-			m_Particles.emplace_back(m_InitPosition, velocity, m_InitScale, m_InitLifeTime);
+			//m_Particles.emplace_back(GetWorldPosition(), Vector3::Random(minVel, maxVel), m_InitScale, m_InitLifeTime);
+			m_Particles.emplace_back(GetWorldPosition(), Vector3::Zero, m_InitScale, 100.0f);
 		}
 	}
 
