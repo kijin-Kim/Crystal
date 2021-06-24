@@ -3,6 +3,17 @@
 #include <random>
 
 namespace Crystal {
+
+	inline float RandomFloatInRange(float min, float max)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<> dis(min, max);
+
+		return static_cast<float>(dis(gen));
+	}
+	
+	
 	namespace Vector3
 	{
 		const DirectX::XMFLOAT3 UnitX = { 1.0f, 0.0f, 0.0f };
@@ -20,9 +31,7 @@ namespace Crystal {
 		const DirectX::XMFLOAT3 Yellow = { 1.0f, 1.0f, 0.0f };
 
 
-		
-
-		inline DirectX::XMFLOAT3 Random(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
+		inline DirectX::XMFLOAT3 RandomInRange(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -306,6 +315,18 @@ namespace Crystal {
 			DirectX::XMFLOAT4X4 result;
 			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationRollPitchYaw((r1.x), (r1.y), (r1.z));
 			XMStoreFloat4x4(&result, newMatrix);
+			return result;
+		}
+
+
+		inline DirectX::XMFLOAT4X4 RotationAxis(const DirectX::XMFLOAT3& axis, float angle)
+		{
+			DirectX::XMFLOAT4X4 result;
+
+			DirectX::XMVECTOR axisVector = DirectX::XMLoadFloat3(&axis);
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationAxis(axisVector, angle);
+			XMStoreFloat4x4(&result, newMatrix);
+			
 			return result;
 		}
 

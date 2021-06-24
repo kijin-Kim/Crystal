@@ -34,7 +34,6 @@ namespace Crystal {
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
 			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-			CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendDesc;
 		} pipelineStateStream;
 
 
@@ -52,14 +51,7 @@ namespace Crystal {
 			CD3DX12_STATIC_SAMPLER_DESC(0)
 		};
 
-		CD3DX12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(CD3DX12_DEFAULT());
-		blendDesc.RenderTarget[0].BlendEnable = true;
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_COLOR;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 
-
-		pipelineStateStream.BlendDesc = blendDesc;
 
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
@@ -128,8 +120,9 @@ namespace Crystal {
 
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 1;
+		rtvFormat.NumRenderTargets = 2;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
@@ -182,10 +175,31 @@ namespace Crystal {
 			for (auto& particle : particles)
 			{
 				PerInstanceData perInstanceData = {};
+
+
 				perInstanceData.World = particle.World;
-				perInstanceData.SubUVIndex = particle.SubImageIndex;
+				perInstanceData.World._11 = perFrameData.View._11;
+				perInstanceData.World._12 = perFrameData.View._12;
+				perInstanceData.World._13 = perFrameData.View._13;
+				perInstanceData.World._21 = perFrameData.View._21;
+				perInstanceData.World._22 = perFrameData.View._22;
+				perInstanceData.World._23 = perFrameData.View._23;
+				perInstanceData.World._31 = perFrameData.View._31;
+				perInstanceData.World._32 = perFrameData.View._32;
+				perInstanceData.World._33 = perFrameData.View._33;
 
 				
+
+				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Scale(particle.Scale));
+				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::RotationAxis(mainCamera->GetWorldForwardVector(), 45.0f));
+				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Translation(particle.Position));
+				
+				                                                                
+
+				
+
+
+				perInstanceData.SubUVIndex = particle.SubImageIndex;
 
 
 				// 같은 텍스쳐를 쓰면 ㅂ묶을 수 있음
@@ -222,7 +236,7 @@ namespace Crystal {
 
 
 					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->GetConstantBufferView(),
-						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					// 텍스쳐를 Heap에 Copy
 					d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),

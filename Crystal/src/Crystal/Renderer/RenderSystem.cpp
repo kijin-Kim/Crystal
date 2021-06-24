@@ -282,15 +282,15 @@ namespace Crystal {
 		scene->PanoramaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr").lock();
 
 		scene->CubemapTexture = CreateShared<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                             D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+		                                              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                              D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                              D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
 		scene->IrradianceTexture = CreateShared<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                 D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                                 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
 		/// COMPUTE
@@ -361,11 +361,11 @@ namespace Crystal {
 		}
 
 
-		if(scene->Cameras.empty())
+		if (scene->Cameras.empty())
 		{
 			return;
 		}
-	
+
 		const auto mainCamera = scene->Cameras[0].lock();
 		if (!mainCamera)
 		{
@@ -374,7 +374,6 @@ namespace Crystal {
 		}
 
 
-		
 		// const auto mainCamera
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -443,8 +442,7 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
-		
-	
+
 		m_LightPipelines[0]->Begin();
 		m_LightPipelines[0]->Record(commandList);
 
@@ -465,9 +463,10 @@ namespace Crystal {
 		m_LightPipelines[1]->Begin();
 		m_LightPipelines[1]->Record(commandList);
 
+		//commandList->ClearDepthStencilView(scene->DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
-		
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -478,8 +477,6 @@ namespace Crystal {
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
 
 
 		m_Pipelines[1]->Begin();
@@ -527,6 +524,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
+		
 
 		commandList->OMSetRenderTargets(
 			1, &scene->ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
@@ -627,28 +625,28 @@ namespace Crystal {
 			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
 
 			scene->ColorBufferTextures[i] = CreateShared<Texture>(rtvBuffer.Get(),
-			                                                     D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			                                                      D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 		}
 
 
 		scene->FloatingPointBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                  DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                  D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                   DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                        DXGI_FORMAT_D24_UNORM_S8_UINT,
-		                                                        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 		if (!level)
 		{
@@ -709,27 +707,27 @@ namespace Crystal {
 
 
 			scene->ColorBufferTextures[i] = CreateShared<Texture>(rtvBuffer.Get(),
-			                                                     D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			                                                      D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 		}
 
 		scene->FloatingPointBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                  DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                  D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                   DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                        DXGI_FORMAT_D24_UNORM_S8_UINT,
-		                                                        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 
 		DXGI_MODE_DESC targetParam = {};
@@ -805,58 +803,58 @@ namespace Crystal {
 
 
 			scene->ColorBufferTextures[i] = CreateShared<Texture>(rtvBuffer.Get(),
-			                                                     D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			                                                      D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 		}
 
 
 		scene->FloatingPointBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                  DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                  D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                   DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                        DXGI_FORMAT_D24_UNORM_S8_UINT,
-		                                                        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 
 		//=== G-Buffers======
 
 
 		scene->AlbedoBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                           D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                           D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                            D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                            D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		scene->RoughnessMetallicAoBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                        DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                        D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		scene->EmissiveBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                             D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                             D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                              D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                              D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		scene->WorldNormalBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
+		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
+		scene->IrradianceBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
 		                                                DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		                                                D3D12_RESOURCE_STATE_RENDER_TARGET);
-		scene->IrradianceBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                               DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                               D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                               D3D12_RESOURCE_STATE_RENDER_TARGET);
 		scene->WorldPositionBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                  DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                  D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                                  D3D12_RESOURCE_STATE_RENDER_TARGET);
+		                                                   DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
 
@@ -866,9 +864,9 @@ namespace Crystal {
 		auto& scene = level->GetScene();
 
 		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                        DXGI_FORMAT_D24_UNORM_S8_UINT,
-		                                                        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	}
 
 	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)

@@ -8,7 +8,6 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
 
     float4 finalColor = OutputTexture[dispatchThreadID.xy];
     finalColor += SourceTexture1[dispatchThreadID.xy];
-   
 
     OutputTexture[dispatchThreadID.xy] = finalColor;
 }

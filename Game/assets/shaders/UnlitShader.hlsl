@@ -15,9 +15,6 @@ cbuffer PerDrawCallData : register(b1)
 struct VS_INPUT
 {
     float3 Position : POSITION;
-
-    
-
     float4 MatRow0 : MATROW0;
     float4 MatRow1 : MATROW1;
     float4 MatRow2 : MATROW2;
@@ -31,6 +28,12 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD;
 };
 
+struct PS_OUTPUT
+{
+    float4 MainColor : SV_Target0;
+    float4 BrightColor : SV_Target1;
+};
+
 
 
 PS_INPUT vsMain(VS_INPUT input)
@@ -38,21 +41,9 @@ PS_INPUT vsMain(VS_INPUT input)
     PS_INPUT output = (PS_INPUT)0;
 
     
+    float4x4 World = float4x4(input.MatRow0, input.MatRow1, input.MatRow2, input.MatRow3);
 
-    float3x3 transposedView = transpose(View);
-    
-    float4 newRow0 = float4(transposedView[0], 0.0f);
-    float4 newRow1 = float4(transposedView[1], 0.0f);
-    float4 newRow2 = float4(transposedView[2], 0.0f);
-    
-    float4x4 world = float4x4(newRow0, newRow1, newRow2, input.MatRow3);
-
-    float4x4 worldView = mul(world, View);
-    worldView[0][0] = length(input.MatRow0);
-    worldView[1][1] = length(input.MatRow1);
-    worldView[2][2] = length(input.MatRow2);
-    
-    output.Position = mul(mul(float4(input.Position, 1.0f), worldView), Projection);
+    output.Position = mul(mul(mul(float4(input.Position, 1.0f), World), View), Projection);
     
     output.TexCoord = ((input.Position + 1.0f) / 2.0f);
 	output.TexCoord.y = -output.TexCoord.y;
@@ -75,10 +66,20 @@ PS_INPUT vsMain(VS_INPUT input)
 SamplerState DefualtSampler : register(s0);
 Texture2D Texture : register(t0);
 
-float4 psMain(PS_INPUT input) : SV_Target
+PS_OUTPUT psMain(PS_INPUT input) : SV_Target
 {
-    float4 color = Texture.Sample(DefualtSampler, input.TexCoord);
+    float4 finalColor = Texture.Sample(DefualtSampler, input.TexCoord);
 
-    return float4(color.rgb, 1.0f);
+    float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+
+    PS_OUTPUT output = (PS_OUTPUT)0;
+
+    output.MainColor = finalColor;
+    if(brightness > 1.0f)
+        output.BrightColor = output.MainColor;
+    else
+        output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    return output;
 }
 
