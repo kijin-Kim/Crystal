@@ -3,11 +3,11 @@
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
 
-class Sun : public Crystal::LocalLightActor
+class Sun : public Crystal::DirectionalLightActor
 {
 	SERIALIZE_PROPERTIES
 	{
-		boost::serialization::base_object<Crystal::LocalLightActor>(*this);
+		boost::serialization::base_object<Crystal::DirectionalLightActor>(*this);
 	}
 
 public:
@@ -16,7 +16,7 @@ public:
 
 	void Initialize() override
 	{
-		Crystal::LocalLightActor::Initialize();
+		Crystal::DirectionalLightActor::Initialize();
 
 
 		auto material = std::make_unique<Crystal::Material>();
@@ -32,8 +32,6 @@ public:
 
 
 		m_LightComponent->SetLocalPosition(Crystal::Vector3::Zero);
-		m_LightComponent->SetLightColor(Crystal::Vector3::White);
-		m_LightComponent->SetLightIntensity(3.0f);
 		m_LightComponent->AttachTo(m_MainComponent);
 	}
 

@@ -23,10 +23,11 @@ struct PS_OUTPUT
 
 struct Light
 {
-    float4 WorldPosition;
+    float3 Direction;
+    float padding0;
     float4 Color;
     float Intensity;
-    float3 padding;
+    float3 padding1;
 };
 
 cbuffer PerFrameData : register(b0)
@@ -125,7 +126,8 @@ PS_OUTPUT psMain(PS_INPUT input)
         float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
 
         // L()
-        float3 L = normalize(Lights[i].WorldPosition.xyz - worldPosition);
+        //float3 L = normalize(Lights[i].WorldPosition.xyz - worldPosition);
+        float3 L = -Lights[i].Direction;
         float3 H = normalize(V + L);
         float attenuation = 1.0f; // No attenuation
         float3 radiance = finalLightColor * attenuation;

@@ -163,15 +163,16 @@ namespace Crystal {
 			if (lightCount >= maxLightCount)
 				break;
 
-			auto localLightComponent = weak.lock();
-			if (!localLightComponent)
+			auto lightComponent = weak.lock();
+			if (!lightComponent)
 				continue;
 
-			auto lightPosition = perFrameData.Lights[lightCount].WorldPosition = localLightComponent->
-				GetWorldPosition();
+			
+			
+			perFrameData.Lights[lightCount].Direction = lightComponent->GetLocalForwardVector();
 
-			perFrameData.Lights[lightCount].Color = localLightComponent->GetLightColor();
-			perFrameData.Lights[lightCount].Intensity = localLightComponent->GetLightIntensity();
+			perFrameData.Lights[lightCount].Color = lightComponent->GetLightColor();
+			perFrameData.Lights[lightCount].Intensity = lightComponent->GetLightIntensity();
 
 
 			lightCount++;

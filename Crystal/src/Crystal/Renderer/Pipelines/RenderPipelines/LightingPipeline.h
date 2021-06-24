@@ -9,7 +9,7 @@ namespace Crystal {
 
 		struct Light
 		{
-			DirectX::XMFLOAT3 WorldPosition = Vector3::Zero;
+			DirectX::XMFLOAT3 Direction = Vector3::Zero;
 			float _pad1;
 
 			DirectX::XMFLOAT3 Color = Vector3::White;

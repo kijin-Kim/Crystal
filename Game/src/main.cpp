@@ -36,13 +36,13 @@ public:
 
 
 		{
-			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
+			/*auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 			sun->SetPosition({0.0f, 200000.0f, 200000.0f});
 			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 
 			sunMesh->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 			auto sunMat = sunMesh->GetMaterial(0);
-			sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
+			sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);*/
 		}
 
 		{
@@ -51,9 +51,11 @@ public:
 			auto sunMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(
 				sun2->GetComponentByClass("StaticMeshComponent"));
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(
-				sun2->GetComponentByClass("LocalLightComponent"));
-			lightComponent->SetLightColor({243.0f / 255.0f, 138.0f / 255.0f, 110.0f / 255.0f});
+				sun2->GetComponentByClass("DirectionalLightComponent"));
+			lightComponent->SetLightColor({243.0f / 255.0f, 138.0f /
+				255.0f, 110.0f / 255.0f});
 			lightComponent->SetLightIntensity(3.0f);
+			lightComponent->RotatePitch(90.0f);
 			sunMesh2->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 			auto sunMat2 = sunMesh2->GetMaterial(0);
 			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};

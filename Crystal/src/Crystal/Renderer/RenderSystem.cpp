@@ -465,8 +465,8 @@ namespace Crystal {
 
 		//commandList->ClearDepthStencilView(scene->DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		m_Pipelines[7]->Begin();
-		m_Pipelines[7]->Record(commandList);
+		//m_Pipelines[7]->Begin();
+		//m_Pipelines[7]->Record(commandList);
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -481,6 +481,10 @@ namespace Crystal {
 
 		m_Pipelines[1]->Begin();
 		m_Pipelines[1]->Record(commandList);
+
+		m_Pipelines[7]->Begin();
+		m_Pipelines[7]->Record(commandList);
+
 
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();

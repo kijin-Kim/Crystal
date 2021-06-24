@@ -460,6 +460,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\SceneConstantBufferData.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.h" />

@@ -37,6 +37,7 @@ void TestPawn::Initialize()
 
 	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
+
 }
 
 void TestPawn::Update(const float deltaTime)

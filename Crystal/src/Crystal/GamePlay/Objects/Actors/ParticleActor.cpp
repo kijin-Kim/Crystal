@@ -19,7 +19,7 @@ namespace Crystal {
 
 		particleComponent->AddMaterial(std::move(particleMaterial));
 		particleComponent->SetLocalPosition({0.0f, 300.0f, 0.0f});
-		particleComponent->SetScale(100.0f);
+		particleComponent->SetScale(300.0f);
 
 		m_MainComponent = particleComponent;
 	}
