@@ -14,6 +14,7 @@
 #include "Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
 #include "Pipelines/ComputePipelines/PanoToCubemapPipeline.h"
 #include "Pipelines/RenderPipelines/CubemapPipeline.h"
+#include "Pipelines/RenderPipelines/GeometrySkeletalPipeline.h"
 #include "Pipelines/RenderPipelines/LightingSkeletalPipeline.h"
 #include "Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 #include "Pipelines/RenderPipelines/LightingPipeline.h"
@@ -32,7 +33,8 @@ namespace Crystal {
 		auto& resourceManager = ResourceManager::Instance();
 
 		auto pbrStaticShader = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
-		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl").lock();
+		//auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl").lock();
+		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/GeometryPass_Skeletal.hlsl").lock();
 		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl").lock();
 		auto panoToCubemapShader = resourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl").lock();
 		auto diffIrradianceShader = resourceManager.GetShader("assets/shaders/DiffuseIrradianceSampling.hlsl").lock();
@@ -259,8 +261,8 @@ namespace Crystal {
 
 
 		m_LightPipelines.push_back(CreatePipeline<GeometryStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
-		m_LightPipelines.push_back(
-			CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+		//m_LightPipelines.push_back(CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
+		m_LightPipelines.push_back(CreatePipeline<GeometrySkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<LightingPipeline>(lightingPassShader, "LightingPipeline"));
 
 
@@ -446,6 +448,9 @@ namespace Crystal {
 		m_LightPipelines[0]->Begin();
 		m_LightPipelines[0]->Record(commandList);
 
+		m_LightPipelines[1]->Begin();
+		m_LightPipelines[1]->Record(commandList);
+
 		// TODO : CPU 복사로 인한 퍼포먼스 이슈
 
 
@@ -460,8 +465,7 @@ namespace Crystal {
 		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
 
-		m_LightPipelines[1]->Begin();
-		m_LightPipelines[1]->Record(commandList);
+
 
 		//commandList->ClearDepthStencilView(scene->DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -567,6 +571,7 @@ namespace Crystal {
 
 
 		m_LightPipelines[0]->End();
+		m_LightPipelines[1]->End();
 		m_Pipelines[0]->End();
 		m_Pipelines[7]->End();
 

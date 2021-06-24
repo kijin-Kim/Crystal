@@ -8,18 +8,6 @@ namespace Crystal {
 	class GeometryStaticPipeline final : public RenderPipeline
 	{
 	public:
-		struct Light
-		{
-			DirectX::XMFLOAT3 WorldPosition = Vector3::Zero;
-			float _pad1;
-
-			DirectX::XMFLOAT3 Color = Vector3::White;
-			float _pad2;
-
-			float Intensity;
-			float _pad3[3];
-		};
-
 		struct PerFrameData
 		{
 			DirectX::XMFLOAT4X4 ViewProjection = Matrix4x4::Identity();
@@ -67,8 +55,6 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(GeometryStaticPipeline)
 	private:
 		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
-
-
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 	};

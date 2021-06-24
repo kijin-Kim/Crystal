@@ -91,29 +91,35 @@ public:
 			}
 		}
 
-		if(false)
+		if(true)
 		{
-			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
-			auto meshComponent = Crystal::Cast<Crystal::SkeletalMeshComponent>(
-				kraken->GetComponentByClass("SkeletalMeshComponent"));
-			meshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>(
-				"assets/models/KRAKEN.fbx",
-				"assets/models/KRAKEN_idle.fbx"));
+			for(int i=0; i<2; i++)
+			{
+				auto kraken = m_World->SpawnActor<Kraken>({}).lock();
+				kraken->SetPosition({ 0.0f + 1000.0f * i, 0.0f, 0.0f });
+				
+				auto meshComponent = Crystal::Cast<Crystal::SkeletalMeshComponent>(
+					kraken->GetComponentByClass("SkeletalMeshComponent"));
+				meshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>(
+					"assets/models/KRAKEN.fbx",
+					"assets/models/KRAKEN_idle.fbx"));
 
-			auto bodyMaterial = meshComponent->GetMaterial(0);
-			bodyMaterial->AlbedoTexture = resourceManager.GetTexture(
-				"assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga");
-			bodyMaterial->RoughnessTexture = resourceManager.GetTexture(
-				"assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga");
-			bodyMaterial->NormalTexture = resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga");
+				auto bodyMaterial = meshComponent->GetMaterial(0);
+				bodyMaterial->AlbedoTexture = resourceManager.GetTexture(
+					"assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga");
+				bodyMaterial->RoughnessTexture = resourceManager.GetTexture(
+					"assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga");
+				bodyMaterial->NormalTexture = resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga");
 
-			auto tentacleMaterial = meshComponent->GetMaterial(1);
-			tentacleMaterial->AlbedoTexture = resourceManager.GetTexture(
-				"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_BaseColor.tga");
-			tentacleMaterial->RoughnessTexture = resourceManager.GetTexture(
-				"assets/textures/Kraken/T_M_KRAKEN_Mat_TENTACLES_LEGS_CLAWS_Roughness.tga");
-			tentacleMaterial->NormalTexture = resourceManager.GetTexture(
-				"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_CLAW_NRM.tga");
+				auto tentacleMaterial = meshComponent->GetMaterial(1);
+				tentacleMaterial->AlbedoTexture = resourceManager.GetTexture(
+					"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_BaseColor.tga");
+				tentacleMaterial->RoughnessTexture = resourceManager.GetTexture(
+					"assets/textures/Kraken/T_M_KRAKEN_Mat_TENTACLES_LEGS_CLAWS_Roughness.tga");
+				tentacleMaterial->NormalTexture = resourceManager.GetTexture(
+					"assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_CLAW_NRM.tga");
+			}
+			
 		}
 
 

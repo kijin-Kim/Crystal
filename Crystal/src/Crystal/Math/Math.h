@@ -12,23 +12,24 @@ namespace Crystal {
 
 		return static_cast<float>(dis(gen));
 	}
-	
-	
-	namespace Vector3
-	{
-		const DirectX::XMFLOAT3 UnitX = { 1.0f, 0.0f, 0.0f };
-		const DirectX::XMFLOAT3 UnitY = { 0.0f, 1.0f, 0.0f };
-		const DirectX::XMFLOAT3 UnitZ = { 0.0f, 0.0f, 1.0f };
-		const DirectX::XMFLOAT3 Zero = { 0.0f, 0.0f, 0.0f };
 
-		const DirectX::XMFLOAT3 White = { 1.0f, 1.0f, 1.0f };
-		const DirectX::XMFLOAT3 Red = { 1.0f, 0.0f, 0.0f };
-		const DirectX::XMFLOAT3 Green = { 0.0f, 1.0f, 0.0f };
-		const DirectX::XMFLOAT3 Blue = { 0.0f, 0.0f, 1.0f };
 
-		const DirectX::XMFLOAT3 Cyan = { 0.0f, 1.0f, 1.0f };
-		const DirectX::XMFLOAT3 Magenta = { 1.0f, 0.0f, 1.0f };
-		const DirectX::XMFLOAT3 Yellow = { 1.0f, 1.0f, 0.0f };
+	namespace Vector3 {
+		const DirectX::XMFLOAT3 UnitX = {1.0f, 0.0f, 0.0f};
+		const DirectX::XMFLOAT3 UnitY = {0.0f, 1.0f, 0.0f};
+		const DirectX::XMFLOAT3 UnitZ = {0.0f, 0.0f, 1.0f};
+		const DirectX::XMFLOAT3 Zero = {0.0f, 0.0f, 0.0f};
+
+		const DirectX::XMFLOAT3 Black = {0.0f, 0.0f, 0.0f};
+
+		const DirectX::XMFLOAT3 White = {1.0f, 1.0f, 1.0f};
+		const DirectX::XMFLOAT3 Red = {1.0f, 0.0f, 0.0f};
+		const DirectX::XMFLOAT3 Green = {0.0f, 1.0f, 0.0f};
+		const DirectX::XMFLOAT3 Blue = {0.0f, 0.0f, 1.0f};
+
+		const DirectX::XMFLOAT3 Cyan = {0.0f, 1.0f, 1.0f};
+		const DirectX::XMFLOAT3 Magenta = {1.0f, 0.0f, 1.0f};
+		const DirectX::XMFLOAT3 Yellow = {1.0f, 1.0f, 0.0f};
 
 
 		inline DirectX::XMFLOAT3 RandomInRange(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
@@ -39,7 +40,7 @@ namespace Crystal {
 			std::uniform_real_distribution<> disy(v1.y, v2.y);
 			std::uniform_real_distribution<> disz(v1.z, v2.z);
 
-			return { static_cast<float>(disx(gen)), static_cast<float>(disy(gen)), static_cast<float>(disz(gen)) };
+			return {static_cast<float>(disx(gen)), static_cast<float>(disy(gen)), static_cast<float>(disz(gen))};
 		}
 
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
@@ -167,13 +168,12 @@ namespace Crystal {
 		}
 	}
 
-	namespace Vector4
-	{
-		const DirectX::XMFLOAT4 Zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+	namespace Vector4 {
+		const DirectX::XMFLOAT4 Zero = {0.0f, 0.0f, 0.0f, 0.0f};
 
 
 		namespace Quaternion {
-			const DirectX::XMFLOAT4 Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
+			const DirectX::XMFLOAT4 Identity = {0.0f, 0.0f, 0.0f, 1.0f};
 		}
 
 		inline DirectX::XMFLOAT4 Multiply(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4& v2)
@@ -237,14 +237,13 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT4 result;
 			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationRollPitchYaw((rollPitchYaw.y),
-				(rollPitchYaw.z), (rollPitchYaw.x));
+			                                                                        (rollPitchYaw.z), (rollPitchYaw.x));
 			XMStoreFloat4(&result, newVector);
 			return result;
 		}
 	}
 
-	namespace Matrix4x4
-	{
+	namespace Matrix4x4 {
 		inline DirectX::XMFLOAT4X4 Identity()
 		{
 			DirectX::XMFLOAT4X4 result;
@@ -272,7 +271,7 @@ namespace Crystal {
 		inline DirectX::XMFLOAT4X4 Scale(const float scale)
 		{
 			DirectX::XMFLOAT4X4 result;
-			DirectX::XMFLOAT3 scaleVector = { scale , scale , scale };
+			DirectX::XMFLOAT3 scaleVector = {scale, scale, scale};
 			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixScalingFromVector(XMLoadFloat3(&scaleVector));
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
@@ -326,7 +325,7 @@ namespace Crystal {
 			DirectX::XMVECTOR axisVector = DirectX::XMLoadFloat3(&axis);
 			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixRotationAxis(axisVector, angle);
 			XMStoreFloat4x4(&result, newMatrix);
-			
+
 			return result;
 		}
 
@@ -397,8 +396,7 @@ namespace Crystal {
 		}
 	}
 
-	namespace Matrix3x3
-	{
+	namespace Matrix3x3 {
 		inline DirectX::XMFLOAT3X3 Transpose(const DirectX::XMFLOAT3X3& m1)
 		{
 			DirectX::XMFLOAT3X3 result;

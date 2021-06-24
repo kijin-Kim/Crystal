@@ -125,10 +125,7 @@ namespace Crystal {
 
 				perDrawData.bToggleIrradianceTexture = true;
 
-				m_PerDrawConstantBuffers[i * 5 + j]->SetData(&perDrawData, 0, sizeof(perDrawData));
-				device->CopyDescriptorsSimple(1, destHeapHandle, m_PerDrawConstantBuffers[i * 5 + j]->GetConstantBufferView(),
-				                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				m_PerDrawConstantBuffers[i * j]->SetData(&perDrawData, 0, sizeof(perDrawData));
 
 				if (albedoTextureHandle.ptr)
 					device->CopyDescriptorsSimple(1, destHeapHandle, albedoTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
