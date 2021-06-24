@@ -16,7 +16,7 @@ namespace Crystal {
 
 			if (it != m_Textures.end())
 			{
-				it->second;
+				return it->second;
 			}
 			
 			m_Textures[fileName] = CreateShared<Texture>(fileName);
