@@ -33,9 +33,10 @@ struct Light
 cbuffer PerFrameData : register(b0)
 {
     float4x4 ViewProjection : packoffset(c0);
-    float4 WorldCameraPosition : packoffset(c4);
-    Light Lights[100] : packoffset(c5);
-    int LightCount : packoffset(c305);
+    float4x4 LightViewProjection : packoffset(c4);
+    float4 WorldCameraPosition : packoffset(c8);
+    Light Lights[100] : packoffset(c9);
+    int LightCount : packoffset(c309);
 }
 
 
@@ -56,6 +57,7 @@ Texture2D EmissiveBuffer : register(t2);
 Texture2D WorldNormalBuffer : register(t3);
 Texture2D IrradianceBuffer : register(t4);
 Texture2D WorldPositionBuffer : register(t5);
+Texture2D ShadowMap : register(t6);
 
 
 SamplerState DefaultSampler : register(s0);
@@ -99,6 +101,15 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 {
     return F0 + (max(1.0f - roughness, F0) - F0) * pow(max(1.0f - cosTheta, 0.0f), 5.0f);
 }
+
+float CalculateShadow(float4 lightSpacePosition)
+{
+    float3 projected = lightSpacePosition.xyz / lightSpacePosition.w; // perspective division
+    projected = projected * 0.5f + 0.5f; // [-1 , 1] to [0 , 1] range
+    return 1.0f;
+}
+
+
 
 
 PS_OUTPUT psMain(PS_INPUT input)

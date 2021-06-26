@@ -22,7 +22,7 @@ namespace Crystal {
 		struct PerFrameData
 		{
 			DirectX::XMFLOAT4X4 ViewProjection = Matrix4x4::Identity();
-
+			DirectX::XMFLOAT4X4 LightViewProjection = Matrix4x4::Identity();
 			DirectX::XMFLOAT3 CameraPositionInWorld = Vector3::Zero;
 			float _pad1;
 

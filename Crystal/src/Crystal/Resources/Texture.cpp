@@ -210,7 +210,7 @@ namespace Crystal {
 		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		dsvDesc.Format = m_Resource.Get()->GetDesc().Format;
+		
 		dsvDesc.ViewDimension = dsvDimension;
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 		dsvDesc.Texture2D.MipSlice = 0;

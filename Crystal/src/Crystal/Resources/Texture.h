@@ -31,6 +31,9 @@ namespace Crystal {
 		ID3D12Resource* GetResource() const { return m_Resource.Get(); }
 
 	private:
+	
+		
+		
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Resource = nullptr;
 		
 		std::unordered_map<D3D12_SRV_DIMENSION, DescriptorAllocation> m_ShaderResourceViews;

@@ -17,6 +17,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "actors/Kraken.h"
+#include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
 class GameApplication : public Crystal::Application
@@ -91,7 +92,7 @@ public:
 			}
 		}
 
-		if(true)
+		if(false)
 		{
 			for(int i=0; i<2; i++)
 			{
@@ -139,6 +140,24 @@ public:
 
 
 		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({ "" }).lock();
+
+		{
+			auto staticMeshActor = m_World->SpawnActor<Crystal::StaticMeshActor>({ "" }).lock();
+			staticMeshActor->SetPosition({ 0.0f, -1000.0f, 0.0f });
+			staticMeshActor->SetScale(5.0f);
+
+			
+			auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
+				staticMeshActor->GetComponentByName("StaticMeshComponent"));
+			staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/floor.fbx"));
+
+			staticMeshComponent->RotatePitch(90.0f);
+			
+			auto& materials = staticMeshComponent->GetMaterials();
+			auto pbrMat = materials[0].get();
+			pbrMat->AlbedoColor = Crystal::Vector3::White;
+		}
+		
 		
 
 

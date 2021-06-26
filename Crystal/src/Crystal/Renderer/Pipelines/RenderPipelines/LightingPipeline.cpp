@@ -121,12 +121,11 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 
-
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
 
 
 		auto& scene = GetScene();
-		
+
 		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
 
 		m_Components.push_back(m_StaticMeshComponent);
@@ -140,13 +139,12 @@ namespace Crystal {
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
 
-
 		auto device = Device::Instance().GetD3DDevice();
 
 		auto renderSystem = Cast<RenderSystem>(GetOuter());
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
-		
+
 		auto camera = scene->Cameras[0].lock();
 
 		PerFrameData perFrameData = {};
@@ -167,8 +165,7 @@ namespace Crystal {
 			if (!lightComponent)
 				continue;
 
-			
-			
+
 			perFrameData.Lights[lightCount].Direction = lightComponent->GetLocalForwardVector();
 
 			perFrameData.Lights[lightCount].Color = lightComponent->GetLightColor();
@@ -189,7 +186,6 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
-
 		device->CopyDescriptorsSimple(1, destHeapHandle,
 		                              scene->AlbedoBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -197,7 +193,7 @@ namespace Crystal {
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
 		                              scene->RoughnessMetallicAoBuffer->
-		                                    GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -218,11 +214,15 @@ namespace Crystal {
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
 		                              scene->WorldPositionBuffer->
-		                                    GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		device->CopyDescriptorsSimple(1, destHeapHandle,
+		                              scene->ShadowMapTexture->
+		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-
-	
 
 
 }

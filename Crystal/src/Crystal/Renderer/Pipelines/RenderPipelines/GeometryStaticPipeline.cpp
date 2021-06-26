@@ -166,7 +166,9 @@ namespace Crystal {
 
 		PerFrameData perFrameData = {};
 
+
 		perFrameData.ViewProjection = Matrix4x4::Transpose(scene->Cameras[0].lock()->GetViewProjection());
+		
 
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 

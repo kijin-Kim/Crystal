@@ -19,6 +19,7 @@
 #include "Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 #include "Pipelines/RenderPipelines/LightingPipeline.h"
 #include "Pipelines/RenderPipelines/LinePipeline.h"
+#include "Pipelines/RenderPipelines/ShadowMapPipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
 
@@ -45,6 +46,7 @@ namespace Crystal {
 		auto toneMappingShader = resourceManager.GetShader("assets/shaders/Tonemapping.hlsl").lock();
 		auto lightingPassShader = resourceManager.GetShader("assets/shaders/LightingPass.hlsl").lock();
 		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl").lock();
+		auto shadowMappingShader = resourceManager.GetShader("assets/shaders/ShadowPass.hlsl").lock();
 
 
 		{
@@ -231,7 +233,7 @@ namespace Crystal {
 			});
 
 
-			RootParameter perFrame = {1, 6, 0};
+			RootParameter perFrame = {1, 7, 0};
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
@@ -276,6 +278,7 @@ namespace Crystal {
 			CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
+		m_Pipelines.push_back(CreatePipeline<ShadowMapPipeline>(shadowMappingShader, "ShadowMapPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -444,6 +447,11 @@ namespace Crystal {
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
+		commandList->ClearDepthStencilView(
+			scene->ShadowMapTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D),
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
+			clearStencilValue, 0, nullptr);
+
 
 		m_LightPipelines[0]->Begin();
 		m_LightPipelines[0]->Record(commandList);
@@ -452,6 +460,15 @@ namespace Crystal {
 		m_LightPipelines[1]->Record(commandList);
 
 		// TODO : CPU 복사로 인한 퍼포먼스 이슈
+
+
+		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
+		                                &scene->ShadowMapTexture->GetDepthStencilView(
+			                                D3D12_DSV_DIMENSION_TEXTURE2D));
+
+
+		m_Pipelines[8]->Begin();
+		m_Pipelines[8]->Record(commandList);
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[] = {
@@ -464,13 +481,6 @@ namespace Crystal {
 
 		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
-
-
-
-		//commandList->ClearDepthStencilView(scene->DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-		//m_Pipelines[7]->Begin();
-		//m_Pipelines[7]->Record(commandList);
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -488,7 +498,6 @@ namespace Crystal {
 
 		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
-
 
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();
@@ -532,7 +541,6 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		
 
 		commandList->OMSetRenderTargets(
 			1, &scene->ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
@@ -574,6 +582,7 @@ namespace Crystal {
 		m_LightPipelines[1]->End();
 		m_Pipelines[0]->End();
 		m_Pipelines[7]->End();
+		m_Pipelines[8]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -738,6 +747,11 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
+		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		                                                DXGI_FORMAT_R24G8_TYPELESS,
+		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
 
 		DXGI_MODE_DESC targetParam = {};
 		targetParam.Width = m_ResWidth;
@@ -876,6 +890,11 @@ namespace Crystal {
 		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		                                                DXGI_FORMAT_R24G8_TYPELESS,
+		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	}
 
 	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)

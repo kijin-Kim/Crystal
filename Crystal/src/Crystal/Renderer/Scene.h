@@ -46,6 +46,8 @@ namespace Crystal {
 		Shared<Texture> PanoramaTexture = nullptr;
 		Shared<Texture> CubemapTexture = nullptr;
 		Shared<Texture> IrradianceTexture = nullptr;
+	
+		Shared<Texture> ShadowMapTexture = nullptr;
 		//===================================================================================
 
 		
