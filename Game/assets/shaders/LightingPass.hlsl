@@ -105,13 +105,36 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float CalculateShadow(float4 lightSpacePosition)
 {
     float3 projected = lightSpacePosition.xyz / lightSpacePosition.w; // perspective division
+    if(projected.z > 1.0f)
+    {
+        return 0.0f;
+    }
+
     float2 texCoord = projected.xy * 0.5f + 0.5f; // [-1 , 1] to [0 , 1] range excepct z
     texCoord.y = -texCoord.y;
 
-    float closest = ShadowMap.Sample(DefaultSampler, texCoord).r;
-    float current = projected.z;
 
-    return current > closest ? 1.0f : 0.0f;
+    float shadow = 1.0f;
+
+    uint shadowMapWidth = 0;
+    uint shadowMapHeight = 0;
+    ShadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
+
+    float2 texelSize = float2(1.0f / shadowMapWidth, 1.0f / shadowMapHeight);
+    float bias = 0.0001f;
+
+    for(int x = -1; x <= 1; ++x) // PCF
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float closest = ShadowMap.Sample(DefaultSampler, texCoord + float2(x,y) * texelSize).r;
+            float current = projected.z;
+            shadow += current > closest + bias ? 1.0f : 0.0f;
+        }
+    }
+    shadow = shadow / 9.0f;
+
+    return shadow;
 }
 
 
