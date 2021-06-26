@@ -114,13 +114,13 @@ float CalculateShadow(float4 lightSpacePosition)
     texCoord.y = -texCoord.y;
 
 
-    float shadow = 1.0f;
+    float shadow = 0.0f;
 
     uint shadowMapWidth = 0;
     uint shadowMapHeight = 0;
     ShadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
 
-    float2 texelSize = float2(1.0f / shadowMapWidth, 1.0f / shadowMapHeight);
+    float2 texelSize = float2(1.0f / float(shadowMapWidth), 1.0f / float(shadowMapHeight));
     float bias = 0.0001f;
 
     for(int x = -1; x <= 1; ++x) // PCF
@@ -132,7 +132,7 @@ float CalculateShadow(float4 lightSpacePosition)
             shadow += current > closest + bias ? 1.0f : 0.0f;
         }
     }
-    shadow = shadow / 9.0f;
+    shadow /= 9.0f;
 
     return shadow;
 }
@@ -204,7 +204,7 @@ PS_OUTPUT psMain(PS_INPUT input)
 
 
     float shadow = CalculateShadow(mul(float4(worldPosition, 1.0f), LightViewProjection));
-    float3 finalColor = emissive + Lo * (1.0 - shadow) + ambient;
+    float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
 
     float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
 
