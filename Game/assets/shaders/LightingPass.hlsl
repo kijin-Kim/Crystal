@@ -105,8 +105,13 @@ float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 float CalculateShadow(float4 lightSpacePosition)
 {
     float3 projected = lightSpacePosition.xyz / lightSpacePosition.w; // perspective division
-    projected = projected * 0.5f + 0.5f; // [-1 , 1] to [0 , 1] range
-    return 1.0f;
+    float2 texCoord = projected.xy * 0.5f + 0.5f; // [-1 , 1] to [0 , 1] range excepct z
+    texCoord.y = -texCoord.y;
+
+    float closest = ShadowMap.Sample(DefaultSampler, texCoord).r;
+    float current = projected.z;
+
+    return current > closest ? 1.0f : 0.0f;
 }
 
 
@@ -174,7 +179,9 @@ PS_OUTPUT psMain(PS_INPUT input)
     float3 diffuse = irradiance * albedo;
     float3 ambient =  kD * diffuse;
 
-    float3 finalColor = emissive + Lo + ambient;
+
+    float shadow = CalculateShadow(mul(float4(worldPosition, 1.0f), LightViewProjection));
+    float3 finalColor = emissive + Lo * (1.0 - shadow) + ambient;
 
     float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
 

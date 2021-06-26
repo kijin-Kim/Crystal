@@ -186,14 +186,10 @@ namespace Crystal {
 
 
 		auto shadowLightSource = scene->Lights[0].lock();
-
-
 		auto view = Matrix4x4::LookTo({ 0.0f, 10000.0f, 0.0f }, shadowLightSource->GetLocalForwardVector(), shadowLightSource->GetLocalUpVector());
-
 		float m_FieldOfView = 60.0f;
 		float m_NearPlane = 100.0f;
 		float m_FarPlane = 100000.0f;
-
 		auto proj = Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView),
 			static_cast<float>(1920.0f) / static_cast<float>(1080.0f), m_NearPlane, m_FarPlane);
 	
