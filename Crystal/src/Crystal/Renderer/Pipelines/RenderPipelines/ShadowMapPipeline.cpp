@@ -106,7 +106,7 @@ namespace Crystal {
 		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
 
 		pipelineStateStream.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_R24G8_TYPELESS;
+		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };

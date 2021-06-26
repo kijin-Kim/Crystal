@@ -448,7 +448,7 @@ namespace Crystal {
 			clearStencilValue, 0, nullptr);
 
 		commandList->ClearDepthStencilView(
-			scene->ShadowMapTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D),
+			scene->ShadowMapTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
@@ -464,7 +464,7 @@ namespace Crystal {
 
 		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
 		                                &scene->ShadowMapTexture->GetDepthStencilView(
-			                                D3D12_DSV_DIMENSION_TEXTURE2D));
+			                                D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT));
 
 
 		m_Pipelines[8]->Begin();

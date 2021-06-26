@@ -220,7 +220,7 @@ namespace Crystal {
 
 		device->CopyDescriptorsSimple(1, destHeapHandle,
 		                              scene->ShadowMapTexture->
-		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R24_UNORM_X8_TYPELESS),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 

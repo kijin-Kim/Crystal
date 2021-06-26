@@ -126,14 +126,14 @@ namespace Crystal {
 	{
 	}
 
-	DescriptorAllocation Texture::CreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	DescriptorAllocation Texture::CreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension, DXGI_FORMAT format)
 	{
 		/*셰이더 리소스 뷰를 생성합니다.*/
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-		shaderResourceViewDesc.Format = m_Resource.Get()->GetDesc().Format;
+		shaderResourceViewDesc.Format = format;
 		shaderResourceViewDesc.ViewDimension = srvDimension;
 		shaderResourceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
@@ -158,13 +158,14 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::CreateUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	DescriptorAllocation Texture::CreateUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension, DXGI_FORMAT format)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.ViewDimension = uavDimension;
+		uavDesc.Format = format;
 		switch (uavDimension)
 		{
 		case D3D12_UAV_DIMENSION_TEXTURE2D:
@@ -187,13 +188,13 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::CreateRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	DescriptorAllocation Texture::CreateRenderTargetView(D3D12_RTV_DIMENSION rtvDimension, DXGI_FORMAT format)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.Format = m_Resource.Get()->GetDesc().Format;
+		rtvDesc.Format = format;
 		rtvDesc.ViewDimension = rtvDimension;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
@@ -204,13 +205,13 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	DescriptorAllocation Texture::CreateDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	DescriptorAllocation Texture::CreateDepthStencilView(D3D12_DSV_DIMENSION dsvDimension, DXGI_FORMAT format)
 	{
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		
+		dsvDesc.Format = format;
 		dsvDesc.ViewDimension = dsvDimension;
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 		dsvDesc.Texture2D.MipSlice = 0;
@@ -221,44 +222,64 @@ namespace Crystal {
 		return newAllocation;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetShaderResourceView(D3D12_SRV_DIMENSION srvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetShaderResourceView(D3D12_SRV_DIMENSION srvDimension, DXGI_FORMAT format)
 	{
-		if (m_ShaderResourceViews.count(srvDimension) == 0)
+		if (format == DXGI_FORMAT_UNKNOWN)
 		{
-			m_ShaderResourceViews[srvDimension] = CreateShaderResourceView(srvDimension);
+			format = m_Resource.Get()->GetDesc().Format;
 		}
 
-		return m_ShaderResourceViews[srvDimension].GetDescriptorHandle();
+		if (m_ShaderResourceViews.count({srvDimension, format}) == 0)
+		{
+			m_ShaderResourceViews[{srvDimension, format}] = CreateShaderResourceView(srvDimension, format);
+		}
+
+		return m_ShaderResourceViews[{srvDimension, format}].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUnorderedAccessView(D3D12_UAV_DIMENSION uavDimension, DXGI_FORMAT format)
 	{
-		if (m_UnorderedAccessViews.count(uavDimension) == 0)
+		if (format == DXGI_FORMAT_UNKNOWN)
 		{
-			m_UnorderedAccessViews[uavDimension] = CreateUnorderedAccessView(uavDimension);
+			format = m_Resource.Get()->GetDesc().Format;
 		}
 
-		return m_UnorderedAccessViews[uavDimension].GetDescriptorHandle();
+		if (m_UnorderedAccessViews.count({uavDimension, format}) == 0)
+		{
+			m_UnorderedAccessViews[{uavDimension, format}] = CreateUnorderedAccessView(uavDimension, format);
+		}
+
+		return m_UnorderedAccessViews[{uavDimension, format}].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRenderTargetView(D3D12_RTV_DIMENSION rtvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRenderTargetView(D3D12_RTV_DIMENSION rtvDimension, DXGI_FORMAT format)
 	{
-		if (m_RenderTargetViews.count(rtvDimension) == 0)
+		if (format == DXGI_FORMAT_UNKNOWN)
 		{
-			m_RenderTargetViews[rtvDimension] = CreateRenderTargetView(rtvDimension);
+			format = m_Resource.Get()->GetDesc().Format;
 		}
 
-		return m_RenderTargetViews[rtvDimension].GetDescriptorHandle();
+		if (m_RenderTargetViews.count({rtvDimension, format}) == 0)
+		{
+			m_RenderTargetViews[{rtvDimension, format}] = CreateRenderTargetView(rtvDimension, format);
+		}
+
+		return m_RenderTargetViews[{rtvDimension, format}].GetDescriptorHandle();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDepthStencilView(D3D12_DSV_DIMENSION dsvDimension)
+	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDepthStencilView(D3D12_DSV_DIMENSION dsvDimension, DXGI_FORMAT format)
 	{
-		if (m_DepthStencilViews.count(dsvDimension) == 0)
+		if (format == DXGI_FORMAT_UNKNOWN)
 		{
-			m_DepthStencilViews[dsvDimension] = CreateDepthStencilView(dsvDimension);
+			format = m_Resource.Get()->GetDesc().Format;
 		}
 
-		return m_DepthStencilViews[dsvDimension].GetDescriptorHandle();
+		if (m_DepthStencilViews.count({dsvDimension, format}) == 0)
+		{
+			m_DepthStencilViews[{dsvDimension, format}] = CreateDepthStencilView(dsvDimension, format);
+		}
+
+		return m_DepthStencilViews[{dsvDimension, format}].GetDescriptorHandle();
 	}
 
 }
