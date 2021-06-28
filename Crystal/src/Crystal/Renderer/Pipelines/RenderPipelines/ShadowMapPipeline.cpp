@@ -181,19 +181,12 @@ namespace Crystal {
 		
 		if (scene->Lights.empty())
 			return;
+
 		
 
 
 		auto shadowLightSource = scene->Lights[0].lock();
-		auto view = Matrix4x4::LookTo({ 0.0f, 10000.0f, 0.0f }, shadowLightSource->GetLocalForwardVector(), shadowLightSource->GetLocalUpVector());
-		float m_FieldOfView = 60.0f;
-		float m_NearPlane = 100.0f;
-		float m_FarPlane = 100000.0f;
-		auto proj = Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView),
-			static_cast<float>(1920.0f) / static_cast<float>(1080.0f), m_NearPlane, m_FarPlane);
-	
-		
-		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(Matrix4x4::Multiply(view, proj)),0);
+		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection()),0);
 		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
 
 
@@ -217,6 +210,8 @@ namespace Crystal {
 				renderable->Render(commandList, j, perInstanceVertexBuffer->GetSize() / sizeof(PerInstanceData));
 			}
 		}
+
+		
 		
 	}
 

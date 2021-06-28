@@ -48,6 +48,7 @@ namespace Crystal {
 		Shared<Texture> IrradianceTexture = nullptr;
 	
 		Shared<Texture> ShadowMapTexture = nullptr;
+		Shared<Texture> ShadowMapDummyColorBuffer = nullptr;
 		//===================================================================================
 
 		

@@ -57,6 +57,7 @@ public:
 				255.0f, 110.0f / 255.0f});
 			lightComponent->SetLightIntensity(3.0f);
 			lightComponent->RotatePitch(90.0f);
+			lightComponent->SetCastShadow(true);
 			sunMesh2->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 			auto sunMat2 = sunMesh2->GetMaterial(0);
 			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};
@@ -64,16 +65,16 @@ public:
 
 		if(true)
 		{
-			for (int i = 0; i < 5; i++)
+			for (int i = -20; i < 20; i++)
 			{
-				for (int j = 0; j < 5; j++)
+				for (int j = -20; j < 20; j++)
 				{
 					for (int k = 0; k < 1; k++)
 					{
 						//test
 
 						auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-						asteroid->SetPosition({1000.0f * i, 1000.0f * j, 1000.0f * k});
+						asteroid->SetPosition({1000.0f * i, 1000.0f * k, 1000.0f * j});
 
 						auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
 							asteroid->GetComponentByName("StaticMeshComponent"));

@@ -472,13 +472,23 @@ namespace Crystal {
 		// TODO : CPU 복사로 인한 퍼포먼스 이슈
 
 
-		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
+		commandList->OMSetRenderTargets(1, &scene->ShadowMapDummyColorBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
 		                                &scene->ShadowMapTexture->GetDepthStencilView(
 			                                D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D32_FLOAT));
+
+		D3D12_VIEWPORT viewPort = {0, 0, 2048, 2048, 0.0f, 1.0f};
+		D3D12_RECT rect = { 0, 0, 2048, 2048 };
+		
+		commandList->RSSetViewports(1, &viewPort);
+		commandList->RSSetScissorRects(1, &rect);
+		
 
 
 		m_Pipelines[8]->Begin();
 		m_Pipelines[8]->Record(commandList);
+
+		commandList->RSSetViewports(1, &mainCamera->GetViewport());
+		commandList->RSSetScissorRects(1, &mainCamera->GetScissorRect());
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[] = {
@@ -488,6 +498,7 @@ namespace Crystal {
 		commandList->OMSetRenderTargets(_countof(rtvHandles), rtvHandles, false,
 		                                &scene->DepthStencilBufferTexture->GetDepthStencilView(
 			                                D3D12_DSV_DIMENSION_TEXTURE2D));
+
 
 		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
@@ -671,10 +682,11 @@ namespace Crystal {
 		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
-		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
 		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
 
 		if (!level)
 		{
@@ -752,15 +764,20 @@ namespace Crystal {
 		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
-		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
 		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		scene->ShadowMapTexture = CreateShared<Texture>(2048, 2048, 1, 1,
 		                                                DXGI_FORMAT_R32_TYPELESS,
 		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+		scene->ShadowMapDummyColorBuffer = CreateShared<Texture>(2048, 2048, 1, 1,
+		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		DXGI_MODE_DESC targetParam = {};
@@ -901,10 +918,15 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
+		scene->ShadowMapTexture = CreateShared<Texture>(2048, 2048, 1, 1,
 		                                                DXGI_FORMAT_R32_TYPELESS,
 		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+		scene->ShadowMapDummyColorBuffer = CreateShared<Texture>(2048, 2048, 1, 1,
+		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
+		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
 	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)

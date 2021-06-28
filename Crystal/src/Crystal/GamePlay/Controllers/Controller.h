@@ -17,10 +17,18 @@ namespace Crystal {
 
 		virtual void Possess(std::shared_ptr<Pawn> pawn)
 		{
+			m_PossessedPawn = pawn;
 		}
 
 		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 
+
+		Weak<Pawn> GetPossessedPawn() const { return m_PossessedPawn; }
+
 		STATIC_TYPE_IMPLE(Controller)
+
+
+	private:
+		Weak<Pawn> m_PossessedPawn;
 	};
 }

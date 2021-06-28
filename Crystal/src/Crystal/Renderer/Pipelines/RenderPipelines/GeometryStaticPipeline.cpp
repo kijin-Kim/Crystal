@@ -165,6 +165,7 @@ namespace Crystal {
 
 
 		PerFrameData perFrameData = {};
+		
 
 
 		perFrameData.ViewProjection = Matrix4x4::Transpose(scene->Cameras[0].lock()->GetViewProjection());
@@ -350,6 +351,8 @@ namespace Crystal {
 
 		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
 		descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
+
+		
 
 
 		for (const auto& pair : m_InstanceBatches)
