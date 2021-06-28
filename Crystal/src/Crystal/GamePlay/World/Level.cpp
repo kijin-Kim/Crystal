@@ -184,6 +184,7 @@ namespace Crystal {
 
 		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
 		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
+		
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));

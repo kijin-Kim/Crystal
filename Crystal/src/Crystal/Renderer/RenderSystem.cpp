@@ -238,7 +238,13 @@ namespace Crystal {
 			RootParameter perExecute = {};
 
 
-			lightingPassShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			lightingPassShader->SetRootSignature({
+				perFrame, perObject, perExecute, {
+					CD3DX12_STATIC_SAMPLER_DESC(0), CD3DX12_STATIC_SAMPLER_DESC(1, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+					                                                            D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+					                                                            D3D12_TEXTURE_ADDRESS_MODE_BORDER)
+				}
+			});
 			lightingPassShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -257,7 +263,11 @@ namespace Crystal {
 			RootParameter perObject = {1, 0, 0};
 			RootParameter perExecute = {0, 10, 0};
 
-			unlitShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			unlitShader->SetRootSignature({
+				perFrame, perObject, perExecute, {
+					CD3DX12_STATIC_SAMPLER_DESC(0)
+				}
+			});
 			unlitShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -448,8 +458,8 @@ namespace Crystal {
 			clearStencilValue, 0, nullptr);
 
 		commandList->ClearDepthStencilView(
-			scene->ShadowMapTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT),
-			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepthValue,
+			scene->ShadowMapTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D32_FLOAT),
+			D3D12_CLEAR_FLAG_DEPTH, clearDepthValue,
 			clearStencilValue, 0, nullptr);
 
 
@@ -464,7 +474,7 @@ namespace Crystal {
 
 		commandList->OMSetRenderTargets(_countof(renderTargets), renderTargets, false,
 		                                &scene->ShadowMapTexture->GetDepthStencilView(
-			                                D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT));
+			                                D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D32_FLOAT));
 
 
 		m_Pipelines[8]->Begin();
@@ -748,7 +758,7 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                DXGI_FORMAT_R24G8_TYPELESS,
+		                                                DXGI_FORMAT_R32_TYPELESS,
 		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
@@ -892,7 +902,7 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 		scene->ShadowMapTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
-		                                                DXGI_FORMAT_R24G8_TYPELESS,
+		                                                DXGI_FORMAT_R32_TYPELESS,
 		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	}

@@ -144,7 +144,7 @@ public:
 		{
 			auto staticMeshActor = m_World->SpawnActor<Crystal::StaticMeshActor>({ "" }).lock();
 			staticMeshActor->SetPosition({ 0.0f, -1000.0f, 0.0f });
-			staticMeshActor->SetScale(5.0f);
+			staticMeshActor->SetScale(50.0f);
 
 			
 			auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(

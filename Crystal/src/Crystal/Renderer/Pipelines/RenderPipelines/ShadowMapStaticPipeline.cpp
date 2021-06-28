@@ -1,5 +1,5 @@
 #include "cspch.h"
-#include "ShadowMapPipeline.h"
+#include "ShadowMapStaticPipeline.h"
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Scene.h"
@@ -7,7 +7,7 @@
 namespace Crystal {
 
 
-	void ShadowMapPipeline::OnCreate()
+	void ShadowMapStaticPipeline::OnCreate()
 	{
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -106,7 +106,7 @@ namespace Crystal {
 		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
 
 		pipelineStateStream.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
@@ -116,7 +116,7 @@ namespace Crystal {
 		
 	}
 
-	void ShadowMapPipeline::Begin()
+	void ShadowMapStaticPipeline::Begin()
 	{
 		RenderPipeline::Begin();
 
@@ -128,13 +128,14 @@ namespace Crystal {
 		auto& scene = GetScene();
 
 
+		
 
+
+	
 		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject
 		{
 			auto meshComponent = scene->StaticMeshes[i].lock();
 			if (!meshComponent)
-				continue;
-			if(!meshComponent->GetCastShadow())
 				continue;
 
 			auto staticMesh = Cast<StaticMesh>(meshComponent->GetRenderable()).get();
@@ -167,7 +168,7 @@ namespace Crystal {
 		
 	}
 
-	void ShadowMapPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void ShadowMapStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
 
@@ -182,18 +183,9 @@ namespace Crystal {
 		if (scene->Lights.empty())
 			return;
 		
-
-
 		auto shadowLightSource = scene->Lights[0].lock();
-		auto view = Matrix4x4::LookTo({ 0.0f, 10000.0f, 0.0f }, shadowLightSource->GetLocalForwardVector(), shadowLightSource->GetLocalUpVector());
-		float m_FieldOfView = 60.0f;
-		float m_NearPlane = 100.0f;
-		float m_FarPlane = 100000.0f;
-		auto proj = Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView),
-			static_cast<float>(1920.0f) / static_cast<float>(1080.0f), m_NearPlane, m_FarPlane);
 	
-		
-		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(Matrix4x4::Multiply(view, proj)),0);
+		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection()),0);
 		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
 
 
@@ -220,7 +212,7 @@ namespace Crystal {
 		
 	}
 
-	void ShadowMapPipeline::End()
+	void ShadowMapStaticPipeline::End()
 	{
 		m_InstanceBatches.clear();
 	}

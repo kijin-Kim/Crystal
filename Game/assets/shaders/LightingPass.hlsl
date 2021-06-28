@@ -61,6 +61,7 @@ Texture2D ShadowMap : register(t6);
 
 
 SamplerState DefaultSampler : register(s0);
+SamplerState ShadowMapSampler : register(s1);
 
 static const float PI = 3.14159265359;
 
@@ -110,8 +111,7 @@ float CalculateShadow(float4 lightSpacePosition)
         return 0.0f;
     }
 
-    float2 texCoord = projected.xy * 0.5f + 0.5f; // [-1 , 1] to [0 , 1] range excepct z
-    texCoord.y = -texCoord.y;
+    float2 texCoord = float2(projected.x * 0.5f + 0.5f, -projected.y * 0.5f + 0.5f); // [-1 , 1] to [0 , 1] range excepct z
 
 
     float shadow = 0.0f;
@@ -127,7 +127,7 @@ float CalculateShadow(float4 lightSpacePosition)
     {
         for(int y = -1; y <= 1; ++y)
         {
-            float closest = ShadowMap.Sample(DefaultSampler, texCoord + float2(x,y) * texelSize).r;
+            float closest = ShadowMap.SampleLevel(ShadowMapSampler, texCoord + float2(x,-y) * texelSize, 0).r;
             float current = projected.z;
             shadow += current > closest + bias ? 1.0f : 0.0f;
         }
