@@ -462,7 +462,8 @@
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\GeometrySkeletalPipeline.h" />
-    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapSkeletalPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapStaticPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\SceneConstantBufferData.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.h" />
@@ -549,7 +550,8 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\Pipelines.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LinePipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingPipeline.cpp" />
-    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapSkeletalPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\TonemappingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\RenderSystem.cpp" />

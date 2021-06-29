@@ -334,8 +334,6 @@ namespace Crystal {
 				renderable->Render(commandList, j, 1);
 			}
 		}
-		
-		
 
 	}
 

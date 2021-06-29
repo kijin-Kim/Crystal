@@ -19,7 +19,8 @@
 #include "Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 #include "Pipelines/RenderPipelines/LightingPipeline.h"
 #include "Pipelines/RenderPipelines/LinePipeline.h"
-#include "Pipelines/RenderPipelines/ShadowMapPipeline.h"
+#include "Pipelines/RenderPipelines/ShadowMapSkeletalPipeline.h"
+#include "Pipelines/RenderPipelines/ShadowMapStaticPipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
 
@@ -46,7 +47,8 @@ namespace Crystal {
 		auto toneMappingShader = resourceManager.GetShader("assets/shaders/Tonemapping.hlsl").lock();
 		auto lightingPassShader = resourceManager.GetShader("assets/shaders/LightingPass.hlsl").lock();
 		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl").lock();
-		auto shadowMappingShader = resourceManager.GetShader("assets/shaders/ShadowPass.hlsl").lock();
+		auto shadowMapStaticShader = resourceManager.GetShader("assets/shaders/ShadowPass_Static.hlsl").lock();
+		auto shadowMapSkeletalShader = resourceManager.GetShader("assets/shaders/ShadowPass_Skeletal.hlsl").lock();
 
 
 		{
@@ -288,7 +290,8 @@ namespace Crystal {
 			CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
-		m_Pipelines.push_back(CreatePipeline<ShadowMapPipeline>(shadowMappingShader, "ShadowMapPipeline"));
+		m_Pipelines.push_back(CreatePipeline<ShadowMapStaticPipeline>(shadowMapStaticShader, "ShadowMapStaticPipeline"));
+		m_Pipelines.push_back(CreatePipeline<ShadowMapSkeletalPipeline>(shadowMapSkeletalShader, "ShadowMapSkeletalPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -486,6 +489,9 @@ namespace Crystal {
 
 		m_Pipelines[8]->Begin();
 		m_Pipelines[8]->Record(commandList);
+
+		m_Pipelines[9]->Begin();
+		m_Pipelines[9]->Record(commandList);
 
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
 		commandList->RSSetScissorRects(1, &mainCamera->GetScissorRect());
@@ -778,6 +784,7 @@ namespace Crystal {
 		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
+
 
 
 		DXGI_MODE_DESC targetParam = {};

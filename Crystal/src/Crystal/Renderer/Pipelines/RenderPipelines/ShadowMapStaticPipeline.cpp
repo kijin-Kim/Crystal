@@ -11,8 +11,6 @@ namespace Crystal {
 	{
 		auto device = Device::Instance().GetD3DDevice();
 
-
-
 		struct PipelineStateStream
 		{
 			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
@@ -24,36 +22,20 @@ namespace Crystal {
 		} pipelineStateStream;
 
 
-		CD3DX12_DESCRIPTOR_RANGE1 perFrameDescriptorRanges[] = {
-			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0},
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
-		};
-
-		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
-		};
-
-
 		CD3DX12_ROOT_PARAMETER1 rootParameters[1];
 		rootParameters[0].InitAsConstants(16, 0);
-		
-
-
-		CD3DX12_STATIC_SAMPLER_DESC staticSamplers[] = {
-			CD3DX12_STATIC_SAMPLER_DESC(0)
-		};
 
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
-		rootSigDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(staticSamplers), staticSamplers,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		rootSigDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr,
+		                     D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
-			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+		                                 rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
@@ -75,7 +57,7 @@ namespace Crystal {
 		};
 
 
-		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
+		pipelineStateStream.InputLayout = {inputLayout, _countof(inputLayout)};
 
 
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -106,14 +88,13 @@ namespace Crystal {
 		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
 
 		pipelineStateStream.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 
 
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
+		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
-		
 	}
 
 	void ShadowMapStaticPipeline::Begin()
@@ -128,14 +109,12 @@ namespace Crystal {
 		auto& scene = GetScene();
 
 
-		
-
-
-	
 		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject
 		{
 			auto meshComponent = scene->StaticMeshes[i].lock();
 			if (!meshComponent)
+				continue;
+			if (!meshComponent->GetCastShadow())
 				continue;
 
 			auto staticMesh = Cast<StaticMesh>(meshComponent->GetRenderable()).get();
@@ -165,7 +144,6 @@ namespace Crystal {
 			                                                 0, sizeof(PerInstanceData) * instanceBatches.
 			                                                                              PerInstanceDatas.size());
 		}
-		
 	}
 
 	void ShadowMapStaticPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
@@ -179,14 +157,14 @@ namespace Crystal {
 		commandList->SetGraphicsRootSignature(m_RootSignature.Get());
 
 		auto& scene = GetScene();
-		
+
 		if (scene->Lights.empty())
 			return;
-		
+
+
 		auto shadowLightSource = scene->Lights[0].lock();
-	
-		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection()),0);
-		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection()), 0);
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
 
 
 		for (const auto& pair : m_InstanceBatches)
@@ -209,7 +187,6 @@ namespace Crystal {
 				renderable->Render(commandList, j, perInstanceVertexBuffer->GetSize() / sizeof(PerInstanceData));
 			}
 		}
-		
 	}
 
 	void ShadowMapStaticPipeline::End()

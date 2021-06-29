@@ -25,7 +25,6 @@ cbuffer PerObjectData : register(b1)
 }
 
 
-
 float4 vsMain(VS_INPUT input) : SV_Position
 {
     float4x4 boneTransform = Bones[input.BoneIDs[0]] * input.BoneWeights[0];

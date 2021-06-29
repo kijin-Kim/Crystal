@@ -65,9 +65,9 @@ public:
 
 		if(true)
 		{
-			for (int i = -20; i < 20; i++)
+			for (int i = -5; i < 5; i++)
 			{
-				for (int j = -20; j < 20; j++)
+				for (int j = -5; j < 5; j++)
 				{
 					for (int k = 0; k < 1; k++)
 					{
@@ -93,7 +93,7 @@ public:
 			}
 		}
 
-		if(false)
+		if(true)
 		{
 			for(int i=0; i<2; i++)
 			{
