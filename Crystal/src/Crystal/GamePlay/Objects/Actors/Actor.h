@@ -76,6 +76,8 @@ namespace Crystal {
 		bool GetIsDead() const { return m_bIsDead; }
 		void Destroy() { m_bIsDead = true; }
 
+		virtual void OnTakeDamage() {}
+
 
 		STATIC_TYPE_IMPLE(Actor)
 	protected:

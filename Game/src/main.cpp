@@ -140,8 +140,12 @@ public:
 		m_World->GetCurrentLevel()->OnClientConnect();
 
 
-		auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({ "" }).lock();
+		if(true)
+		{
+			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({ "" }).lock();
+		}
 
+		if(false)
 		{
 			auto staticMeshActor = m_World->SpawnActor<Crystal::StaticMeshActor>({ "" }).lock();
 			staticMeshActor->SetPosition({ 0.0f, -1000.0f, 0.0f });

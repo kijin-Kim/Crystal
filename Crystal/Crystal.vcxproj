@@ -511,6 +511,7 @@
     <ClInclude Include="src\Crystal\Resources\Shader.h" />
     <ClInclude Include="src\Crystal\Resources\ShaderManager.h" />
     <ClInclude Include="src\Crystal\Resources\TextureManager.h" />
+    <ClInclude Include="src\Crystal\Types.h" />
     <ClInclude Include="src\SmartPointerHelper.h" />
     <ClInclude Include="src\cspch.h" />
   </ItemGroup>

@@ -17,6 +17,11 @@ namespace Crystal {
 		auto& scene = level->GetScene();
 
 		level->RegisterPhysicsWorldComponent(Cast<CollisionComponent>(shared_from_this()));
+
+
+#ifndef CS_NM_DEDICATED
+		level->GetScene()->CollisionComponents.push_back(Cast<CollisionComponent>(shared_from_this()));
+#endif		
 	}
 
 	

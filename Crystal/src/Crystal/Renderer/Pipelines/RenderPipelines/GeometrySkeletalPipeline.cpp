@@ -318,7 +318,10 @@ namespace Crystal {
 
 		for(int i=0; i< scene->SkeletalMeshes.size();i++)
 		{
-			auto renderable = scene->SkeletalMeshes[i].lock()->GetRenderable().lock();
+			auto skeletalMesh = scene->SkeletalMeshes[i].lock();
+			if (!skeletalMesh)
+				return;
+			auto renderable = skeletalMesh->GetRenderable().lock();
 			if (!renderable)
 				return;
 

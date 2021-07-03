@@ -1,5 +1,6 @@
 ﻿#include "TestPawn.h"
 
+#include "Crystal/Types.h"
 #include "Crystal/GamePlay/World/Level.h"
 
 BOOST_CLASS_EXPORT(TestPawn)
@@ -129,5 +130,20 @@ void TestPawn::OnFire()
 
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
 	if (level)
-		level->DrawDebugLine(start, direction, maxDistance, Crystal::Vector3::Green);
+	{
+		Crystal::HitResult hitResult = {};
+		Crystal::CollisionParams collisionParams = {};
+		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
+		
+		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
+		if(result)
+		{
+			auto hitActor = hitResult.HitActor.lock();
+			if(hitActor)
+			{
+				hitActor->Destroy();
+			}
+			
+		}
+	}
 }

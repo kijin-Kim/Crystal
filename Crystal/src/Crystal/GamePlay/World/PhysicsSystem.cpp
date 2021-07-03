@@ -1,6 +1,8 @@
 #include "cspch.h"
 #include "PhysicsSystem.h"
 
+#include "Crystal/Types.h"
+
 namespace Crystal {
 
 
@@ -8,7 +10,7 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
-#if 0
+#if 1
 		// Bounding Sphere
 		for (const auto& lhsWeak : m_BoundingSphereComponents)
 		{
@@ -132,10 +134,10 @@ namespace Crystal {
 		auto impulsePerIMass = Vector3::Multiply(contactNormal, impulse); // InverseMass ´ç impulse
 
 		lhsComponent->SetVelocity(Vector3::Add(lhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-			                                       lhsComponent->GetInverseMass())));
+		                                                                                      lhsComponent->GetInverseMass())));
 
 		rhsComponent->SetVelocity(Vector3::Add(rhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-			                                       -rhsComponent->GetInverseMass())));
+		                                                                                      -rhsComponent->GetInverseMass())));
 	}
 
 	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
@@ -183,6 +185,50 @@ namespace Crystal {
 		{
 			m_BoundingSphereComponents.push_back(Cast<BoundingSphereComponent>(component));
 		}
+	}
+
+	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const CollisionParams& collisionParams)
+	{
+		// Bounding Sphere
+
+		float nearest = dist;
+		bool result = false;
+		
+		for (const auto& lhsWeak : m_BoundingSphereComponents)
+		{
+	
+			
+			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
+			if (!sphereComplhs)
+				continue;
+
+			auto ownerActor = Cast<Actor>(sphereComplhs->GetOuter());
+			if(collisionParams.ShouldBeIgnored(ownerActor))
+			{
+				continue;
+			}
+
+			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
+
+
+			
+			DirectX::XMVECTOR originVector = DirectX::XMLoadFloat3(&origin);
+			DirectX::XMVECTOR directionVector = DirectX::XMLoadFloat3(&direction);
+			
+			bool currentResult = sphereLhs.Intersects(originVector, directionVector, dist);
+			if (currentResult && dist < nearest)
+			{
+				nearest = dist;
+				outHitResult.HitActor = ownerActor;
+			}
+
+
+			result |= currentResult;
+			
+		}
+
+		return result;
+		
 	}
 
 

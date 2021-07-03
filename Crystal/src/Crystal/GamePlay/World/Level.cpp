@@ -350,4 +350,10 @@ namespace Crystal {
 
 		return false;
 	}
+
+	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const CollisionParams& collisionParams)
+	{
+		DrawDebugLine(origin, direction, dist, Crystal::Vector3::Green);
+		return m_PhysicsSystem->LineTraceSingle(outHitResult, origin, direction, dist, collisionParams);
+	}
 }

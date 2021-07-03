@@ -8,12 +8,17 @@ namespace Crystal {
 	class PhysicsSystem : public Object
 	{
 	public:
+	
+	public:
 		PhysicsSystem() = default;
 		~PhysicsSystem() override = default;
 
 		void Update(const float deltaTime) override;
 
 		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> compWeak);
+
+
+		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const struct CollisionParams& collisionParams);
 
 
 		STATIC_TYPE_IMPLE(PhysicsWorld)
@@ -26,6 +31,8 @@ namespace Crystal {
 
 		void ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
 			const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration);
+
+		
 
 	private:
 		// Actor Has OwnerShip

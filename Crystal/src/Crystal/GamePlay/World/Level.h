@@ -46,6 +46,8 @@ namespace Crystal {
 		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> component);
 		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 
+		
+
 		void OnClientConnect();
 
 		const Shared<Scene>& GetScene() { return m_Scene; }
@@ -60,6 +62,8 @@ namespace Crystal {
 		
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float , const struct CollisionParams& collisionParams);
 
 		STATIC_TYPE_IMPLE(Level)
 

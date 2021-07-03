@@ -153,7 +153,7 @@ namespace Crystal {
 		{
 			
 #ifndef CS_NM_DEDICATED
-			//SetRenderable(resourceManager.GetRenderable("LineBoxMesh"));
+			
 #endif
 		}
 

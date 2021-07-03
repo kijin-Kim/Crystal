@@ -37,7 +37,7 @@ namespace Crystal {
 		for (int i = 0; i < scene->CollisionComponents.size(); i++)
 		{
 			auto component = Cast<CollisionComponent>(scene->CollisionComponents[i]);
-			if(!component)
+			if (!component)
 				continue;
 
 			PerInstanceData perInstanceData = {};
@@ -48,15 +48,30 @@ namespace Crystal {
 			auto& materials = component->GetMaterials();
 			for (const auto& mat : materials)
 			{
-				/*if (!IsValidForThisPipelineNew(mat.get()))
-					continue;*/
-
 				auto material = mat.get();
 				perInstanceData.Color = material->AlbedoColor;
-				
+
 			}
 
-			auto renderable = component->GetRenderable().lock();
+			auto staticType = component->StaticType();
+
+			Shared<Renderable> renderable = nullptr;
+
+			
+			if (staticType == "RayComponent")
+			{
+				renderable = scene->LineMesh;
+			}
+			else if (staticType == "BoundingBoxComponent" || staticType == "BoundingOrientedBoxComponent")
+			{
+				renderable = scene->LineBoxMesh;
+			}
+			else if(staticType == "BoundingSphereComponent")
+			{
+				renderable = scene->LineSphereMesh;
+			}
+
+			
 			if(!renderable)
 			{
 				continue;
