@@ -16,6 +16,12 @@ class TestPawn final : public Crystal::Pawn
 		boost::serialization::base_object<Crystal::Pawn>(*this);
 		ar & *m_MovementComponent;
 		ar & *m_CameraComponent;
+		ar& m_bShouldFire;
+		ar& m_RoundPerMin;
+		ar & m_RoundPerSec;
+		ar& m_FireInterval;
+//		ar& m_FireTimer;
+		ar& m_Health;
 	}
 
 public:
@@ -42,8 +48,6 @@ public:
 private:
 	void OnFire();
 
-	
-	
 
 private:
 	std::shared_ptr<Crystal::MovementComponent> m_MovementComponent = nullptr;
@@ -53,7 +57,9 @@ private:
 	float m_RoundPerMin = 500.0f;
 	float m_RoundPerSec = m_RoundPerMin / 60.0f;
 	float m_FireInterval = 1.0f / m_RoundPerSec;
-	
 
 	Crystal::Timer m_FireTimer;
+
+
+	int m_Health = 0;
 };

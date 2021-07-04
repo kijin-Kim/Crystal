@@ -8,47 +8,53 @@ BOOST_CLASS_EXPORT(TestPawn)
 void TestPawn::Initialize()
 {
 	Pawn::Initialize();
-	
+
 
 	auto material = std::make_unique<Crystal::Material>();
 	material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
 
 
-	auto boxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	boxComponent->SetRadius(908.0f / 2.0f);
-	boxComponent->SetMass(20000.0f);
+	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+	sphereComponent->SetRadius(908.0f / 2.0f);
+	sphereComponent->SetMass(20000.0f);
+	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	{
+			this->m_Health -= 1;
+	});
 
-	m_MainComponent = boxComponent;
+
+	m_MainComponent = sphereComponent;
 
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 	staticMeshComponent->AddMaterial(std::move(material));
 	staticMeshComponent->AttachTo(m_MainComponent);
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-	springArmComponent->SetOffsetPosition({ 0, 450.0f, -1500.0f });
+	springArmComponent->SetOffsetPosition({0, 450.0f, -1500.0f});
 	springArmComponent->AttachTo(m_MainComponent);
-	
+
 
 	m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
 	m_CameraComponent->SetFieldOfView(60.0f);
 	m_CameraComponent->SetNearPlane(100.0f);
-	m_CameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
+	m_CameraComponent->SetViewport({0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f});
 	m_CameraComponent->SetFarPlane(1000000.0f);
 	m_CameraComponent->AttachTo(springArmComponent);
 
 	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
-
 }
 
 void TestPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
 
+	CS_DEBUG_INFO("%d", m_Health);
+
 
 	m_FireTimer.Tick();
-	
-	if(m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)
+
+	if (m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)
 	{
 		m_FireTimer.Reset();
 		OnFire();
@@ -134,16 +140,15 @@ void TestPawn::OnFire()
 		Crystal::HitResult hitResult = {};
 		Crystal::CollisionParams collisionParams = {};
 		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
-		
+
 		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
-		if(result)
+		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();
-			if(hitActor)
+			if (hitActor)
 			{
-				hitActor->Destroy();
+				hitActor->OnTakeDamage(1.0f, Crystal::Cast<Actor>(weak_from_this()));
 			}
-			
 		}
 	}
 }

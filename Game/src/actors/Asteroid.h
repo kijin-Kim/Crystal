@@ -40,5 +40,12 @@ public:
 		SetPosition({(float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000), (float)(rand() % 10000 - 5000)});
 	}
 
+	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override
+	{
+		Destroy();
+	}
+
+	
 	STATIC_TYPE_IMPLE(Asteroid)
 };
+	

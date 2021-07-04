@@ -51,14 +51,18 @@ namespace Crystal {
 		void SetCollisionEnabled(bool bEnable) { m_bCollisionEnabled = bEnable; }
 		bool IsCollisionEnabled() const override { return m_bCollisionEnabled; }
 
+		virtual void OnHit(const struct HitResult& hitResult);
+		void BindOnHitEvent(const std::function<void(const struct HitResult&)>& event);
+
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
 	protected:
 		DirectX::XMFLOAT4X4 m_PostScaledTransform = Matrix4x4::Identity();
 
-
 	private:
 		bool m_bCollisionEnabled = true;
+		std::function<void(const struct HitResult&)> m_OnHitEvent;
+		
 	};
 
 	class RayComponent : public CollisionComponent

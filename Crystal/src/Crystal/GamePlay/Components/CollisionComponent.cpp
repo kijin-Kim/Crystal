@@ -1,5 +1,7 @@
 #include "cspch.h"
 #include "CollisionComponent.h"
+
+#include "Crystal/Types.h"
 #include "Crystal/GamePlay/World/World.h"
 #include "Crystal/GamePlay/World/Level.h"
 
@@ -24,6 +26,18 @@ namespace Crystal {
 #endif		
 	}
 
-	
+	void CollisionComponent::OnHit(const HitResult& hitResult)
+	{
+		if(m_OnHitEvent)
+		{
+			m_OnHitEvent(hitResult);
+		}
+	}
+
+	void CollisionComponent::BindOnHitEvent(const std::function<void(const HitResult&)>& event)
+	{
+		m_OnHitEvent = event;
+	}
+
 
 }

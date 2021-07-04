@@ -38,64 +38,17 @@ namespace Crystal {
 				if (sphereLhs.Intersects(sphereRhs, totalDist))
 				{
 					ResolveVelocity(sphereComplhs, sphereCompRhs, totalDist);
-				}
-			}
-		}
-
-		// Bounding Sphere
-		for (const auto& lhsWeak : m_BoundingSphereComponents)
-		{
-			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
-			if (!sphereComplhs)
-				continue;
-
-			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
-
-			// Bounding Sphere
-			for (const auto& rhsWeak : m_BoundingSphereComponents)
-			{
-				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
-				if (!sphereCompRhs)
-					continue;
-
-				if (sphereComplhs == sphereCompRhs)
-					continue;
-
-
-				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
-
-				float totalDist = 0.0f;
-				if (sphereLhs.Intersects(sphereRhs, totalDist))
-				{
 					ResolvePenetration(sphereComplhs, sphereCompRhs, totalDist);
+
+					
+					HitResult hitResult = {};
+					hitResult.HitActor = Cast<Actor>(sphereCompRhs->GetOuter());
+					sphereComplhs->OnHit(hitResult);
 				}
 			}
 		}
 
 
-		// Bounding Sphere
-		for (const auto& sphereCompWeak : m_BoundingSphereComponents)
-		{
-			auto sphereCompLhs = Cast<BoundingSphereComponent>(sphereCompWeak);
-			if (!sphereCompLhs)
-				continue;
-
-			auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
-
-			// Bounding Oriented Box
-			for (const auto& obbCompWeak : m_BoundingOrientedBoxComponents)
-			{
-				auto obbCompRhs = Cast<BoundingOrientedBoxComponent>(obbCompWeak);
-				if (!obbCompRhs)
-					continue;
-
-				auto obbRhs = obbCompRhs->GetWorldBoundingOrientedBox();
-
-				if (sphereLhs.Intersects(obbRhs))
-				{
-				}
-			}
-		}
 #endif
 	}
 
