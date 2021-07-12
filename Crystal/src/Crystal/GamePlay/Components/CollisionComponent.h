@@ -23,7 +23,7 @@ namespace Crystal {
 		CollisionComponent()
 		{
 			auto material = std::make_unique<Material>();
-			material->ShadingModel = EShadingModel::ShadingModel_Unlit;
+			material->ShadingModel = EShadingModel::SM_Unlit;
 			material->AlbedoColor = Vector3::Yellow;
 
 			AddMaterial(std::move(material));

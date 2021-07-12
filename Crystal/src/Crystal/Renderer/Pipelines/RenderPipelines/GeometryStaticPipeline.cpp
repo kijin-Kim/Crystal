@@ -146,6 +146,8 @@ namespace Crystal {
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
+		
+
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));

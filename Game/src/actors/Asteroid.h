@@ -18,16 +18,17 @@ public:
 	void Initialize() override
 	{
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-		boundingSphereComponent->SetRadius(400.0f);
+		boundingSphereComponent->SetRadius(40.0f);
 
 		m_MainComponent = boundingSphereComponent;
 
 		auto material = std::make_unique<Crystal::Material>();
-		material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
+		material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
 
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		meshComponent->AddMaterial(std::move(material));
 		meshComponent->AttachTo(m_MainComponent);
+		meshComponent->SetScale(1.0f);
 
 		auto randomScale = rand() % 1 + 1;
 

@@ -3,37 +3,34 @@
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
 
-class Sun : public Crystal::DirectionalLightActor
+class PlayCircle : public Crystal::Actor
 {
 	SERIALIZE_PROPERTIES
 	{
-		boost::serialization::base_object<Crystal::DirectionalLightActor>(*this);
+		boost::serialization::base_object<Crystal::Actor>(*this);
 	}
 
 public:
-	Sun() = default;
-	~Sun() override = default;
+	PlayCircle() = default;
+	~PlayCircle() override = default;
 
 	void Initialize() override
 	{
-		Crystal::DirectionalLightActor::Initialize();
+		Crystal::Actor::Initialize();
 
 
 		auto material = std::make_unique<Crystal::Material>();
-		material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
+		material->AlbedoColor = Crystal::Vector3::Red;
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
 		staticMeshComponent->SetScale(600.0f);
+		
 
 		m_MainComponent = staticMeshComponent;
-
-
-		m_LightComponent->SetLocalPosition(Crystal::Vector3::Zero);
-		m_LightComponent->AttachTo(m_MainComponent);
 	}
 
-	STATIC_TYPE_IMPLE(Sun)
+	STATIC_TYPE_IMPLE(PlayCircle)
 };

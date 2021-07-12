@@ -19,10 +19,10 @@ public:
 	{
 
 		auto bodyMaterial = std::make_unique<Crystal::Material>();
-		bodyMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
+		bodyMaterial->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
 
 		auto tentacleMaterial = std::make_unique<Crystal::Material>();
-		tentacleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
+		tentacleMaterial->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
 
 
 		auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");

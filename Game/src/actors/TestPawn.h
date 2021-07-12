@@ -42,6 +42,10 @@ public:
 	void BeginFire();
 	void EndFire();
 
+	void FireMissile();
+
+	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
+
 
 	STATIC_TYPE_IMPLE(TestPawn)
 

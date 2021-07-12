@@ -17,6 +17,8 @@
 #include <boost/functional/hash.hpp>
 
 #include "actors/Kraken.h"
+#include "actors/Missile.h"
+#include "actors/PlayCircle.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
@@ -79,15 +81,13 @@ public:
 						auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
 							asteroid->GetComponentByName("StaticMeshComponent"));
 						staticMeshComponent->SetRenderable(
-							resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_1.fbx"));
+							resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_6.fbx"));
 						auto& materials = staticMeshComponent->GetMaterials();
 						auto pbrMat = materials[0].get();
-						pbrMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_1_A.tga");
-						pbrMat->MetallicTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_1_M.tga");
-						pbrMat->RoughnessTexture = resourceManager.
-							GetTexture("assets/textures/Asteroid/AstOre_1_R.tga");
-						pbrMat->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_1_N.tga");
-						pbrMat->EmissiveTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_1_E.tga");
+						pbrMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_A.tga");
+						pbrMat->MetallicTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_M.tga");
+						pbrMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_R.tga");
+						pbrMat->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_N.tga");
 					}
 				}
 			}
@@ -163,7 +163,12 @@ public:
 			pbrMat->AlbedoColor = Crystal::Vector3::White;
 		}
 		
+
+		auto playCircle = m_World->SpawnActor<PlayCircle>({ "" }).lock();
+		auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(playCircle->GetComponentByClass("StaticMeshComponent"));
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		
+
 
 
 #endif

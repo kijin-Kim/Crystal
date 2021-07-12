@@ -38,6 +38,13 @@ namespace Crystal {
 		fireActionMapping.bCtrlDown = false;
 		fireActionMapping.bShiftDown = false;
 		AddActionMapping("Fire", fireActionMapping);
+
+		Crystal::ActionMapping fireMissileActionMapping = {};
+		fireMissileActionMapping.CrystalCode = Crystal::Mouse::Button::Right;
+		fireMissileActionMapping.bAltDown = false;
+		fireMissileActionMapping.bCtrlDown = false;
+		fireMissileActionMapping.bShiftDown = false;
+		AddActionMapping("FireMissile", fireMissileActionMapping);
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

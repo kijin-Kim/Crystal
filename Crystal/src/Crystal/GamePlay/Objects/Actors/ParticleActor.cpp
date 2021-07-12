@@ -14,7 +14,7 @@ namespace Crystal {
 		auto particleComponent = CreateComponent<ParticleComponent>("ParticleComponent");
 
 		auto particleMaterial = CreateShared<Crystal::Material>();
-		particleMaterial->ShadingModel = Crystal::EShadingModel::ShadingModel_Undefined;
+		particleMaterial->ShadingModel = Crystal::EShadingModel::SM_Undefined;
 		particleMaterial->AlbedoTexture = ResourceManager::Instance().GetTexture("assets/textures/T_Explosion_SubUV.tga");
 
 		particleComponent->AddMaterial(std::move(particleMaterial));

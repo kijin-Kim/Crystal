@@ -948,13 +948,13 @@ namespace Crystal {
 
 		switch (materials[0]->ShadingModel)
 		{
-		case EShadingModel::ShadingModel_Undefined:
+		case EShadingModel::SM_Undefined:
 			m_Pipelines[7]->RegisterPipelineComponents(componentWeak);
 			break;
-		case EShadingModel::ShadingModel_Unlit:
+		case EShadingModel::SM_Unlit:
 			m_Pipelines[0]->RegisterPipelineComponents(componentWeak);
 			break;
-		case EShadingModel::ShadingModel_DefaultLit:
+		case EShadingModel::SM_DefaultLit:
 			{
 				auto type = component->StaticType();
 				if (type == "StaticMeshComponent")

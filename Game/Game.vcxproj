@@ -313,6 +313,8 @@
   <ItemGroup>
     <ClCompile Include="src\actors\Asteroid.cpp" />
     <ClCompile Include="src\actors\Kraken.cpp" />
+    <ClCompile Include="src\actors\Missile.cpp" />
+    <ClCompile Include="src\actors\PlayCircle.cpp" />
     <ClCompile Include="src\actors\Sun.cpp" />
     <ClCompile Include="src\actors\TestPawn.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -320,6 +322,8 @@
   <ItemGroup>
     <ClInclude Include="src\actors\Asteroid.h" />
     <ClInclude Include="src\actors\Kraken.h" />
+    <ClInclude Include="src\actors\Missile.h" />
+    <ClInclude Include="src\actors\PlayCircle.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\TestPawn.h" />
   </ItemGroup>

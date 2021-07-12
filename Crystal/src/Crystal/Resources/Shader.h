@@ -91,6 +91,8 @@ namespace Crystal {
 		void SetInputLayout(InputLayout inputLayout) { m_InputLayout = inputLayout; }
 		const InputLayout& GetInputLayout() const { return m_InputLayout; }
 
+		
+
 		void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE type) { m_PrimitiveTopologyType = type; }
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const { return m_PrimitiveTopologyType; }
 
@@ -121,6 +123,10 @@ namespace Crystal {
 
 		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_ShaderReflection = nullptr;
 
+
 		DirectX::XMFLOAT3 m_DispatchThreadGroupCount = Vector3::Zero;
+
+		D3D12_DEPTH_STENCIL_DESC m_DepthStencilDesc = {};
+		D3D12_RT_FORMAT_ARRAY m_RenderTargetFormats = {};
 	};
 }

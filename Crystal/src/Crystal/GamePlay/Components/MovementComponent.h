@@ -3,7 +3,7 @@
 #include "TransformComponent.h"
 
 namespace Crystal {
-	class MovementComponent final : public Component
+	class MovementComponent : public Component
 	{
 		SERIALIZE_PROPERTIES
 		{

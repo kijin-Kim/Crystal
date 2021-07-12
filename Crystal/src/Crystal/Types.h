@@ -3,6 +3,22 @@
 
 namespace Crystal {
 
+	enum class EShadingModel
+	{
+		SM_Undefined,
+		SM_Unlit,
+		SM_DefaultLit,
+		ShadingModelCount
+	};
+
+	enum class EBlendMode
+	{
+		BM_Opaque,
+		BM_Translucent,
+		BM_Additive,
+		BlendModeCount
+	};
+
 	struct HitResult
 	{
 		Weak<Actor> HitActor = {};

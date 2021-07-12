@@ -1,5 +1,6 @@
 ﻿#include "TestPawn.h"
 
+#include "Missile.h"
 #include "Crystal/Types.h"
 #include "Crystal/GamePlay/World/Level.h"
 
@@ -11,11 +12,11 @@ void TestPawn::Initialize()
 
 
 	auto material = std::make_unique<Crystal::Material>();
-	material->ShadingModel = Crystal::EShadingModel::ShadingModel_DefaultLit;
+	material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
 
 
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	sphereComponent->SetRadius(908.0f / 2.0f);
+	sphereComponent->SetRadius(50.0f);
 	sphereComponent->SetMass(20000.0f);
 	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	{
@@ -30,15 +31,15 @@ void TestPawn::Initialize()
 	staticMeshComponent->AttachTo(m_MainComponent);
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-	springArmComponent->SetOffsetPosition({0, 450.0f, -1500.0f});
+	springArmComponent->SetOffsetPosition({0, 45.0f, -150.0f});
 	springArmComponent->AttachTo(m_MainComponent);
 
 
 	m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-	m_CameraComponent->SetFieldOfView(60.0f);
-	m_CameraComponent->SetNearPlane(100.0f);
+	m_CameraComponent->SetFieldOfView(90.0f);
+	m_CameraComponent->SetNearPlane(20.0f);
 	m_CameraComponent->SetViewport({0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f});
-	m_CameraComponent->SetFarPlane(1000000.0f);
+	m_CameraComponent->SetFarPlane(100000.0f);
 	m_CameraComponent->AttachTo(springArmComponent);
 
 	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
@@ -75,6 +76,8 @@ void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::BeginFire));
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(TestPawn::EndFire));
+
+	inputComponent->BindAction("FireMissile", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::FireMissile));
 }
 
 void TestPawn::RotateYaw(float value)
@@ -91,21 +94,21 @@ void TestPawn::RotatePitch(float value)
 
 void TestPawn::MoveForward(float value)
 {
-	value *= 30000000;
+	value *= 3000000;
 	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
 	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 }
 
 void TestPawn::MoveRight(float value)
 {
-	value *= 30000000;
+	value *= 3000000;
 	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
 	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 }
 
 void TestPawn::MoveUp(float value)
 {
-	value *= 30000000;
+	value *= 3000000;
 	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
 	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 }
@@ -125,6 +128,38 @@ void TestPawn::EndFire()
 {
 	CS_DEBUG_INFO("EndFire!!");
 	m_bShouldFire = false;
+}
+
+void TestPawn::FireMissile()
+{
+	CS_DEBUG_INFO("FireMissile !!");
+
+	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
+	if(level)
+	{
+		auto missile = level->SpawnActor<Missile>({}).lock();
+		auto playerPosition = GetPosition();
+		missile->SetPosition({playerPosition.x, playerPosition.y, playerPosition.z + 30.0f });
+		
+		
+	}
+	
+}
+
+void TestPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+{
+	auto actorCausedDamage = damageCauser.lock();
+	if(!actorCausedDamage)
+	{
+		return;
+	}
+
+	auto staticType = actorCausedDamage->StaticType();
+	if(staticType == "TestPawn")
+	{
+		m_Health -= damage;
+	}
+	
 }
 
 void TestPawn::OnFire()

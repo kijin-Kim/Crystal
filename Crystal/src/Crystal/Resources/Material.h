@@ -1,19 +1,14 @@
 #pragma once
 #include <memory>
+
+#include "Crystal/Types.h"
 #include "Crystal/Resources/Texture.h"
 #include "Crystal/Resources/Shader.h"
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
 
-	enum class EShadingModel
-	{
-		ShadingModel_Undefined,
-		ShadingModel_Unlit,
-		ShadingModel_DefaultLit,
-		ShadingModelCount
-	};
-	
+
 
 	struct Material : public Object
 	{
@@ -31,7 +26,10 @@ namespace Crystal {
 		Weak<Texture> EmissiveTexture = {};
 		DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 
-		EShadingModel ShadingModel = EShadingModel::ShadingModel_Undefined;
+		bool bTwoSided = false;
+
+		EShadingModel ShadingModel = EShadingModel::SM_Undefined;
+		EBlendMode BlendMode = EBlendMode::BM_Opaque;
 
 		bool UsingSameTextures(Material* material);
 
