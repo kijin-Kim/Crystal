@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 
 #include "Crystal/GamePlay/Objects/Object.h"
+#include "Crystal/Math/Math.h"
 
 namespace Crystal {
 	class Component;
@@ -32,6 +33,9 @@ namespace Crystal {
 		struct ActorSpawnParams
 		{
 			std::string Name;
+			DirectX::XMFLOAT3 Position = Vector3::Zero;
+			DirectX::XMFLOAT4 Rotation = Vector4::Zero;
+			float Scale = 0.0f;
 			Level* Level = nullptr;
 		};
 
@@ -43,11 +47,7 @@ namespace Crystal {
 
 		void OnCreate() override;
 
-		virtual void Begin();
-
-		virtual void End()
-		{
-		}
+		void Begin() override;
 
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/

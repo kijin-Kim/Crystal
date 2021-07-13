@@ -55,33 +55,17 @@ namespace Crystal {
 	{
 		if (spawnParams.Level)
 		{
-			return spawnParams.Level->SpawnActor<T>(spawnParams.Name);
+			return spawnParams.Level->SpawnActor<T>(spawnParams);
 		}
 
 		if (m_CurrentLevel)
 		{
-			return m_CurrentLevel->SpawnActor<T>(spawnParams.Name);
+			return m_CurrentLevel->SpawnActor<T>(spawnParams);
 		}
 
 		CS_FATAL(false, "먼저 Level을 설정해주세요");
 		return {};
 	}
 
-	template <class T>
-	std::weak_ptr<T> World::SpawnPrototypeActor(const std::string& prototypeActorName, const Actor::ActorSpawnParams& spawnParams)
-	{
-		if (spawnParams.Level)
-		{
-			return spawnParams.Level->SpawnProtoTypedActor<T>(prototypeActorName, spawnParams.Name);
-		}
-
-		if (m_CurrentLevel)
-		{
-			return m_CurrentLevel->SpawnProtoTypedActor<T>(prototypeActorName, spawnParams.Name);
-		}
-
-		CS_FATAL(false, "먼저 Level을 설정해주세요");
-		return nullptr;
-	}
 
 }

@@ -176,6 +176,12 @@ namespace Crystal {
 			const DirectX::XMFLOAT4 Identity = {0.0f, 0.0f, 0.0f, 1.0f};
 		}
 
+		inline bool IsZero(const DirectX::XMFLOAT4& v1)
+		{
+			bool isZero = DirectX::XMVector4Equal(XMLoadFloat4(&v1), DirectX::XMVectorZero());
+			return isZero;
+		}
+
 		inline DirectX::XMFLOAT4 Multiply(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4& v2)
 		{
 			DirectX::XMFLOAT4 result;

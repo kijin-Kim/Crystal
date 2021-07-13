@@ -66,7 +66,7 @@ namespace Crystal {
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
 	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
-		auto debugLineActor = SpawnActor<LineActor>().lock();
+		auto debugLineActor = SpawnActor<LineActor>({}).lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
 		lineComponent->SetOrigin(origin);
 		lineComponent->SetDirection(direction);
@@ -124,7 +124,7 @@ namespace Crystal {
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& startPoint, const DirectX::XMFLOAT3& endPoint,
 	                          const DirectX::XMFLOAT3& color /*= { 0.0f, 1.0f, 0.0f }*/)
 	{
-		auto debugLineActor = SpawnActor<LineActor>().lock();
+		auto debugLineActor = SpawnActor<LineActor>({}).lock();
 		auto lineComponent = debugLineActor->GetLineComponent();
 
 		const auto endSubStart = Vector3::Subtract(endPoint, startPoint);
@@ -204,7 +204,7 @@ namespace Crystal {
 
 		playerStartActor->Destroy();
 
-		auto playerController = SpawnActor<PlayerController>().lock();
+		auto playerController = SpawnActor<PlayerController>({}).lock();
 		playerController->Possess(newActor);
 
 #endif

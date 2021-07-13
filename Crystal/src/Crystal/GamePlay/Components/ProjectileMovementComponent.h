@@ -14,15 +14,13 @@ namespace Crystal {
 		ProjectileMovementComponent() = default;
 		~ProjectileMovementComponent() override = default;
 
-		void Update(const float deltaTime) override
+		void Begin() override
 		{
-			MovementComponent::Update(deltaTime);
-
+			MovementComponent::Begin();
 			
-			
+			auto newVelocity = Vector3::Multiply(m_TargetComponent->GetWorldForwardVector(), 3000.0f);
+			m_TargetComponent->SetVelocity(newVelocity);
 		}
-
-
 		
 		STATIC_TYPE_IMPLE(ProjectileMovementComponent)
 	};

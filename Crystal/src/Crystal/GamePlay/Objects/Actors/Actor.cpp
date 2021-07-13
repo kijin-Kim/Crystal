@@ -23,6 +23,15 @@ namespace Crystal {
 	void Actor::Begin()
 	{
 		Cast<Level>(GetOuter())->AddActor(Cast<Actor>(shared_from_this()));
+
+		for (auto& transformComponent : m_TransformHierarchy)
+			transformComponent->UpdateTransforms();
+
+		for (auto& component : m_Components)
+			component->Begin();
+		for (auto& transformComponent : m_TransformHierarchy)
+			transformComponent->Begin();
+		
 	}
 
 	void Actor::UpdateComponents(float deltaTime)

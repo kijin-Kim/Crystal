@@ -31,6 +31,14 @@ namespace Crystal {
 		virtual void Initialize();
 		virtual void OnCreate();
 
+		virtual void Begin()
+		{
+		}
+
+		virtual void End()
+		{
+		}
+
 		
 
 		virtual void Update(float deltaTime);

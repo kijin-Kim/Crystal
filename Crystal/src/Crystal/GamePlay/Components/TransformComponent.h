@@ -35,9 +35,13 @@ namespace Crystal {
 		TransformComponent() = default;
 		~TransformComponent() override = default;
 
+		void Begin() override;
+
 		void UpdateTransformByForce(float deltaTime);
 		void Update(float deltaTime) override;
-		void UpdateTransformHierarchy();
+		void UpdateTransforms();
+		void UpdateLocalTransform();
+		void UpdateWorldTransform();
 
 		void AttachTo(const std::shared_ptr<TransformComponent> component);
 
@@ -58,7 +62,7 @@ namespace Crystal {
 		void RotateYaw(float angle);
 
 		DirectX::XMFLOAT3 GetLocalPosition() const;
-		DirectX::XMFLOAT3 GetWorldPosition() const;
+		DirectX::XMFLOAT3 GetWorldPosition();
 		const DirectX::XMFLOAT3& GetVelocity() const;
 		float GetScale();
 		float GetMass() const;
@@ -68,15 +72,15 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetLocalRightVector() const;
 		const DirectX::XMFLOAT3& GetLocalUpVector() const;
 		const DirectX::XMFLOAT3& GetLocalForwardVector() const;
-		DirectX::XMFLOAT3 GetWorldRightVector() const;
-		DirectX::XMFLOAT3 GetWorldUpVector() const;
-		DirectX::XMFLOAT3 GetWorldForwardVector() const;
+		DirectX::XMFLOAT3 GetWorldRightVector();
+		DirectX::XMFLOAT3 GetWorldUpVector();
+		DirectX::XMFLOAT3 GetWorldForwardVector();
 
 		void SetParentComponent(const std::weak_ptr<TransformComponent>& component);
 		std::weak_ptr<TransformComponent> GetParentComponent() const;
 
 
-		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
+		const DirectX::XMFLOAT4X4& GetWorldTransform();
 		const DirectX::XMFLOAT4X4& GetLocalTransform() const;
 
 		const DirectX::XMFLOAT4& GetRotation() const;

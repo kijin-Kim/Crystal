@@ -4,6 +4,11 @@
 BOOST_CLASS_EXPORT(Crystal::TransformComponent)
 
 namespace Crystal {
+	void TransformComponent::Begin()
+	{
+		Component::Begin();
+	}
+
 	void TransformComponent::UpdateTransformByForce(float deltaTime)
 	{
 		auto position = GetLocalPosition();
@@ -30,20 +35,28 @@ namespace Crystal {
 		Component::Update(deltaTime);
 
 		UpdateTransformByForce(deltaTime);
+		UpdateTransforms();
+	}
 
+	void TransformComponent::UpdateTransforms()
+	{
+		UpdateLocalTransform();
+		UpdateWorldTransform();
+	}
+
+	void TransformComponent::UpdateLocalTransform()
+	{
 		const auto position = GetLocalPosition();
-		const auto scale = Matrix4x4::Scale({m_Scale, m_Scale, m_Scale});
+		const auto scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
 		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_Rotation);
 		const auto translation = Matrix4x4::Translation(position);
 
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, translation);
-
-		UpdateTransformHierarchy();
 	}
 
 
-	void TransformComponent::UpdateTransformHierarchy()
+	void TransformComponent::UpdateWorldTransform()
 	{
 		/*Parent부터 자식 순으로 계산하여야 함*/
 		if (!m_ParentComponent.expired())
@@ -171,8 +184,9 @@ namespace Crystal {
 	}
 
 
-	DirectX::XMFLOAT3 TransformComponent::GetWorldPosition() const
+	DirectX::XMFLOAT3 TransformComponent::GetWorldPosition()
 	{
+		UpdateTransforms();
 		return {m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43};
 	}
 
@@ -222,18 +236,21 @@ namespace Crystal {
 		return m_Forward;
 	}
 
-	DirectX::XMFLOAT3 TransformComponent::GetWorldRightVector() const
+	DirectX::XMFLOAT3 TransformComponent::GetWorldRightVector()
 	{
+		UpdateTransforms();
 		return {m_WorldTransform._11, m_WorldTransform._12, m_WorldTransform._13};
 	}
 
-	DirectX::XMFLOAT3 TransformComponent::GetWorldUpVector() const
+	DirectX::XMFLOAT3 TransformComponent::GetWorldUpVector()
 	{
+		UpdateTransforms();
 		return {m_WorldTransform._21, m_WorldTransform._22, m_WorldTransform._23};
 	}
 
-	DirectX::XMFLOAT3 TransformComponent::GetWorldForwardVector() const
+	DirectX::XMFLOAT3 TransformComponent::GetWorldForwardVector()
 	{
+		UpdateTransforms();
 		return {m_WorldTransform._31, m_WorldTransform._32, m_WorldTransform._33};
 	}
 
@@ -248,8 +265,9 @@ namespace Crystal {
 	}
 
 
-	const DirectX::XMFLOAT4X4& TransformComponent::GetWorldTransform() const
+	const DirectX::XMFLOAT4X4& TransformComponent::GetWorldTransform()
 	{
+		UpdateTransforms();
 		return m_WorldTransform;
 	}
 

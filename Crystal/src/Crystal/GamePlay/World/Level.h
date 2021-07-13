@@ -27,7 +27,7 @@ namespace Crystal {
 		void Update(const float deltaTime) override;
 
 		template <class T>
-		std::weak_ptr<T> SpawnActor(const std::string& name = "");
+		std::weak_ptr<T> SpawnActor(const Actor::ActorSpawnParams& spawnParams);
 
 
 		void AddActor(const std::shared_ptr<Actor>& actor);
@@ -88,16 +88,33 @@ namespace Crystal {
 	};
 
 	template <class T>
-	std::weak_ptr<T> Crystal::Level::SpawnActor(const std::string& name /*= ""*/)
+	std::weak_ptr<T> Crystal::Level::SpawnActor(const Actor::ActorSpawnParams& spawnParams)
 	{
 		// Create new actor
-		auto newActor = CreateObject<T>(name, weak_from_this());
+		auto newActor = Cast<Actor>(CreateObject<T>(spawnParams.Name, weak_from_this()));
 
+		// Set Initial Transform
+		if(!Vector3::IsZero(spawnParams.Position))
+		{
+			newActor->SetPosition(spawnParams.Position);
+		}
+
+		if(!Vector4::IsZero(spawnParams.Rotation))
+		{
+			newActor->SetRotation(spawnParams.Rotation);
+		}
+
+		if(spawnParams.Scale != 0.0f)
+		{
+			newActor->SetScale(spawnParams.Scale);
+		}
+		
+		
+		
+	
 		newActor->Begin();
 
-		//m_Actors.push_back(newActor);
-
-		return newActor;
+		return Cast<T>(newActor);
 	}
 
 

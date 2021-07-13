@@ -13,7 +13,7 @@ namespace Crystal {
 	public:
 		MovementComponent() = default;
 		~MovementComponent() override = default;
-
+		
 		void SetTargetComponent(std::shared_ptr<TransformComponent> targetComponent)
 		{
 			m_TargetComponent = std::move(targetComponent);
@@ -29,7 +29,7 @@ namespace Crystal {
 
 
 		STATIC_TYPE_IMPLE(MovementComponent)
-	private:
+	protected:
 		std::shared_ptr<TransformComponent> m_TargetComponent = nullptr;
 	};
 }

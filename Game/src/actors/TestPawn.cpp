@@ -137,9 +137,15 @@ void TestPawn::FireMissile()
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
 	if(level)
 	{
-		auto missile = level->SpawnActor<Missile>({}).lock();
+		Crystal::Actor::ActorSpawnParams spawnParams = {};
+
 		auto playerPosition = GetPosition();
-		missile->SetPosition({playerPosition.x, playerPosition.y, playerPosition.z + 30.0f });
+		spawnParams.Position = { playerPosition.x, playerPosition.y, playerPosition.z + 30.0f };
+		spawnParams.Rotation = GetRotation();
+		
+		auto missile = level->SpawnActor<Missile>(spawnParams).lock();
+		
+		
 		
 		
 	}

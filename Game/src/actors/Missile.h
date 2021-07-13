@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
+#include "Crystal/GamePlay/Components/ProjectileMovementComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/Material.h"
 
@@ -29,10 +30,14 @@ public:
 		meshComponent->AddMaterial(std::move(material));
 		meshComponent->AttachTo(m_MainComponent);
 
-		
 		meshComponent->SetRenderable(Crystal::ResourceManager::Instance().GetRenderable<Crystal::StaticMesh>("assets/models/SM_Missile_B.fbx"));
 
 		m_MainComponent->SetMass(5000.0f);
+
+		auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
+		projectileMovementComponent->SetTargetComponent(m_MainComponent);
+		
+		
 	}
 
 

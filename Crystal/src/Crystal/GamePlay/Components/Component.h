@@ -21,6 +21,7 @@ namespace Crystal {
 		{
 		}
 
+
 		virtual bool CanBeRendered() const { return false; }
 		virtual bool IsCollisionEnabled() const { return false; }
 
