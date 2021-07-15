@@ -93,6 +93,18 @@ namespace Crystal {
 				++it;
 			}
 		}
+
+		for (auto it = Textures.begin(); it != Textures.end();)
+		{
+			if (it->expired())
+			{
+				it = Textures.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
 
 

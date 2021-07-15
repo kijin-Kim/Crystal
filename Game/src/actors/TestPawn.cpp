@@ -31,7 +31,7 @@ void TestPawn::Initialize()
 	staticMeshComponent->AttachTo(m_MainComponent);
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
-	springArmComponent->SetOffsetPosition({0, 45.0f, -150.0f});
+	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
 	springArmComponent->AttachTo(m_MainComponent);
 
 
@@ -144,8 +144,7 @@ void TestPawn::FireMissile()
 		spawnParams.Rotation = GetRotation();
 		
 		auto missile = level->SpawnActor<Missile>(spawnParams).lock();
-		
-		
+	
 		
 		
 	}

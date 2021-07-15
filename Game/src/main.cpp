@@ -18,6 +18,7 @@
 
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
+#include "actors/MyHUD.h"
 #include "actors/PlayCircle.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
@@ -167,7 +168,9 @@ public:
 		auto playCircle = m_World->SpawnActor<PlayCircle>({ "" }).lock();
 		auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(playCircle->GetComponentByClass("StaticMeshComponent"));
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
-		
+
+
+		auto hud = m_World->SpawnActor<MyHUD>({ "" }).lock();
 
 
 

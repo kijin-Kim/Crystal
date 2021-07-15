@@ -5,6 +5,7 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
+#include "Crystal/GamePlay/Components/TextureComponent.h"
 #include "Crystal/GamePlay/Components/TransformComponent.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
 
@@ -59,10 +60,12 @@ namespace Crystal {
 		std::vector<Weak<SkeletalMeshComponent>> SkeletalMeshes;
 		std::vector<Weak<ParticleComponent>> Particles;
 		std::vector<Weak<CollisionComponent>> CollisionComponents;
+		std::vector<Weak<TextureComponent>> Textures;
 
 
 		std::vector<Weak<LightComponent>> Lights;
 		std::vector<Weak<CameraComponent>> Cameras;
+		
 		//===================================================================================
 
 		void SetMainCamera(const Shared<CameraComponent>& camera);

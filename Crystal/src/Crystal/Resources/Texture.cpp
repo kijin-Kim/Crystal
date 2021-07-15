@@ -9,6 +9,8 @@ namespace Crystal {
 	Texture::Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format,
 	                 D3D12_RESOURCE_FLAGS resourceFlags, D3D12_RESOURCE_STATES initialStates)
 	{
+
+		
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		textureDesc.Width = (UINT)width;
@@ -63,6 +65,8 @@ namespace Crystal {
 		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(),
 		                     DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
 		CS_FATAL(SUCCEEDED(hr), "%s 텍스쳐의 밉 체인을 생성하는데 실패하였습니다.", filePath.string().c_str());
+
+
 
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -128,6 +132,9 @@ namespace Crystal {
 
 	DescriptorAllocation Texture::CreateShaderResourceView(D3D12_SRV_DIMENSION srvDimension, DXGI_FORMAT format)
 	{
+
+		
+		
 		/*셰이더 리소스 뷰를 생성합니다.*/
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();

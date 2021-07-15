@@ -448,6 +448,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\TextureComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Actor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.h" />
@@ -463,6 +464,7 @@
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
     <ClInclude Include="src\Crystal\Renderer\PipelineStateObject.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline2D.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\GeometrySkeletalPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapSkeletalPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ShadowMapStaticPipeline.h" />
@@ -527,6 +529,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\TextureComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\Controller.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
@@ -547,6 +550,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline2D.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\GeometrySkeletalPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\LightingSkeletalPipeline.cpp" />

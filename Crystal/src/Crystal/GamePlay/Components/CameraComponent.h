@@ -51,6 +51,9 @@ namespace Crystal {
 		const DirectX::XMFLOAT4X4& GetView() const { return m_View; }
 		const DirectX::XMFLOAT4X4& GetProjection() const { return m_Projection; }
 
+		float GetNearPlane() const { return m_NearPlane; }
+		float GetFarPlane() const { return m_FarPlane; }
+
 		STATIC_TYPE_IMPLE(CameraComponent)
 
 	private:

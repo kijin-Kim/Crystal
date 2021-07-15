@@ -39,7 +39,7 @@ namespace Crystal {
 
 		void UpdateTransformByForce(float deltaTime);
 		void Update(float deltaTime) override;
-		void UpdateTransforms();
+		virtual void UpdateTransforms();
 		void UpdateLocalTransform();
 		void UpdateWorldTransform();
 

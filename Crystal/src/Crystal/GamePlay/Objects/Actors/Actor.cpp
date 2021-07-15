@@ -62,8 +62,6 @@ namespace Crystal {
 
 	void Actor::RegisterComponents()
 	{
-		CS_FATAL(m_MainComponent, "Actor : %s의 MainComponent가 nullptr 입니다", GetObjectName().c_str());
-
 		for (const auto& c : m_Components)
 		{
 			c->RegisterComponent();

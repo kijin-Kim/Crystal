@@ -36,7 +36,7 @@ public:
 
 		auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 		projectileMovementComponent->SetTargetComponent(m_MainComponent);
-		
+		projectileMovementComponent->SetTargetVelocity({0.0f, 0.0f, 3000.0f});
 		
 	}
 

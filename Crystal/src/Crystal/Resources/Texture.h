@@ -69,6 +69,9 @@ namespace Crystal {
 
 		ID3D12Resource* GetResource() const { return m_Resource.Get(); }
 
+		UINT64 GetWidth() const { return m_Resource->GetDesc().Width; }
+		UINT64 GetHeight() const { return m_Resource->GetDesc().Height; }
+
 	private:
 		
 		
@@ -82,10 +85,6 @@ namespace Crystal {
 		std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_UnorderedAccessViews;
 		std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_RenderTargetViews;
 		std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_DepthStencilViews;
-
-
-		
-		
 		
 	};
 }

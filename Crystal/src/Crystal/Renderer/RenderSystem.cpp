@@ -23,6 +23,7 @@
 #include "Pipelines/RenderPipelines/ShadowMapStaticPipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
+#include "Pipelines/RenderPipelines/UnlitPipeline2D.h"
 
 namespace Crystal {
 
@@ -49,6 +50,7 @@ namespace Crystal {
 		auto unlitShader = resourceManager.GetShader("assets/shaders/UnlitShader.hlsl").lock();
 		auto shadowMapStaticShader = resourceManager.GetShader("assets/shaders/ShadowPass_Static.hlsl").lock();
 		auto shadowMapSkeletalShader = resourceManager.GetShader("assets/shaders/ShadowPass_Skeletal.hlsl").lock();
+		auto unlitShader2D = resourceManager.GetShader("assets/shaders/UnlitShader2D.hlsl").lock();
 
 
 		{
@@ -292,6 +294,7 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ShadowMapStaticPipeline>(shadowMapStaticShader, "ShadowMapStaticPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ShadowMapSkeletalPipeline>(shadowMapSkeletalShader, "ShadowMapSkeletalPipeline"));
+		m_Pipelines.push_back(CreatePipeline<UnlitPipeline2D>(unlitShader2D, "UnlitShader2DPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -526,6 +529,8 @@ namespace Crystal {
 		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
 
+		
+
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -575,6 +580,9 @@ namespace Crystal {
 
 		m_Pipelines[6]->Begin();
 		m_Pipelines[6]->Record(commandList);
+
+		m_Pipelines[10]->Begin();
+		m_Pipelines[10]->Record(commandList);
 
 
 		resourceBarrier.Transition.pResource = scene->FloatingPointBuffer->GetResource();

@@ -18,8 +18,13 @@ namespace Crystal {
 		{
 			MovementComponent::Begin();
 			
-			auto newVelocity = Vector3::Multiply(m_TargetComponent->GetWorldForwardVector(), 3000.0f);
-			m_TargetComponent->SetVelocity(newVelocity);
+			auto xVel = Vector3::Multiply(m_TargetComponent->GetWorldRightVector(), m_Velocity.x);
+			auto yVel = Vector3::Multiply(m_TargetComponent->GetWorldUpVector(), m_Velocity.y);
+			auto zVel = Vector3::Multiply(m_TargetComponent->GetWorldForwardVector(), m_Velocity.z);
+
+			auto newVel = Vector3::Add(Vector3::Add(xVel, yVel), zVel);
+			
+			m_TargetComponent->SetVelocity(newVel);
 		}
 		
 		STATIC_TYPE_IMPLE(ProjectileMovementComponent)

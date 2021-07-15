@@ -1,16 +1,12 @@
-ï»¿#include "cspch.h"
-#include "UnlitPipeline.h"
+#include "cspch.h"
+#include "UnlitPipeline2D.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
-#include "Crystal/GamePlay/Objects/Actors/Actor.h"
-#include "Crystal/GamePlay/World/Level.h"
-#include "Crystal/Renderer/RenderSystem.h"
-
+#include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
 
-	void UnlitPipeline::OnCreate()
+	void UnlitPipeline2D::OnCreate()
 	{
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -21,7 +17,7 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
-		CS_FATAL(SUCCEEDED(hr), "CBV_SRVí™ì„ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRVÈüÀ» »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
 
 
 		struct PipelineStateStream
@@ -39,7 +35,6 @@ namespace Crystal {
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
-			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1},
 			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
 		};
 
@@ -57,32 +52,31 @@ namespace Crystal {
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
 		rootSigDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(staticSamplers), staticSamplers,
-		                     D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		CS_FATAL(SUCCEEDED(hr), "Root Signatureë¥¼ ì‹œë¦¬ì–¼í™”í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤");
+		CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ ½Ã¸®¾óÈ­ÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
-		                                 rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		CS_FATAL(SUCCEEDED(hr), "Root Signatureë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤");
+			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+		CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù");
 
 
 		pipelineStateStream.RootSignature = m_RootSignature.Get();
 
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 
 			{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"SUBUV_INDEX", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 		};
 
 
-		pipelineStateStream.InputLayout = {inputLayout, _countof(inputLayout)};
+		pipelineStateStream.InputLayout = { inputLayout, _countof(inputLayout) };
 
 
 		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -121,9 +115,8 @@ namespace Crystal {
 
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 2;
-		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvFormat.NumRenderTargets = 1;
+		rtvFormat.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		pipelineStateStream.RTVFormats = rtvFormat;
 
@@ -131,29 +124,25 @@ namespace Crystal {
 		blendDesc.AlphaToCoverageEnable = false;
 		blendDesc.IndependentBlendEnable = false;
 		blendDesc.RenderTarget[0].BlendEnable = true;
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		
 
 		pipelineStateStream.BlendDesc = blendDesc;
-		
-
-		
 
 
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
+		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 
 		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
-		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Objectë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤");
+		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù");
 
 
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
-		m_PerDrawCallConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
-		m_PerDrawCallConstantBuffer->CreateConstantBufferView();
 	}
 
-	void UnlitPipeline::Begin()
+	void UnlitPipeline2D::Begin()
 	{
 		auto& scene = GetScene();
 
@@ -161,8 +150,8 @@ namespace Crystal {
 
 		auto& mainCamera = scene->Cameras[0].lock();
 
-		perFrameData.View = Matrix4x4::Transpose(mainCamera->GetView());
-		perFrameData.Projection = Matrix4x4::Transpose(mainCamera->GetProjection());
+		perFrameData.View = Matrix4x4::Transpose(Matrix4x4::LookTo({ 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f, 1.0f }, {0.0f, 1.0f, 0.0f }));
+		perFrameData.Projection = Matrix4x4::Transpose(Matrix4x4::OrthoGraphic(1920.0f, 1080.0f, 0.1f, 1000.0f));
 
 		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
 
@@ -176,88 +165,57 @@ namespace Crystal {
 		m_InstanceBatches.clear();
 
 
-		for (auto& p : scene->Particles)
+		for (auto& texture : scene->Textures)
 		{
-			auto particleComponent = p.lock();
-			if (!particleComponent)
+			auto textureComponent = texture.lock();
+			if (!textureComponent)
 			{
 				continue;
 			}
 
-			auto& particles = particleComponent->GetParticles();
+			
+			PerInstanceData perInstanceData = {};
 
 
-			for (auto& particle : particles)
+			perInstanceData.World = textureComponent->GetWorldTransform();
+
+
+			// °°Àº ÅØ½ºÃÄ¸¦ ¾²¸é ¤²¹­À» ¼ö ÀÖÀ½
+
+			auto& materials = textureComponent->GetMaterials();
+			for (auto& mat : materials)
 			{
-				PerInstanceData perInstanceData = {};
-
-
-				perInstanceData.World = particle.World;
-				perInstanceData.World._11 = perFrameData.View._11;
-				perInstanceData.World._12 = perFrameData.View._12;
-				perInstanceData.World._13 = perFrameData.View._13;
-				perInstanceData.World._21 = perFrameData.View._21;
-				perInstanceData.World._22 = perFrameData.View._22;
-				perInstanceData.World._23 = perFrameData.View._23;
-				perInstanceData.World._31 = perFrameData.View._31;
-				perInstanceData.World._32 = perFrameData.View._32;
-				perInstanceData.World._33 = perFrameData.View._33;
-
-				
-
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Scale(particle.Scale));
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::RotationAxis(mainCamera->GetWorldForwardVector(), 45.0f));
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Translation(particle.Position));
-				
-
-				perInstanceData.SubUVIndex = particle.SubImageIndex;
-
-
-				// ê°™ì€ í…ìŠ¤ì³ë¥¼ ì“°ë©´ ã…‚ë¬¶ì„ ìˆ˜ ìˆìŒ
-
-				auto& materials = particleComponent->GetMaterials();
-				for (auto& mat : materials)
+	
+				auto texture = mat->AlbedoTexture.lock();
+				if (!texture)
 				{
-					PerDrawCallData perDrawCallData = {};
-					perDrawCallData.HorizontalSubImageCount = 6;
-					perDrawCallData.VerticalSubImageCount = 6;
-
-					m_PerDrawCallConstantBuffer->SetData(&perDrawCallData, 0, sizeof(perDrawCallData));
-
-
-					auto texture = mat->AlbedoTexture.lock();
-					if (!texture)
-					{
-						continue;
-					}
-
-
-					auto it = m_InstanceBatches.find(texture.get()); // ê°™ì€ í…ìŠ¤ì³ë¥¼ ì“°ê³ ìˆëŠ” ë°°ì¹˜ê°€ ìˆìœ¼ë©´,
-					if (it != m_InstanceBatches.end())
-					{
-						++it->second.InstanceCount;
-						it->second.PerInstanceDatas.push_back(perInstanceData);
-						continue;
-					}
-
-					auto result = m_InstanceBatches.insert({texture.get(), InstanceBatch()});
-					auto& newInstanceBatch = result.first->second;
-
-					newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
-
-
-					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->GetConstantBufferView(),
-					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-					// í…ìŠ¤ì³ë¥¼ Heapì— Copy
-					d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-
-					newInstanceBatch.PerInstanceDatas.push_back(perInstanceData);
+					continue;
 				}
+
+
+				auto it = m_InstanceBatches.find(texture.get()); // °°Àº ÅØ½ºÃÄ¸¦ ¾²°íÀÖ´Â ¹èÄ¡°¡ ÀÖÀ¸¸é,
+				if (it != m_InstanceBatches.end())
+				{
+					++it->second.InstanceCount;
+					it->second.PerInstanceDatas.push_back(perInstanceData);
+					continue;
+				}
+
+				auto result = m_InstanceBatches.insert({ texture.get(), InstanceBatch() });
+				auto& newInstanceBatch = result.first->second;
+
+				newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+
+				// ÅØ½ºÃÄ¸¦ Heap¿¡ Copy
+				d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+				newInstanceBatch.PerInstanceDatas.push_back(perInstanceData);
 			}
+
+			
 		}
 
 		m_DrawDatas.clear();
@@ -270,14 +228,14 @@ namespace Crystal {
 			drawData.DescriptorHeapOffset = batch.second.DescriptorHeapOffset;
 
 			drawData.InstanceVertexBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size(),
-			                                                     batch.second.PerInstanceDatas.size(), false, true);
+				batch.second.PerInstanceDatas.size(), false, true);
 			drawData.InstanceVertexBuffer->SetData(batch.second.PerInstanceDatas.data(), 0, sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size());
 
 			m_DrawDatas.push_back(std::move(drawData));
 		}
 	}
 
-	void UnlitPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	void UnlitPipeline2D::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
 
@@ -286,7 +244,7 @@ namespace Crystal {
 
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetGraphicsRootSignature(m_RootSignature.Get());
-		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
 
 
@@ -297,13 +255,13 @@ namespace Crystal {
 		for (const auto& drawData : m_DrawDatas)
 		{
 			D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-			descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * drawData.DescriptorHeapOffset;
+			descriptorHeapHandle.ptr += drawData.DescriptorHeapOffset;
 			commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapHandle);
 
 
 			std::vector<D3D12_VERTEX_BUFFER_VIEW> vertexBufferViews;
 
-			auto& vertexBuffers = scene->PlaneQuad3DMesh->GetVertexBuffers();
+			auto& vertexBuffers = scene->PlaneQuad2DMesh->GetVertexBuffers();
 			for (const auto& vertexbuffer : vertexBuffers)
 			{
 				vertexBufferViews.push_back(vertexbuffer->GetVertexBufferView());
@@ -312,10 +270,8 @@ namespace Crystal {
 
 			commandList->IASetVertexBuffers(0, vertexBufferViews.size(), vertexBufferViews.data());
 			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->GetVertexBufferView());
-			commandList->IASetIndexBuffer(&scene->PlaneQuad3DMesh->GetIndexBuffers()[0]->GetIndexBufferView());
-			commandList->DrawIndexedInstanced(scene->PlaneQuad3DMesh->GetIndexBuffers()[0]->GetElementCount(), drawData.InstanceCount, 0, 0, 0);
+			commandList->IASetIndexBuffer(&scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->GetIndexBufferView());
+			commandList->DrawIndexedInstanced(scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->GetElementCount(), drawData.InstanceCount, 0, 0, 0);
 		}
 	}
-
-
 }

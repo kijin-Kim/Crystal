@@ -47,10 +47,12 @@ namespace Crystal {
 			m_Projection = Matrix4x4::Perspective(DirectX::XMConvertToRadians(m_FieldOfView),
 			                                      static_cast<float>(m_Viewport.Width) / static_cast<float>(m_Viewport.
 				                                      Height), m_NearPlane, m_FarPlane);
-
 			m_ViewProjection = Matrix4x4::Multiply(m_View, m_Projection);
 			break;
 		case ECameraProjectionMode::CPM_Orthographic:
+			m_View = Matrix4x4::LookTo(worldPosition, worldForward, worldUp);
+			m_Projection = Matrix4x4::OrthoGraphic(1920.0f, 1080.0f, m_NearPlane, m_FarPlane);
+			m_ViewProjection = Matrix4x4::Multiply(m_View, m_Projection);
 			break;
 		default:
 			CS_FATAL(false, "예상치 못한 Camera Projection Mode.");
