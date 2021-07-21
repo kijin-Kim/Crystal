@@ -47,7 +47,7 @@ namespace Crystal {
 	void TransformComponent::UpdateLocalTransform()
 	{
 		const auto position = GetLocalPosition();
-		const auto scale = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
+		const auto scale = Matrix4x4::Scale(m_Scale);
 		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_Rotation);
 		const auto translation = Matrix4x4::Translation(position);
 
@@ -104,9 +104,9 @@ namespace Crystal {
 	}
 
 
-	void TransformComponent::SetScale(const float scale)
+	void TransformComponent::SetUnitScale(const float scale)
 	{
-		m_Scale = scale;
+		m_Scale = { scale, scale, scale };
 	}
 
 	void TransformComponent::SetVelocity(const DirectX::XMFLOAT3& velocity)
@@ -196,7 +196,7 @@ namespace Crystal {
 		return m_Velocity;
 	}
 
-	float TransformComponent::GetScale()
+	const DirectX::XMFLOAT3& TransformComponent::GetScale()
 	{
 		return m_Scale;
 	}

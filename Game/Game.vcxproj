@@ -325,6 +325,7 @@
     <ClInclude Include="src\actors\Missile.h" />
     <ClInclude Include="src\actors\MyHUD.h" />
     <ClInclude Include="src\actors\PlayCircle.h" />
+    <ClInclude Include="src\actors\SpaceCombatTypes.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\TestPawn.h" />
   </ItemGroup>

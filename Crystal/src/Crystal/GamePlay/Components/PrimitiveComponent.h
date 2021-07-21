@@ -13,6 +13,7 @@ namespace Crystal {
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<TransformComponent>(*this);
+			ar & m_bHideInGame;
 		}
 
 	public:
@@ -20,7 +21,6 @@ namespace Crystal {
 
 		~PrimitiveComponent() override = default;
 
-		void RegisterComponent() override;
 
 		void Update(const float deltaTime) override
 		{
@@ -35,7 +35,6 @@ namespace Crystal {
 		void AddMaterial(Shared<Material> material);
 		const std::vector<Shared<Material>>& GetMaterials() const;
 		Material* GetMaterial(uint32_t index) const;
-		
 
 
 		void SetRenderable(Weak<Renderable> renderable)
@@ -49,12 +48,15 @@ namespace Crystal {
 		bool CanBeRendered() const override { return true; }
 		bool IsCollisionEnabled() const override { return false; }
 
+		void SetHideInGame(bool bHide) { m_bHideInGame = bHide; }
+		bool GetHideInGame() const { return m_bHideInGame; }
+
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
 		Weak<Renderable> m_Renderable = {};
 
 		std::vector<Shared<Material>> m_Materials;
 
-
+		bool m_bHideInGame = false;
 	};
 }

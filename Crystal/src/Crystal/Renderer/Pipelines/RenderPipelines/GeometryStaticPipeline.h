@@ -1,10 +1,19 @@
 #pragma once
 #include "Crystal/Resources/Buffer.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
+
 #include <vector>
+
+#include "Crystal/Renderer/InstancedStaticMesh.h"
 
 
 namespace Crystal {
+	
+	
+
+	
+
+	
 	class GeometryStaticPipeline final : public RenderPipeline
 	{
 	public:
@@ -19,29 +28,6 @@ namespace Crystal {
 		};
 
 
-		struct PerInstanceData
-		{
-			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
-			DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
-			DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
-			float RoughnessConstant = 0.0f;
-			float MetallicConstant = 0.0f;
-
-			uint32_t bToggleAlbedoTexture = false;
-			uint32_t bToggleMetallicTexture = false;
-			uint32_t bToggleRoughnessTexture = false;
-			uint32_t bToggleNormalTexture = false;
-			uint32_t bToggleIrradianceTexture = false;
-			uint32_t bToggleEmissivetexture = false;
-		};
-
-		struct InstanceBatch
-		{
-			std::vector<PerInstanceData> PerInstanceDatas;
-			std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
-			std::array<Material*, 10> MaterialLookup;
-			UINT64 DescriptorOffset = -1;
-		};
 
 	public:
 		GeometryStaticPipeline() = default;
@@ -54,8 +40,13 @@ namespace Crystal {
 		void End() override;
 		STATIC_TYPE_IMPLE(GeometryStaticPipeline)
 	private:
-		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
+		std::map<Renderable*, InstancedStaticMeshData> m_InstanceBatches;
+		InstancedStaticMesh m_InstancedStaticMesh;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 	};
+
+
+
+
 }

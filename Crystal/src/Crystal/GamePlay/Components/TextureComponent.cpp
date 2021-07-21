@@ -31,8 +31,8 @@ namespace Crystal {
 
 		const auto position = GetLocalPosition();
 
-		float scaleX = m_Scale;
-		float scaleY = m_Scale;
+		float scaleX = m_Scale.x;
+		float scaleY = m_Scale.y;
 		float scaleZ = 1.0f;
 
 		auto texture = m_Materials[0]->AlbedoTexture.lock();

@@ -2,6 +2,8 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
+#include "Crystal/Resources/Meshes.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class PlayCircle : public Crystal::Actor
 {
@@ -19,14 +21,20 @@ public:
 		Crystal::Actor::Initialize();
 
 
-		auto material = std::make_unique<Crystal::Material>();
-		material->AlbedoColor = Crystal::Vector3::Red;
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+		
+		auto material = Crystal::CreateShared<Crystal::Material>();
+		material->EmissiveColor = Crystal::Vector3::Red;
+		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
+		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 
+		
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetScale(600.0f);
+		staticMeshComponent->SetUnitScale(500.0f);
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		
 
 		m_MainComponent = staticMeshComponent;

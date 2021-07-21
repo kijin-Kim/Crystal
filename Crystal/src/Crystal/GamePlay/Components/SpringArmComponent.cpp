@@ -14,7 +14,7 @@ namespace Crystal {
 		}
 
 
-		m_LocalTransform = Matrix4x4::Scale({ m_Scale, m_Scale, m_Scale });
+		m_LocalTransform = Matrix4x4::Scale(m_Scale);
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform, Matrix4x4::RotationQuaternion(m_Rotation));
 		m_LocalTransform = Matrix4x4::Multiply(m_LocalTransform,
 			Matrix4x4::Translation(Vector3::Add(GetLocalPosition(), m_OffsetPosition)));

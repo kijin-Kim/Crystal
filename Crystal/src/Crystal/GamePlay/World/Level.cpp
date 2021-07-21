@@ -9,6 +9,8 @@
 #include "../../../../../Game/src/actors/TestPawn.h"
 #include "Crystal/Resources/ResourceManager.h"
 
+#include "../../../../../Game/src/actors/MyHUD.h"
+
 namespace Crystal {
 	void Level::OnCreate()
 	{
@@ -144,14 +146,6 @@ namespace Crystal {
 		m_PhysicsSystem->RegisterPhysicsWorldComponent(component);
 	}
 
-	void Level::RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak)
-	{
-		if (m_RenderSystem)
-		{
-			m_RenderSystem->RegisterPrimitiveComponentNew(componentWeak);
-		}
-	}
-
 
 	void Level::OnClientConnect()
 	{
@@ -182,23 +176,27 @@ namespace Crystal {
 
 		auto playerStartActor = playerStartActors[0].lock();
 
+		m_HUD = SpawnActor<MyHUD>({ "" }).lock();
+		
+
 		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
 		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
+		m_Player = newActor;
 		
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
 
-		auto& resourceManager = ResourceManager::Instance();
-		
-		newActorMesh->SetRenderable(resourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
-		auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-		newActorMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-		newActorMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-		newActorMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
+		//auto& resourceManager = ResourceManager::Instance();
+		//
+		//newActorMesh->SetRenderable(resourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
+		//auto newActorMat = newActorMesh->GetMaterial(0);
+		//newActorMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
+		//newActorMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
+		//newActorMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
+		//newActorMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
 
-		newActor->SetScale(playerStartActor->GetScale());
+		newActor->SetUnitScale(playerStartActor->GetScale().x);
 		newActor->SetRotation(playerStartActor->GetRotation());
 		newActor->SetPosition(playerStartActor->GetPosition());
 
@@ -241,7 +239,7 @@ namespace Crystal {
 		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
 		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
-		newActor->SetScale(playerStartActor->GetScale());
+		newActor->SetUnitScale(playerStartActor->GetScale());
 		newActor->SetRotation(playerStartActor->GetRotation());
 		newActor->SetPosition(playerStartActor->GetPosition());
 
@@ -337,6 +335,8 @@ namespace Crystal {
 		{
 			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
+
+		
 
 
 		

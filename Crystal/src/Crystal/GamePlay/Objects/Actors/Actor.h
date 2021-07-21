@@ -59,8 +59,8 @@ namespace Crystal {
 
 		std::weak_ptr<TransformComponent> GetMainComponent() const { return m_MainComponent; }
 
-		void SetScale(float scale);
-		float GetScale() const;
+		void SetUnitScale(float scale);
+		const DirectX::XMFLOAT3& GetScale() const;
 
 		void SetPosition(const DirectX::XMFLOAT3& position);
 		DirectX::XMFLOAT3 GetPosition() const;

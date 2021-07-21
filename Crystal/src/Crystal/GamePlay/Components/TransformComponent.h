@@ -48,7 +48,7 @@ namespace Crystal {
 		void SetLocalPosition(const DirectX::XMFLOAT3& position);
 		void SetWorldPosition(const DirectX::XMFLOAT3& position);
 
-		void SetScale(const float scale);
+		void SetUnitScale(const float scale);
 		void SetVelocity(const DirectX::XMFLOAT3& velocity);
 		void SetMass(const float mass);
 		void SetInverseMass(const float inverseMass);
@@ -64,7 +64,7 @@ namespace Crystal {
 		DirectX::XMFLOAT3 GetLocalPosition() const;
 		DirectX::XMFLOAT3 GetWorldPosition();
 		const DirectX::XMFLOAT3& GetVelocity() const;
-		float GetScale();
+		const DirectX::XMFLOAT3& GetScale();
 		float GetMass() const;
 		float GetInverseMass() const;
 		bool HasFiniteMass() const;
@@ -101,7 +101,7 @@ namespace Crystal {
 		DirectX::XMFLOAT4X4 m_LocalTransform = Matrix4x4::Identity();
 
 
-		float m_Scale = 1.0f; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
+		DirectX::XMFLOAT3 m_Scale = {1.0f, 1.0f, 1.0f }; // Unit Scale만 현재 허용함 ( Unit 이외의 Scale을 허용할 경우 조명이 적용되는 메쉬들의 노말 값을 보정해주어야 함 )
 		DirectX::XMFLOAT4 m_Rotation = Vector4::Quaternion::Identity;
 
 

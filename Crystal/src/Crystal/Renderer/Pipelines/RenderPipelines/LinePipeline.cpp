@@ -40,6 +40,11 @@ namespace Crystal {
 			if (!component)
 				continue;
 
+			if(component->GetHideInGame())
+			{
+				continue;
+			}
+
 			PerInstanceData perInstanceData = {};
 			perInstanceData.World = component->GetPostScaledTransform();
 

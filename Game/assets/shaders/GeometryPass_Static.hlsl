@@ -19,12 +19,13 @@ struct VS_INPUT
     float RoughnessConstant : ROUGHNESS_CONSTANT;
     float MetallicConstant : METALLIC_CONSTANT;
 
+    bool bShouldLit : SHOULD_LIT;
     bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
     bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
     bool bToggleNormalTexture : TOGGLE_NORMAL_TEXTURE;
     bool bToggleIrradianceTexture : TOGGLE_IRRADIANCE_TEXTURE;
-    bool bToggleEmissivetexture : TOGGLE_EMISSIVE_TEXTURE;
+    bool bToggleEmissiveTexture : TOGGLE_EMISSIVE_TEXTURE;
 
 };
 
@@ -43,12 +44,13 @@ struct PS_INPUT
     nointerpolation float RoughnessConstant : ROUGHNESS_CONSTANT;
     nointerpolation float MetallicConstant : METALLIC_CONSTANT;
 
+    nointerpolation bool bShouldLit : SHOULD_LIT;
     nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE; 
     nointerpolation bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
     nointerpolation bool bToggleNormalTexture : TOGGLE_NORMAL_TEXTURE;
     nointerpolation bool bToggleIrradianceTexture : TOGGLE_IRRADIANCE_TEXTURE;
-    nointerpolation bool bToggleEmissivetexture : TOGGLE_EMISSIVE_TEXTURE;
+    nointerpolation bool bToggleEmissiveTexture : TOGGLE_EMISSIVE_TEXTURE;
 
 };
 
@@ -90,7 +92,7 @@ PS_INPUT vsMain(VS_INPUT input)
     output.bToggleRoughnessTexture = input.bToggleRoughnessTexture;
     output.bToggleNormalTexture  = input.bToggleNormalTexture;
     output.bToggleIrradianceTexture  = input.bToggleIrradianceTexture;
-    output.bToggleEmissivetexture  = input.bToggleEmissivetexture;
+    output.bToggleEmissiveTexture  = input.bToggleEmissiveTexture;
     output.RoughnessConstant = input.RoughnessConstant;
     output.MetallicConstant  = input.MetallicConstant;
 
@@ -121,7 +123,7 @@ PS_OUTPUT psMain(PS_INPUT input) : SV_TARGET
     Textures[TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : input.RoughnessConstant;
     float metallic = input.bToggleMetallicTexture ? 
     Textures[TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : input.MetallicConstant;
-    float3 emissive = input.bToggleEmissivetexture ? 
+    float3 emissive = input.bToggleEmissiveTexture ? 
     Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
     
     

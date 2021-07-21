@@ -2,6 +2,8 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
+#include "Crystal/Resources/Meshes.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class Sun : public Crystal::DirectionalLightActor
 {
@@ -20,13 +22,21 @@ public:
 
 
 		auto material = std::make_unique<Crystal::Material>();
-		material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
+		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
+		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 
 
+
+
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+		
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetScale(600.0f);
+		staticMeshComponent->SetUnitScale(60.0f);
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+		
+		
 
 		m_MainComponent = staticMeshComponent;
 

@@ -3,7 +3,7 @@
 
 namespace Crystal {
 
-	class UnlitPipeline2D : public RenderPipeline
+	class UIPipeline : public RenderPipeline
 	{
 	public:
 
@@ -17,8 +17,8 @@ namespace Crystal {
 
 
 	public:
-		UnlitPipeline2D() = default;
-		~UnlitPipeline2D() override = default;
+		UIPipeline() = default;
+		~UIPipeline() override = default;
 
 		void OnCreate() override;
 		void Begin() override;

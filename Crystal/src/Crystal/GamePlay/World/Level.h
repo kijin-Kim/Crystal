@@ -5,6 +5,7 @@
 #include "PhysicsSystem.h"
 #include "World.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
+#include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Renderer/Scene.h"
 
@@ -44,9 +45,7 @@ namespace Crystal {
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
 
 		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> component);
-		void RegisterRendererComponent(std::weak_ptr<PrimitiveComponent> componentWeak);
 
-		
 
 		void OnClientConnect();
 
@@ -59,11 +58,15 @@ namespace Crystal {
 
 		std::weak_ptr<PlayerController> GetPlayerController(int index);
 		std::weak_ptr<PlayerController> GetPlayerControllerByNetworkId(int id);
-		
+
+		Weak<Pawn> GetPlayerPawn() const { return m_Player; }
+		Weak<Actor> GetHUD() const { return m_HUD; }
+
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float , const struct CollisionParams& collisionParams);
+		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float,
+		                     const struct CollisionParams& collisionParams);
 
 		STATIC_TYPE_IMPLE(Level)
 
@@ -76,8 +79,10 @@ namespace Crystal {
 		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
 		Shared<Scene> m_Scene = nullptr;
 		Shared<RenderSystem> m_RenderSystem = nullptr;
-		
 
+
+		Shared<Pawn> m_Player = nullptr;
+		Shared<Actor> m_HUD = nullptr;
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
 		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;
@@ -94,24 +99,22 @@ namespace Crystal {
 		auto newActor = Cast<Actor>(CreateObject<T>(spawnParams.Name, weak_from_this()));
 
 		// Set Initial Transform
-		if(!Vector3::IsZero(spawnParams.Position))
+		if (!Vector3::IsZero(spawnParams.Position))
 		{
 			newActor->SetPosition(spawnParams.Position);
 		}
 
-		if(!Vector4::IsZero(spawnParams.Rotation))
+		if (!Vector4::IsZero(spawnParams.Rotation))
 		{
 			newActor->SetRotation(spawnParams.Rotation);
 		}
 
-		if(spawnParams.Scale != 0.0f)
+		if (spawnParams.Scale != 0.0f)
 		{
-			newActor->SetScale(spawnParams.Scale);
+			newActor->SetUnitScale(spawnParams.Scale);
 		}
-		
-		
-		
-	
+
+
 		newActor->Begin();
 
 		return Cast<T>(newActor);

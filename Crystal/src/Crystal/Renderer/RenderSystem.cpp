@@ -14,6 +14,7 @@
 #include "Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
 #include "Pipelines/ComputePipelines/PanoToCubemapPipeline.h"
 #include "Pipelines/RenderPipelines/CubemapPipeline.h"
+#include "Pipelines/RenderPipelines/ForwardStaticPipeline.h"
 #include "Pipelines/RenderPipelines/GeometrySkeletalPipeline.h"
 #include "Pipelines/RenderPipelines/LightingSkeletalPipeline.h"
 #include "Pipelines/RenderPipelines/GeometryStaticPipeline.h"
@@ -23,7 +24,7 @@
 #include "Pipelines/RenderPipelines/ShadowMapStaticPipeline.h"
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
-#include "Pipelines/RenderPipelines/UnlitPipeline2D.h"
+#include "Pipelines/RenderPipelines/UIPipeline.h"
 
 namespace Crystal {
 
@@ -35,7 +36,8 @@ namespace Crystal {
 
 		auto& resourceManager = ResourceManager::Instance();
 
-		auto pbrStaticShader = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
+		auto geometryShaderStatic = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
+		auto forwardShaderStatic = resourceManager.GetShader("assets/shaders/PBRShader_Static.hlsl").lock();
 		//auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl").lock();
 		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/GeometryPass_Skeletal.hlsl").lock();
 		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl").lock();
@@ -62,7 +64,7 @@ namespace Crystal {
 						{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 						});*/
 
-			pbrStaticShader->SetInputLayout({
+			geometryShaderStatic->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -119,8 +121,8 @@ namespace Crystal {
 			RootParameter perObject = {0, 0, 0};
 			RootParameter perExecute = {0, 5, 0};
 
-			pbrStaticShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
-			pbrStaticShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+			geometryShaderStatic->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			geometryShaderStatic->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
 		{
@@ -276,7 +278,7 @@ namespace Crystal {
 		}
 
 
-		m_LightPipelines.push_back(CreatePipeline<GeometryStaticPipeline>(pbrStaticShader, "PBRStaticPipeline"));
+		m_LightPipelines.push_back(CreatePipeline<GeometryStaticPipeline>(geometryShaderStatic, "PBRStaticPipeline"));
 		//m_LightPipelines.push_back(CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<GeometrySkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<LightingPipeline>(lightingPassShader, "LightingPipeline"));
@@ -294,7 +296,8 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ShadowMapStaticPipeline>(shadowMapStaticShader, "ShadowMapStaticPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ShadowMapSkeletalPipeline>(shadowMapSkeletalShader, "ShadowMapSkeletalPipeline"));
-		m_Pipelines.push_back(CreatePipeline<UnlitPipeline2D>(unlitShader2D, "UnlitShader2DPipeline"));
+		m_Pipelines.push_back(CreatePipeline<UIPipeline>(unlitShader2D, "UnlitShader2DPipeline"));
+		m_Pipelines.push_back(CreatePipeline<ForwardStaticPipeline>(forwardShaderStatic, "ForwardStaticPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -345,6 +348,8 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
+		
+		
 
 		m_Pipelines[3]->Begin();
 		m_Pipelines[3]->Record(commandList);
@@ -359,6 +364,8 @@ namespace Crystal {
 		CS_INFO("HDRI로부터 Cubemap 생성중...");
 		commandQueue->Flush();
 		CS_INFO("HDRI로부터 Cubemap 생성 완료");
+
+		
 	}
 
 	void RenderSystem::Update(const float deltaTime)
@@ -512,12 +519,19 @@ namespace Crystal {
 		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
 
+		m_Pipelines[11]->Begin();
+		m_Pipelines[11]->Record(commandList);
+
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
+		
+		
 
 		m_Pipelines[0]->Begin();
 		m_Pipelines[0]->Record(commandList);
+
+		
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -618,6 +632,7 @@ namespace Crystal {
 		m_Pipelines[0]->End();
 		m_Pipelines[7]->End();
 		m_Pipelines[8]->End();
+		m_Pipelines[11]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -943,44 +958,5 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
-
-	void RenderSystem::RegisterPrimitiveComponentNew(std::weak_ptr<PrimitiveComponent> componentWeak)
-	{
-		auto component = componentWeak.lock();
-
-		const auto& materials = component->GetMaterials();
-
-
-		if (materials.empty())
-			return;
-
-		switch (materials[0]->ShadingModel)
-		{
-		case EShadingModel::SM_Undefined:
-			m_Pipelines[7]->RegisterPipelineComponents(componentWeak);
-			break;
-		case EShadingModel::SM_Unlit:
-			m_Pipelines[0]->RegisterPipelineComponents(componentWeak);
-			break;
-		case EShadingModel::SM_DefaultLit:
-			{
-				auto type = component->StaticType();
-				if (type == "StaticMeshComponent")
-				{
-					m_LightPipelines[0]->RegisterPipelineComponents(componentWeak);
-				}
-
-				if (type == "SkeletalMeshComponent")
-				{
-					m_LightPipelines[1]->RegisterPipelineComponents(componentWeak);
-				}
-
-				break;
-			}
-
-		default: ;
-		}
-	}
-
 
 }

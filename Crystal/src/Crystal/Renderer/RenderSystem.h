@@ -38,9 +38,6 @@ namespace Crystal {
 		
 
 
-		void RegisterPrimitiveComponentNew(Weak<PrimitiveComponent> componentWeak);
-
-
 	
 
 		template <class T>

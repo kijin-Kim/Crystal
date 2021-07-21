@@ -1,4 +1,5 @@
 #pragma once
+#include "SpaceCombatTypes.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
@@ -22,6 +23,7 @@ class TestPawn final : public Crystal::Pawn
 		ar& m_FireInterval;
 //		ar& m_FireTimer;
 		ar& m_Health;
+		ar& m_bHasItem;
 	}
 
 public:
@@ -30,6 +32,7 @@ public:
 
 	void Initialize() override;
 
+	void Begin() override;
 	void Update(const float deltaTime) override;
 	void SetupInputComponent(Crystal::InputComponent* inputComponent) override;
 
@@ -46,12 +49,19 @@ public:
 
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
+	void UpdateHealth();
+	void UpdateItemStatus(ItemType itemType, bool bAcquired);
+
+	void UsePowerItem();
+	void UseHealItem();
+	void UseShieldItem();
+
 
 	STATIC_TYPE_IMPLE(TestPawn)
 
 private:
 	void OnFire();
-
+	
 
 private:
 	std::shared_ptr<Crystal::MovementComponent> m_MovementComponent = nullptr;
@@ -65,5 +75,9 @@ private:
 	Crystal::Timer m_FireTimer;
 
 
-	int m_Health = 0;
+	int m_Health = 100;
+	float m_Power = 1.0f;
+	bool m_bIsInVunlnerable = false;
+
+	bool m_bHasItem[ItemTypeCount];
 };

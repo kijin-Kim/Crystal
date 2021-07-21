@@ -24,7 +24,13 @@ public:
 		m_MainComponent = boundingSphereComponent;
 
 		auto material = std::make_unique<Crystal::Material>();
-		material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
+		material->ShadingModel = Crystal::EShadingModel::SM_Lit;
+		material->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/T_SpaceShipsVol4_Weapons_Dif.tga");
+		material->MetallicTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/T_SpaceShipsVol4_Weapons_M.tga");
+		material->RoughnessTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/T_SpaceShipsVol4_Weapons_R.tga");
+		material->NormalTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/T_SpaceShipsVol4_Weapons_Norm.tga");
+		material->EmissiveTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/T_SpaceShipsVol4_Weapons_G.tga");
+
 
 		auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		meshComponent->AddMaterial(std::move(material));
@@ -37,10 +43,8 @@ public:
 		auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 		projectileMovementComponent->SetTargetComponent(m_MainComponent);
 		projectileMovementComponent->SetTargetVelocity({0.0f, 0.0f, 3000.0f});
-		
 	}
 
 
 	STATIC_TYPE_IMPLE(Missile)
-	
 };

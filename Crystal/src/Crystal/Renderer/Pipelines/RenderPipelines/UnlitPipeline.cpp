@@ -6,6 +6,7 @@
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
+#include "Crystal/Renderer/Pipelines/PipelineStateHelper.h"
 
 
 namespace Crystal {
@@ -24,19 +25,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
-		struct PipelineStateStream
-		{
-			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
-			CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
-			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-			CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-			CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendDesc;
-		} pipelineStateStream;
-
+		
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
 			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1},
@@ -68,7 +57,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
-		pipelineStateStream.RootSignature = m_RootSignature.Get();
 
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -82,70 +70,28 @@ namespace Crystal {
 		};
 
 
-		pipelineStateStream.InputLayout = {inputLayout, _countof(inputLayout)};
+	
 
-
-		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-
-		auto& shaderDatablobs = m_Shader->GetRaw();
-
-		pipelineStateStream.VS = {
-			shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Vertex]->GetBufferSize()
-		};
-
-		pipelineStateStream.PS = {
-			shaderDatablobs[ShaderType::Pixel]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Pixel]->GetBufferSize()
-		};
-
-
-		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		depthStencilDesc.StencilEnable = false;
-		depthStencilDesc.StencilReadMask = 0x00;
-		depthStencilDesc.StencilWriteMask = 0x00;
-		depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-		depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-
-		pipelineStateStream.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 		rtvFormat.NumRenderTargets = 2;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		pipelineStateStream.RTVFormats = rtvFormat;
 
-		CD3DX12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(CD3DX12_DEFAULT());
-		blendDesc.AlphaToCoverageEnable = false;
-		blendDesc.IndependentBlendEnable = false;
-		blendDesc.RenderTarget[0].BlendEnable = true;
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputLayout, _countof(inputLayout) };
+		RenderTargetDescription renderTargetDescription(rtvFormat, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
-		pipelineStateStream.BlendDesc = blendDesc;
-		
+		PipelineStateDescription pipelineStateDescription(
+			inputLayoutDesc,
+			StateHelper::Additive,
+			StateHelper::DepthEnable,
+			StateHelper::CullCounterClock,
+			renderTargetDescription,
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
+		);
 
-		
+		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
 
-
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
-
-		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
-		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 
 
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
@@ -180,6 +126,10 @@ namespace Crystal {
 		{
 			auto particleComponent = p.lock();
 			if (!particleComponent)
+			{
+				continue;
+			}
+			if(particleComponent->GetHideInGame())
 			{
 				continue;
 			}

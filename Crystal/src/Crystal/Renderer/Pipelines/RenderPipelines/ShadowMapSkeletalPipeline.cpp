@@ -3,6 +3,7 @@
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Scene.h"
+#include "Crystal/Renderer/Pipelines/PipelineStateHelper.h"
 
 namespace Crystal {
 
@@ -10,15 +11,7 @@ namespace Crystal {
 	{
 		auto device = Device::Instance().GetD3DDevice();
 
-		struct PipelineStateStream
-		{
-			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
-			CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopology;
-			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
-			CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-		} pipelineStateStream;
+	
 
 		CD3DX12_ROOT_PARAMETER1 rootParameters[2];
 		rootParameters[0].InitAsConstants(16, 0);
@@ -38,8 +31,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
-		pipelineStateStream.RootSignature = m_RootSignature.Get();
-
+		
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -52,44 +44,22 @@ namespace Crystal {
 		};
 
 
-		pipelineStateStream.InputLayout = {inputLayout, _countof(inputLayout)};
 
 
-		pipelineStateStream.PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputLayout, _countof(inputLayout) };
+		RenderTargetDescription renderTargetDescription(DXGI_FORMAT_D32_FLOAT);
+
+		PipelineStateDescription pipelineStateDescription(
+			inputLayoutDesc,
+			StateHelper::Opaque,
+			StateHelper::DepthEnable,
+			StateHelper::CullCounterClock,
+			renderTargetDescription,
+			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
+		);
 
 
-		auto& shaderDatablobs = m_Shader->GetRaw();
-
-		pipelineStateStream.VS = {
-			shaderDatablobs[ShaderType::Vertex]->GetBufferPointer(),
-			shaderDatablobs[ShaderType::Vertex]->GetBufferSize()
-		};
-
-
-		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		depthStencilDesc.StencilEnable = false;
-		depthStencilDesc.StencilReadMask = 0x00;
-		depthStencilDesc.StencilWriteMask = 0x00;
-		depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-		depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
-
-		pipelineStateStream.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(depthStencilDesc);
-		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-
-
-		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(pipelineStateStream), &pipelineStateStream};
-
-		hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
-		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
+		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
 	}
 
 	void ShadowMapSkeletalPipeline::Begin()
@@ -105,6 +75,11 @@ namespace Crystal {
 			auto component = scene->SkeletalMeshes[i].lock();
 			if (!component)
 				continue;
+
+			if(component->GetHideInGame())
+			{
+				continue;
+			}
 
 
 			while (scene->SkeletalMeshes.size() > m_PerObjectConstantBuffers.size())
@@ -144,10 +119,18 @@ namespace Crystal {
 		{
 			auto skeletalMeshComponent = scene->SkeletalMeshes[i].lock();
 			if (!skeletalMeshComponent)
-				return;
+				continue;
+			if (!skeletalMeshComponent->GetCastShadow())
+				continue;
+
+			if(skeletalMeshComponent->GetHideInGame())
+			{
+				continue;
+			}
+			
 			auto renderable = skeletalMeshComponent->GetRenderable().lock();
 			if (!renderable)
-				return;
+				continue;
 
 			commandList->SetGraphicsRootConstantBufferView(1, m_PerObjectConstantBuffers[i]->GetGPUVirtualAddress());
 

@@ -2,8 +2,13 @@
 #include <DirectXMath.h>
 #include <random>
 
+#define PI 3.1415920f
+#define TWO_PI PI * 2.0f
+
 namespace Crystal {
 
+
+	
 	inline float RandomFloatInRange(float min, float max)
 	{
 		std::random_device rd;
@@ -15,21 +20,21 @@ namespace Crystal {
 
 
 	namespace Vector3 {
-		const DirectX::XMFLOAT3 UnitX = {1.0f, 0.0f, 0.0f};
-		const DirectX::XMFLOAT3 UnitY = {0.0f, 1.0f, 0.0f};
-		const DirectX::XMFLOAT3 UnitZ = {0.0f, 0.0f, 1.0f};
-		const DirectX::XMFLOAT3 Zero = {0.0f, 0.0f, 0.0f};
+		static const DirectX::XMFLOAT3 UnitX = {1.0f, 0.0f, 0.0f};
+		static const DirectX::XMFLOAT3 UnitY = {0.0f, 1.0f, 0.0f};
+		static const DirectX::XMFLOAT3 UnitZ = {0.0f, 0.0f, 1.0f};
+		static const DirectX::XMFLOAT3 Zero = {0.0f, 0.0f, 0.0f};
 
-		const DirectX::XMFLOAT3 Black = {0.0f, 0.0f, 0.0f};
+		static const DirectX::XMFLOAT3 Black = {0.0f, 0.0f, 0.0f};
 
-		const DirectX::XMFLOAT3 White = {1.0f, 1.0f, 1.0f};
-		const DirectX::XMFLOAT3 Red = {1.0f, 0.0f, 0.0f};
-		const DirectX::XMFLOAT3 Green = {0.0f, 1.0f, 0.0f};
-		const DirectX::XMFLOAT3 Blue = {0.0f, 0.0f, 1.0f};
+		static const DirectX::XMFLOAT3 White = {1.0f, 1.0f, 1.0f};
+		static const DirectX::XMFLOAT3 Red = {1.0f, 0.0f, 0.0f};
+		static const DirectX::XMFLOAT3 Green = {0.0f, 1.0f, 0.0f};
+		static const DirectX::XMFLOAT3 Blue = {0.0f, 0.0f, 1.0f};
 
-		const DirectX::XMFLOAT3 Cyan = {0.0f, 1.0f, 1.0f};
-		const DirectX::XMFLOAT3 Magenta = {1.0f, 0.0f, 1.0f};
-		const DirectX::XMFLOAT3 Yellow = {1.0f, 1.0f, 0.0f};
+		static const DirectX::XMFLOAT3 Cyan = {0.0f, 1.0f, 1.0f};
+		static const DirectX::XMFLOAT3 Magenta = {1.0f, 0.0f, 1.0f};
+		static const DirectX::XMFLOAT3 Yellow = {1.0f, 1.0f, 0.0f};
 
 
 		inline DirectX::XMFLOAT3 RandomInRange(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
@@ -41,6 +46,21 @@ namespace Crystal {
 			std::uniform_real_distribution<> disz(v1.z, v2.z);
 
 			return {static_cast<float>(disx(gen)), static_cast<float>(disy(gen)), static_cast<float>(disz(gen))};
+		}
+
+		inline DirectX::XMFLOAT3 RandomPositionInSphere(const DirectX::XMFLOAT3& center, float radius)
+		{
+			float theta = RandomFloatInRange(0.0f, TWO_PI);
+			float phi= RandomFloatInRange(0.0f, PI);
+			float r = RandomFloatInRange(0.0f, radius);
+
+			
+			DirectX::XMFLOAT3 position = {};
+			position.x = r * sin(phi) * cos(theta);
+			position.y = r * sin(phi) * sin(theta);
+			position.z = r * cos(phi);
+			
+			return position;			
 		}
 
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)

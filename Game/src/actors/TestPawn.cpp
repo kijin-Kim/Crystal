@@ -1,6 +1,7 @@
 ﻿#include "TestPawn.h"
 
 #include "Missile.h"
+#include "MyHUD.h"
 #include "Crystal/Types.h"
 #include "Crystal/GamePlay/World/Level.h"
 
@@ -11,8 +12,7 @@ void TestPawn::Initialize()
 	Pawn::Initialize();
 
 
-	auto material = std::make_unique<Crystal::Material>();
-	material->ShadingModel = Crystal::EShadingModel::SM_DefaultLit;
+	
 
 
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
@@ -20,15 +20,36 @@ void TestPawn::Initialize()
 	sphereComponent->SetMass(20000.0f);
 	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	{
-			this->m_Health -= 1;
+		if (m_bIsInVunlnerable)
+			return;
+
+		m_Health -= 1;
+		UpdateHealth();
 	});
 
 
 	m_MainComponent = sphereComponent;
 
+
+	auto& resourceManager = Crystal::ResourceManager::Instance();
+
+	auto material = Crystal::CreateShared<Crystal::Material>();
+	material->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
+	material->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
+	material->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
+	material->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
+	material->ShadingModel = Crystal::EShadingModel::SM_Lit;
+	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+	
+	
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-	staticMeshComponent->AddMaterial(std::move(material));
+	staticMeshComponent->AddMaterial(material);
 	staticMeshComponent->AttachTo(m_MainComponent);
+	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
+
+	
+
+	
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
@@ -44,6 +65,12 @@ void TestPawn::Initialize()
 
 	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
+}
+
+void TestPawn::Begin()
+{
+	Pawn::Begin();
+	UpdateHealth();
 }
 
 void TestPawn::Update(const float deltaTime)
@@ -78,6 +105,10 @@ void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(TestPawn::EndFire));
 
 	inputComponent->BindAction("FireMissile", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::FireMissile));
+
+	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UsePowerItem));
+	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UseHealItem));
+	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UseShieldItem));
 }
 
 void TestPawn::RotateYaw(float value)
@@ -135,36 +166,34 @@ void TestPawn::FireMissile()
 	CS_DEBUG_INFO("FireMissile !!");
 
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
-	if(level)
+	if (level)
 	{
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
 		auto playerPosition = GetPosition();
-		spawnParams.Position = { playerPosition.x, playerPosition.y, playerPosition.z + 30.0f };
-		spawnParams.Rotation = GetRotation();
-		
+		spawnParams.Position = {playerPosition.x, playerPosition.y, playerPosition.z + 30.0f};
+		spawnParams.Rotation = Crystal::Vector4::QuaternionMultiply(GetRotation(), m_CameraComponent->GetRotation());
+
 		auto missile = level->SpawnActor<Missile>(spawnParams).lock();
-	
-		
-		
 	}
-	
 }
 
 void TestPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
+	if (m_bIsInVunlnerable)
+		return;
+
 	auto actorCausedDamage = damageCauser.lock();
-	if(!actorCausedDamage)
+	if (!actorCausedDamage)
 	{
 		return;
 	}
 
 	auto staticType = actorCausedDamage->StaticType();
-	if(staticType == "TestPawn")
+	if (staticType == "TestPawn")
 	{
 		m_Health -= damage;
 	}
-	
 }
 
 void TestPawn::OnFire()
@@ -187,8 +216,101 @@ void TestPawn::OnFire()
 			auto hitActor = hitResult.HitActor.lock();
 			if (hitActor)
 			{
-				hitActor->OnTakeDamage(1.0f, Crystal::Cast<Actor>(weak_from_this()));
+				if (hitActor->StaticType() == "HealAsteroid")
+				{
+					m_bHasItem[ItemType_Heal] = true;
+					UpdateItemStatus(ItemType_Heal, true);
+				}
+				else if (hitActor->StaticType() == "PowerAsteroid")
+				{
+					m_bHasItem[ItemType_Power] = true;
+					UpdateItemStatus(ItemType_Power, true);
+				}
+				else if (hitActor->StaticType() == "ShieldAsteroid")
+				{
+					m_bHasItem[ItemType_Shield] = true;
+					UpdateItemStatus(ItemType_Shield, true);
+				}
+
+				hitActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
 			}
 		}
 	}
+}
+
+void TestPawn::UpdateHealth()
+{
+	m_Health = max(m_Health, 0);
+	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
+	if (level)
+	{
+		auto hud = Crystal::Cast<MyHUD>(level->GetHUD());
+		if (hud)
+		{
+			hud->OnHealthUpdated(m_Health, 100);
+		}
+	}
+}
+
+void TestPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
+{
+	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
+	if (!level)
+	{
+		return;
+	}
+
+	auto hud = Crystal::Cast<MyHUD>(level->GetHUD());
+	if (!hud)
+	{
+		return;
+	}
+
+
+	if (bAcquired)
+	{
+		hud->OnItemAcquired(itemType);
+	}
+	else
+	{
+		hud->OnItemUsed(itemType);
+	}
+}
+
+void TestPawn::UsePowerItem()
+{
+	if (!m_bHasItem[ItemType_Power])
+	{
+		return;
+	}
+
+	m_bHasItem[ItemType_Power] = false;
+	UpdateItemStatus(ItemType_Power, false);
+	m_Power += 2.0f;
+}
+
+void TestPawn::UseHealItem()
+{
+	if (!m_bHasItem[ItemType_Heal])
+	{
+		return;
+	}
+
+	m_bHasItem[ItemType_Heal] = false;
+	UpdateItemStatus(ItemType_Heal, false);
+	m_Health += 10;
+	m_Health = min(m_Health, 100);
+	UpdateHealth();
+}
+
+void TestPawn::UseShieldItem()
+{
+	if (!m_bHasItem[ItemType_Shield])
+	{
+		return;
+	}
+
+	m_bHasItem[ItemType_Shield] = false;
+	UpdateItemStatus(ItemType_Shield, false);
+	m_bIsInVunlnerable = true;
 }

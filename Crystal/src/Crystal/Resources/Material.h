@@ -28,10 +28,12 @@ namespace Crystal {
 
 		bool bTwoSided = false;
 
-		EShadingModel ShadingModel = EShadingModel::SM_Undefined;
+		EShadingModel ShadingModel = EShadingModel::SM_Lit;
 		EBlendMode BlendMode = EBlendMode::BM_Opaque;
 
 		bool UsingSameTextures(Material* material);
+
+		
 
 		STATIC_TYPE_IMPLE(Material)
 	};

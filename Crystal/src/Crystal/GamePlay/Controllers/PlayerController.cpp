@@ -45,6 +45,29 @@ namespace Crystal {
 		fireMissileActionMapping.bCtrlDown = false;
 		fireMissileActionMapping.bShiftDown = false;
 		AddActionMapping("FireMissile", fireMissileActionMapping);
+
+
+		Crystal::ActionMapping usePowerItemActionMapping = {};
+		usePowerItemActionMapping.CrystalCode = Crystal::Keyboard::Num1;
+		usePowerItemActionMapping.bAltDown = false;
+		usePowerItemActionMapping.bCtrlDown = false;
+		usePowerItemActionMapping.bShiftDown = false;
+		AddActionMapping("UsePowerItem", usePowerItemActionMapping);
+
+		Crystal::ActionMapping useHealItemActionMapping = {};
+		useHealItemActionMapping.CrystalCode = Crystal::Keyboard::Num2;
+		useHealItemActionMapping.bAltDown = false;
+		useHealItemActionMapping.bCtrlDown = false;
+		useHealItemActionMapping.bShiftDown = false;
+		AddActionMapping("UseHealItem", useHealItemActionMapping);
+
+		Crystal::ActionMapping useShieldItemActionMapping = {};
+		useShieldItemActionMapping.CrystalCode = Crystal::Keyboard::Num3;
+		useShieldItemActionMapping.bAltDown = false;
+		useShieldItemActionMapping.bCtrlDown = false;
+		useShieldItemActionMapping.bShiftDown = false;
+		AddActionMapping("UseShieldItem", useShieldItemActionMapping);
+		
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

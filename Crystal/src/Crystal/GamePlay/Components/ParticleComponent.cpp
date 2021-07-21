@@ -66,7 +66,7 @@ namespace Crystal {
 
 		if (m_Particles.size() < m_ParticleSpawnCount)
 		{
-			m_Particles.emplace_back(GetWorldPosition(), Vector3::Zero, GetScale(), 45.0f, 100.0f);
+			m_Particles.emplace_back(GetWorldPosition(), Vector3::Zero, GetScale().x, 45.0f, 100.0f);
 		}
 	}
 

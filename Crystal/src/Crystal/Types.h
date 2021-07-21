@@ -1,13 +1,15 @@
 #pragma once
+#include <boost/container_hash/hash.hpp>
+
 #include "GamePlay/Objects/Actors/Actor.h"
 
 namespace Crystal {
 
+
 	enum class EShadingModel
 	{
-		SM_Undefined,
 		SM_Unlit,
-		SM_DefaultLit,
+		SM_Lit,
 		ShadingModelCount
 	};
 
@@ -19,6 +21,20 @@ namespace Crystal {
 		BlendModeCount
 	};
 
+
+	struct PipelineStateKey
+	{
+		EBlendMode BlendMode;
+		bool bTwoSided = false;
+
+		bool operator==(const PipelineStateKey& other) const
+		{
+			return BlendMode == other.BlendMode
+			&& bTwoSided == other.bTwoSided;
+		}
+	};
+	
+	
 	struct HitResult
 	{
 		Weak<Actor> HitActor = {};
@@ -31,10 +47,10 @@ namespace Crystal {
 
 		bool ShouldBeIgnored(const Shared<Actor>& actor) const
 		{
-			auto it = std::find_if(IgnoreActors.begin(), IgnoreActors.end(), [&actor](const Weak<Actor>& other)->bool
+			auto it = std::find_if(IgnoreActors.begin(), IgnoreActors.end(), [&actor](const Weak<Actor>& other)-> bool
 			{
 				auto otherActor = other.lock();
-				if(!otherActor)
+				if (!otherActor)
 				{
 					return false;
 				}
@@ -46,5 +62,23 @@ namespace Crystal {
 			return it != IgnoreActors.end();
 		}
 	};
-	
+
+}
+
+
+namespace std {
+	template<>
+	struct hash<Crystal::PipelineStateKey>
+	{
+		size_t operator()(const Crystal::PipelineStateKey& k) const
+		{
+			using boost::hash_value;
+			using boost::hash_combine;
+
+			size_t seed = 0;
+			hash_combine(seed, hash_value(k.BlendMode));
+			hash_combine(seed, hash_value(k.bTwoSided));
+			return seed;
+		}
+	};
 }

@@ -19,7 +19,14 @@ namespace Crystal {
 		void UpdateTransforms() override;
 
 
+		void SetScaleX(float scale) { m_Scale.x = scale; }
+		void SetScaleY(float scale) { m_Scale.y = scale; }
+		
+
+
 		STATIC_TYPE_IMPLE(TextureComponent)
+
+	
 	};
 
 }

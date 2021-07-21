@@ -52,9 +52,16 @@ namespace Crystal {
 			if (!component)
 				continue;
 
+			if(component->GetHideInGame())
+			{
+				continue;
+			}
+
 			PerObjectData perObjectData = {};
 
 			auto skeletalMesh = Cast<SkeletalMesh>(component->GetRenderable());
+
+			
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
 			auto boneMatrices = skeletalMesh->GetBoneTransforms();
@@ -66,6 +73,13 @@ namespace Crystal {
 			destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 			auto& materials = component->GetMaterials();
+
+			if (materials.empty())
+				continue;
+
+			if (materials[0]->ShadingModel != EShadingModel::SM_Lit || materials[0]->BlendMode != EBlendMode::BM_Opaque)
+				continue;
+			
 			for (int j = 0; j < materials.size(); j++)
 			{
 				PerDrawData perDrawData = {};
