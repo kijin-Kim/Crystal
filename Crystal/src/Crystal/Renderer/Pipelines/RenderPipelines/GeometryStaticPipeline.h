@@ -40,7 +40,6 @@ namespace Crystal {
 		void End() override;
 		STATIC_TYPE_IMPLE(GeometryStaticPipeline)
 	private:
-		std::map<Renderable*, InstancedStaticMeshData> m_InstanceBatches;
 		InstancedStaticMesh m_InstancedStaticMesh;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 

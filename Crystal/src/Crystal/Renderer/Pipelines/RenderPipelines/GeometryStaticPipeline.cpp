@@ -76,6 +76,7 @@ namespace Crystal {
 			{"ROUGHNESS_CONSTANT", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"METALLIC_CONSTANT", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"SHOULD_LIT", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"OPACITY", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"TOGGLE_ALBEDO_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"TOGGLE_METALLIC_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"TOGGLE_ROUGHNESS_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
@@ -144,9 +145,7 @@ namespace Crystal {
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-
-		int materialCount = 0;
-		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
+		
 
 		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject
 		{
@@ -154,148 +153,18 @@ namespace Crystal {
 			if (!meshComponent)
 				continue;
 
+			auto materials = meshComponent->GetMaterials();
+
+			if (materials.empty())
+				continue;
+			
+			if (!(materials[0]->ShadingModel == EShadingModel::SM_Lit && materials[0]->BlendMode == EBlendMode::BM_Opaque))
+				continue;
+			
+
 			m_InstancedStaticMesh.AddInstance(meshComponent, m_DescriptorHeap, 2);
 
-			//if (meshComponent->GetHideInGame())
-			//{
-			//	continue;
-			//}
-
-			//auto staticMesh = Cast<StaticMesh>(meshComponent->GetRenderable()).get();
-
-			//
-
-
-			//StaticMeshPerInstanceData perInstanceData = {};
-
-			//perInstanceData.World = meshComponent->GetWorldTransform();
-			//auto& materials = meshComponent->GetMaterials();
-
-
-			//if (materials.empty())
-			//	continue;
-
-			//if (materials[0]->ShadingModel != EShadingModel::SM_Lit || materials[0]->BlendMode != EBlendMode::BM_Opaque)
-			//	continue;
-
-
-			//for (auto& mat : materials)
-			//{
-			//	auto matRow = mat.get();
-
-
-			//	perInstanceData.AlbedoColor = matRow->AlbedoColor;
-			//	perInstanceData.EmissiveColor = matRow->EmissiveColor;
-			//	perInstanceData.RoughnessConstant = matRow->RoughnessConstant;
-			//	perInstanceData.MetallicConstant = matRow->MetallicConstant;
-
-			//	perInstanceData.bToggleAlbedoTexture = !matRow->AlbedoTexture.expired() ? true : false;
-			//	perInstanceData.bToggleMetallicTexture = !matRow->MetallicTexture.expired() ? true : false;
-			//	perInstanceData.bToggleRoughnessTexture = !matRow->RoughnessTexture.expired() ? true : false;
-			//	perInstanceData.bToggleNormalTexture = !matRow->NormalTexture.expired() ? true : false;
-			//	perInstanceData.bToggleEmissivetexture = !matRow->EmissiveTexture.expired() ? true : false;
-
-			//	perInstanceData.bToggleIrradianceTexture = true; // TEMP
-
-			//	bool bFindMaterial = false;
-			//	if (m_InstanceBatches[staticMesh].Material)
-			//	{
-			//		bFindMaterial = m_InstanceBatches[staticMesh].Material->UsingSameTextures(matRow);
-			//	}
-
-			//	if (bFindMaterial)
-			//	{
-			//		continue;
-			//	}
-
-
-			//	m_InstanceBatches[staticMesh].Material = matRow;
-
-
-			//	if (m_InstanceBatches[staticMesh].DescriptorOffset == -1)
-			//	{
-			//		m_InstanceBatches[staticMesh].DescriptorOffset =
-			//			device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-			//			* (2 + 5 * materialCount);
-			//	}
-
-
-			//	auto cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-			//	cpuHandle.ptr += m_InstanceBatches[staticMesh].DescriptorOffset;
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-			//		* (5 * 0);
-
-
-			//	if (perInstanceData.bToggleAlbedoTexture)
-			//	{
-			//		auto albedoTexture = matRow->AlbedoTexture.lock();
-			//		device->CopyDescriptorsSimple(1, cpuHandle,
-			//		                              albedoTexture->GetShaderResourceView(
-			//			                              D3D12_SRV_DIMENSION_TEXTURE2D),
-			//		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			//	}
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			//	if (perInstanceData.bToggleMetallicTexture)
-			//	{
-			//		auto metallicTexture = matRow->MetallicTexture.lock();
-			//		device->CopyDescriptorsSimple(1, cpuHandle,
-			//		                              metallicTexture->GetShaderResourceView(
-			//			                              D3D12_SRV_DIMENSION_TEXTURE2D),
-			//		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			//	}
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			//	if (perInstanceData.bToggleRoughnessTexture)
-			//	{
-			//		auto roughnessTexture = matRow->RoughnessTexture.lock();
-			//		device->CopyDescriptorsSimple(1, cpuHandle,
-			//		                              roughnessTexture->GetShaderResourceView(
-			//			                              D3D12_SRV_DIMENSION_TEXTURE2D),
-			//		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			//	}
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			//	if (perInstanceData.bToggleNormalTexture)
-			//	{
-			//		auto normalTexture = matRow->NormalTexture.lock();
-			//		device->CopyDescriptorsSimple(1, cpuHandle,
-			//		                              normalTexture->GetShaderResourceView(
-			//			                              D3D12_SRV_DIMENSION_TEXTURE2D),
-			//		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			//	}
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-			//	if (perInstanceData.bToggleEmissivetexture)
-			//	{
-			//		auto emissiveTexture = matRow->EmissiveTexture.lock();
-			//		device->CopyDescriptorsSimple(1, cpuHandle,
-			//		                              emissiveTexture->GetShaderResourceView(
-			//			                              D3D12_SRV_DIMENSION_TEXTURE2D),
-			//		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			//	}
-			//	cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-
-			//	materialCount++;
-			//}
-			//m_InstanceBatches[staticMesh].AddPerInstanceData(perInstanceData);
 		}
-
-
-	/*	for (auto& pair : m_InstanceBatches)
-		{
-			auto& instanceBatches = pair.second;
-
-
-			instanceBatches.PerInstanceVertexBuffer = CreateUnique<Buffer>(nullptr, sizeof(StaticMeshPerInstanceData) *
-			                                                               instanceBatches.PerInstanceDatas.size(),
-			                                                               instanceBatches.PerInstanceDatas.size(), false, true);
-
-			instanceBatches.PerInstanceVertexBuffer->SetData(instanceBatches.PerInstanceDatas.data(),
-			                                                 0, sizeof(StaticMeshPerInstanceData) * instanceBatches.
-			                                                                              PerInstanceDatas.size());
-		}*/
 
 		m_InstancedStaticMesh.PrepareDynamicVertexBuffer();
 	}
@@ -306,7 +175,6 @@ namespace Crystal {
 
 		auto& device = Device::Instance();
 
-
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetGraphicsRootSignature(m_RootSignature.Get());
 		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
@@ -314,35 +182,8 @@ namespace Crystal {
 
 		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-
 		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
 		descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 2;
-
-
-		//for (const auto& pair : m_InstanceBatches)
-		//{
-		//	auto& renderable = pair.first;
-		//	auto& instanceBatch = pair.second;
-		//	auto& perInstanceVertexBuffer = instanceBatch.PerInstanceVertexBuffer;
-
-		//	auto handle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		//	handle.ptr += instanceBatch.DescriptorOffset;
-		//	commandList->SetGraphicsRootDescriptorTable(1, handle);
-
-
-		//	commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
-
-		//	if (!renderable)
-		//	{
-		//		continue;
-		//	}
-
-		//	//여기서부터 Texture2D Array Per Instance
-		//	for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
-		//	{
-		//		renderable->Render(commandList, j, perInstanceVertexBuffer->GetSize() / sizeof(StaticMeshPerInstanceData));
-		//	}
-		//}
 
 
 		m_InstancedStaticMesh.Render(commandList, m_DescriptorHeap, 1);
@@ -350,7 +191,6 @@ namespace Crystal {
 
 	void GeometryStaticPipeline::End()
 	{
-		m_InstanceBatches.clear();
 		m_InstancedStaticMesh.Clear();
 	}
 

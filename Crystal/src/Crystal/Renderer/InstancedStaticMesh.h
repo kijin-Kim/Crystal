@@ -16,6 +16,7 @@ namespace Crystal {
 		float MetallicConstant = 0.0f;
 
 		uint32_t bShouldLit = true;
+		float Opacity = 1.0f;
 		uint32_t bToggleAlbedoTexture = false;
 		uint32_t bToggleMetallicTexture = false;
 		uint32_t bToggleRoughnessTexture = false;

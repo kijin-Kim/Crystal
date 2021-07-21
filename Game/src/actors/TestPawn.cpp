@@ -57,7 +57,7 @@ void TestPawn::Initialize()
 
 
 	m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-	m_CameraComponent->SetFieldOfView(90.0f);
+	m_CameraComponent->SetFieldOfView(85.0f);
 	m_CameraComponent->SetNearPlane(20.0f);
 	m_CameraComponent->SetViewport({0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f});
 	m_CameraComponent->SetFarPlane(100000.0f);

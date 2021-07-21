@@ -18,6 +18,8 @@ public:
 	void Initialize() override
 	{
 		auto material = Crystal::CreateShared<Crystal::Material>();
+		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+		material->ShadingModel = Crystal::EShadingModel::SM_Lit;
 
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");

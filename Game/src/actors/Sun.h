@@ -27,7 +27,6 @@ public:
 
 
 
-
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 		
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");

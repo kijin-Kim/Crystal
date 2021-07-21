@@ -28,6 +28,8 @@ namespace Crystal {
 
 		bool bTwoSided = false;
 
+		float Opacity = 1.0f;
+
 		EShadingModel ShadingModel = EShadingModel::SM_Lit;
 		EBlendMode BlendMode = EBlendMode::BM_Opaque;
 

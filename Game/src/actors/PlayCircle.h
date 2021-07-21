@@ -25,8 +25,11 @@ public:
 		
 		auto material = Crystal::CreateShared<Crystal::Material>();
 		material->EmissiveColor = Crystal::Vector3::Red;
+		material->Opacity = 0.1f;
 		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
-		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+		material->BlendMode = Crystal::EBlendMode::BM_Translucent;
+		material->bTwoSided = true;
+		
 
 		
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "Crystal/Renderer/InstancedStaticMesh.h"
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/Material.h"
 
@@ -35,30 +36,7 @@ namespace Crystal {
 		};
 
 
-		struct PerInstanceData
-		{
-			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
-			DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
-			DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
-			float RoughnessConstant = 0.0f;
-			float MetallicConstant = 0.0f;
 
-			uint32_t bShouldLit = true;
-			uint32_t bToggleAlbedoTexture = false;
-			uint32_t bToggleMetallicTexture = false;
-			uint32_t bToggleRoughnessTexture = false;
-			uint32_t bToggleNormalTexture = false;
-			uint32_t bToggleIrradianceTexture = false;
-			uint32_t bToggleEmissivetexture = false;
-		};
-
-		struct InstanceBatch
-		{
-			std::vector<PerInstanceData> PerInstanceDatas;
-			std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
-			Material* Material = nullptr;
-			UINT64 DescriptorOffset = -1;
-		};
 
 	public:
 		ForwardStaticPipeline() = default;
@@ -71,12 +49,13 @@ namespace Crystal {
 		void End() override;
 		STATIC_TYPE_IMPLE(ForwardStaticPipeline)
 	private:
-		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
-		
+		InstancedStaticMesh m_InstancedStaticMesh;
 
+		
 		std::unordered_map<PipelineStateKey, Microsoft::WRL::ComPtr<ID3D12PipelineState>> m_PipelineStates;
+		std::unordered_map<ID3D12PipelineState*, InstancedStaticMesh> m_InstancedStaticMeshes;
 
 	};
 }
