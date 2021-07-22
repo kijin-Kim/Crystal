@@ -116,8 +116,6 @@ namespace Crystal {
 		RenderPipeline::Begin();
 
 
-		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
-
 		auto device = Device::Instance().GetD3DDevice();
 
 		auto& scene = GetScene();
@@ -129,7 +127,8 @@ namespace Crystal {
 		perFrameData.ViewProjection = Matrix4x4::Transpose(scene->Cameras[0].lock()->GetViewProjection());
 
 
-		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
+		m_PerFrameConstantBuffer = BufferManager::Instance().GetConstantBuffer(&perFrameData, sizeof(perFrameData));
+
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(
@@ -137,7 +136,7 @@ namespace Crystal {
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->AsConstantBufferView(),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

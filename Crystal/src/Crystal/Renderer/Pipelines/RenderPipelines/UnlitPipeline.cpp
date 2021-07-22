@@ -196,7 +196,7 @@ namespace Crystal {
 					newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 
 
-					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->GetConstantBufferView(),
+					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->AsConstantBufferView(),
 					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					// 텍스쳐를 Heap에 Copy
@@ -256,13 +256,13 @@ namespace Crystal {
 			auto& vertexBuffers = scene->PlaneQuad3DMesh->GetVertexBuffers();
 			for (const auto& vertexbuffer : vertexBuffers)
 			{
-				vertexBufferViews.push_back(vertexbuffer->GetVertexBufferView());
+				vertexBufferViews.push_back(vertexbuffer->AsVertexBufferView());
 			}
 
 
 			commandList->IASetVertexBuffers(0, vertexBufferViews.size(), vertexBufferViews.data());
-			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->GetVertexBufferView());
-			commandList->IASetIndexBuffer(&scene->PlaneQuad3DMesh->GetIndexBuffers()[0]->GetIndexBufferView());
+			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->AsVertexBufferView());
+			commandList->IASetIndexBuffer(&scene->PlaneQuad3DMesh->GetIndexBuffers()[0]->AsIndexBufferView());
 			commandList->DrawIndexedInstanced(scene->PlaneQuad3DMesh->GetIndexBuffers()[0]->GetElementCount(), drawData.InstanceCount, 0, 0, 0);
 		}
 	}

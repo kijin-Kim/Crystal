@@ -25,7 +25,7 @@ public:
 		
 		auto material = Crystal::CreateShared<Crystal::Material>();
 		material->EmissiveColor = Crystal::Vector3::Red;
-		material->Opacity = 0.1f;
+		material->Opacity = 0.2f;
 		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 		material->BlendMode = Crystal::EBlendMode::BM_Translucent;
 		material->bTwoSided = true;
@@ -36,8 +36,9 @@ public:
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetUnitScale(500.0f);
+		staticMeshComponent->SetUnitScale(5.0f);
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
+		
 		
 
 		m_MainComponent = staticMeshComponent;

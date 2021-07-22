@@ -11,9 +11,11 @@
 #include "Crystal/Resources/Texture.h"
 #include "Pipelines/ComputePipelines/AdditveBlendingPipeline.h"
 #include "Pipelines/ComputePipelines/BlurPipeline.h"
+#include "Pipelines/ComputePipelines/BrightColorExtractingPipeline.h"
 #include "Pipelines/ComputePipelines/DiffIrradSamplingPipeline.h"
 #include "Pipelines/ComputePipelines/PanoToCubemapPipeline.h"
 #include "Pipelines/RenderPipelines/CubemapPipeline.h"
+#include "Pipelines/RenderPipelines/ForwardStaticBlendingPipeline.h"
 #include "Pipelines/RenderPipelines/ForwardStaticPipeline.h"
 #include "Pipelines/RenderPipelines/GeometrySkeletalPipeline.h"
 #include "Pipelines/RenderPipelines/LightingSkeletalPipeline.h"
@@ -38,7 +40,7 @@ namespace Crystal {
 
 		auto geometryShaderStatic = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
 		auto forwardShaderStatic = resourceManager.GetShader("assets/shaders/PBRShader_Static.hlsl").lock();
-		//auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/PBRShader_Skeletal.hlsl").lock();
+		auto forwardBlendingShaderStatic = resourceManager.GetShader("assets/shaders/PBRShader_Static_NoInstancing.hlsl").lock();
 		auto pbrSkeletalShader = resourceManager.GetShader("assets/shaders/GeometryPass_Skeletal.hlsl").lock();
 		auto skyboxShader = resourceManager.GetShader("assets/shaders/SkyboxShader.hlsl").lock();
 		auto panoToCubemapShader = resourceManager.GetShader("assets/shaders/EquirectangularToCube.hlsl").lock();
@@ -53,6 +55,7 @@ namespace Crystal {
 		auto shadowMapStaticShader = resourceManager.GetShader("assets/shaders/ShadowPass_Static.hlsl").lock();
 		auto shadowMapSkeletalShader = resourceManager.GetShader("assets/shaders/ShadowPass_Skeletal.hlsl").lock();
 		auto unlitShader2D = resourceManager.GetShader("assets/shaders/UnlitShader2D.hlsl").lock();
+		auto brightColorExtractingShader = resourceManager.GetShader("assets/shaders/BrightColorExtracting.hlsl").lock();
 
 
 		{
@@ -234,6 +237,16 @@ namespace Crystal {
 		}
 
 		{
+			RootParameter perFrame = { 0, 1, 1 };
+			RootParameter perObject = {};
+			RootParameter perExecute = {};
+
+
+			brightColorExtractingShader->SetRootSignature({ perFrame, perObject, perExecute });
+			brightColorExtractingShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 1 });			
+		}
+
+		{
 			lightingPassShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 			});
@@ -298,6 +311,8 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<ShadowMapSkeletalPipeline>(shadowMapSkeletalShader, "ShadowMapSkeletalPipeline"));
 		m_Pipelines.push_back(CreatePipeline<UIPipeline>(unlitShader2D, "UnlitShader2DPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ForwardStaticPipeline>(forwardShaderStatic, "ForwardStaticPipeline"));
+		m_Pipelines.push_back(CreatePipeline<ForwardStaticBlendingPipeline>(forwardBlendingShaderStatic, "ForwardStaticPipeline"));
+		m_Pipelines.push_back(CreatePipeline<BrightColorExtractingPipeline>(brightColorExtractingShader, "BrightColorExtractingPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -519,8 +534,7 @@ namespace Crystal {
 		m_LightPipelines[2]->Begin();
 		m_LightPipelines[2]->Record(commandList);
 
-		m_Pipelines[11]->Begin();
-		m_Pipelines[11]->Record(commandList);
+
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -530,15 +544,27 @@ namespace Crystal {
 
 		m_Pipelines[0]->Begin();
 		m_Pipelines[0]->Record(commandList);
+		
 
 		
 
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		m_Pipelines[11]->Begin();
+		m_Pipelines[11]->Record(commandList);
+
 
 		m_Pipelines[1]->Begin();
 		m_Pipelines[1]->Record(commandList);
+
+		m_Pipelines[12]->Begin();
+		m_Pipelines[12]->Record(commandList);
+
+		m_Pipelines[13]->Begin();
+		m_Pipelines[13]->Record(commandList);
+
+		
 
 		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
@@ -633,6 +659,7 @@ namespace Crystal {
 		m_Pipelines[7]->End();
 		m_Pipelines[8]->End();
 		m_Pipelines[11]->End();
+		m_Pipelines[12]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -647,6 +674,8 @@ namespace Crystal {
 			scene->RemoveGarbage();
 			CS_DEBUG_INFO("Garbage Removed");
 		}
+
+		BufferManager::Instance().Flush();
 	}
 
 	void RenderSystem::ChangeResolution(int width, int height)

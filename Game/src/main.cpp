@@ -159,6 +159,11 @@ public:
 
 
 		auto playCircle = m_World->SpawnActor<PlayCircle>({""}).lock();
+		auto playCircle2 = m_World->SpawnActor<PlayCircle>({""}).lock();
+		playCircle2->SetPosition({ 0.0f, 0.0f, -1000.0f });
+		auto staticMesh = Crystal::Cast<Crystal::StaticMeshComponent>(playCircle2->GetComponentByClass("StaticMeshComponent"));
+		staticMesh->GetMaterials()[0]->EmissiveColor = Crystal::Vector3::Blue;
+		
 
 
 #endif

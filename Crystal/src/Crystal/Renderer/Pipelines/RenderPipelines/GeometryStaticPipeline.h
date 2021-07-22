@@ -43,6 +43,8 @@ namespace Crystal {
 		InstancedStaticMesh m_InstancedStaticMesh;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
+
+		Shared<Buffer> m_PerFrameConstantBuffer = nullptr;
 	};
 
 

@@ -18,6 +18,11 @@ namespace Crystal {
 		return static_cast<float>(dis(gen));
 	}
 
+	inline uint32_t Align(uint32_t num, uint32_t alignByte)
+	{
+		return (num + (alignByte - 1)) & ~(alignByte - 1);
+	}
+
 
 	namespace Vector3 {
 		static const DirectX::XMFLOAT3 UnitX = {1.0f, 0.0f, 0.0f};

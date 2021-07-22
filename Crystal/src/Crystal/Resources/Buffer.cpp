@@ -2,18 +2,20 @@
 #include "Buffer.h"
 
 #include "Crystal/Core/Device.h"
+#include "Crystal/Math/Math.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "DirectXTex/d3dx12.h"
 
 namespace Crystal {
 	Buffer::Buffer(void* data, UINT sizeInByte, UINT count, bool bAlign256, bool bAsDynamic)
 		: m_ElementCount(count),
-		m_Size(sizeInByte)
+		m_Size(sizeInByte),
+		m_bIsDynamic(bAsDynamic)
 	{
 		
 		if (bAlign256)
 		{
-			m_Size = (sizeInByte + (256 - 1)) & ~(256 - 1); // 256바이트를 기준으로 정렬된 크기.
+			m_Size = Align(m_Size, 256);
 		}
 
 		auto device = Device::Instance().GetD3DDevice();
@@ -79,17 +81,21 @@ namespace Crystal {
 		memcpy(m_CpuBasePtr + offset, data, size);
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Buffer::GetConstantBufferView() const
+	D3D12_CPU_DESCRIPTOR_HANDLE Buffer::AsConstantBufferView()
 	{
+		if (m_ConstantBufferView.IsNull())
+		{
+			CreateConstantBufferView();
+		}
 		return m_ConstantBufferView.GetDescriptorHandle();
 	}
 
-	D3D12_VERTEX_BUFFER_VIEW Buffer::GetVertexBufferView() const
+	D3D12_VERTEX_BUFFER_VIEW Buffer::AsVertexBufferView() const
 	{
 		return { m_Resource->GetGPUVirtualAddress(), m_Size, m_Size / m_ElementCount };
 	}
 
-	D3D12_INDEX_BUFFER_VIEW Buffer::GetIndexBufferView() const
+	D3D12_INDEX_BUFFER_VIEW Buffer::AsIndexBufferView() const
 	{
 		return {m_Resource->GetGPUVirtualAddress(), m_Size, DXGI_FORMAT_R32_UINT};
 	}
@@ -126,6 +132,85 @@ namespace Crystal {
 	uint32_t Buffer::GetSize() const
 	{
 		return m_Size;
+	}
+
+	//=============================================================================
+	
+
+	Shared<Buffer> BufferManager::GetConstantBuffer(void* data, UINT requestedSize)
+	{
+		auto it = m_AvailableConstantBuffers.find(Align(requestedSize, 256));
+
+		if (it == m_AvailableConstantBuffers.end())
+		{
+			CS_DEBUG_INFO("Create New ConstantBuffer");
+			auto newBuffer = CreateShared<Buffer>(data, requestedSize, 0, true, true);
+			m_UsedConstantBuffers.push_back(newBuffer);
+			return newBuffer;
+		}
+
+		const auto constantBuffer = it->second;
+
+		m_AvailableConstantBuffers.erase(it);
+		m_UsedConstantBuffers.push_back(constantBuffer);
+
+		if(data)
+		{
+			constantBuffer->SetData(data, 0, requestedSize);
+		}
+		
+		return constantBuffer;
+	}
+
+	Shared<Buffer> BufferManager::GetBuffer(void* data, UINT requestedSize, UINT count, bool bAsDynamic)
+	{
+		
+		auto it = m_AvailableBuffers.begin();
+		while(it != m_AvailableBuffers.end())
+		{
+			if(it->first.bIsDynmaic == bAsDynamic && it->first.Size >= requestedSize) // find first match size
+			{
+				it->second->SetElementCount(count);
+				if(data)
+				{
+					it->second->SetData(data, 0, requestedSize);
+				}
+				auto buffer = it->second;
+				
+				m_AvailableBuffers.erase(it);
+				m_UsedBuffers.push_back(buffer);
+
+				return buffer;
+			}
+			++it;
+		}
+
+		CS_DEBUG_INFO("Create New Buffer");
+		const auto newBuffer = CreateShared<Buffer>(data, requestedSize, count, false, bAsDynamic);
+		m_UsedBuffers.push_back(newBuffer);
+		return newBuffer;
+	}
+
+	void BufferManager::Flush()
+	{
+		if(!m_UsedConstantBuffers.empty())
+		{
+			for(int i=0; i< m_UsedConstantBuffers.size();i++)
+			{
+				m_AvailableConstantBuffers.insert({ m_UsedConstantBuffers[i]->GetSize(), m_UsedConstantBuffers[i] });
+			}
+			m_UsedConstantBuffers.clear();
+		}
+
+
+		if (!m_UsedBuffers.empty())
+		{
+			for (int i = 0; i < m_UsedBuffers.size(); i++)
+			{
+				m_AvailableBuffers.insert({ { m_UsedBuffers[i]->GetSize(), m_UsedBuffers[i]->GetIsDynamic() }, m_UsedBuffers[i]});
+			}
+			m_UsedBuffers.clear();
+		}
 	}
 
 }

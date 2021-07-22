@@ -118,30 +118,10 @@ namespace Crystal {
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
 		);
 
-		PipelineStateDescription translucentNoCull(
-			inputLayoutDesc,
-			StateHelper::NonPremultiplied,
-			StateHelper::DepthEnable,
-			StateHelper::CullNone,
-			renderTargetDescription,
-			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
-		);
-
-		PipelineStateDescription translucentCounterClockCull(
-			inputLayoutDesc,
-			StateHelper::NonPremultiplied,
-			StateHelper::DepthEnable,
-			StateHelper::CullCounterClock,
-			renderTargetDescription,
-			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
-		);
 
 	
 		opaqueNoCull.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineStates[{EBlendMode::BM_Opaque, true}]);
 		opaqueCounterClockCull.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineStates[{EBlendMode::BM_Opaque, false}]);
-		
-		translucentNoCull.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineStates[{EBlendMode::BM_Translucent, true}]);
-		translucentCounterClockCull.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineStates[{EBlendMode::BM_Translucent, false}]);
 	}
 
 	void ForwardStaticPipeline::Begin()
@@ -187,12 +167,14 @@ namespace Crystal {
 		perFrameData.LightCount = lightCount;
 
 
+
+		
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
+		device->CopyDescriptorsSimple(1, destHeapHandle, m_PerFrameConstantBuffer->AsConstantBufferView(),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

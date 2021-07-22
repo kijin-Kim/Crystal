@@ -28,7 +28,7 @@ namespace Crystal {
 	struct InstancedStaticMeshData
 	{
 		std::vector<StaticMeshPerInstanceData> PerInstanceDatas;
-		std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
+		Shared<Buffer> PerInstanceVertexBuffer = nullptr;
 		Material* Material = nullptr;
 		UINT64 DescriptorOffset = -1;
 

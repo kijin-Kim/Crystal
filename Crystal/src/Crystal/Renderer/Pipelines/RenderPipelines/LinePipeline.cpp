@@ -30,7 +30,7 @@ namespace Crystal {
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->GetConstantBufferView(),
+		device->CopyDescriptorsSimple(1, cpuHandle, m_PerFrameConstantBuffer->AsConstantBufferView(),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -136,7 +136,7 @@ namespace Crystal {
 			auto& instanceBatch = pair.second;
 			auto& perInstanceVertexBuffer = instanceBatch.PerInstanceVertexBuffer;
 
-			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
+			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView());
 
 			if(!renderable)
 			{

@@ -19,11 +19,6 @@ namespace Crystal {
 		auto& materials = meshComponent->GetMaterials();
 
 		
-
-		
-
-
-
 		StaticMeshPerInstanceData perInstanceData = {};
 
 		perInstanceData.World = meshComponent->GetWorldTransform();
@@ -133,18 +128,16 @@ namespace Crystal {
 
 	void InstancedStaticMesh::PrepareDynamicVertexBuffer()
 	{
+		auto& bufferManager = BufferManager::Instance();
+
+		
 		for (auto& pair : InstancedStaticMeshes)
 		{
 			auto& instancedStaticMeshes = pair.second;
 
-
-			instancedStaticMeshes.PerInstanceVertexBuffer = CreateUnique<Buffer>(nullptr, sizeof(StaticMeshPerInstanceData) *
-			                                                               instancedStaticMeshes.PerInstanceDatas.size(),
-			                                                               instancedStaticMeshes.PerInstanceDatas.size(), false, true);
-
-			instancedStaticMeshes.PerInstanceVertexBuffer->SetData(instancedStaticMeshes.PerInstanceDatas.data(),
-			                                                 0, sizeof(StaticMeshPerInstanceData) * instancedStaticMeshes.
-			                                                                              PerInstanceDatas.size());
+			instancedStaticMeshes.PerInstanceVertexBuffer = bufferManager.GetBuffer(instancedStaticMeshes.PerInstanceDatas.data(), sizeof(StaticMeshPerInstanceData) *
+				instancedStaticMeshes.PerInstanceDatas.size(),
+				instancedStaticMeshes.PerInstanceDatas.size(), true);		
 		}
 	}
 
@@ -161,7 +154,7 @@ namespace Crystal {
 			commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, handle);
 
 
-			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->GetVertexBufferView());
+			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView());
 
 			if (!renderable)
 			{

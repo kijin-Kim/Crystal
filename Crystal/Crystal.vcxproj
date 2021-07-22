@@ -465,7 +465,9 @@
     <ClInclude Include="src\Crystal\GamePlay\World\PhysicsSystem.h" />
     <ClInclude Include="src\Crystal\Renderer\InstancedStaticMesh.h" />
     <ClInclude Include="src\Crystal\Renderer\PipelineStateObject.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BrightColorExtractingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\PipelineStateHelper.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UIPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\GeometrySkeletalPipeline.h" />
@@ -552,8 +554,10 @@
     <ClCompile Include="src\Crystal\Renderer\InstancedStaticMesh.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\AdditveBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BlurPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BrightColorExtractingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UIPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\CubemapPipeline.cpp" />
