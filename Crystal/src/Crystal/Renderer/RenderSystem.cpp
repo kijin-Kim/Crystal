@@ -524,7 +524,6 @@ namespace Crystal {
 
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[] = {
 			scene->FloatingPointBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D),
-			scene->BrightColorBuffer->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D)
 		};
 		commandList->OMSetRenderTargets(_countof(rtvHandles), rtvHandles, false,
 		                                &scene->DepthStencilBufferTexture->GetDepthStencilView(

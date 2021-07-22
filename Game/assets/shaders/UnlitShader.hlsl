@@ -28,13 +28,6 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD;
 };
 
-struct PS_OUTPUT
-{
-    float4 MainColor : SV_Target0;
-    float4 BrightColor : SV_Target1;
-};
-
-
 
 PS_INPUT vsMain(VS_INPUT input)
 {
@@ -66,20 +59,8 @@ PS_INPUT vsMain(VS_INPUT input)
 SamplerState DefualtSampler : register(s0);
 Texture2D Texture : register(t0);
 
-PS_OUTPUT psMain(PS_INPUT input) : SV_Target
+float4 psMain(PS_INPUT input) : SV_Target
 {
-    float4 finalColor = Texture.Sample(DefualtSampler, input.TexCoord);
-
-    float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
-
-    PS_OUTPUT output = (PS_OUTPUT)0;
-
-    output.MainColor = finalColor;
-    if(brightness > 1.0f)
-        output.BrightColor = output.MainColor;
-    else
-        output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-    return output;
+    return Texture.Sample(DefualtSampler, input.TexCoord);
 }
 

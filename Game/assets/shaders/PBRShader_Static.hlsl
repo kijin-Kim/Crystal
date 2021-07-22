@@ -59,11 +59,6 @@ struct PS_INPUT
 
 };
 
-struct PS_OUTPUT
-{
-    float4 MainColor : SV_Target0;
-    float4 BrightColor : SV_Target1;
-};
 
 
 struct Light
@@ -215,7 +210,7 @@ float CalculateShadow(float4 lightSpacePosition)
 
 
 
-PS_OUTPUT psMain(PS_INPUT input)
+float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 emissive = input.bToggleEmissivetexture ? Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
@@ -224,16 +219,7 @@ PS_OUTPUT psMain(PS_INPUT input)
         float3 finalColor = emissive;
         float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
 
-        PS_OUTPUT output = (PS_OUTPUT)0;
-
-        output.MainColor = float4(finalColor, input.Opacity);
-
-        if(brightness > 1.0f)
-            output.BrightColor = output.MainColor;
-        else
-            output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-        return output;
+        return float4(finalColor, input.Opacity);
     }
 
     float3 albedo = input.bToggleAlbedoTexture ? pow(Textures[TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : input.AlbedoColor.rgb;
@@ -305,15 +291,6 @@ PS_OUTPUT psMain(PS_INPUT input)
     float shadow = CalculateShadow(mul(input.WorldPosition, LightViewProjection));
     float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
 
-    float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
-
-    PS_OUTPUT output = (PS_OUTPUT)0;
-
-    output.MainColor = float4(finalColor, input.Opacity);
-    if(brightness > 1.0f)
-        output.BrightColor = output.MainColor;
-    else
-        output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-    return output;
+    return float4(finalColor, input.Opacity);
+    
 }

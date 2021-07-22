@@ -14,11 +14,7 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD;
 };
 
-struct PS_OUTPUT
-{
-    float4 MainColor : SV_Target0;
-    float4 BrightColor : SV_Target1;
-};
+
 
 
 struct Light
@@ -140,7 +136,7 @@ float CalculateShadow(float4 lightSpacePosition)
 
 
 
-PS_OUTPUT psMain(PS_INPUT input)
+float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 albedo = AlbedoBuffer.Sample(DefaultSampler, input.TexCoord).rgb;
@@ -208,13 +204,6 @@ PS_OUTPUT psMain(PS_INPUT input)
 
     float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
 
-    PS_OUTPUT output = (PS_OUTPUT)0;
-
-    output.MainColor = float4(finalColor, 1.0f);
-    if(brightness > 1.0f)
-        output.BrightColor = output.MainColor;
-    else
-        output.BrightColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-    return output;
+    return float4(finalColor, 1.0f);
+    
 }

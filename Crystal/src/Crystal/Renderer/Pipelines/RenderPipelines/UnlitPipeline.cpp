@@ -73,9 +73,8 @@ namespace Crystal {
 	
 
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
-		rtvFormat.NumRenderTargets = 2;
+		rtvFormat.NumRenderTargets = 1;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		rtvFormat.RTFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 
 		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputLayout, _countof(inputLayout) };
