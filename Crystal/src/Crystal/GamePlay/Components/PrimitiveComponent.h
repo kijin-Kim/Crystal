@@ -37,7 +37,7 @@ namespace Crystal {
 		Material* GetMaterial(uint32_t index) const;
 
 
-		void SetRenderable(Weak<Renderable> renderable)
+		virtual void SetRenderable(Weak<Renderable> renderable)
 		{
 			m_Renderable = renderable;
 		}

@@ -21,8 +21,6 @@ struct VS_INPUT
     float RoughnessConstant : ROUGHNESS_CONSTANT;
     float MetallicConstant : METALLIC_CONSTANT;
 
-    bool bShouldLit : SHOULD_LIT;
-    float Opacity : OPACITY;
     bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
     bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
@@ -48,8 +46,6 @@ struct PS_INPUT
     nointerpolation float MetallicConstant : METALLIC_CONSTANT;
 
 
-    nointerpolation bool bShouldLit : SHOULD_LIT;
-    nointerpolation float Opacity : OPACITY;
     nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE; 
     nointerpolation bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
@@ -98,8 +94,6 @@ PS_INPUT vsMain(VS_INPUT input)
 
     output.AlbedoColor = input.AlbedoColor;
     output.EmissiveColor = input.EmissiveColor;
-    output.Opacity = input.Opacity;
-    output.bShouldLit = input.bShouldLit;
     output.bToggleAlbedoTexture = input.bToggleAlbedoTexture;
     output.bToggleMetallicTexture = input.bToggleMetallicTexture;
     output.bToggleRoughnessTexture = input.bToggleRoughnessTexture;
@@ -214,14 +208,6 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
     float3 emissive = input.bToggleEmissivetexture ? Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : input.EmissiveColor;
-    if(!input.bShouldLit)
-    {
-        float3 finalColor = emissive;
-        float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
-
-        return float4(finalColor, input.Opacity);
-    }
-
     float3 albedo = input.bToggleAlbedoTexture ? pow(Textures[TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : input.AlbedoColor.rgb;
     float roughness = input.bToggleRoughnessTexture ? 
     Textures[TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : input.RoughnessConstant;
@@ -291,6 +277,6 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float shadow = CalculateShadow(mul(input.WorldPosition, LightViewProjection));
     float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
 
-    return float4(finalColor, input.Opacity);
+    return float4(finalColor, 1.0f);
     
 }

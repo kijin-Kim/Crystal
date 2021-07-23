@@ -42,7 +42,7 @@ public:
 		{
 			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
 			sun->SetPosition({0.0f, 20000.0f, 20000.0f});
-			
+
 
 			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 			auto sunMat = sunMesh->GetMaterial(0);
@@ -52,11 +52,10 @@ public:
 		{
 			auto sun2 = m_World->SpawnActor<Sun>({"Sun"}).lock();
 			sun2->SetPosition({+10000.0f, -20000.0f, +20000.0f});
-			
-			
-			
+
+
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun2->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({ 243.0f / 255.0f, 138.0f / 255.0f, 110.0f / 255.0f });
+			lightComponent->SetLightColor({243.0f / 255.0f, 138.0f / 255.0f, 110.0f / 255.0f});
 			lightComponent->SetLightIntensity(3.0f);
 			lightComponent->RotatePitch(90.0f);
 			lightComponent->SetCastShadow(true);
@@ -66,50 +65,43 @@ public:
 			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};
 		}
 
-		if (true)
+
+		if (false)
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 1000; i++)
 			{
-				for (int j = 0; j < 10; j++)
+				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+			}
+
+			for (int i = 0; i < 250; i++)
+			{
+				int randomNumber = rand() % 3;
+				switch (randomNumber)
 				{
-					for (int k = 0; k < 10; k++)
+				case 0:
 					{
-						//test
-						int randomNumber = rand() % 3;
-						randomNumber = 3;
-						switch (randomNumber)
-						{
-						case 0:
-							{
-								auto asteroid = m_World->SpawnActor<HealAsteroid>({}).lock();
-								asteroid->SetPosition({100.0f * i, 100.0f * k, 100.0f * j});
-								break;
-							}
-						case 1:
-							{
-								auto asteroid = m_World->SpawnActor<PowerAsteroid>({}).lock();
-								asteroid->SetPosition({100.0f * i, 100.0f * k, 100.0f * j});
-								break;
-							}
-						case 2:
-							{
-								auto asteroid = m_World->SpawnActor<ShieldAsteroid>({}).lock();
-								asteroid->SetPosition({100.0f * i, 100.0f * k, 100.0f * j});
-								break;
-							}
-						case 3:
-							{
-								auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-								asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
-								break;
-							}
-						}
+						auto asteroid = m_World->SpawnActor<HealAsteroid>({}).lock();
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						break;
+					}
+				case 1:
+					{
+						auto asteroid = m_World->SpawnActor<PowerAsteroid>({}).lock();
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						break;
+					}
+				case 2:
+					{
+						auto asteroid = m_World->SpawnActor<ShieldAsteroid>({}).lock();
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						break;
 					}
 				}
 			}
 		}
 
-		if (false)
+		if (true)
 		{
 			for (int i = 0; i < 2; i++)
 			{
@@ -134,7 +126,7 @@ public:
 		m_World->GetCurrentLevel()->OnClientConnect();
 
 
-		if (true)
+		if (false)
 		{
 			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({""}).lock();
 		}
@@ -158,13 +150,13 @@ public:
 		}
 
 
-		auto playCircle = m_World->SpawnActor<PlayCircle>({""}).lock();
-		auto playCircle2 = m_World->SpawnActor<PlayCircle>({""}).lock();
-		playCircle2->SetPosition({ 0.0f, 0.0f, -1000.0f });
-		auto staticMesh = Crystal::Cast<Crystal::StaticMeshComponent>(playCircle2->GetComponentByClass("StaticMeshComponent"));
-		staticMesh->GetMaterials()[0]->EmissiveColor = Crystal::Vector3::Blue;
-		
+		if(false)
+		{
+			auto playCircle = m_World->SpawnActor<PlayCircle>({ "" }).lock();
+		}
 
+
+		
 
 #endif
 

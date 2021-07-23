@@ -35,8 +35,6 @@ namespace Crystal {
 			perInstanceData.RoughnessConstant = matRow->RoughnessConstant;
 			perInstanceData.MetallicConstant = matRow->MetallicConstant;
 			
-			perInstanceData.bShouldLit = matRow->ShadingModel == EShadingModel::SM_Lit ? true : false;
-			perInstanceData.Opacity = matRow->Opacity;
 			perInstanceData.bToggleAlbedoTexture = !matRow->AlbedoTexture.expired() ? true : false;
 			perInstanceData.bToggleMetallicTexture = !matRow->MetallicTexture.expired() ? true : false;
 			perInstanceData.bToggleRoughnessTexture = !matRow->RoughnessTexture.expired() ? true : false;

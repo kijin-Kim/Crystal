@@ -32,7 +32,7 @@ public:
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetUnitScale(60.0f);
+		staticMeshComponent->SetUnitScale(30.0f);
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Sphere.fbx"));
 		
 		

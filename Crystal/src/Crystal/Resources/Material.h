@@ -26,9 +26,10 @@ namespace Crystal {
 		Weak<Texture> EmissiveTexture = {};
 		DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 
-		bool bTwoSided = false;
-
+		Weak<Texture> OpacityTexture = {};
 		float Opacity = 1.0f;
+
+		bool bTwoSided = false;
 
 		EShadingModel ShadingModel = EShadingModel::SM_Lit;
 		EBlendMode BlendMode = EBlendMode::BM_Opaque;

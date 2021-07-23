@@ -94,7 +94,7 @@ namespace Crystal {
 			auto skeletalMesh = Cast<SkeletalMesh>(component->GetRenderable());
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
-			auto boneMatrices = skeletalMesh->GetBoneTransforms();
+			auto boneMatrices = component->GetBoneTransforms();
 			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : 최적화 매우매우매우매우 비효율적
 			m_PerObjectConstantBuffers[i]->SetData(&perObjectData, 0, sizeof(perObjectData));
 		}

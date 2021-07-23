@@ -71,12 +71,12 @@ public:
 		}
 
 
-		auto randomScale = rand() % 10 + 1;
+		auto randomScale = rand() % 5 + 1;
 
 		m_MainComponent->RotateRoll(rand() % 360);
 		m_MainComponent->RotatePitch(rand() % 360);
 		m_MainComponent->RotateYaw(rand() % 360);
-		m_MainComponent->SetUnitScale(randomScale / 50.0f);
+		m_MainComponent->SetUnitScale(randomScale);
 		m_MainComponent->SetMass(5000.0f * randomScale);
 	}
 

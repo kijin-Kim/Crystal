@@ -119,6 +119,7 @@ namespace Crystal {
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		/*메터리얼을 Shader Visible Descriptor Heap에 복사합니다.*/
+
 		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)
 		{
 			auto component = scene->SkeletalMeshes[i].lock();
@@ -143,7 +144,7 @@ namespace Crystal {
 			auto skeletalMesh = Cast<SkeletalMesh>(component->GetRenderable());
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
-			auto boneMatrices = skeletalMesh->GetBoneTransforms();
+			auto boneMatrices = component->GetBoneTransforms();
 			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : 최적화 매우매우매우매우 비효율적
 			m_PerObjectConstantBuffers[i]->SetData(&perObjectData, 0, sizeof(perObjectData));
 

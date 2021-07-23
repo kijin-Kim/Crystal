@@ -5,6 +5,7 @@
 #include <vector>
 #include <array>
 
+#include "Animation.h"
 #include "Crystal/Resources/Material.h"
 #include "Crystal/Math/Math.h"
 #include "Crystal/Resources/Renderable.h"
@@ -115,44 +116,24 @@ namespace Crystal {
 		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
 	};
 
+	
+
 	class SkeletalMesh : public Mesh
 	{
 	public:
-		SkeletalMesh() = default;
-		SkeletalMesh(const std::string& meshFilePath, const std::string& animationFilePath = "");
-		~SkeletalMesh() override;
+		SkeletalMesh(const std::string& meshFilePath);
+		~SkeletalMesh() override = default;
 
-		void Update(float deltaTime) override;
 		//TEMP//
-		const std::vector<DirectX::XMFLOAT4X4>& GetBoneTransforms() const { return m_BoneTransforms; }
+
+		std::vector <DirectX::XMFLOAT4X4>& GetBoneOffset() { return m_BoneOffsets; }
+		std::unordered_map <std::string, uint32_t>& GetBoneMap() { return m_BoneMap; }
+
 	private:
 		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
 
-		void boneTransform(float deltaTime);
-		void readNodeHierarchy(float animationTime, const aiNode* pNode, const DirectX::XMFLOAT4X4& parentTransform);
-		int findNodeAnimIndex(unsigned int animationIndex, const std::string& nodeName);
-
-		DirectX::XMFLOAT3 interpolateScale(float animationTime, aiNodeAnim* nodeAnim);
-		DirectX::XMFLOAT4 interpolateRotation(float animationTime, aiNodeAnim* nodeAnim);
-		DirectX::XMFLOAT3 interpolateTranslation(float animationTime, aiNodeAnim* nodeAnim);
-
-		uint32_t findScale(float animationTime, aiNodeAnim* nodeAnim);
-		uint32_t findRotation(float animationTime, aiNodeAnim* nodeAnim);
-		uint32_t findTranslation(float animationTime, aiNodeAnim* nodeAnim);
-
 	private:
-		const aiScene* m_AnimationScene = nullptr;
-
 		std::vector <DirectX::XMFLOAT4X4> m_BoneOffsets; // Bone의 Local Transform
-		std::vector <DirectX::XMFLOAT4X4> m_BoneTransforms; // 최종적으로 변환된 Bone들의 값 (World Space)
 		std::unordered_map <std::string, uint32_t> m_BoneMap; // m_BoneTransforms의 Index를 가지고 있음. [노드의 이름, m_BoneTransforms의 인덱스]
-		using AnimationChannelMap = std::map<std::string, uint32_t>;
-		std::vector <AnimationChannelMap> m_AnimationChannelMaps;
-		DirectX::XMFLOAT4X4 m_InverseGlobalTransform = Matrix4x4::Identity();
-		bool m_bMeshHasBones = false;
-		bool m_bMeshHasAnimations = false;
-		float m_AnimationTime = 0.0f;
-
-		Assimp::Importer* m_AnimationFileImporter = nullptr;
 	};
 }

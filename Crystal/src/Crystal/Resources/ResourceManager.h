@@ -1,4 +1,5 @@
 #pragma once
+#include "AnimationManager.h"
 #include "ShaderManager.h"
 #include "RenderableManager.h"
 #include "TextureManager.h"
@@ -50,6 +51,16 @@ namespace Crystal {
 			return m_RenderableManager->get<T>(fileName, std::forward<Args>(args)...);
 		}
 
+		Weak<Animation> GetAnimation(const std::string& fileName)
+		{
+			if (!m_AnimationManager)
+			{
+				return {};
+			}
+
+			return m_AnimationManager->get(fileName);
+		}
+
 	private:
 		ResourceManager()
 		{
@@ -57,6 +68,7 @@ namespace Crystal {
 			m_ShaderManager = CreateUnique<ShaderManager>();
 			m_TextureManager = CreateUnique<TextureManager>();
 			m_RenderableManager = CreateUnique<RenderableManager>();
+			m_AnimationManager = CreateUnique<AnimationManager>();
 #endif
 		}
 
@@ -66,6 +78,7 @@ namespace Crystal {
 		Unique<ShaderManager> m_ShaderManager = nullptr;
 		Unique<TextureManager> m_TextureManager = nullptr;
 		Unique<RenderableManager> m_RenderableManager = nullptr;
+		Unique<AnimationManager> m_AnimationManager = nullptr;
 	};
 
 

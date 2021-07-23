@@ -26,7 +26,7 @@ namespace Crystal {
 		};
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
+			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
 		};
 
 
@@ -174,6 +174,7 @@ namespace Crystal {
 			scene->ShadowMapTexture->
 			GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R32_FLOAT),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject
@@ -200,7 +201,7 @@ namespace Crystal {
 			
 			m_AlphaSortedStaticMeshes.insert({ lengthSquared, meshComponent});
 
-			auto cpuHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+			
 			for (auto& mat : materials)
 			{
 				auto matRow = mat.get();
@@ -219,6 +220,7 @@ namespace Crystal {
 				perDrawData.bToggleRoughnessTexture = !matRow->RoughnessTexture.expired() ? true : false;
 				perDrawData.bToggleNormalTexture = !matRow->NormalTexture.expired() ? true : false;
 				perDrawData.bToggleEmissiveTexture = !matRow->EmissiveTexture.expired() ? true : false;
+				perDrawData.bToggleOpacityTexture = !matRow->OpacityTexture.expired() ? true : false;
 
 				perDrawData.bToggleIrradianceTexture = true; // TEMP
 
@@ -226,52 +228,63 @@ namespace Crystal {
 				if (perDrawData.bToggleAlbedoTexture)
 				{
 					auto albedoTexture = matRow->AlbedoTexture.lock();
-					device->CopyDescriptorsSimple(1, cpuHandle,
+					device->CopyDescriptorsSimple(1, destHeapHandle,
 						albedoTexture->GetShaderResourceView(
 							D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perDrawData.bToggleMetallicTexture)
 				{
 					auto metallicTexture = matRow->MetallicTexture.lock();
-					device->CopyDescriptorsSimple(1, cpuHandle,
+					device->CopyDescriptorsSimple(1, destHeapHandle,
 						metallicTexture->GetShaderResourceView(
 							D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perDrawData.bToggleRoughnessTexture)
 				{
 					auto roughnessTexture = matRow->RoughnessTexture.lock();
-					device->CopyDescriptorsSimple(1, cpuHandle,
+					device->CopyDescriptorsSimple(1, destHeapHandle,
 						roughnessTexture->GetShaderResourceView(
 							D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perDrawData.bToggleNormalTexture)
 				{
 					auto normalTexture = matRow->NormalTexture.lock();
-					device->CopyDescriptorsSimple(1, cpuHandle,
+					device->CopyDescriptorsSimple(1, destHeapHandle,
 						normalTexture->GetShaderResourceView(
 							D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				if (perDrawData.bToggleEmissiveTexture)
 				{
 					auto emissiveTexture = matRow->EmissiveTexture.lock();
-					device->CopyDescriptorsSimple(1, cpuHandle,
+					device->CopyDescriptorsSimple(1, destHeapHandle,
 						emissiveTexture->GetShaderResourceView(
 							D3D12_SRV_DIMENSION_TEXTURE2D),
 						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
-				cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+				if (perDrawData.bToggleOpacityTexture)
+				{
+					auto opacityTexture = matRow->OpacityTexture.lock();
+					device->CopyDescriptorsSimple(1, destHeapHandle,
+						opacityTexture->GetShaderResourceView(
+							D3D12_SRV_DIMENSION_TEXTURE2D),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				}
+				destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				
 			}
@@ -293,7 +306,7 @@ namespace Crystal {
 
 		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
-		descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 3;
 
 		auto& scene = GetScene();
 
@@ -352,13 +365,14 @@ namespace Crystal {
 					perDrawData.bToggleRoughnessTexture = !materials[j]->RoughnessTexture.expired() ? true : false;
 					perDrawData.bToggleNormalTexture = !materials[j]->NormalTexture.expired() ? true : false;
 					perDrawData.bToggleEmissiveTexture = !materials[j]->EmissiveTexture.expired() ? true : false;
+					perDrawData.bToggleOpacityTexture= !materials[j]->OpacityTexture.expired() ? true : false;
 
 					perDrawData.bToggleIrradianceTexture = true; // TEMP
 					
 					
 					commandList->SetGraphicsRootConstantBufferView(2, BufferManager::Instance().GetConstantBuffer(&perDrawData, sizeof(perDrawData))->GetGPUVirtualAddress());
 					commandList->SetGraphicsRootDescriptorTable(3, descriptorHeapHandle); // PerMaterial
-					descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 5;
+					descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
 
 
 					commandList->SetPipelineState(m_PipelineStates[{materials[j]->BlendMode, materials[j]->bTwoSided}].Get());

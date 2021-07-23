@@ -3,7 +3,6 @@
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
-#include "Crystal/Resources/Animation.h"
 #include "Crystal/Resources/Meshes.h"
 #include "Crystal/Resources/ResourceManager.h"
 
@@ -40,8 +39,10 @@ public:
 		sphereComponent->SetMass(40000.0f);
 
 
+		
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
-		skeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx", "assets/models/KRAKEN_idle.fbx"));
+		skeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx"));
+		skeletalMeshComponent->SetAnimation(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"));
 		skeletalMeshComponent->RotatePitch(90.0f);
 		skeletalMeshComponent->AddMaterial(std::move(bodyMaterial));
 		skeletalMeshComponent->AddMaterial(std::move(tentacleMaterial));

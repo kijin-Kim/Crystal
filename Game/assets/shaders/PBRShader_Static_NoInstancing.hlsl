@@ -63,7 +63,8 @@ cbuffer PerDrawData : register(b2)
     bool bToggleRoughnessTexture;
     bool bToggleNormalTexture;
     bool bToggleIrradianceTexture;
-    bool bToggleEmissivetexture;
+    bool bToggleEmissiveTexture;
+    bool bToggleOpacityTexture;
 }
 
 PS_INPUT vsMain(VS_INPUT input)
@@ -74,6 +75,10 @@ PS_INPUT vsMain(VS_INPUT input)
     output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
     output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
+
+    input.TexCoord.x *= 40.0f;
+    input.TexCoord.y *= 16.0f;
+    
     output.TexCoord = input.TexCoord;
     output.WorldNormal = mul(input.Normal, (float3x3) World);
     
@@ -94,10 +99,11 @@ PS_INPUT vsMain(VS_INPUT input)
 #define TEXTURE_TYPE_ROUGHNESS 2
 #define TEXTURE_TYPE_NORMAL 3
 #define TEXTURE_TYPE_EMISSIVE 4
+#define TEXTURE_TYPE_OPACITY 5
 
 TextureCube IrradianceTexture : register(t0);
 Texture2D ShadowMap : register(t1);
-Texture2D Textures[5] : register(t2);
+Texture2D Textures[6] : register(t2);
 
 
 
@@ -184,18 +190,19 @@ float CalculateShadow(float4 lightSpacePosition)
 float4 psMain(PS_INPUT input) : SV_TARGET
 {
     //Current we have only one directional light
-    float3 emissive = bToggleEmissivetexture ? Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : EmissiveColor;
+    float3 emissive = bToggleEmissiveTexture ? Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : EmissiveColor;
+    float opacity = bToggleOpacityTexture ? Textures[TEXTURE_TYPE_OPACITY].Sample(DefaultSampler, input.TexCoord).r : Opacity;
     if(!bShouldLit)
     {
         float3 finalColor = emissive;
-        return float4(finalColor, Opacity);
+        return float4(finalColor, opacity);
     }
 
     float3 albedo = bToggleAlbedoTexture ? pow(Textures[TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? 
     Textures[TEXTURE_TYPE_ROUGHNESS].Sample(DefaultSampler, input.TexCoord).r : RoughnessConstant;
-    float metallic = bToggleMetallicTexture ? 
-    Textures[TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
+    float metallic = bToggleMetallicTexture ? Textures[TEXTURE_TYPE_METALLIC].Sample(DefaultSampler, input.TexCoord).r : MetallicConstant;
+    
     
     
     /*�븻*/
@@ -261,5 +268,5 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
 
 
-    return float4(finalColor, Opacity);
+    return float4(finalColor, opacity);
 }

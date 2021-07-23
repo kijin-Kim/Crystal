@@ -2,6 +2,11 @@
 #include "Component.h"
 #include "PrimitiveComponent.h"
 
+#include "Crystal/Resources/Animation.h"
+
+struct aiNodeAnim;
+struct aiNode;
+
 namespace Crystal {
 	class MeshComponent : public PrimitiveComponent
 	{
@@ -61,6 +66,39 @@ namespace Crystal {
 		~SkeletalMeshComponent() override = default;
 
 		void RegisterComponent() override;
+
+		void SetRenderable(Weak<Renderable> renderable) override;
+
+
+		void SetAnimation(Weak<Animation> animation);
+
+		void Update(float deltaTime) override;
+
+
+		void BoneTransform(float deltaTime);
+		void ReadNodeHierarchy(float animationTime, const aiNode* pNode, const DirectX::XMFLOAT4X4& parentTransform);
+
+		const std::vector <DirectX::XMFLOAT4X4>& GetBoneTransforms() const { return m_BoneTransforms; }
+		
+		
 		STATIC_TYPE_IMPLE(SkeletalMeshComponent)
+
+	private:
+		DirectX::XMFLOAT3 interpolateScale(float animationTime, aiNodeAnim* nodeAnim);
+		DirectX::XMFLOAT4 interpolateRotation(float animationTime, aiNodeAnim* nodeAnim);
+		DirectX::XMFLOAT3 interpolateTranslation(float animationTime, aiNodeAnim* nodeAnim);
+
+		uint32_t findScale(float animationTime, aiNodeAnim* nodeAnim);
+		uint32_t findRotation(float animationTime, aiNodeAnim* nodeAnim);
+		uint32_t findTranslation(float animationTime, aiNodeAnim* nodeAnim);
+
+	private:
+		Weak<Animation> m_Animation;
+		
+		std::vector <DirectX::XMFLOAT4X4> m_BoneTransforms; // 최종적으로 변환된 Bone들의 값 (World Space)
+		
+		DirectX::XMFLOAT4X4 m_InverseGlobalTransform = Matrix4x4::Identity();		
+		
+		float m_AnimationTime = 0.0f;
 	};
 }

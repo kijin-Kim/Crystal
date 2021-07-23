@@ -488,13 +488,14 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UnlitPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\RenderSystem.h" />
     <ClInclude Include="src\Crystal\Renderer\Scene.h" />
+    <ClInclude Include="src\Crystal\Resources\Animation.h" />
+    <ClInclude Include="src\Crystal\Resources\AnimationManager.h" />
     <ClInclude Include="src\Crystal\Resources\BasicShapeMeshes.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocation.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocator.h" />
     <ClInclude Include="src\Crystal\Resources\DescriptorAllocatorPage.h" />
     <ClInclude Include="src\Crystal\Resources\RenderableManager.h" />
     <ClInclude Include="src\Crystal\Resources\Renderable.h" />
-    <ClInclude Include="src\Crystal\Resources\Animation.h" />
     <ClInclude Include="src\Crystal\Resources\Buffer.h" />
     <ClInclude Include="src\Crystal\Resources\ResourceManager.h" />
     <ClInclude Include="src\Crystal\Resources\Texture.h" />
@@ -574,6 +575,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\PipelineStateHelper.cpp" />
     <ClCompile Include="src\Crystal\Renderer\RenderSystem.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Scene.cpp" />
+    <ClCompile Include="src\Crystal\Resources\Animation.cpp" />
     <ClCompile Include="src\Crystal\Resources\Buffer.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocation.cpp" />
     <ClCompile Include="src\Crystal\Resources\DescriptorAllocator.cpp" />

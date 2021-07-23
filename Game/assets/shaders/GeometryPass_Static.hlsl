@@ -19,7 +19,6 @@ struct VS_INPUT
     float RoughnessConstant : ROUGHNESS_CONSTANT;
     float MetallicConstant : METALLIC_CONSTANT;
 
-    bool bShouldLit : SHOULD_LIT;
     bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE;
     bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;
@@ -44,7 +43,6 @@ struct PS_INPUT
     nointerpolation float RoughnessConstant : ROUGHNESS_CONSTANT;
     nointerpolation float MetallicConstant : METALLIC_CONSTANT;
 
-    nointerpolation bool bShouldLit : SHOULD_LIT;
     nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
     nointerpolation bool bToggleMetallicTexture : TOGGLE_METALLIC_TEXTURE; 
     nointerpolation bool bToggleRoughnessTexture : TOGGLE_ROUGHNESS_TEXTURE;

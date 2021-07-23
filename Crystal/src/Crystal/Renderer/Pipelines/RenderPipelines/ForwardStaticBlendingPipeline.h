@@ -52,6 +52,7 @@ namespace Crystal {
 			int bToggleNormalTexture = false;
 			int bToggleIrradianceTexture = false;
 			int bToggleEmissiveTexture = false;
+			int bToggleOpacityTexture = false;
 		};
 
 

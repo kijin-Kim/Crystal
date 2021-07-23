@@ -7,6 +7,7 @@
 
 namespace Crystal {
 
+	
 
 	
 	inline float RandomFloatInRange(float min, float max)
@@ -425,6 +426,8 @@ namespace Crystal {
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}
+
+
 	}
 
 	namespace Matrix3x3 {
