@@ -77,9 +77,6 @@ void TestPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
 
-	CS_DEBUG_INFO("%d", m_Health);
-
-
 	m_FireTimer.Tick();
 
 	if (m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)

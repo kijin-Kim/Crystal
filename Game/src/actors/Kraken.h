@@ -39,24 +39,37 @@ public:
 		sphereComponent->SetMass(40000.0f);
 
 
-		
-		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
-		skeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx"));
-		skeletalMeshComponent->SetAnimation(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"));
-		skeletalMeshComponent->RotatePitch(90.0f);
-		skeletalMeshComponent->AddMaterial(std::move(bodyMaterial));
-		skeletalMeshComponent->AddMaterial(std::move(tentacleMaterial));
-		skeletalMeshComponent->SetLocalPosition({0.0f, -400.0f, 0.0f});
+		m_SkeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
+		m_SkeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx"));
+		m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnAttack), 3.0f);
+		m_SkeletalMeshComponent->RotatePitch(90.0f);
+		m_SkeletalMeshComponent->AddMaterial(std::move(bodyMaterial));
+		m_SkeletalMeshComponent->AddMaterial(std::move(tentacleMaterial));
+		m_SkeletalMeshComponent->SetLocalPosition({0.0f, -400.0f, 0.0f});
 
 
 		m_MainComponent = sphereComponent;
 
-		skeletalMeshComponent->AttachTo(m_MainComponent);
+		m_SkeletalMeshComponent->AttachTo(m_MainComponent);
 
+		
+	}
 
-		SetPosition({0.0f, 0.0f, 2000.0f});
+	void OnAttack()
+	{
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+		m_SkeletalMeshComponent->PlayAnimationWithEndEvent(resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx"), false, CS_ANIMATION_FN(Kraken::OnIdle));
+	}
+
+	void OnIdle()
+	{
+		auto& resourceManager = Crystal::ResourceManager::Instance();
+		m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnAttack), 3.0f);
 	}
 
 
 	STATIC_TYPE_IMPLE(Kraken)
+
+private:
+	Crystal::Shared<Crystal::SkeletalMeshComponent> m_SkeletalMeshComponent = nullptr;
 };
