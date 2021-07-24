@@ -18,6 +18,7 @@
 
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
+#include "actors/MyAIController.h"
 #include "actors/MyHUD.h"
 #include "actors/PlayCircle.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
@@ -66,17 +67,18 @@ public:
 		}
 
 
-		if (false)
+		if (true)
 		{
-			for (int i = 0; i < 1000; i++)
+		/*	for (int i = 0; i < 1000; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
-			}
+			}*/
 
-			for (int i = 0; i < 250; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				int randomNumber = rand() % 3;
+				randomNumber = 2;
 				switch (randomNumber)
 				{
 				case 0:
@@ -101,12 +103,14 @@ public:
 			}
 		}
 
-		if (true)
+		if (false)
 		{
 			for (int i = 0; i < 2; i++)
 			{
 				auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 				kraken->SetPosition({0.0f + 1000.0f * i, 0.0f, 0.0f});
+				auto myAIController = m_World->SpawnActor<MyAIController>({}).lock();
+				myAIController->Possess(kraken);
 			}
 		}
 
