@@ -45,6 +45,7 @@ namespace Crystal {
 	{
 		std::map<Renderable*, InstancedStaticMeshData> InstancedStaticMeshes;
 		uint32_t MaterialCount = 0;
+		
 
 		void AddInstance(const Shared<StaticMeshComponent>& meshComponent, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 			uint32_t descriptorTableOffset);

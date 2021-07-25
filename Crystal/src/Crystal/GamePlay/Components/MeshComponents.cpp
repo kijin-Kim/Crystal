@@ -51,26 +51,65 @@ namespace Crystal {
 		}
 	}
 
-	void SkeletalMeshComponent::SetAnimation(Weak<Animation> animation)
+	void SkeletalMeshComponent::PlayAnimation(Weak<Animation> animation, bool bShouldLoop)
 	{
+		m_AnimationTime = 0.0f;
 		m_Animation = animation;
+		m_bShouldLoopAnimation = bShouldLoop;
+		
+		m_AnimationEvent = nullptr;
+		m_AnimationEventTimer.Reset();
+	}
+
+	void SkeletalMeshComponent::PlayAnimationWithEvent(Weak<Animation> animation, bool bShouldLoop, const std::function<void()>& event, float eventInterval)
+	{
+		PlayAnimation(animation, bShouldLoop);
+		m_AnimationEvent = event;
+		m_AnimationEventInterval = eventInterval;
+	}
+
+	void SkeletalMeshComponent::PlayAnimationWithEndEvent(Weak<Animation> animation, bool bShouldLoop, const std::function<void()>& event)
+	{
+		PlayAnimationWithEvent(animation, bShouldLoop, event, animation.lock()->GetAnimScene()->mAnimations[0]->mDuration / animation.lock()->GetAnimScene()->mAnimations[0]->mTicksPerSecond);
 	}
 
 	void SkeletalMeshComponent::Update(float deltaTime)
 	{
-		auto animation = m_Animation.lock();
+		MeshComponent::Update(deltaTime);
 
+		
+		auto animation = m_Animation.lock();
 		if (animation)
 		{
-			auto animScene = animation->GetAnimScene();
-			float ticksPerSecond = animScene->mAnimations[0]->mTicksPerSecond != 0
-				? (float)animScene->mAnimations[0]->mTicksPerSecond
-				: 25.0f;
-			m_AnimationTime += deltaTime * ticksPerSecond;
-			m_AnimationTime = fmod(m_AnimationTime, (float)animScene->mAnimations[0]->mDuration);
+			if (m_AnimationEvent)
+			{
+				m_AnimationEventTimer.Tick();
+				if (m_AnimationEventTimer.GetElapsedTime() >= m_AnimationEventInterval)
+				{
+					m_AnimationEventTimer.Reset();
+					m_AnimationEvent();
+				}
+			}
 
-			BoneTransform(m_AnimationTime);
+			
+			auto animScene = animation->GetAnimScene();
+			float ticksPerSecond = animScene->mAnimations[0]->mTicksPerSecond != 0 ? (float)animScene->mAnimations[0]->mTicksPerSecond : 25.0f;
+			
+			m_AnimationTime += deltaTime * ticksPerSecond;
+			if(m_AnimationTime >= (float)animScene->mAnimations[0]->mDuration)
+			{
+				if(m_bShouldLoopAnimation)
+				{
+					m_AnimationTime = fmod(m_AnimationTime, (float)animScene->mAnimations[0]->mDuration);
+				} else
+				{
+					return;
+				}
+			}
+
+			BoneTransform(m_AnimationTime);	
 		}
+		
 	}
 
 	void SkeletalMeshComponent::BoneTransform(float deltaTime)
@@ -104,13 +143,13 @@ namespace Crystal {
 
 		if (nodeAnim)
 		{
-			DirectX::XMFLOAT3 scale = interpolateScale(animationTime, nodeAnim);
+			DirectX::XMFLOAT3 scale = InterpolateScale(animationTime, nodeAnim);
 			DirectX::XMFLOAT4X4 scaleMatrix = Matrix4x4::Scale(scale);
 
-			DirectX::XMFLOAT4 rotation = interpolateRotation(animationTime, nodeAnim);
+			DirectX::XMFLOAT4 rotation = InterpolateRotation(animationTime, nodeAnim);
 			DirectX::XMFLOAT4X4 rotationMatrix = Matrix4x4::RotationQuaternion(rotation);
 
-			DirectX::XMFLOAT3 translation = interpolateTranslation(animationTime, nodeAnim);
+			DirectX::XMFLOAT3 translation = InterpolateTranslation(animationTime, nodeAnim);
 			DirectX::XMFLOAT4X4 translationMatrix = Matrix4x4::Translation(translation);
 
 			nodeTransform = Matrix4x4::Multiply(Matrix4x4::Multiply(scaleMatrix, rotationMatrix), translationMatrix);
@@ -136,7 +175,7 @@ namespace Crystal {
 	}
 
 
-	DirectX::XMFLOAT3 SkeletalMeshComponent::interpolateScale(float animationTime, aiNodeAnim* nodeAnim)
+	DirectX::XMFLOAT3 SkeletalMeshComponent::InterpolateScale(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		if (nodeAnim->mNumScalingKeys == 1)
 			return {
@@ -144,7 +183,7 @@ namespace Crystal {
 				nodeAnim->mScalingKeys[0].mValue.z
 		};
 
-		uint32_t index = findScale(animationTime, nodeAnim);
+		uint32_t index = FindScale(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
 		float deltaTime = (float)(nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].mTime);
 		float factor = (float)(animationTime - nodeAnim->mScalingKeys[index].mTime) / (float)deltaTime;
@@ -159,7 +198,7 @@ namespace Crystal {
 		return { result.x, result.y, result.z };
 	}
 
-	DirectX::XMFLOAT4 SkeletalMeshComponent::interpolateRotation(float animationTime, aiNodeAnim* nodeAnim)
+	DirectX::XMFLOAT4 SkeletalMeshComponent::InterpolateRotation(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		if (nodeAnim->mNumRotationKeys == 1)
 			return {
@@ -167,7 +206,7 @@ namespace Crystal {
 				nodeAnim->mRotationKeys[0].mValue.z, nodeAnim->mRotationKeys[0].mValue.w
 		};
 
-		uint32_t index = findRotation(animationTime, nodeAnim);
+		uint32_t index = FindRotation(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
 		float deltaTime = (float)(nodeAnim->mRotationKeys[nextIndex].mTime - nodeAnim->mRotationKeys[index].mTime);
 		float factor = (float)((animationTime - nodeAnim->mRotationKeys[index].mTime) / deltaTime);
@@ -184,12 +223,12 @@ namespace Crystal {
 		return { result.x, result.y, result.z, result.w };
 	}
 
-	DirectX::XMFLOAT3 SkeletalMeshComponent::interpolateTranslation(float animationTime, aiNodeAnim* nodeAnim)
+	DirectX::XMFLOAT3 SkeletalMeshComponent::InterpolateTranslation(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		if (nodeAnim->mNumPositionKeys == 1)
 			return { nodeAnim->mPositionKeys[0].mValue.x, nodeAnim->mPositionKeys[0].mValue.y, nodeAnim->mPositionKeys[0].mValue.z };
 
-		uint32_t index = findTranslation(animationTime, nodeAnim);
+		uint32_t index = FindTranslation(animationTime, nodeAnim);
 		uint32_t nextIndex = index + 1;
 		float deltaTime = (float)(nodeAnim->mPositionKeys[nextIndex].mTime - nodeAnim->mPositionKeys[index].mTime);
 		float factor = (float)((animationTime - nodeAnim->mPositionKeys[index].mTime) / deltaTime);
@@ -204,7 +243,7 @@ namespace Crystal {
 		return { result.x, result.y, result.z };
 	}
 
-	uint32_t SkeletalMeshComponent::findScale(float animationTime, aiNodeAnim* nodeAnim)
+	uint32_t SkeletalMeshComponent::FindScale(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		for (unsigned int i = 0; i < nodeAnim->mNumScalingKeys - 1; i++)
 		{
@@ -215,7 +254,7 @@ namespace Crystal {
 		return 0;
 	}
 
-	uint32_t SkeletalMeshComponent::findRotation(float animationTime, aiNodeAnim* nodeAnim)
+	uint32_t SkeletalMeshComponent::FindRotation(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		for (unsigned int i = 0; i < nodeAnim->mNumRotationKeys - 1; i++)
 		{
@@ -226,7 +265,7 @@ namespace Crystal {
 		return 0;
 	}
 
-	uint32_t SkeletalMeshComponent::findTranslation(float animationTime, aiNodeAnim* nodeAnim)
+	uint32_t SkeletalMeshComponent::FindTranslation(float animationTime, aiNodeAnim* nodeAnim)
 	{
 		for (unsigned int i = 0; i < nodeAnim->mNumPositionKeys - 1; i++)
 		{
@@ -235,4 +274,6 @@ namespace Crystal {
 		}
 		return 0;
 	}
+
+
 }

@@ -90,9 +90,9 @@ namespace Crystal {
 		return m_ConstantBufferView.GetDescriptorHandle();
 	}
 
-	D3D12_VERTEX_BUFFER_VIEW Buffer::AsVertexBufferView() const
+	D3D12_VERTEX_BUFFER_VIEW Buffer::AsVertexBufferView(UINT stride) const
 	{
-		return { m_Resource->GetGPUVirtualAddress(), m_Size, m_Size / m_ElementCount };
+		return { m_Resource->GetGPUVirtualAddress(), m_Size, stride };
 	}
 
 	D3D12_INDEX_BUFFER_VIEW Buffer::AsIndexBufferView() const

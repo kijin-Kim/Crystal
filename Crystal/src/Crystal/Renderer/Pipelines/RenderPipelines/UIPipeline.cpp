@@ -204,12 +204,12 @@ namespace Crystal {
 			auto& vertexBuffers = scene->PlaneQuad2DMesh->GetVertexBuffers();
 			for (const auto& vertexbuffer : vertexBuffers)
 			{
-				vertexBufferViews.push_back(vertexbuffer->AsVertexBufferView());
+				vertexBufferViews.push_back(vertexbuffer->AsVertexBufferView(vertexbuffer->GetSize() / vertexbuffer->GetElementCount()));
 			}
 
 
 			commandList->IASetVertexBuffers(0, vertexBufferViews.size(), vertexBufferViews.data());
-			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->AsVertexBufferView());
+			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->AsVertexBufferView(sizeof(PerInstanceData)));
 			commandList->IASetIndexBuffer(&scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->AsIndexBufferView());
 			commandList->DrawIndexedInstanced(scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->GetElementCount(), drawData.InstanceCount, 0, 0, 0);
 		}

@@ -136,7 +136,7 @@ namespace Crystal {
 			auto& instanceBatch = pair.second;
 			auto& perInstanceVertexBuffer = instanceBatch.PerInstanceVertexBuffer;
 
-			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView());
+			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView(perInstanceVertexBuffer->GetSize() / perInstanceVertexBuffer->GetElementCount()));
 
 			if(!renderable)
 			{

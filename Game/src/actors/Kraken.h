@@ -73,3 +73,4 @@ public:
 private:
 	Crystal::Shared<Crystal::SkeletalMeshComponent> m_SkeletalMeshComponent = nullptr;
 };
+

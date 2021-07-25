@@ -18,9 +18,10 @@
 
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
-#include "actors/MyAIController.h"
+#include "actors/KrakenAIController.h"
 #include "actors/MyHUD.h"
 #include "actors/PlayCircle.h"
+#include "actors/SpaceWhale.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
@@ -75,10 +76,9 @@ public:
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
 			}*/
 
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 25; i++)
 			{
 				int randomNumber = rand() % 3;
-				randomNumber = 2;
 				switch (randomNumber)
 				{
 				case 0:
@@ -103,15 +103,19 @@ public:
 			}
 		}
 
-		if (false)
+		auto a = resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx");
+		
+		if (true)
 		{
-			for (int i = 0; i < 2; i++)
-			{
-				auto kraken = m_World->SpawnActor<Kraken>({}).lock();
-				kraken->SetPosition({0.0f + 1000.0f * i, 0.0f, 0.0f});
-				auto myAIController = m_World->SpawnActor<MyAIController>({}).lock();
-				myAIController->Possess(kraken);
-			}
+			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
+			kraken->SetPosition({ 0.0f, 0.0f, 0.0f });
+			auto krakenController = m_World->SpawnActor<KrakenAIController>({}).lock();
+			krakenController->Possess(kraken);
+
+			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
+			spaceWhale->SetPosition({ 0.0f, 1000.0f, 0.0f });
+			auto spaceWhaleController = m_World->SpawnActor<KrakenAIController>({}).lock();
+			spaceWhaleController->Possess(kraken);
 		}
 
 
@@ -158,6 +162,7 @@ public:
 		{
 			auto playCircle = m_World->SpawnActor<PlayCircle>({ "" }).lock();
 		}
+
 
 
 		

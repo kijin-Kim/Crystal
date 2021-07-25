@@ -152,7 +152,10 @@ namespace Crystal {
 			commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, handle);
 
 
-			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView());
+			
+			
+			commandList->IASetVertexBuffers(1, 1, &perInstanceVertexBuffer->AsVertexBufferView(sizeof(StaticMeshPerInstanceData)));
+	
 
 			if (!renderable)
 			{
@@ -162,7 +165,7 @@ namespace Crystal {
 			//여기서부터 Texture2D Array Per Instance
 			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 			{
-				renderable->Render(commandList, j, perInstanceVertexBuffer->GetSize() / sizeof(StaticMeshPerInstanceData));
+				renderable->Render(commandList, j, instanceBatch.PerInstanceDatas.size());
 			}
 		}
 	}

@@ -2,8 +2,6 @@
 #include "Actor.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/InputComponent.h"
-#include "Crystal/GamePlay/Components/MovementComponent.h"
-#include "Crystal/Resources/ShaderManager.h"
 
 namespace Crystal {
 	// User Controll-able actor
@@ -15,27 +13,22 @@ namespace Crystal {
 		}
 		
 	public:
-		Pawn()
-		{
-		}
+		Pawn() = default;
+		~Pawn() override = default;
 
-		virtual ~Pawn()
-		{
-		}
+		virtual void SetupInputComponent(InputComponent* inputComponent) {}
 
-		void Begin() override
-		{
-			Actor::Begin();
-		}
-		void Update(const float deltaTime) override
-		{
-			Actor::Update(deltaTime); // Updating All Component
-		}
+		void AddInputVector(const DirectX::XMFLOAT3& direction, float scale);
 
-		virtual void SetupInputComponent(InputComponent* inputComponent)
-		{
-		}
+
+		
+		const DirectX::XMFLOAT3& GetInputVector() const { return m_InputVector; }
+		void ResetInputVector() { m_InputVector = Vector3::Zero; }
+
+		
 
 		STATIC_TYPE_IMPLE(Pawn)
+	protected:
+		DirectX::XMFLOAT3 m_InputVector = Vector3::Zero;
 	};
 }

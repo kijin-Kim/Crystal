@@ -122,23 +122,31 @@ void TestPawn::RotatePitch(float value)
 
 void TestPawn::MoveForward(float value)
 {
-	value *= 3000000;
+
+	AddInputVector(m_MainComponent->GetLocalForwardVector(), value);
+	
+	/*value *= 3000000;
 	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
-	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
+	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);*/
 }
 
 void TestPawn::MoveRight(float value)
 {
-	value *= 3000000;
-	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
-	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
+	AddInputVector(m_MainComponent->GetLocalRightVector(), value);
+	
+	//value *= 3000000;
+	//DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
+	//Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 }
 
 void TestPawn::MoveUp(float value)
 {
+	AddInputVector(m_MainComponent->GetLocalUpVector(), value);
+
+	/*
 	value *= 3000000;
 	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
-	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
+	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);*/
 }
 
 void TestPawn::RollRight(float value)

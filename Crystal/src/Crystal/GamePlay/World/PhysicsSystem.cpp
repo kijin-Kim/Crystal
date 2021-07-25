@@ -10,7 +10,7 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
-#if 0
+#if 1
 		// Bounding Sphere
 		for (const auto& lhsWeak : m_BoundingSphereComponents)
 		{

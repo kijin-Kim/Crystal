@@ -550,8 +550,8 @@ namespace Crystal {
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		m_Pipelines[11]->Begin();
-		m_Pipelines[11]->Record(commandList);
+		/*m_Pipelines[11]->Begin();
+		m_Pipelines[11]->Record(commandList);*/
 
 
 		m_Pipelines[1]->Begin();

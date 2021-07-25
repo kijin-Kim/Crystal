@@ -11,7 +11,7 @@ namespace Crystal {
 	void Renderable::Render(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList, int submeshIndex, int instanceCount /*= 1*/)
 	{
 		D3D12_VERTEX_BUFFER_VIEW vbv[] = {
-			m_VertexBuffers[submeshIndex]->AsVertexBufferView()
+			m_VertexBuffers[submeshIndex]->AsVertexBufferView(m_VertexBuffers[submeshIndex]->GetSize() / m_VertexBuffers[submeshIndex]->GetElementCount())
 		};
 
 		commandList->IASetVertexBuffers(0, _countof(vbv), vbv);

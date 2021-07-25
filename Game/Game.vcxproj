@@ -323,10 +323,12 @@
     <ClInclude Include="src\actors\Asteroid.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Missile.h" />
-    <ClInclude Include="src\actors\MyAIController.h" />
+    <ClInclude Include="src\actors\KrakenAIController.h" />
     <ClInclude Include="src\actors\MyHUD.h" />
     <ClInclude Include="src\actors\PlayCircle.h" />
     <ClInclude Include="src\actors\SpaceCombatTypes.h" />
+    <ClInclude Include="src\actors\SpaceWhale.h" />
+    <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\TestPawn.h" />
   </ItemGroup>

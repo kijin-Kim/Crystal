@@ -5,6 +5,7 @@
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Core/Logger.h"
 #include "Crystal/Core/Timer.h"
+#include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"

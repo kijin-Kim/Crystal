@@ -450,6 +450,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TextureComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Controllers\AIController.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Actor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\CameraPawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\GameMode.h" />

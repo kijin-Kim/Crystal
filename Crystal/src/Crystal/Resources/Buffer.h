@@ -15,7 +15,7 @@ namespace Crystal {
 		
 
 		D3D12_CPU_DESCRIPTOR_HANDLE AsConstantBufferView();
-		D3D12_VERTEX_BUFFER_VIEW AsVertexBufferView() const;
+		D3D12_VERTEX_BUFFER_VIEW AsVertexBufferView(UINT stride) const;
 		D3D12_INDEX_BUFFER_VIEW AsIndexBufferView() const;
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const;
