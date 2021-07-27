@@ -13,11 +13,12 @@ namespace Crystal {
 
 	public:
 		Controller() = default;
-		virtual ~Controller() = default;
+		~Controller() override = default;
 
 		virtual void Possess(std::shared_ptr<Pawn> pawn)
 		{
 			m_PossessedPawn = pawn;
+			pawn->OnPossessed(Cast<Controller>(weak_from_this()));
 		}
 
 		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
@@ -28,7 +29,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(Controller)
 
 
-	private:
+	protected:
 		Weak<Pawn> m_PossessedPawn;
 	};
 }

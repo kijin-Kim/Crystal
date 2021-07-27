@@ -45,8 +45,8 @@ namespace Crystal {
 		AddPendingSpawnedActors();
 		for (const auto& actor : m_Actors)
 		{
-			actor->UpdateComponents(deltaTime);
 			actor->Update(deltaTime);
+			actor->UpdateComponents(deltaTime);
 			if (actor->GetIsDead())
 			{
 				m_bHasDeadActors = true;
@@ -197,7 +197,7 @@ namespace Crystal {
 		//newActorMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
 
 		newActor->SetUnitScale(playerStartActor->GetScale().x);
-		newActor->SetRotation(playerStartActor->GetRotation());
+		newActor->SetRotationQuat(playerStartActor->GetRotationQuat());
 		newActor->SetPosition(playerStartActor->GetPosition());
 
 		playerStartActor->Destroy();
@@ -240,7 +240,7 @@ namespace Crystal {
 		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
 
 		newActor->SetUnitScale(playerStartActor->GetScale());
-		newActor->SetRotation(playerStartActor->GetRotation());
+		newActor->SetRotationQuat(playerStartActor->GetRotationQuat());
 		newActor->SetPosition(playerStartActor->GetPosition());
 
 		playerStartActor->Destroy();

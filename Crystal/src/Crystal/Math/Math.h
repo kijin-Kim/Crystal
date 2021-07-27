@@ -174,6 +174,7 @@ namespace Crystal {
 		inline bool IsZero(const DirectX::XMFLOAT3& v1)
 		{
 			bool isZero = DirectX::XMVector3Equal(XMLoadFloat3(&v1), DirectX::XMVectorZero());
+			
 			return isZero;
 		}
 
@@ -183,6 +184,7 @@ namespace Crystal {
 			DirectX::XMVECTOR newVector = DirectX::XMVectorClamp(XMLoadFloat3(&v1), XMLoadFloat3(&v2), XMLoadFloat3(&v3));
 			XMStoreFloat3(&result, newVector);
 			return result;
+			
 		}
 
 		inline DirectX::XMFLOAT3 RotateQuaternion(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT4& quaternion)
@@ -191,6 +193,42 @@ namespace Crystal {
 			DirectX::XMVECTOR newVector = DirectX::XMVector3Rotate(XMLoadFloat3(&v1), XMLoadFloat4(&quaternion));
 			XMStoreFloat3(&result, newVector);
 			return result;
+		}
+
+
+		inline DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMFLOAT4& quaternion)
+		{
+			// this code is from https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+			DirectX::XMFLOAT3 rotation = Vector3::Zero;
+			
+			// roll (x-axis rotation)
+			double sinr_cosp = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
+			double cosr_cosp = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+			rotation.y = std::atan2(sinr_cosp, cosr_cosp);
+
+			// pitch (y-axis rotation)
+			double sinp = 2 * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
+			if (std::abs(sinp) >= 1)
+				rotation.z = std::copysign(PI / 2, sinp); // use 90 degrees if out of range
+			else
+				rotation.z = std::asin(sinp);
+
+			// yaw (z-axis rotation)
+			double siny_cosp = 2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
+			double cosy_cosp = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+			rotation.x = std::atan2(siny_cosp, cosy_cosp);
+
+
+			return rotation;
+		}
+
+		inline float AngleBetweenNormals(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector3AngleBetweenNormals(XMLoadFloat3(&v1), DirectX::XMLoadFloat3(&v2));
+			XMStoreFloat3(&result, newVector);
+			return result.x;
 		}
 	}
 
@@ -262,6 +300,7 @@ namespace Crystal {
 			DirectX::XMFLOAT4 result;
 			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationAxis(XMLoadFloat3(&axis), (angle));
 			XMStoreFloat4(&result, newVector);
+			
 			return result;
 		}
 

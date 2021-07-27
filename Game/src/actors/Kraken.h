@@ -36,7 +36,7 @@ public:
 		auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		sphereComponent->SetRadius(804 / 2.0f);
 
-		sphereComponent->SetMass(40000.0f);
+		sphereComponent->SetInverseMass(0.0f);
 
 
 		m_SkeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");

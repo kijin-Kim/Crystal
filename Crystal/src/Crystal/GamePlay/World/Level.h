@@ -106,7 +106,7 @@ namespace Crystal {
 
 		if (!Vector4::IsZero(spawnParams.Rotation))
 		{
-			newActor->SetRotation(spawnParams.Rotation);
+			newActor->SetRotationQuat(spawnParams.Rotation);
 		}
 
 		if (spawnParams.Scale != 0.0f)

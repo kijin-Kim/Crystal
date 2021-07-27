@@ -65,8 +65,8 @@ namespace Crystal {
 		void SetPosition(const DirectX::XMFLOAT3& position);
 		DirectX::XMFLOAT3 GetPosition() const;
 
-		void SetRotation(const DirectX::XMFLOAT4& rotation);
-		DirectX::XMFLOAT4 GetRotation() const;
+		void SetRotationQuat(const DirectX::XMFLOAT4& rotation);
+		DirectX::XMFLOAT4 GetRotationQuat() const;
 
 
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);

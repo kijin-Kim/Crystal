@@ -5,11 +5,14 @@
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Core/Logger.h"
 #include "Crystal/Core/Timer.h"
-#include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
+
+namespace Crystal {
+	class PawnMovementComponent;
+}
 
 class TestPawn final : public Crystal::Pawn
 {
@@ -65,7 +68,7 @@ private:
 	
 
 private:
-	std::shared_ptr<Crystal::MovementComponent> m_MovementComponent = nullptr;
+	std::shared_ptr<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
 	std::shared_ptr<Crystal::CameraComponent> m_CameraComponent = nullptr;
 
 	bool m_bShouldFire = false;

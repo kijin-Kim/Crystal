@@ -68,7 +68,7 @@ public:
 		}
 
 
-		if (true)
+		if (false)
 		{
 		/*	for (int i = 0; i < 1000; i++)
 			{
@@ -76,7 +76,7 @@ public:
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
 			}*/
 
-			for (int i = 0; i < 25; i++)
+			for (int i = 0; i < 250; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -103,19 +103,22 @@ public:
 			}
 		}
 
-		auto a = resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx");
 		
-		if (true)
+		if (false)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({ 0.0f, 0.0f, 0.0f });
 			auto krakenController = m_World->SpawnActor<KrakenAIController>({}).lock();
 			krakenController->Possess(kraken);
+		}
+
+		if(true)
+		{
 
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
-			spaceWhale->SetPosition({ 0.0f, 1000.0f, 0.0f });
-			auto spaceWhaleController = m_World->SpawnActor<KrakenAIController>({}).lock();
-			spaceWhaleController->Possess(kraken);
+			spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
+			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
+			spaceWhaleController->Possess(spaceWhale);
 		}
 
 

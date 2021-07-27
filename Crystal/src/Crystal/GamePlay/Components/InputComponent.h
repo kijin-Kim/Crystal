@@ -31,6 +31,7 @@ namespace Crystal {
 		void UnBindAction(const std::string& actionName, EKeyEvent keyEventType);
 
 		bool ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		
 
 		void BindCursor(bool bShouldBindCursor) { m_bShouldBindCursor = bShouldBindCursor; }
 		bool IsCursorBind() const { return m_bShouldBindCursor; }
@@ -42,10 +43,10 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(InputComponent)
 
 	private:
-		bool processAxisMappedInput(int64_t keyCode, float axisValue);
-		bool processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus);
-		std::pair<int64_t, EKeyEvent> getCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam);
-		MouseCodeWithDelta getCrystalMouseCodeWithDelta(UINT uMsg, LPARAM lParam);
+		bool ProcessAxisMappedInput(int64_t keyCode, float axisValue);
+		bool ProcessActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus);
+		std::pair<int64_t, EKeyEvent> GetCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		MouseCodeWithDelta GetCrystalMouseCodeWithDelta(UINT uMsg, LPARAM lParam);
 	private:
 		/* ActionName, Function */
 		std::map<std::pair<std::string, EKeyEvent>, std::function<void(void)>> m_ActionFunctionMap;

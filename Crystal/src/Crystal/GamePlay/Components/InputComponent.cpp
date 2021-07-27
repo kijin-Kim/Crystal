@@ -46,20 +46,20 @@ namespace Crystal {
 
 		
 		
-		auto [keyCode, keyStatus] = getCrystalKeyCode(uMsg, wParam, lParam);
+		auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, wParam, lParam);
 
 
 
 		
-		processActionMappedInput(uMsg, keyCode, lParam, keyStatus);
+		ProcessActionMappedInput(uMsg, keyCode, lParam, keyStatus);
 
 		
 
-		MouseCodeWithDelta mouseCodes = getCrystalMouseCodeWithDelta(uMsg, lParam);
-		processActionMappedInput(uMsg, mouseCodes.MouseX.first, lParam, EKeyEvent::KE_Pressed);
-		processActionMappedInput(uMsg, mouseCodes.MouseY.first, lParam, EKeyEvent::KE_Pressed);
-		processActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
-		processActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
+		MouseCodeWithDelta mouseCodes = GetCrystalMouseCodeWithDelta(uMsg, lParam);
+		ProcessActionMappedInput(uMsg, mouseCodes.MouseX.first, lParam, EKeyEvent::KE_Pressed);
+		ProcessActionMappedInput(uMsg, mouseCodes.MouseY.first, lParam, EKeyEvent::KE_Pressed);
+		ProcessActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
+		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
 
 		/*액시스 매핑을 처리합니다.*/
 		static UCHAR pKeysBuffer[256];
@@ -67,20 +67,20 @@ namespace Crystal {
 		{
 			if (GetAsyncKeyState(i) & 0x8000)
 			{
-				auto [keyCode, keyStatus] = getCrystalKeyCode(uMsg, i, lParam);
-				processAxisMappedInput(keyCode, 1.0f);
+				auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, i, lParam);
+				ProcessAxisMappedInput(keyCode, 1.0f);
 			}
 		}
-		processAxisMappedInput(mouseCodes.MouseX.first, mouseCodes.MouseX.second);
-		processAxisMappedInput(mouseCodes.MouseY.first, mouseCodes.MouseY.second);
-		processAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
-		processAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
+		ProcessAxisMappedInput(mouseCodes.MouseX.first, mouseCodes.MouseX.second);
+		ProcessAxisMappedInput(mouseCodes.MouseY.first, mouseCodes.MouseY.second);
+		ProcessAxisMappedInput(mouseCodes.VWheel.first, mouseCodes.VWheel.second);
+		ProcessAxisMappedInput(mouseCodes.HWheel.first, mouseCodes.HWheel.second);
 
 
 		return false;
 	}
 
-	bool InputComponent::processAxisMappedInput(int64_t keyCode, float axisValue)
+	bool InputComponent::ProcessAxisMappedInput(int64_t keyCode, float axisValue)
 	{
 		auto ownerActor = Cast<Actor>(GetOuter());
 		if (!ownerActor)
@@ -115,7 +115,7 @@ namespace Crystal {
 		return bHandledOnAxis;
 	}
 
-	bool InputComponent::processActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
+	bool InputComponent::ProcessActionMappedInput(UINT uMsg, int64_t keyCode, LPARAM lParam, EKeyEvent keyStatus)
 	{
 		auto ownerActor = Cast<Actor>(GetOuter());
 		if (!ownerActor)
@@ -155,7 +155,7 @@ namespace Crystal {
 		return bHandledOnAction;
 	}
 
-	std::pair<int64_t, EKeyEvent> InputComponent::getCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	std::pair<int64_t, EKeyEvent> InputComponent::GetCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		std::pair<int64_t, EKeyEvent> crystalKey = std::make_pair(Keyboard::Unknown, EKeyEvent::KE_Pressed);
 		crystalKey.second = (HIWORD(lParam) & KF_REPEAT) ? EKeyEvent::KE_Repeat : EKeyEvent::KE_Pressed;
@@ -414,7 +414,7 @@ namespace Crystal {
 		return  crystalKey;
 	}
 
-	MouseCodeWithDelta InputComponent::getCrystalMouseCodeWithDelta(UINT uMsg, LPARAM lParam)
+	MouseCodeWithDelta InputComponent::GetCrystalMouseCodeWithDelta(UINT uMsg, LPARAM lParam)
 	{
 		MouseCodeWithDelta codes;
 		codes.MouseX = { Mouse::UnKnown, 0.0f };

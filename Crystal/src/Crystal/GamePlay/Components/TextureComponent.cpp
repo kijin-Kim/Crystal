@@ -43,7 +43,7 @@ namespace Crystal {
 		}
 		
 		const auto scale = Matrix4x4::Scale({ scaleX, scaleY, scaleZ });
-		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_Rotation);
+		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_RotationQuat);
 		const auto translation = Matrix4x4::Translation(position);
 
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);

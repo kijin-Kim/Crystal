@@ -4,6 +4,7 @@
 #include "MyHUD.h"
 #include "Crystal/Types.h"
 #include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/GamePlay/Components/MovementComponent.h"
 
 BOOST_CLASS_EXPORT(TestPawn)
 
@@ -11,13 +12,9 @@ void TestPawn::Initialize()
 {
 	Pawn::Initialize();
 
-
-	
-
-
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
 	sphereComponent->SetRadius(50.0f);
-	sphereComponent->SetMass(20000.0f);
+	sphereComponent->SetMass(7000.0f);
 	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	{
 		if (m_bIsInVunlnerable)
@@ -63,8 +60,9 @@ void TestPawn::Initialize()
 	m_CameraComponent->SetFarPlane(100000.0f);
 	m_CameraComponent->AttachTo(springArmComponent);
 
-	m_MovementComponent = CreateComponent<Crystal::MovementComponent>("MovementComponent");
+	m_MovementComponent = CreateComponent<Crystal::PawnMovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
+	m_MovementComponent->SetMaxAcceleration(3000000.f);
 }
 
 void TestPawn::Begin()
@@ -84,6 +82,7 @@ void TestPawn::Update(const float deltaTime)
 		m_FireTimer.Reset();
 		OnFire();
 	}
+
 }
 
 void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
@@ -122,31 +121,17 @@ void TestPawn::RotatePitch(float value)
 
 void TestPawn::MoveForward(float value)
 {
-
 	AddInputVector(m_MainComponent->GetLocalForwardVector(), value);
-	
-	/*value *= 3000000;
-	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), value);
-	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);*/
 }
 
 void TestPawn::MoveRight(float value)
 {
 	AddInputVector(m_MainComponent->GetLocalRightVector(), value);
-	
-	//value *= 3000000;
-	//DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalRightVector(), value);
-	//Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);
 }
 
 void TestPawn::MoveUp(float value)
 {
 	AddInputVector(m_MainComponent->GetLocalUpVector(), value);
-
-	/*
-	value *= 3000000;
-	DirectX::XMFLOAT3 force = Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), value);
-	Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->AddForce(force);*/
 }
 
 void TestPawn::RollRight(float value)
@@ -177,7 +162,7 @@ void TestPawn::FireMissile()
 
 		auto playerPosition = GetPosition();
 		spawnParams.Position = {playerPosition.x, playerPosition.y, playerPosition.z + 30.0f};
-		spawnParams.Rotation = Crystal::Vector4::QuaternionMultiply(GetRotation(), m_CameraComponent->GetRotation());
+		spawnParams.Rotation = Crystal::Vector4::QuaternionMultiply(GetRotationQuat(), m_CameraComponent->GetRotationQuat());
 
 		auto missile = level->SpawnActor<Missile>(spawnParams).lock();
 	}
