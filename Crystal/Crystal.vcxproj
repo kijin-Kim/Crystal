@@ -440,6 +440,9 @@
     <ClInclude Include="src\Crystal\Core\SerializeHelper.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\AI\BehaviorTree.h" />
+    <ClInclude Include="src\Crystal\GamePlay\AI\Blackboard.h" />
+    <ClInclude Include="src\Crystal\GamePlay\AI\Decorator.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\LightComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
@@ -528,6 +531,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Crystal\Core\Device.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\AI\BehaviorTree.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\AI\Blackboard.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\AI\Decorator.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\Component.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
@@ -538,6 +544,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TextureComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Controllers\AIController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\Controller.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\PlayerController.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Actor.cpp" />

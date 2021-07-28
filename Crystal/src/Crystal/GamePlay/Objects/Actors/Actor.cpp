@@ -162,6 +162,11 @@ namespace Crystal {
 		return m_MainComponent->GetRotationQuat();
 	}
 
+	void Actor::AddForce(const DirectX::XMFLOAT3& force)
+	{
+		m_MainComponent->AddForce(force);
+	}
+
 	std::weak_ptr<Component> Actor::GetComponentByName(const std::string& name)
 	{
 		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),

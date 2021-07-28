@@ -56,25 +56,7 @@ namespace Crystal {
 		
 
 
-		template <class T>
-		std::shared_ptr<T> CreateObject(const std::string& name = "", const std::weak_ptr<Object>& outer = {})
-		{
-			std::shared_ptr<T> newObject = std::make_shared<T>();
-			newObject->Initialize();
-
-			if (!name.empty())
-			{
-				newObject->SetObjectName(name);
-			}
-			if (!outer.expired())
-			{
-				newObject->SetOuter(outer);
-			}
-
-			newObject->OnCreate();
-
-			return newObject;
-		}
+		
 
 		STATIC_TYPE_IMPLE(Object)
 
@@ -83,5 +65,24 @@ namespace Crystal {
 		std::weak_ptr<Object> m_Outer;
 	};
 
+	template <class T>
+	std::shared_ptr<T> CreateObject(const std::string& name = "", const std::weak_ptr<Object>& outer = {})
+	{
+		std::shared_ptr<T> newObject = std::make_shared<T>();
+		newObject->Initialize();
 
+		if (!name.empty())
+		{
+			newObject->SetObjectName(name);
+		}
+		if (!outer.expired())
+		{
+			newObject->SetOuter(outer);
+		}
+
+		newObject->OnCreate();
+
+		return newObject;
+	}
+	
 }

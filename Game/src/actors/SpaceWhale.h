@@ -1,5 +1,6 @@
 #pragma once
 #include "SpaceWhaleAIController.h"
+#include "Crystal/GamePlay/AI/Blackboard.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/Resources/ResourceManager.h"
@@ -43,34 +44,17 @@ public:
 
 	void OnPossessed(Crystal::Weak<Crystal::Controller> controller) override
 	{
+		
 		Crystal::Pawn::OnPossessed(controller);
 
-		m_MoveTargetLocation = Crystal::Vector3::Zero;
-		
+	
 		auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(m_Controller);
-		spaceWhaleController->MoveToLocation(m_MoveTargetLocation, 300000000.0f, 120.0f);
+		
+		//spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("TargetLocation", { -5000.0f , 0.0f, 5000.0f });
+		
 
-		auto newFacing = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(m_MoveTargetLocation, m_MainComponent->GetWorldPosition()));
-
-		auto normalizedForward = Crystal::Vector3::Normalize(m_MainComponent->GetWorldForwardVector());
-		auto rotationAxis = Crystal::Vector3::Normalize(Crystal::Vector3::Cross(normalizedForward, newFacing));
-
-		if (Crystal::Vector3::IsZero(rotationAxis))
-		{
-			return;
-		}
-
-		auto angle = Crystal::Vector3::AngleBetweenNormals(normalizedForward, newFacing);
-		auto quat = Crystal::Vector4::QuaternionRotationAxis(rotationAxis, angle);
-
-		auto rotation = m_MainComponent->GetRotationQuat();
-		auto newQuat = Crystal::Vector4::QuaternionMultiply(rotation, quat);
-		m_MainComponent->SetRotationQuat(newQuat);
 	}
 	
 	STATIC_TYPE_IMPLE(SpaceWhale)
-
-private:
-	DirectX::XMFLOAT3 m_MoveTargetLocation = Crystal::Vector3::Zero;
 
 };

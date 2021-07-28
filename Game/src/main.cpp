@@ -22,6 +22,9 @@
 #include "actors/MyHUD.h"
 #include "actors/PlayCircle.h"
 #include "actors/SpaceWhale.h"
+#include "Crystal/GamePlay/AI/BehaviorTree.h"
+#include "Crystal/GamePlay/AI/Blackboard.h"
+#include "Crystal/GamePlay/AI/Decorator.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
@@ -114,11 +117,45 @@ public:
 
 		if(true)
 		{
-
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
 			spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
 			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
 			spaceWhaleController->Possess(spaceWhale);
+			
+			
+			auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
+			auto rootNode = behaviorTree->GetRootNode();
+
+
+			auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("Sequence");
+			auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+			blackboardBasedDecorator->BlackboardKey = "TargetLocation";
+			blackboardBasedDecorator->bIsSet = true;
+			sequenceNode->AddDecorator(blackboardBasedDecorator);
+
+			auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("MoveToLocation");
+			faceLocationNode->TargetLocationKey = "TargetLocation";
+			sequenceNode->AddChildNode(faceLocationNode);
+
+			auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("MoveToLocation");
+			moveToLocationNode->TargetLocationKey = "TargetLocation";
+			moveToLocationNode->AcceptableRadius = 120.0f;
+			moveToLocationNode->MaxAcceleration = 300000000.0f;
+			sequenceNode->AddChildNode(moveToLocationNode);
+
+
+			
+			
+
+			
+			rootNode->AddChildNode(sequenceNode);
+			
+
+			
+			spaceWhaleController->SetBehaviorTree(behaviorTree);
+			auto blackboard = spaceWhaleController->GetBlackboardComponent();
+		
+			
 		}
 
 
@@ -167,7 +204,8 @@ public:
 		}
 
 
-
+		
+		
 		
 
 #endif

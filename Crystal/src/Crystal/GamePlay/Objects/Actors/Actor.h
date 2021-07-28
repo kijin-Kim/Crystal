@@ -68,6 +68,8 @@ namespace Crystal {
 		void SetRotationQuat(const DirectX::XMFLOAT4& rotation);
 		DirectX::XMFLOAT4 GetRotationQuat() const;
 
+		void AddForce(const DirectX::XMFLOAT3& force);
+
 
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);
 		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
@@ -86,7 +88,9 @@ namespace Crystal {
 		std::shared_ptr<T> CreateComponent(const std::string& name = "")
 		{
 			/*TODO : Component만 받게 체크...*/
-			std::shared_ptr<T> newComponent = CreateObject<T>(name, weak_from_this());
+			std::shared_ptr<T> newComponent = CreateObject<T>();
+			newComponent->SetObjectName(name);
+			newComponent->SetOuter(weak_from_this());
 			AddComponent(newComponent);
 			return newComponent;
 		}

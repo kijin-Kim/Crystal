@@ -2,6 +2,12 @@
 #include "Controller.h"
 
 namespace Crystal {
+	class BlackboardComponent;
+}
+
+namespace Crystal {
+	class BehaviorTree;
+	class BehaviorTreeComponent;
 
 	class AIController : public Controller
 	{
@@ -9,65 +15,21 @@ namespace Crystal {
 		AIController() = default;
 		~AIController() override = default;
 
-		void MoveToLocation(const DirectX::XMFLOAT3& location, float maxAccel, float acceptableRadius = 2.0f)
-		{
-			m_MoveToLocationRequest.TargetLocation = location;
-			m_MoveToLocationRequest.bShouldMoveToTargetLocation = true;
-			m_MoveToLocationRequest.MaxAcceleration = maxAccel;
-			m_MoveToLocationRequest.AcceptableRadius = acceptableRadius;
-		}
+		void Initialize() override;
 
-		void ProcessMoveToLocationRequest()
-		{
-			auto pawn = m_PossessedPawn.lock();
-			if (!pawn)
-			{
-				return;
-			}
-				
-			auto mainComponent = pawn->GetMainComponent().lock();
-			if(!mainComponent)
-			{
-				return;
-			}
+		void SetBehaviorTree(Shared<BehaviorTree> behaviorTree);
 
-			if(!mainComponent->HasFiniteMass())
-			{
-				return;
-			}
-			
-			if (!m_MoveToLocationRequest.bShouldMoveToTargetLocation)
-			{
-				return;
-			}
+		Shared<BlackboardComponent> GetBlackboardComponent() const;
+		
 
-			
-			auto distance = Vector3::Subtract(m_MoveToLocationRequest.TargetLocation, mainComponent->GetWorldPosition());
-			float lengthSq = Vector3::LengthSquared(distance);
-			float acceptableRadiusSq = m_MoveToLocationRequest.AcceptableRadius * m_MoveToLocationRequest.AcceptableRadius;
+		void MoveToLocation(const DirectX::XMFLOAT3& location, float maxAccel, float acceptableRadius = 2.0f);
 
-			if (lengthSq <= acceptableRadiusSq)
-			{
-				m_MoveToLocationRequest = {};
-				return;
-			}
-
-			auto direction = Vector3::Normalize(distance);
-
-			mainComponent->AddForce(Vector3::Multiply(direction, m_MoveToLocationRequest.MaxAcceleration));
-		}
+		void ProcessMoveToLocationRequest();
 
 
-		void Update(float deltaTime) override
-		{
-			Controller::Update(deltaTime);
+		void Update(float deltaTime) override;
 
-			ProcessMoveToLocationRequest();
-			
-			
-		}
 
-	
 		STATIC_TYPE_IMPLE(AIController)
 
 	private:
@@ -82,7 +44,9 @@ namespace Crystal {
 
 
 		MoveToLocationRequest m_MoveToLocationRequest = {};
-		
+
+		std::shared_ptr<BehaviorTreeComponent> m_BehaviorTreeComponent = nullptr;
+		std::shared_ptr<BlackboardComponent> m_BlackboardComponent = nullptr;
 		
 	};
 

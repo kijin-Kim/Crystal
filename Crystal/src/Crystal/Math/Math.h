@@ -4,6 +4,8 @@
 
 #define PI 3.1415920f
 #define TWO_PI PI * 2.0f
+#define MACHINE_EPSILON std::numeric_limits<float>::epsilon()
+#define XMVECTOR_EPSILON DirectX::XMVectorSet(MACHINE_EPSILON, MACHINE_EPSILON, MACHINE_EPSILON, MACHINE_EPSILON)
 
 namespace Crystal {
 
@@ -41,6 +43,7 @@ namespace Crystal {
 		static const DirectX::XMFLOAT3 Cyan = {0.0f, 1.0f, 1.0f};
 		static const DirectX::XMFLOAT3 Magenta = {1.0f, 0.0f, 1.0f};
 		static const DirectX::XMFLOAT3 Yellow = {1.0f, 1.0f, 0.0f};
+		
 
 
 		inline DirectX::XMFLOAT3 RandomInRange(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
@@ -50,6 +53,7 @@ namespace Crystal {
 			std::uniform_real_distribution<> disx(v1.x, v2.x);
 			std::uniform_real_distribution<> disy(v1.y, v2.y);
 			std::uniform_real_distribution<> disz(v1.z, v2.z);
+			
 
 			return {static_cast<float>(disx(gen)), static_cast<float>(disy(gen)), static_cast<float>(disz(gen))};
 		}
@@ -120,8 +124,15 @@ namespace Crystal {
 
 		inline bool Equal(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)
 		{
-			return DirectX::XMVector3Equal(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
+			return DirectX::XMVector3NearEqual(XMLoadFloat3(&v1), XMLoadFloat3(&v2), XMVECTOR_EPSILON);
 		}
+
+		inline bool Equal(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, float tolerance)
+		{
+			return DirectX::XMVector3NearEqual(XMLoadFloat3(&v1), XMLoadFloat3(&v2), DirectX::XMVectorSet(tolerance, tolerance, tolerance, tolerance));
+		}
+
+		
 
 		inline float Greater(const DirectX::XMFLOAT3& v1)
 		{
@@ -173,7 +184,7 @@ namespace Crystal {
 
 		inline bool IsZero(const DirectX::XMFLOAT3& v1)
 		{
-			bool isZero = DirectX::XMVector3Equal(XMLoadFloat3(&v1), DirectX::XMVectorZero());
+			bool isZero = DirectX::XMVector3NearEqual(XMLoadFloat3(&v1), DirectX::XMVectorZero(), XMVECTOR_EPSILON);
 			
 			return isZero;
 		}
@@ -191,6 +202,7 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT3 result;
 			DirectX::XMVECTOR newVector = DirectX::XMVector3Rotate(XMLoadFloat3(&v1), XMLoadFloat4(&quaternion));
+			
 			XMStoreFloat3(&result, newVector);
 			return result;
 		}
@@ -242,7 +254,7 @@ namespace Crystal {
 
 		inline bool IsZero(const DirectX::XMFLOAT4& v1)
 		{
-			bool isZero = DirectX::XMVector4Equal(XMLoadFloat4(&v1), DirectX::XMVectorZero());
+			bool isZero = DirectX::XMVector4NearEqual(XMLoadFloat4(&v1), DirectX::XMVectorZero(), XMVECTOR_EPSILON);
 			return isZero;
 		}
 
