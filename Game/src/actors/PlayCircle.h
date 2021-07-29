@@ -1,4 +1,5 @@
 #pragma once
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/LightActor.h"
@@ -25,20 +26,27 @@ public:
 		
 		auto material = Crystal::CreateShared<Crystal::Material>();
 		material->EmissiveColor = Crystal::Vector3::Red;
-		material->OpacityTexture = resourceManager.GetTexture("assets/textures/T_HoneycombMask.tga");
+		material->Opacity = 0.3f;
+		//material->OpacityTexture = resourceManager.GetTexture("assets/textures/T_HoneycombMask.tga");
 		
 		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 		material->BlendMode = Crystal::EBlendMode::BM_Translucent;
 		material->bTwoSided = true;
 		
+		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		boundingSphereComponent->SetRadius(50.0f);
+		m_MainComponent = boundingSphereComponent;
 
+		
+		
 		
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetUnitScale(10000.0f);
+		staticMeshComponent->SetUnitScale(50.0f);
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/1M_Sphere.fbx"));
+		staticMeshComponent->AttachTo(m_MainComponent);
 		
 		
 

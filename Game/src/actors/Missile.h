@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Components/ProjectileMovementComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/Material.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class Missile : public Crystal::Actor
 {

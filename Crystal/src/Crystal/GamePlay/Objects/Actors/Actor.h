@@ -68,6 +68,8 @@ namespace Crystal {
 		void SetRotationQuat(const DirectX::XMFLOAT4& rotation);
 		DirectX::XMFLOAT4 GetRotationQuat() const;
 
+		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
+
 		void AddForce(const DirectX::XMFLOAT3& force);
 
 

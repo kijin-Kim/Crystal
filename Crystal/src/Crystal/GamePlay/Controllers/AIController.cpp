@@ -3,6 +3,7 @@
 
 #include "Crystal/GamePlay/AI/BehaviorTree.h"
 #include "Crystal/GamePlay/AI/Blackboard.h"
+//#include "Crystal/GamePlay/Components/AIComponent.h"
 
 namespace Crystal {
 
@@ -13,6 +14,7 @@ namespace Crystal {
 
 		m_BehaviorTreeComponent = CreateComponent<BehaviorTreeComponent>("BehaviorTreeComponent");
 		m_BlackboardComponent = CreateComponent<BlackboardComponent>("BlackboardComponent");
+		//m_AIPerceptionComponent = CreateComponent<AIPerceptionComponent>("AIPerceptionComponent");
 	}
 
 	void AIController::SetBehaviorTree(Shared<BehaviorTree> behaviorTree)

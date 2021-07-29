@@ -15,8 +15,8 @@ namespace Crystal {
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<PrimitiveComponent>(*this);
-			ar & m_PostScaledTransform;
-			ar & m_bCollisionEnabled;
+			ar& m_PostScaledTransform;
+			ar& m_bCollisionEnabled;
 		}
 
 	public:
@@ -29,9 +29,10 @@ namespace Crystal {
 			AddMaterial(std::move(material));
 		}
 
-		~CollisionComponent() override
-		{
-		}
+		~CollisionComponent() override = default;
+
+
+		
 
 		void SetLineColor(const DirectX::XMFLOAT3& color)
 		{
@@ -40,11 +41,10 @@ namespace Crystal {
 
 		const DirectX::XMFLOAT3& GetLineColor() const
 		{
-			/*auto color = m_MaterialsOld[0]->GetFloatInput("Color"); 
+			/*auto color = m_MaterialsOld[0]->GetFloatInput("Color");
 			return { color.x, color.y, color.z };*/
 		}
 
-		void RegisterComponent() override;
 
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
@@ -62,7 +62,7 @@ namespace Crystal {
 	private:
 		bool m_bCollisionEnabled = true;
 		std::function<void(const struct HitResult&)> m_OnHitEvent;
-		
+
 	};
 
 	class RayComponent : public CollisionComponent
@@ -72,6 +72,7 @@ namespace Crystal {
 
 		~RayComponent() override = default;
 
+		void RegisterComponent() override;
 
 
 		void Update(const float deltaTime) override
@@ -79,13 +80,13 @@ namespace Crystal {
 			CollisionComponent::Update(deltaTime);
 
 			// Caculate Post Transform
-			const DirectX::XMFLOAT3 currentDirection = {1.0f, 0.0f, 0.0f};
+			const DirectX::XMFLOAT3 currentDirection = { 1.0f, 0.0f, 0.0f };
 
 			const auto scaleMatrix = Matrix4x4::Scale(m_MaxDistance);
 			auto rotationAxis = Vector3::Normalize(Vector3::Cross(currentDirection, m_Direction));
 			if (Vector3::IsZero(rotationAxis))
 			{
-				rotationAxis = {0.0f, 0.0f, -1.0f};
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
 			}
 			const auto rotationAngle = acosf(Vector3::Dot(currentDirection, m_Direction));
 			const auto quternion =
@@ -109,17 +110,19 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(RayComponent)
 	private:
-		DirectX::XMFLOAT3 m_Origin = {0.0f, 0.0f, 0.0f};
-		DirectX::XMFLOAT3 m_Direction = {1.0f, 0.0f, 0.0f};
+		DirectX::XMFLOAT3 m_Origin = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_Direction = { 1.0f, 0.0f, 0.0f };
 		float m_MaxDistance = 1.0f;
 	};
 
 	class BoundingBoxComponent : public CollisionComponent
 	{
-		
+
 	public:
 		BoundingBoxComponent() = default;
 		~BoundingBoxComponent() override = default;
+
+		void RegisterComponent() override;
 
 
 		void Update(const float deltaTime) override
@@ -128,7 +131,7 @@ namespace Crystal {
 
 			// Caculate Post Transform
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
-				m_BoundingBox.Extents, {2.0f, 2.0f, 2.0f}));
+				m_BoundingBox.Extents, { 2.0f, 2.0f, 2.0f }));
 			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingBox.Center));
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
 		}
@@ -153,15 +156,10 @@ namespace Crystal {
 	class BoundingOrientedBoxComponent : public CollisionComponent
 	{
 	public:
-		BoundingOrientedBoxComponent()
-		{
-			
-#ifndef CS_NM_DEDICATED
-			
-#endif
-		}
-
+		BoundingOrientedBoxComponent() = default;
 		~BoundingOrientedBoxComponent() override = default;
+
+		void RegisterComponent() override;
 
 		void Update(const float deltaTime) override
 		{
@@ -169,9 +167,9 @@ namespace Crystal {
 
 			// Caculate Post Transform
 			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
-				m_BoundingOrientedBox.Extents, {2.0f, 2.0f, 2.0f}));
+				m_BoundingOrientedBox.Extents, { 2.0f, 2.0f, 2.0f }));
 			postTransform = Matrix4x4::Multiply(postTransform,
-			                                    Matrix4x4::RotationQuaternion(m_BoundingOrientedBox.Orientation));
+				Matrix4x4::RotationQuaternion(m_BoundingOrientedBox.Orientation));
 			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingOrientedBox.Center));
 			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
 		}
@@ -203,7 +201,7 @@ namespace Crystal {
 	public:
 		BoundingSphereComponent() = default;
 
-
+		void RegisterComponent() override;
 
 		void Update(const float deltaTime) override
 		{

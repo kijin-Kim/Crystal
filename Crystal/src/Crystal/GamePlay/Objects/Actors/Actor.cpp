@@ -162,6 +162,11 @@ namespace Crystal {
 		return m_MainComponent->GetRotationQuat();
 	}
 
+	const DirectX::XMFLOAT4X4& Actor::GetWorldTransform() const
+	{
+		return m_MainComponent->GetWorldTransform();
+	}
+
 	void Actor::AddForce(const DirectX::XMFLOAT3& force)
 	{
 		m_MainComponent->AddForce(force);

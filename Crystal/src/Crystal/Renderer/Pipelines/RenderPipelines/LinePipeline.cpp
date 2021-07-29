@@ -6,6 +6,8 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
+#include "Crystal/Renderer/Scene.h"
+//#include "Crystal/GamePlay/Components/AIComponent.h"
 
 namespace Crystal {
 
@@ -34,9 +36,10 @@ namespace Crystal {
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		for (int i = 0; i < scene->CollisionComponents.size(); i++)
+
+		for (int i = 0; i < scene->BoundingOrientedBoxComponents.size(); i++)
 		{
-			auto component = Cast<CollisionComponent>(scene->CollisionComponents[i]);
+			auto component = scene->BoundingOrientedBoxComponents[i].lock();
 			if (!component)
 				continue;
 
@@ -49,6 +52,39 @@ namespace Crystal {
 			perInstanceData.World = component->GetPostScaledTransform();
 
 
+			auto& materials = component->GetMaterials();
+			for (const auto& mat : materials)
+			{
+				auto material = mat.get();
+				perInstanceData.Color = material->AlbedoColor;
+
+			}
+
+
+			Shared<Renderable> renderable = scene->LineBoxMesh;
+			
+			if(!renderable)
+			{
+				continue;
+			}
+			
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+		for (int i = 0; i < scene->BoundingBoxComponents.size(); i++)
+		{
+			auto component = scene->BoundingBoxComponents[i].lock();
+			if (!component)
+				continue;
+
+			if (component->GetHideInGame())
+			{
+				continue;
+			}
+
+			PerInstanceData perInstanceData = {};
+			perInstanceData.World = component->GetPostScaledTransform();
+
 
 			auto& materials = component->GetMaterials();
 			for (const auto& mat : materials)
@@ -58,33 +94,111 @@ namespace Crystal {
 
 			}
 
-			auto staticType = component->StaticType();
 
-			Shared<Renderable> renderable = nullptr;
+			Shared<Renderable> renderable = scene->LineBoxMesh;
 
-			
-			if (staticType == "RayComponent")
-			{
-				renderable = scene->LineMesh;
-			}
-			else if (staticType == "BoundingBoxComponent" || staticType == "BoundingOrientedBoxComponent")
-			{
-				renderable = scene->LineBoxMesh;
-			}
-			else if(staticType == "BoundingSphereComponent")
-			{
-				renderable = scene->LineSphereMesh;
-			}
-
-			
-			if(!renderable)
+			if (!renderable)
 			{
 				continue;
 			}
-			
+
 			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-			
 		}
+
+
+		for (int i = 0; i < scene->BoundingSphereComponents.size(); i++)
+		{
+			auto component = scene->BoundingSphereComponents[i].lock();
+			if (!component)
+				continue;
+
+			if (component->GetHideInGame())
+			{
+				continue;
+			}
+
+			PerInstanceData perInstanceData = {};
+			perInstanceData.World = component->GetPostScaledTransform();
+
+
+			auto& materials = component->GetMaterials();
+			for (const auto& mat : materials)
+			{
+				auto material = mat.get();
+				perInstanceData.Color = material->AlbedoColor;
+
+			}
+
+
+			Shared<Renderable> renderable = scene->LineSphereMesh;
+
+			if (!renderable)
+			{
+				continue;
+			}
+
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+
+
+		for (int i = 0; i < scene->RayComponents.size(); i++)
+		{
+			auto component = scene->RayComponents[i].lock();
+			if (!component)
+				continue;
+
+			if (component->GetHideInGame())
+			{
+				continue;
+			}
+
+			PerInstanceData perInstanceData = {};
+			perInstanceData.World = component->GetPostScaledTransform();
+
+
+			auto& materials = component->GetMaterials();
+			for (const auto& mat : materials)
+			{
+				auto material = mat.get();
+				perInstanceData.Color = material->AlbedoColor;
+
+			}
+
+
+			Shared<Renderable> renderable = scene->LineMesh;
+
+			if (!renderable)
+			{
+				continue;
+			}
+
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+
+		
+		for (int i = 0; i < scene->AIPerceptions.size(); i++)
+		{
+			auto component = Cast<AIPerceptionComponent>(scene->AIPerceptions[i]);
+			if (!component)
+				continue;
+
+			PerInstanceData perInstanceData = {};
+			perInstanceData.World = component->GetHearingSphereTransform();
+			perInstanceData.Color = Vector3::Green;
+		
+
+			Shared<Renderable> renderable = scene->LineSphereMesh;
+
+			if (!renderable)
+			{
+				continue;
+			}
+
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
 
 
 		for (auto& pair : m_InstanceBatches)

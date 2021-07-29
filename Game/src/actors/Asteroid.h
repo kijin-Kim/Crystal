@@ -3,6 +3,7 @@
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
+#include "Crystal/Resources/ResourceManager.h"
 
 class Asteroid : public Crystal::Actor
 {
@@ -21,11 +22,16 @@ public:
 		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 		material->ShadingModel = Crystal::EShadingModel::SM_Lit;
 
+		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		boundingSphereComponent->SetRadius(40.0f);
+
+		m_MainComponent = boundingSphereComponent;
+
+
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		staticMeshComponent->AddMaterial(material);
-
-		m_MainComponent = staticMeshComponent;
+		staticMeshComponent->AttachTo(m_MainComponent);
 
 
 		int randomNumber = rand() % 6;

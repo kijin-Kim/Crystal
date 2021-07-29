@@ -7,6 +7,7 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Renderer/Pipelines/PipelineStateHelper.h"
+#include "Crystal/Renderer/Scene.h"
 
 
 namespace Crystal {

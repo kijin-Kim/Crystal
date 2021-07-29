@@ -1,16 +1,14 @@
 #pragma once
-#include "Crystal/Core/Timer.h"
+#include "Crystal/Resources/BasicShapeMeshes.h"
+#include "Crystal/GamePlay/Components/AIComponent.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
-#include "Crystal/GamePlay/Components/PrimitiveComponent.h"
-#include "Crystal/GamePlay/Components/TextureComponent.h"
-#include "Crystal/GamePlay/Components/TransformComponent.h"
-#include "Crystal/Resources/BasicShapeMeshes.h"
+#include "Crystal/GamePlay/Components/TextureComponent.h""
 
 namespace Crystal {
-
+	
 	/*
 	 * 렌더링에 사용되는 리소스들을 준비합니다.
 	 */
@@ -59,12 +57,23 @@ namespace Crystal {
 		std::vector<Weak<StaticMeshComponent>> StaticMeshes;
 		std::vector<Weak<SkeletalMeshComponent>> SkeletalMeshes;
 		std::vector<Weak<ParticleComponent>> Particles;
-		std::vector<Weak<CollisionComponent>> CollisionComponents;
+
+		std::vector<Weak<BoundingBoxComponent>> BoundingBoxComponents;
+		std::vector<Weak<BoundingOrientedBoxComponent>> BoundingOrientedBoxComponents;
+		std::vector<Weak<BoundingSphereComponent>> BoundingSphereComponents;
+		std::vector<Weak<RayComponent>> RayComponents;
+		
+		
 		std::vector<Weak<TextureComponent>> Textures;
 
 
 		std::vector<Weak<LightComponent>> Lights;
 		std::vector<Weak<CameraComponent>> Cameras;
+
+		std::vector<Weak<AIPerceptionSourceComponent>> AIPerceptionSources;
+		std::vector<Weak<AIPerceptionComponent>> AIPerceptions;
+
+		
 		
 		//===================================================================================
 

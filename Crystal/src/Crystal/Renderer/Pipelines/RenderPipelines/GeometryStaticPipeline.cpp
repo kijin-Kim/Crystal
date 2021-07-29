@@ -8,6 +8,7 @@
 #include "Crystal/Resources/Meshes.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Core/Device.h"
+#include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
 

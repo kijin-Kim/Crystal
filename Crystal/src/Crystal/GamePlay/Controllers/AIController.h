@@ -1,13 +1,13 @@
 #pragma once
 #include "Controller.h"
 
-namespace Crystal {
-	class BlackboardComponent;
-}
+
 
 namespace Crystal {
 	class BehaviorTree;
 	class BehaviorTreeComponent;
+	class BlackboardComponent;
+	//class AIPerceptionComponent;
 
 	class AIController : public Controller
 	{
@@ -32,7 +32,7 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(AIController)
 
-	private:
+	protected:
 		struct MoveToLocationRequest
 		{
 			
@@ -45,8 +45,9 @@ namespace Crystal {
 
 		MoveToLocationRequest m_MoveToLocationRequest = {};
 
-		std::shared_ptr<BehaviorTreeComponent> m_BehaviorTreeComponent = nullptr;
-		std::shared_ptr<BlackboardComponent> m_BlackboardComponent = nullptr;
+		Shared<BehaviorTreeComponent> m_BehaviorTreeComponent = nullptr;
+		Shared<BlackboardComponent> m_BlackboardComponent = nullptr;
+		//Shared<AIPerceptionComponent> m_AIPerceptionComponent = nullptr;
 		
 	};
 

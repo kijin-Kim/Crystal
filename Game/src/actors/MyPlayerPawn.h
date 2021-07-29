@@ -14,7 +14,7 @@ namespace Crystal {
 	class PawnMovementComponent;
 }
 
-class TestPawn final : public Crystal::Pawn
+class MyPlayerPawn final : public Crystal::Pawn
 {
 	SERIALIZE_PROPERTIES
 	{
@@ -31,8 +31,8 @@ class TestPawn final : public Crystal::Pawn
 	}
 
 public:
-	TestPawn() = default;
-	~TestPawn() override = default;
+	MyPlayerPawn() = default;
+	~MyPlayerPawn() override = default;
 
 	void Initialize() override;
 
@@ -61,7 +61,7 @@ public:
 	void UseShieldItem();
 
 
-	STATIC_TYPE_IMPLE(TestPawn)
+	STATIC_TYPE_IMPLE(MyPlayerPawn)
 
 private:
 	void OnFire();

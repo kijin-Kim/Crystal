@@ -5,7 +5,7 @@
 #include "Crystal/GamePlay/Objects/Actors/CameraPawn.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
-#include "actors/TestPawn.h"
+#include "actors/MyPlayerPawn.h"
 #include "actors/Asteroid.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "actors/Sun.h"
@@ -14,7 +14,6 @@
 #include "Crystal/GamePlay/Objects/Actors/PlayerStartActor.h"
 
 #include <sstream>
-#include <boost/functional/hash.hpp>
 
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
@@ -73,13 +72,13 @@ public:
 
 		if (false)
 		{
-		/*	for (int i = 0; i < 1000; i++)
+			for (int i = 0; i < 50; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
-			}*/
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+			}
 
-			for (int i = 0; i < 250; i++)
+			for (int i = 0; i < 50; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -87,19 +86,19 @@ public:
 				case 0:
 					{
 						auto asteroid = m_World->SpawnActor<HealAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
 						break;
 					}
 				case 1:
 					{
 						auto asteroid = m_World->SpawnActor<PowerAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
 						break;
 					}
 				case 2:
 					{
 						auto asteroid = m_World->SpawnActor<ShieldAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
 						break;
 					}
 				}
@@ -118,7 +117,8 @@ public:
 		if(true)
 		{
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
-			spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
+			//spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
+			spaceWhale->SetPosition({ 2000.0f, 0.0f, 0.0f });
 			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
 			spaceWhaleController->Possess(spaceWhale);
 			
@@ -127,13 +127,16 @@ public:
 			auto rootNode = behaviorTree->GetRootNode();
 
 
+			auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
+			
+			
 			auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("Sequence");
 			auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 			blackboardBasedDecorator->BlackboardKey = "TargetLocation";
 			blackboardBasedDecorator->bIsSet = true;
 			sequenceNode->AddDecorator(blackboardBasedDecorator);
 
-			auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("MoveToLocation");
+			auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("FaceLocation");
 			faceLocationNode->TargetLocationKey = "TargetLocation";
 			sequenceNode->AddChildNode(faceLocationNode);
 
@@ -143,17 +146,18 @@ public:
 			moveToLocationNode->MaxAcceleration = 300000000.0f;
 			sequenceNode->AddChildNode(moveToLocationNode);
 
+			auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("ClearBlackboardValue");
+			clearValueNode->BlackboardKey = "TargetLocation";
+			sequenceNode->AddChildNode(clearValueNode);
+			
+			
+			
+			selectorNode->AddChildNode(sequenceNode);
+			rootNode->AddChildNode(selectorNode);
+			
 
-			
-			
 
-			
-			rootNode->AddChildNode(sequenceNode);
-			
-
-			
-			spaceWhaleController->SetBehaviorTree(behaviorTree);
-			auto blackboard = spaceWhaleController->GetBlackboardComponent();
+			//spaceWhaleController->SetBehaviorTree(behaviorTree);
 		
 			
 		}

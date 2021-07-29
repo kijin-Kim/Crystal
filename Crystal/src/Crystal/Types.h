@@ -21,6 +21,12 @@ namespace Crystal {
 		BlendModeCount
 	};
 
+	enum class ECollisionType
+	{
+		CT_Block,
+		CT_Overlap
+	};
+
 
 	struct PipelineStateKey
 	{

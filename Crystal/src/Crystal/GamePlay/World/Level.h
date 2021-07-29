@@ -7,7 +7,6 @@
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/GamePlay/Objects/Actors/Pawn.h"
 #include "Crystal/Renderer/RenderSystem.h"
-#include "Crystal/Renderer/Scene.h"
 
 
 namespace Crystal {
@@ -44,12 +43,9 @@ namespace Crystal {
 		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
 
-		void RegisterPhysicsWorldComponent(std::weak_ptr<Component> component);
-
-
 		void OnClientConnect();
 
-		const Shared<Scene>& GetScene() { return m_Scene; }
+		const Shared<Scene>& GetScene() const;
 
 
 		std::weak_ptr<Actor> GetActorByName(const std::string& name);

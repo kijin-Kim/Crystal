@@ -3,6 +3,7 @@
 
 #include "MeshComponents.h"
 #include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/Scene.h"
 
 BOOST_CLASS_EXPORT(Crystal::TextureComponent)
 

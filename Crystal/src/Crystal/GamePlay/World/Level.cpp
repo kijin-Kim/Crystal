@@ -2,11 +2,13 @@
 #include "Level.h"
 
 
+#include "Crystal/Renderer/Scene.h"
+
 #include "Crystal/GamePlay/Objects/Actors/LineActor.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 
-#include "../../../../../Game/src/actors/TestPawn.h"
+#include "../../../../../Game/src/actors/MyPlayerPawn.h"
 #include "Crystal/Resources/ResourceManager.h"
 
 #include "../../../../../Game/src/actors/MyHUD.h"
@@ -15,11 +17,6 @@ namespace Crystal {
 	void Level::OnCreate()
 	{
 		Object::OnCreate();
-
-		m_PhysicsSystem = CreateShared<PhysicsSystem>();
-		m_PhysicsSystem->Initialize();
-		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
-		m_PhysicsSystem->OnCreate();
 
 		m_Scene = CreateShared<Scene>();
 
@@ -32,6 +29,12 @@ namespace Crystal {
 		m_RenderSystem->OnCreate();
 		m_RenderSystem->Begin();
 #endif
+
+		m_PhysicsSystem = CreateShared<PhysicsSystem>();
+		m_PhysicsSystem->Initialize();
+		m_PhysicsSystem->SetOuter(weak_from_this());
+		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
+		m_PhysicsSystem->OnCreate();
 	}
 
 	void Level::Update(const float deltaTime)
@@ -141,11 +144,6 @@ namespace Crystal {
 		debugLineActor->SetLifeTime(1.5f);
 	}
 
-	void Level::RegisterPhysicsWorldComponent(std::weak_ptr<Component> component)
-	{
-		m_PhysicsSystem->RegisterPhysicsWorldComponent(component);
-	}
-
 
 	void Level::OnClientConnect()
 	{
@@ -179,7 +177,7 @@ namespace Crystal {
 		m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		
 
-		auto newActor = SpawnActor<TestPawn>({"TestPawn"}).lock();
+		auto newActor = SpawnActor<MyPlayerPawn>({"MyPlayerPawn"}).lock();
 		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
 		m_Player = newActor;
 		
@@ -227,7 +225,7 @@ namespace Crystal {
 		auto playerStartActor = playerStartActors[0].lock();
 
 
-		auto newActor = SpawnActor<TestPawn>({ "TestPawn" }).lock();
+		auto newActor = SpawnActor<MyPlayerPawn>({ "MyPlayerPawn" }).lock();
 
 		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
 			newActor->GetComponentByClass("StaticMeshComponent"));
@@ -251,6 +249,11 @@ namespace Crystal {
 
 
 #endif
+	}
+
+	const Shared<Scene>& Level::GetScene() const
+	{
+		return m_Scene;
 	}
 
 	std::weak_ptr<Actor> Level::GetActorByName(const std::string& name)

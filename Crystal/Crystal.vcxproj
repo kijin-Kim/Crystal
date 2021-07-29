@@ -443,6 +443,7 @@
     <ClInclude Include="src\Crystal\GamePlay\AI\BehaviorTree.h" />
     <ClInclude Include="src\Crystal\GamePlay\AI\Blackboard.h" />
     <ClInclude Include="src\Crystal\GamePlay\AI\Decorator.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\AIComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\LightComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
@@ -534,6 +535,7 @@
     <ClCompile Include="src\Crystal\GamePlay\AI\BehaviorTree.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\AI\Blackboard.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\AI\Decorator.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\AIComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\CollisionComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\Component.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />

@@ -4,6 +4,7 @@
 #include "assimp/anim.h"
 #include "assimp/scene.h"
 #include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/Renderer/Scene.h"
 
 BOOST_CLASS_EXPORT(Crystal::MeshComponent)
 

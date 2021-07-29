@@ -291,6 +291,28 @@ namespace Crystal {
 		std::string TargetLocationKey;
 	};
 
+	class BTTaskNodeClearBlackboardValue : public BTTaskNode
+	{
+	public:
+		BTTaskNodeClearBlackboardValue() = default;
+		~BTTaskNodeClearBlackboardValue() override = default;
+
+		bool Execute(float deltaTime) override
+		{
+			auto blackboard = GetBlackboardComponent().lock();
+			blackboard->ClearValue(BlackboardKey);
+
+			return true;
+		}
+		
+
+		STATIC_TYPE_IMPLE(BTTaskNodeClearBlackboardValue)
+
+	public:
+		std::string BlackboardKey;
+		
+	};
+
 
 
 	class BehaviorTree : public Object

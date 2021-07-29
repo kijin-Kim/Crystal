@@ -1,4 +1,4 @@
-﻿#include "TestPawn.h"
+﻿#include "MyPlayerPawn.h"
 
 #include "Missile.h"
 #include "MyHUD.h"
@@ -6,26 +6,31 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/MovementComponent.h"
 
-BOOST_CLASS_EXPORT(TestPawn)
+BOOST_CLASS_EXPORT(MyPlayerPawn)
 
-void TestPawn::Initialize()
+void MyPlayerPawn::Initialize()
 {
 	Pawn::Initialize();
 
-	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	sphereComponent->SetRadius(50.0f);
-	sphereComponent->SetMass(7000.0f);
-	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
-	{
-		if (m_bIsInVunlnerable)
-			return;
+	//auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+	//sphereComponent->SetRadius(50.0f);
+	//sphereComponent->SetMass(7000.0f);
+	//sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	//{
+	//	if (m_bIsInVunlnerable)
+	//		return;
 
-		m_Health -= 1;
-		UpdateHealth();
-	});
+	//	m_Health -= 1;
+	//	UpdateHealth();
+	//});
 
 
-	m_MainComponent = sphereComponent;
+	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+	boundingOrientedBoxComponent->SetExtents({ 90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
+	boundingOrientedBoxComponent->SetMass(7000.0f);
+
+
+	m_MainComponent = boundingOrientedBoxComponent;
 
 
 	auto& resourceManager = Crystal::ResourceManager::Instance();
@@ -65,13 +70,13 @@ void TestPawn::Initialize()
 	m_MovementComponent->SetMaxAcceleration(3000000.f);
 }
 
-void TestPawn::Begin()
+void MyPlayerPawn::Begin()
 {
 	Pawn::Begin();
 	UpdateHealth();
 }
 
-void TestPawn::Update(const float deltaTime)
+void MyPlayerPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
 
@@ -85,73 +90,73 @@ void TestPawn::Update(const float deltaTime)
 
 }
 
-void TestPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
+void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 {
 	Pawn::SetupInputComponent(inputComponent);
 
-	inputComponent->BindAxis("MoveForward", CS_AXIS_FN(TestPawn::MoveForward));
-	inputComponent->BindAxis("MoveRight", CS_AXIS_FN(TestPawn::MoveRight));
-	inputComponent->BindAxis("MoveUp", CS_AXIS_FN(TestPawn::MoveUp));
-	inputComponent->BindAxis("RollRight", CS_AXIS_FN(TestPawn::RollRight));
+	inputComponent->BindAxis("MoveForward", CS_AXIS_FN(MyPlayerPawn::MoveForward));
+	inputComponent->BindAxis("MoveRight", CS_AXIS_FN(MyPlayerPawn::MoveRight));
+	inputComponent->BindAxis("MoveUp", CS_AXIS_FN(MyPlayerPawn::MoveUp));
+	inputComponent->BindAxis("RollRight", CS_AXIS_FN(MyPlayerPawn::RollRight));
 
-	inputComponent->BindAxis("LookUp", CS_AXIS_FN(TestPawn::RotatePitch));
-	inputComponent->BindAxis("Turn", CS_AXIS_FN(TestPawn::RotateYaw));
+	inputComponent->BindAxis("LookUp", CS_AXIS_FN(MyPlayerPawn::RotatePitch));
+	inputComponent->BindAxis("Turn", CS_AXIS_FN(MyPlayerPawn::RotateYaw));
 
-	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::BeginFire));
-	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(TestPawn::EndFire));
+	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::BeginFire));
+	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::EndFire));
 
-	inputComponent->BindAction("FireMissile", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::FireMissile));
+	inputComponent->BindAction("FireMissile", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::FireMissile));
 
-	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UsePowerItem));
-	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UseHealItem));
-	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TestPawn::UseShieldItem));
+	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UsePowerItem));
+	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
+	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseShieldItem));
 }
 
-void TestPawn::RotateYaw(float value)
+void MyPlayerPawn::RotateYaw(float value)
 {
 	value *= 0.05f;
 	m_MainComponent->RotateYaw(value);
 }
 
-void TestPawn::RotatePitch(float value)
+void MyPlayerPawn::RotatePitch(float value)
 {
 	value *= 0.05f;
 	m_MainComponent->RotatePitch(value);
 }
 
-void TestPawn::MoveForward(float value)
+void MyPlayerPawn::MoveForward(float value)
 {
 	AddInputVector(m_MainComponent->GetLocalForwardVector(), value);
 }
 
-void TestPawn::MoveRight(float value)
+void MyPlayerPawn::MoveRight(float value)
 {
 	AddInputVector(m_MainComponent->GetLocalRightVector(), value);
 }
 
-void TestPawn::MoveUp(float value)
+void MyPlayerPawn::MoveUp(float value)
 {
 	AddInputVector(m_MainComponent->GetLocalUpVector(), value);
 }
 
-void TestPawn::RollRight(float value)
+void MyPlayerPawn::RollRight(float value)
 {
 	m_MainComponent->RotateRoll(-value);
 }
 
-void TestPawn::BeginFire()
+void MyPlayerPawn::BeginFire()
 {
 	CS_DEBUG_INFO("BeginFire!!");
 	m_bShouldFire = true;
 }
 
-void TestPawn::EndFire()
+void MyPlayerPawn::EndFire()
 {
 	CS_DEBUG_INFO("EndFire!!");
 	m_bShouldFire = false;
 }
 
-void TestPawn::FireMissile()
+void MyPlayerPawn::FireMissile()
 {
 	CS_DEBUG_INFO("FireMissile !!");
 
@@ -168,7 +173,7 @@ void TestPawn::FireMissile()
 	}
 }
 
-void TestPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
 	if (m_bIsInVunlnerable)
 		return;
@@ -180,13 +185,13 @@ void TestPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	}
 
 	auto staticType = actorCausedDamage->StaticType();
-	if (staticType == "TestPawn")
+	if (staticType == "MyPlayerPawn")
 	{
 		m_Health -= damage;
 	}
 }
 
-void TestPawn::OnFire()
+void MyPlayerPawn::OnFire()
 {
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
@@ -228,7 +233,7 @@ void TestPawn::OnFire()
 	}
 }
 
-void TestPawn::UpdateHealth()
+void MyPlayerPawn::UpdateHealth()
 {
 	m_Health = max(m_Health, 0);
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
@@ -242,7 +247,7 @@ void TestPawn::UpdateHealth()
 	}
 }
 
-void TestPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
+void MyPlayerPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
 {
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
 	if (!level)
@@ -267,7 +272,7 @@ void TestPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
 	}
 }
 
-void TestPawn::UsePowerItem()
+void MyPlayerPawn::UsePowerItem()
 {
 	if (!m_bHasItem[ItemType_Power])
 	{
@@ -279,7 +284,7 @@ void TestPawn::UsePowerItem()
 	m_Power += 2.0f;
 }
 
-void TestPawn::UseHealItem()
+void MyPlayerPawn::UseHealItem()
 {
 	if (!m_bHasItem[ItemType_Heal])
 	{
@@ -293,7 +298,7 @@ void TestPawn::UseHealItem()
 	UpdateHealth();
 }
 
-void TestPawn::UseShieldItem()
+void MyPlayerPawn::UseShieldItem()
 {
 	if (!m_bHasItem[ItemType_Shield])
 	{

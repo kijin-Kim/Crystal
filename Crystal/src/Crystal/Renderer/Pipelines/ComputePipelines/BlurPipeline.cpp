@@ -6,7 +6,7 @@
 #include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Resources/DescriptorAllocation.h"
-
+#include "Crystal/Renderer/Scene.h"
 namespace Crystal {
 
 

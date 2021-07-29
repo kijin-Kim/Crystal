@@ -8,6 +8,7 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
+#include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
 

@@ -71,7 +71,7 @@ namespace Crystal {
 			// Methods
 			void XM_CALLCONV Transform(_Out_ BoundingSphere& Out, _In_ FXMMATRIX M) const;
 			void XM_CALLCONV Transform(_Out_ BoundingSphere& Out, _In_ float Scale, _In_ FXMVECTOR Rotation,
-			                           _In_ FXMVECTOR Translation) const;
+				_In_ FXMVECTOR Translation) const;
 			// Transform the sphere
 
 			ContainmentType XM_CALLCONV Contains(_In_ FXMVECTOR Point) const;
@@ -96,20 +96,20 @@ namespace Crystal {
 			// Ray-sphere test
 
 			ContainmentType XM_CALLCONV ContainedBy(_In_ FXMVECTOR Plane0, _In_ FXMVECTOR Plane1, _In_ FXMVECTOR Plane2,
-			                                        _In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
-			                                        _In_ HXMVECTOR Plane5) const;
+				_In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
+				_In_ HXMVECTOR Plane5) const;
 			// Test sphere against six planes (see BoundingFrustum::GetPlanes)
 
 			// Static methods
 			static void CreateMerged(_Out_ BoundingSphere& Out, _In_ const BoundingSphere& S1,
-			                         _In_ const BoundingSphere& S2);
+				_In_ const BoundingSphere& S2);
 
 			static void CreateFromBoundingBox(_Out_ BoundingSphere& Out, _In_ const BoundingBox& box);
 			static void CreateFromBoundingBox(_Out_ BoundingSphere& Out, _In_ const BoundingOrientedBox& box);
 
 			static void CreateFromPoints(_Out_ BoundingSphere& Out, _In_ size_t Count,
-			                             _In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
-			                             pPoints, _In_ size_t Stride);
+				_In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
+				pPoints, _In_ size_t Stride);
 
 			static void CreateFromFrustum(_Out_ BoundingSphere& Out, _In_ const BoundingFrustum& fr);
 		};
@@ -143,7 +143,7 @@ namespace Crystal {
 			// Methods
 			void XM_CALLCONV Transform(_Out_ BoundingBox& Out, _In_ FXMMATRIX M) const;
 			void XM_CALLCONV Transform(_Out_ BoundingBox& Out, _In_ float Scale, _In_ FXMVECTOR Rotation,
-			                           _In_ FXMVECTOR Translation) const;
+				_In_ FXMVECTOR Translation) const;
 
 			void GetCorners(_Out_writes_(8) XMFLOAT3* Corners) const;
 			// Gets the 8 corners of the box
@@ -170,8 +170,8 @@ namespace Crystal {
 			// Ray-Box test
 
 			ContainmentType XM_CALLCONV ContainedBy(_In_ FXMVECTOR Plane0, _In_ FXMVECTOR Plane1, _In_ FXMVECTOR Plane2,
-			                                        _In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
-			                                        _In_ HXMVECTOR Plane5) const;
+				_In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
+				_In_ HXMVECTOR Plane5) const;
 			// Test box against six planes (see BoundingFrustum::GetPlanes)
 
 			// Static methods
@@ -181,8 +181,8 @@ namespace Crystal {
 
 			static void XM_CALLCONV CreateFromPoints(_Out_ BoundingBox& Out, _In_ FXMVECTOR pt1, _In_ FXMVECTOR pt2);
 			static void CreateFromPoints(_Out_ BoundingBox& Out, _In_ size_t Count,
-			                             _In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
-			                             pPoints, _In_ size_t Stride);
+				_In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
+				pPoints, _In_ size_t Stride);
 		};
 
 		//-------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ namespace Crystal {
 			BoundingOrientedBox& operator=(BoundingOrientedBox&&) = default;
 
 			XM_CONSTEXPR BoundingOrientedBox(_In_ const XMFLOAT3& _Center, _In_ const XMFLOAT3& _Extents,
-			                                 _In_ const XMFLOAT4& _Orientation)
+				_In_ const XMFLOAT4& _Orientation)
 				: Center(_Center), Extents(_Extents), Orientation(_Orientation)
 			{
 			}
@@ -216,7 +216,7 @@ namespace Crystal {
 			// Methods
 			void XM_CALLCONV Transform(_Out_ BoundingOrientedBox& Out, _In_ FXMMATRIX M) const;
 			void XM_CALLCONV Transform(_Out_ BoundingOrientedBox& Out, _In_ float Scale, _In_ FXMVECTOR Rotation,
-			                           _In_ FXMVECTOR Translation) const;
+				_In_ FXMVECTOR Translation) const;
 
 			void GetCorners(_Out_writes_(8) XMFLOAT3* Corners) const;
 			// Gets the 8 corners of the box
@@ -243,16 +243,16 @@ namespace Crystal {
 			// Ray-OrientedBox test
 
 			ContainmentType XM_CALLCONV ContainedBy(_In_ FXMVECTOR Plane0, _In_ FXMVECTOR Plane1, _In_ FXMVECTOR Plane2,
-			                                        _In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
-			                                        _In_ HXMVECTOR Plane5) const;
+				_In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
+				_In_ HXMVECTOR Plane5) const;
 			// Test OrientedBox against six planes (see BoundingFrustum::GetPlanes)
 
 			// Static methods
 			static void CreateFromBoundingBox(_Out_ BoundingOrientedBox& Out, _In_ const BoundingBox& box);
 
 			static void CreateFromPoints(_Out_ BoundingOrientedBox& Out, _In_ size_t Count,
-			                             _In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
-			                             pPoints, _In_ size_t Stride);
+				_In_reads_bytes_(sizeof(XMFLOAT3) + Stride * (Count - 1)) const XMFLOAT3*
+				pPoints, _In_ size_t Stride);
 		};
 
 		//-------------------------------------------------------------------------------------
@@ -285,12 +285,12 @@ namespace Crystal {
 			BoundingFrustum& operator=(BoundingFrustum&&) = default;
 
 			XM_CONSTEXPR BoundingFrustum(_In_ const XMFLOAT3& _Origin, _In_ const XMFLOAT4& _Orientation,
-			                             _In_ float _RightSlope, _In_ float _LeftSlope, _In_ float _TopSlope,
-			                             _In_ float _BottomSlope,
-			                             _In_ float _Near, _In_ float _Far)
+				_In_ float _RightSlope, _In_ float _LeftSlope, _In_ float _TopSlope,
+				_In_ float _BottomSlope,
+				_In_ float _Near, _In_ float _Far)
 				: Origin(_Origin), Orientation(_Orientation),
-				  RightSlope(_RightSlope), LeftSlope(_LeftSlope), TopSlope(_TopSlope), BottomSlope(_BottomSlope),
-				  Near(_Near), Far(_Far)
+				RightSlope(_RightSlope), LeftSlope(_LeftSlope), TopSlope(_TopSlope), BottomSlope(_BottomSlope),
+				Near(_Near), Far(_Far)
 			{
 			}
 
@@ -299,7 +299,7 @@ namespace Crystal {
 			// Methods
 			void XM_CALLCONV Transform(_Out_ BoundingFrustum& Out, _In_ FXMMATRIX M) const;
 			void XM_CALLCONV Transform(_Out_ BoundingFrustum& Out, _In_ float Scale, _In_ FXMVECTOR Rotation,
-			                           _In_ FXMVECTOR Translation) const;
+				_In_ FXMVECTOR Translation) const;
 
 			void GetCorners(_Out_writes_(8) XMFLOAT3* Corners) const;
 			// Gets the 8 corners of the frustum
@@ -327,13 +327,13 @@ namespace Crystal {
 			// Ray-Frustum test
 
 			ContainmentType XM_CALLCONV ContainedBy(_In_ FXMVECTOR Plane0, _In_ FXMVECTOR Plane1, _In_ FXMVECTOR Plane2,
-			                                        _In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
-			                                        _In_ HXMVECTOR Plane5) const;
+				_In_ GXMVECTOR Plane3, _In_ HXMVECTOR Plane4,
+				_In_ HXMVECTOR Plane5) const;
 			// Test frustum against six planes (see BoundingFrustum::GetPlanes)
 
 			void GetPlanes(_Out_opt_ XMVECTOR* NearPlane, _Out_opt_ XMVECTOR* FarPlane, _Out_opt_ XMVECTOR* RightPlane,
-			               _Out_opt_ XMVECTOR* LeftPlane, _Out_opt_ XMVECTOR* TopPlane,
-			               _Out_opt_ XMVECTOR* BottomPlane) const;
+				_Out_opt_ XMVECTOR* LeftPlane, _Out_opt_ XMVECTOR* TopPlane,
+				_Out_opt_ XMVECTOR* BottomPlane) const;
 			// Create 6 Planes representation of Frustum
 
 			// Static methods
@@ -345,21 +345,21 @@ namespace Crystal {
 		//-----------------------------------------------------------------------------
 		namespace TriangleTests {
 			bool XM_CALLCONV Intersects(_In_ FXMVECTOR Origin, _In_ FXMVECTOR Direction, _In_ FXMVECTOR V0,
-			                            _In_ GXMVECTOR V1, _In_ HXMVECTOR V2, _Out_ float& Dist);
+				_In_ GXMVECTOR V1, _In_ HXMVECTOR V2, _Out_ float& Dist);
 			// Ray-Triangle
 
 			bool XM_CALLCONV Intersects(_In_ FXMVECTOR A0, _In_ FXMVECTOR A1, _In_ FXMVECTOR A2, _In_ GXMVECTOR B0,
-			                            _In_ HXMVECTOR B1, _In_ HXMVECTOR B2);
+				_In_ HXMVECTOR B1, _In_ HXMVECTOR B2);
 			// Triangle-Triangle
 
 			PlaneIntersectionType XM_CALLCONV Intersects(_In_ FXMVECTOR V0, _In_ FXMVECTOR V1, _In_ FXMVECTOR V2,
-			                                             _In_ GXMVECTOR Plane);
+				_In_ GXMVECTOR Plane);
 			// Plane-Triangle
 
 			ContainmentType XM_CALLCONV ContainedBy(_In_ FXMVECTOR V0, _In_ FXMVECTOR V1, _In_ FXMVECTOR V2,
-			                                        _In_ GXMVECTOR Plane0, _In_ HXMVECTOR Plane1, _In_ HXMVECTOR Plane2,
-			                                        _In_ CXMVECTOR Plane3, _In_ CXMVECTOR Plane4,
-			                                        _In_ CXMVECTOR Plane5);
+				_In_ GXMVECTOR Plane0, _In_ HXMVECTOR Plane1, _In_ HXMVECTOR Plane2,
+				_In_ CXMVECTOR Plane3, _In_ CXMVECTOR Plane4,
+				_In_ CXMVECTOR Plane5);
 			// Test a triangle against six planes at once (see BoundingFrustum::GetPlanes)
 		}
 
@@ -373,9 +373,9 @@ namespace Crystal {
 
 #pragma warning(push)
 #pragma warning(disable : 4068 4365 4616 6001)
-		// C4068/4616: ignore unknown pragmas
-		// C4365: Off by default noise
-		// C6001: False positives
+		 // C4068/4616: ignore unknown pragmas
+		 // C4365: Off by default noise
+		 // C6001: False positives
 
 #ifdef _PREFAST_
 #pragma prefast(push)

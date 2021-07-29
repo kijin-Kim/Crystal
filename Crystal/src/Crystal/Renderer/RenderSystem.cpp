@@ -8,6 +8,7 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Resources/BasicShapeMeshes.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
+#include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Resources/Texture.h"
 #include "Pipelines/ComputePipelines/AdditveBlendingPipeline.h"
 #include "Pipelines/ComputePipelines/BlurPipeline.h"
@@ -27,6 +28,7 @@
 #include "Pipelines/RenderPipelines/TonemappingPipeline.h"
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
 #include "Pipelines/RenderPipelines/UIPipeline.h"
+#include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
 

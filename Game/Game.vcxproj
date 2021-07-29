@@ -316,11 +316,12 @@
     <ClCompile Include="src\actors\Missile.cpp" />
     <ClCompile Include="src\actors\PlayCircle.cpp" />
     <ClCompile Include="src\actors\Sun.cpp" />
-    <ClCompile Include="src\actors\TestPawn.cpp" />
+    <ClCompile Include="src\actors\MyPlayerPawn.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actors\Asteroid.h" />
+    <ClInclude Include="src\actors\CustomBTTask.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Missile.h" />
     <ClInclude Include="src\actors\KrakenAIController.h" />
@@ -330,7 +331,7 @@
     <ClInclude Include="src\actors\SpaceWhale.h" />
     <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
     <ClInclude Include="src\actors\Sun.h" />
-    <ClInclude Include="src\actors\TestPawn.h" />
+    <ClInclude Include="src\actors\MyPlayerPawn.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="assets\shaders\AdditiveBlending.hlsl">

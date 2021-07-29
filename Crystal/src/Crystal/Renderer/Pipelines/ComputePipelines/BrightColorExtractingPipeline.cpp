@@ -4,6 +4,7 @@
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
+#include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
 

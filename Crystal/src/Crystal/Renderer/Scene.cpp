@@ -1,8 +1,6 @@
 ﻿#include "cspch.h"
 #include "Scene.h"
 
-#include "Crystal/Core/Device.h"
-#include "SceneConstantBufferData.h"
 
 namespace Crystal {
 
@@ -99,6 +97,80 @@ namespace Crystal {
 			if (it->expired())
 			{
 				it = Textures.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+
+		for (auto it = AIPerceptionSources.begin(); it != AIPerceptionSources.end();)
+		{
+			if (it->expired())
+			{
+				it = AIPerceptionSources.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = AIPerceptions.begin(); it != AIPerceptions.end();)
+		{
+			if (it->expired())
+			{
+				it = AIPerceptions.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = BoundingBoxComponents.begin(); it != BoundingBoxComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = BoundingBoxComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+
+		for (auto it = BoundingOrientedBoxComponents.begin(); it != BoundingOrientedBoxComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = BoundingOrientedBoxComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = BoundingSphereComponents.begin(); it != BoundingSphereComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = BoundingSphereComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		for (auto it = RayComponents.begin(); it != RayComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = RayComponents.erase(it);
 			}
 			else
 			{
