@@ -177,6 +177,18 @@ namespace Crystal {
 				++it;
 			}
 		}
+
+		for (auto it = BoundingFrustumComponents.begin(); it != BoundingFrustumComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = BoundingFrustumComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
 
 

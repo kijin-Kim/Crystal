@@ -30,6 +30,8 @@ void MyPlayerPawn::Initialize()
 	boundingOrientedBoxComponent->SetMass(7000.0f);
 
 
+
+
 	m_MainComponent = boundingOrientedBoxComponent;
 
 

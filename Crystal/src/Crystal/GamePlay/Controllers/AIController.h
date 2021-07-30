@@ -7,7 +7,7 @@ namespace Crystal {
 	class BehaviorTree;
 	class BehaviorTreeComponent;
 	class BlackboardComponent;
-	//class AIPerceptionComponent;
+	class AIPerceptionComponent;
 
 	class AIController : public Controller
 	{
@@ -47,7 +47,7 @@ namespace Crystal {
 
 		Shared<BehaviorTreeComponent> m_BehaviorTreeComponent = nullptr;
 		Shared<BlackboardComponent> m_BlackboardComponent = nullptr;
-		//Shared<AIPerceptionComponent> m_AIPerceptionComponent = nullptr;
+		Shared<AIPerceptionComponent> m_AIPerceptionComponent = nullptr;
 		
 	};
 

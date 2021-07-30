@@ -315,6 +315,7 @@
     <ClCompile Include="src\actors\Kraken.cpp" />
     <ClCompile Include="src\actors\Missile.cpp" />
     <ClCompile Include="src\actors\PlayCircle.cpp" />
+    <ClCompile Include="src\actors\SpaceWhaleAIController.cpp" />
     <ClCompile Include="src\actors\Sun.cpp" />
     <ClCompile Include="src\actors\MyPlayerPawn.cpp" />
     <ClCompile Include="src\main.cpp" />

@@ -25,6 +25,7 @@ namespace Crystal {
 		//======================== Scene Owned Objects ======================================
 		Shared<Line> LineMesh = CreateShared<Line>();
 		Shared<LineBox> LineBoxMesh = CreateShared<LineBox>();
+		Shared<LineQuad> LineQuadMesh = CreateShared<LineQuad>();
 		Shared<LineSphere> LineSphereMesh = CreateShared<LineSphere>();
 		Shared<PlaneQuad2D> PlaneQuad2DMesh = CreateShared<PlaneQuad2D>();
 		Shared<PlaneQuad3D> PlaneQuad3DMesh = CreateShared<PlaneQuad3D>();
@@ -62,6 +63,7 @@ namespace Crystal {
 		std::vector<Weak<BoundingOrientedBoxComponent>> BoundingOrientedBoxComponents;
 		std::vector<Weak<BoundingSphereComponent>> BoundingSphereComponents;
 		std::vector<Weak<RayComponent>> RayComponents;
+		std::vector<Weak<BoundingFrustumComponent>> BoundingFrustumComponents;
 		
 		
 		std::vector<Weak<TextureComponent>> Textures;

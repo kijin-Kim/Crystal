@@ -28,15 +28,22 @@ public:
 		sphereComponent->SetRadius(804 / 2.0f);
 		sphereComponent->SetMass(800000.0f);*/
 
+		/*auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingFrustumComponent>("BoundingFrustumComponent");
+		boundingOrientedBoxComponent->SetFarWidth(1920.0f);
+		boundingOrientedBoxComponent->SetFarHeight(1080.0f);
+		boundingOrientedBoxComponent->SetNearZ(0.0f);
+		boundingOrientedBoxComponent->SetFarZ(2000.0f);*/
+
 		auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-		boundingOrientedBoxComponent->SetExtents({ 4.9f / 2.0f , 2.8f / 2.0f, 11.0f / 2.0f });
-		boundingOrientedBoxComponent->SetUnitScale(100.0f);
+		boundingOrientedBoxComponent->SetExtents({ 4.9f / 2.0f * 100.0f, 2.8f / 2.0f * 100.0f, 11.0f / 2.0f * 100.0f});
 
-
+		
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 		skeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/Biomechanical Whale Animated.fbx"));
 		skeletalMeshComponent->PlayAnimation(resourceManager.GetAnimation("assets/models/Biomechanical Whale Animated.fbx"), true);
 		skeletalMeshComponent->AddMaterial(material);
+		skeletalMeshComponent->SetUnitScale(100.0f);
+		
 		skeletalMeshComponent->RotateYaw(180.0f);
 		
 		

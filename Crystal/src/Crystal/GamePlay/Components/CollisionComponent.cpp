@@ -63,6 +63,19 @@ namespace Crystal {
 #endif
 	}
 
+	void BoundingFrustumComponent::RegisterComponent()
+	{
+		CollisionComponent::RegisterComponent();
+
+		auto owner = Cast<Actor>(GetOuter());
+		auto level = Cast<Level>(owner->GetOuter());
+		auto& scene = level->GetScene();
+
+#ifndef CS_NM_DEDICATED
+		scene->BoundingFrustumComponents.push_back(Cast<BoundingFrustumComponent>(shared_from_this()));
+#endif
+	}
+
 	void BoundingSphereComponent::RegisterComponent()
 	{
 		CollisionComponent::RegisterComponent();

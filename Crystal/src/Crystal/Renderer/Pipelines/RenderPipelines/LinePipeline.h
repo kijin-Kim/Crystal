@@ -1,8 +1,18 @@
 #pragma once
+#include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/Buffer.h"
 
+
+
 namespace Crystal {
+
+	namespace Collision {
+		class BoundingFrustum;
+	}
+
+	class BoundingFrustumComponent;
+	
 	class LinePipeline : public RenderPipeline
 	{
 	public:
@@ -27,18 +37,21 @@ namespace Crystal {
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 		void End() override;
+
 		
 
+		STATIC_TYPE_IMPLE(LinePipeline)
 	
+	private:
+		void CalculateBoundingFrustumTransform(const Collision::BoundingFrustum& frustum, const DirectX::XMFLOAT4X4& world);
+		
+	private:
+
 		struct InstanceBatch
 		{
 			std::vector<PerInstanceData> PerInstanceDatas;
 			std::unique_ptr<Buffer> PerInstanceVertexBuffer = nullptr;
 		};
-
-		STATIC_TYPE_IMPLE(LinePipeline)
-	
-	private:
 		std::map<Renderable*, InstanceBatch> m_InstanceBatches;
 	};
 }

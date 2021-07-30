@@ -176,6 +176,15 @@ namespace Crystal {
 			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
 		}
 
+		for (int i = 0; i < scene->BoundingFrustumComponents.size(); i++)
+		{
+			auto component = Cast<BoundingFrustumComponent>(scene->BoundingFrustumComponents[i]);
+			if (!component)
+				continue;
+
+			CalculateBoundingFrustumTransform(component->GetBoundingFrustum(), component->GetWorldTransform());
+		}
+
 
 		
 		for (int i = 0; i < scene->AIPerceptions.size(); i++)
@@ -184,20 +193,31 @@ namespace Crystal {
 			if (!component)
 				continue;
 
-			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetHearingSphereTransform();
-			perInstanceData.Color = Vector3::Green;
-		
-
-			Shared<Renderable> renderable = scene->LineSphereMesh;
-
-			if (!renderable)
+			if(component->GetIsHearingEnabled())
 			{
-				continue;
+				PerInstanceData perInstanceData = {};
+				perInstanceData.World = component->GetHearingSphereTransform();
+				perInstanceData.Color = Vector3::Green;
+
+
+				Shared<Renderable> renderable = scene->LineSphereMesh;
+
+				if (!renderable)
+				{
+					continue;
+				}
+
+				m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
 			}
 
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+			if(component->GetIsSightEnabled())
+			{
+				CalculateBoundingFrustumTransform(component->GetSightFrustum(), component->GetSightFrustumTransform());
+			}
+			
 		}
+
+		
 
 
 
@@ -270,5 +290,141 @@ namespace Crystal {
 	void LinePipeline::End()
 	{
 		m_InstanceBatches.clear();
+	}
+
+	void LinePipeline::CalculateBoundingFrustumTransform(const Collision::BoundingFrustum& frustum, const DirectX::XMFLOAT4X4& world)
+	{
+		DirectX::XMFLOAT3 corners[8];
+		frustum.GetCorners(corners);
+
+		auto scene = GetScene();
+
+		Shared<Renderable> renderable = scene->LineQuadMesh;
+		if (!renderable)
+		{
+			return;
+		}
+
+		float nearWidth = fabs(corners[0].x - corners[2].x);
+		float nearHeight = fabs(corners[0].y - corners[2].y);
+
+		float farWidth = fabs(corners[4].x - corners[6].x);
+		float farHeight = fabs(corners[4].y - corners[6].y);
+
+
+		PerInstanceData perInstanceData = {};
+		perInstanceData.Color = Vector3::Yellow;
+
+
+		auto nearScale = Matrix4x4::Scale({ nearWidth, nearHeight, 1.0f });
+		auto nearTranslation = Matrix4x4::Translation({ 0.0f, 0.0f, frustum.Near });
+		perInstanceData.World = Matrix4x4::Multiply(Matrix4x4::Multiply(nearScale, nearTranslation), world);
+		m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+
+
+		auto farScale = Matrix4x4::Scale({ farWidth, farHeight, 1.0f });
+		auto farTranslation = Matrix4x4::Translation({ 0.0f, 0.0f, frustum.Far });
+		perInstanceData.World = Matrix4x4::Multiply(Matrix4x4::Multiply(farScale, farTranslation), world);
+		m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+
+
+
+		renderable = scene->LineMesh;
+		if (!renderable)
+		{
+			return;
+		}
+
+		{
+			auto farNearCornerSub = Vector3::Subtract(corners[4], corners[0]);
+			const auto scaleMatrix = Matrix4x4::Scale(Vector3::Length(farNearCornerSub));
+
+
+			auto direction = Vector3::Normalize(farNearCornerSub);
+			auto rotationAxis = Vector3::Normalize(Vector3::Cross(Vector3::UnitX, direction));
+			if (Vector3::IsZero(rotationAxis))
+			{
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
+			}
+			const auto rotationAngle = acosf(Vector3::Dot(Vector3::UnitX, direction));
+			const auto quaternion = Vector4::QuaternionRotationAxis(rotationAxis, rotationAngle);
+			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quaternion);
+			DirectX::XMFLOAT4X4 scaleRotation = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+
+
+
+			scaleRotation = Matrix4x4::Multiply(scaleRotation, Matrix4x4::Translation(corners[0]));
+			perInstanceData.World = Matrix4x4::Multiply(scaleRotation, world);
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+		{
+			auto farNearCornerSub = Vector3::Subtract(corners[5], corners[1]);
+			const auto scaleMatrix = Matrix4x4::Scale(Vector3::Length(farNearCornerSub));
+
+
+			auto direction = Vector3::Normalize(farNearCornerSub);
+			auto rotationAxis = Vector3::Normalize(Vector3::Cross(Vector3::UnitX, direction));
+			if (Vector3::IsZero(rotationAxis))
+			{
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
+			}
+			const auto rotationAngle = acosf(Vector3::Dot(Vector3::UnitX, direction));
+			const auto quaternion = Vector4::QuaternionRotationAxis(rotationAxis, rotationAngle);
+			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quaternion);
+			DirectX::XMFLOAT4X4 scaleRotation = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+
+
+
+			scaleRotation = Matrix4x4::Multiply(scaleRotation, Matrix4x4::Translation(corners[1]));
+			perInstanceData.World = Matrix4x4::Multiply(scaleRotation, world);
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+		{
+			auto farNearCornerSub = Vector3::Subtract(corners[6], corners[2]);
+			const auto scaleMatrix = Matrix4x4::Scale(Vector3::Length(farNearCornerSub));
+
+
+			auto direction = Vector3::Normalize(farNearCornerSub);
+			auto rotationAxis = Vector3::Normalize(Vector3::Cross(Vector3::UnitX, direction));
+			if (Vector3::IsZero(rotationAxis))
+			{
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
+			}
+			const auto rotationAngle = acosf(Vector3::Dot(Vector3::UnitX, direction));
+			const auto quaternion = Vector4::QuaternionRotationAxis(rotationAxis, rotationAngle);
+			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quaternion);
+			DirectX::XMFLOAT4X4 scaleRotation = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+
+
+
+			scaleRotation = Matrix4x4::Multiply(scaleRotation, Matrix4x4::Translation(corners[2]));
+			perInstanceData.World = Matrix4x4::Multiply(scaleRotation, world);
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
+
+		{
+			auto farNearCornerSub = Vector3::Subtract(corners[7], corners[3]);
+			const auto scaleMatrix = Matrix4x4::Scale(Vector3::Length(farNearCornerSub));
+
+
+			auto direction = Vector3::Normalize(farNearCornerSub);
+			auto rotationAxis = Vector3::Normalize(Vector3::Cross(Vector3::UnitX, direction));
+			if (Vector3::IsZero(rotationAxis))
+			{
+				rotationAxis = { 0.0f, 0.0f, -1.0f };
+			}
+			const auto rotationAngle = acosf(Vector3::Dot(Vector3::UnitX, direction));
+			const auto quaternion = Vector4::QuaternionRotationAxis(rotationAxis, rotationAngle);
+			const auto rotationMatrix = Matrix4x4::RotationQuaternion(quaternion);
+			DirectX::XMFLOAT4X4 scaleRotation = Matrix4x4::Multiply(scaleMatrix, rotationMatrix);
+
+
+
+			scaleRotation = Matrix4x4::Multiply(scaleRotation, Matrix4x4::Translation(corners[3]));
+			perInstanceData.World = Matrix4x4::Multiply(scaleRotation, world);
+			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+		}
 	}
 }

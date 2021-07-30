@@ -8,6 +8,8 @@ public:
 	SpaceWhaleAIController() = default;
 	~SpaceWhaleAIController() override = default;
 
+	void Initialize() override;
+
 
 	STATIC_TYPE_IMPLE(SpaceWhaleAIController)
 };
