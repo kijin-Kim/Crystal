@@ -108,7 +108,7 @@ namespace Crystal {
 
 
 		DirectX::XMFLOAT3 m_Velocity = Vector3::Zero;
-		float m_InverseMass = 1 / 10.0f;
+		float m_InverseMass = 1.0f;
 
 
 		DirectX::XMFLOAT3 m_Right = Vector3::UnitX;

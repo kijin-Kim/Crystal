@@ -63,6 +63,7 @@ public:
 			lightComponent->SetLightIntensity(3.0f);
 			lightComponent->RotatePitch(90.0f);
 			lightComponent->SetCastShadow(true);
+			
 
 			auto sunMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(sun2->GetComponentByClass("StaticMeshComponent"));
 			auto sunMat2 = sunMesh2->GetMaterial(0);
@@ -70,15 +71,16 @@ public:
 		}
 
 
-		if (false)
+		if (true)
 		{
 			for (int i = 0; i < 50; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
+				//asteroid->SetPosition(Crystal::Vector3::Zero);
 			}
 
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -114,7 +116,7 @@ public:
 			krakenController->Possess(kraken);
 		}
 
-		if(true)
+		if(false)
 		{
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
 			//spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
@@ -151,21 +153,27 @@ public:
 			sequenceNode->AddChildNode(clearValueNode);
 			
 			
+
+			
+			
+			
+
+			
+			
 			
 			selectorNode->AddChildNode(sequenceNode);
 			rootNode->AddChildNode(selectorNode);
 			
 
-
+			
 			//spaceWhaleController->SetBehaviorTree(behaviorTree);
-		
 			
 		}
 
 
 		{
 			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
-			playerStart->SetPosition({0.0f, 0.0f, 0.0f});
+			playerStart->SetPosition({0.0f, 0.0f, -1000.0f});
 			auto playerStart2 = m_World->SpawnActor<Crystal::PlayerStartActor>({"2"}).lock();
 			playerStart2->SetPosition({0.0f, 0.0f, -4000.0f});
 			auto playerStart3 = m_World->SpawnActor<Crystal::PlayerStartActor>({"3"}).lock();

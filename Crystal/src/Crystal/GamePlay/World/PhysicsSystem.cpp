@@ -14,77 +14,78 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
-#if 0
-		// Bounding Sphere
-		for (const auto& lhsWeak : m_BoundingSphereComponents)
+#if 1
+
+		auto scene = GetScene();
+
+		for (int i = 0; i < scene->BoundingSphereComponents.size() - 1; i++)
 		{
-			auto sphereCompLhs = Cast<BoundingSphereComponent>(lhsWeak);
+			auto sphereCompLhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[i]);
+
 			if (!sphereCompLhs)
 				continue;
 
+			
 			auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
+			
 
+			auto collisionTypeLhs = sphereCompLhs->GetCollisionType();
+			
+			
 			// Bounding Sphere
-			for (const auto& rhsWeak : m_BoundingSphereComponents)
+			for (int j = i + 1; j < scene->BoundingSphereComponents.size(); j++)
 			{
-				auto sphereCompRhs = Cast<BoundingSphereComponent>(rhsWeak);
+				auto sphereCompRhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[j]);
 				if (!sphereCompRhs)
 					continue;
 
-				if (sphereCompLhs == sphereCompRhs)
-					continue;
-
-
 				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
 
-
-				auto collisionTypeLhs = sphereCompLhs->GetCollisionType();
 				auto collisionTypeRhs = sphereCompRhs->GetCollisionType();
-				
+
 
 				float totalDist = 0.0f;
 				if (sphereLhs.Intersects(sphereRhs, totalDist))
 				{
-					if(collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
+
+					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
 					{
 						ResolveCollision(sphereCompLhs, sphereCompRhs, totalDist);
 						HitResult hitResult = {};
 						hitResult.HitActor = Cast<Actor>(sphereCompRhs->GetOuter());
 						sphereCompLhs->OnHit(hitResult);
-					}
-					
-					
-					switch (collisionTypeLhs)
-					{
-					case ECollisionType::CT_Block:
-						break;
-					case ECollisionType::CT_Overlap:
-						if(!sphereCompLhs->GetIsOverlapped())
-						{
-							sphereCompLhs->SetIsOverlapped(true);
-							// OnBeginOverlapped
-						}
-						break;
-					}
-
-					if(collisionTypeLhs == ECollisionType::CT_Overlap || collisionTypeRhs == ECollisionType::CT_Overlap)
-					{
 						continue;
 					}
+					
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && !sphereCompLhs->IsOverlappedWith(sphereCompRhs))
+					{
+						// OnBeginOverlap
+						sphereCompLhs->OnBeginOverlap(sphereCompRhs);	
+					}
 
-				
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && !sphereCompRhs->IsOverlappedWith(sphereCompLhs))
+					{
+						// OnBeginOverlap
+						sphereCompRhs->OnBeginOverlap(sphereCompLhs);
+					}
+					
 				}
 				else
 				{
-					if(sphereCompLhs->GetIsOverlapped())
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && sphereCompLhs->IsOverlappedWith(sphereCompRhs))
 					{
-						// OnEndOverlapped
-						sphereCompLhs->SetIsOverlapped(false);
+						// OnBeginOverlap
+						sphereCompLhs->OnEndOverlap(sphereCompRhs);
+					}
+
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && sphereCompRhs->IsOverlappedWith(sphereCompLhs))
+					{
+						// OnBeginOverlap
+						sphereCompRhs->OnEndOverlap(sphereCompLhs);
 					}
 				}
 			}
 		}
-
 
 #endif
 	}
@@ -131,10 +132,10 @@ namespace Crystal {
 	}
 
 	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
-		const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	                                       const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
-			rhsComponent->GetWorldPosition()));
+		                                                          rhsComponent->GetWorldPosition()));
 
 		float totalInverseMass = lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass();
 		if (totalInverseMass <= 0)
@@ -151,7 +152,8 @@ namespace Crystal {
 		rhsComponent->SetLocalPosition(Vector3::Add(rhsComponent->GetLocalPosition(), rhsDist));
 	}
 
-	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const CollisionParams& collisionParams)
+	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+	                                    const CollisionParams& collisionParams)
 	{
 		// Bounding Sphere
 
@@ -160,17 +162,15 @@ namespace Crystal {
 
 
 		auto scene = GetScene();
-		
+
 		for (const auto& lhsWeak : scene->BoundingSphereComponents)
 		{
-	
-			
 			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
 			if (!sphereComplhs)
 				continue;
 
 			auto ownerActor = Cast<Actor>(sphereComplhs->GetOuter());
-			if(collisionParams.ShouldBeIgnored(ownerActor))
+			if (collisionParams.ShouldBeIgnored(ownerActor))
 			{
 				continue;
 			}
@@ -178,10 +178,9 @@ namespace Crystal {
 			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
 
 
-			
 			DirectX::XMVECTOR originVector = DirectX::XMLoadFloat3(&origin);
 			DirectX::XMVECTOR directionVector = DirectX::XMLoadFloat3(&direction);
-			
+
 			bool currentResult = sphereLhs.Intersects(originVector, directionVector, dist);
 			if (currentResult && dist < nearest)
 			{
@@ -191,17 +190,15 @@ namespace Crystal {
 
 
 			result |= currentResult;
-			
 		}
 
 		return result;
-		
 	}
 
 	const Shared<Scene>& PhysicsSystem::GetScene()
 	{
 		auto level = Cast<Level>(GetOuter());
-		if(level)
+		if (level)
 		{
 			return level->GetScene();
 		}

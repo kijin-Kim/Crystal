@@ -29,6 +29,7 @@ namespace Crystal {
 
 		~CollisionComponent() override = default;
 
+		void Update(const float deltaTime) override;
 
 		void SetLineColor(const DirectX::XMFLOAT3& color)
 		{
@@ -47,8 +48,18 @@ namespace Crystal {
 		void SetCollisionEnabled(bool bEnable) { m_bCollisionEnabled = bEnable; }
 		bool IsCollisionEnabled() const override { return m_bCollisionEnabled; }
 
-		virtual void OnHit(const struct HitResult& hitResult);
+
+		void SetCollisionType(ECollisionType type) { m_CollisionType = type; }
+		ECollisionType GetCollisionType() const { return m_CollisionType; }
+
+		void OnHit(const struct HitResult& hitResult);
 		void BindOnHitEvent(const std::function<void(const struct HitResult&)>& event);
+
+		void OnBeginOverlap(const Weak<CollisionComponent>& overlappedComponent);
+		void OnEndOverlap(const Weak<CollisionComponent>& overlappedComponent);
+		bool IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent);
+
+		const std::vector <Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
 
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
@@ -57,7 +68,11 @@ namespace Crystal {
 
 	private:
 		bool m_bCollisionEnabled = true;
+
+		std::vector <Weak<CollisionComponent>> m_OverlappedComponents;
+		
 		std::function<void(const struct HitResult&)> m_OnHitEvent;
+		ECollisionType m_CollisionType = ECollisionType::CT_Block;
 	};
 
 	class RayComponent : public CollisionComponent

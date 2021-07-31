@@ -24,6 +24,8 @@ public:
 
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		boundingSphereComponent->SetRadius(40.0f);
+		boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
+		
 
 		m_MainComponent = boundingSphereComponent;
 
@@ -83,7 +85,7 @@ public:
 		m_MainComponent->RotatePitch(rand() % 360);
 		m_MainComponent->RotateYaw(rand() % 360);
 		m_MainComponent->SetUnitScale(randomScale);
-		m_MainComponent->SetMass(5000.0f * randomScale);
+		m_MainComponent->SetMass(500.0f * randomScale);
 	}
 
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override

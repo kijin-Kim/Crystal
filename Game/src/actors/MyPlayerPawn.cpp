@@ -12,10 +12,24 @@ void MyPlayerPawn::Initialize()
 {
 	Pawn::Initialize();
 
-	//auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	//sphereComponent->SetRadius(50.0f);
-	//sphereComponent->SetMass(7000.0f);
-	//sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	sphereComponent->SetRadius(50.0f);
+	sphereComponent->SetMass(7000.0f);
+	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	{
+		if (m_bIsInVunlnerable)
+			return;
+
+		m_Health -= 1;
+		UpdateHealth();
+	});
+
+
+	//auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+	//boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
+	//boundingOrientedBoxComponent->SetMass(7000.0f);
+	//boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	//{
 	//	if (m_bIsInVunlnerable)
 	//		return;
@@ -24,15 +38,7 @@ void MyPlayerPawn::Initialize()
 	//	UpdateHealth();
 	//});
 
-
-	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({ 90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
-	boundingOrientedBoxComponent->SetMass(7000.0f);
-
-
-
-
-	m_MainComponent = boundingOrientedBoxComponent;
+	m_MainComponent = sphereComponent;
 
 
 	auto& resourceManager = Crystal::ResourceManager::Instance();
@@ -44,16 +50,13 @@ void MyPlayerPawn::Initialize()
 	material->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
 	material->ShadingModel = Crystal::EShadingModel::SM_Lit;
 	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
-	
-	
+
+
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
 	staticMeshComponent->AddMaterial(material);
 	staticMeshComponent->AttachTo(m_MainComponent);
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
 
-	
-
-	
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
@@ -89,7 +92,6 @@ void MyPlayerPawn::Update(const float deltaTime)
 		m_FireTimer.Reset();
 		OnFire();
 	}
-
 }
 
 void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)

@@ -10,10 +10,27 @@ BOOST_CLASS_EXPORT(Crystal::CollisionComponent)
 
 namespace Crystal {
 
-	
+
+	void CollisionComponent::Update(const float deltaTime)
+	{
+		PrimitiveComponent::Update(deltaTime);
+
+		for (auto it = m_OverlappedComponents.begin(); it != m_OverlappedComponents.end();)
+		{
+			if (it->expired())
+			{
+				it = m_OverlappedComponents.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
 	void CollisionComponent::OnHit(const HitResult& hitResult)
 	{
-		if(m_OnHitEvent)
+		if (m_OnHitEvent)
 		{
 			m_OnHitEvent(hitResult);
 		}
@@ -23,6 +40,63 @@ namespace Crystal {
 	{
 		m_OnHitEvent = event;
 	}
+
+	void CollisionComponent::OnBeginOverlap(const Weak<CollisionComponent>& overlappedComponent)
+	{
+		CS_DEBUG_INFO("Begin Overlap");
+		m_OverlappedComponents.push_back(overlappedComponent);
+	}
+
+	void CollisionComponent::OnEndOverlap(const Weak<CollisionComponent>& overlappedComponent)
+	{
+		CS_DEBUG_INFO("End Overlap");
+		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlappedComponent](const Weak<CollisionComponent>& other)
+		{
+			auto overlapped = overlappedComponent.lock();
+			if (!overlapped)
+			{
+				return false;
+			}
+
+			auto otherOverlapped = other.lock();
+			if (!otherOverlapped)
+			{
+				return false;
+			}
+
+			return overlapped == otherOverlapped;
+		});
+
+		if (it != m_OverlappedComponents.end())
+		{
+			// Avoid erase copy
+			std::swap(*it, m_OverlappedComponents.back());
+			m_OverlappedComponents.erase(m_OverlappedComponents.end() - 1);
+		}
+	}
+
+	bool CollisionComponent::IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent)
+	{
+		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlappedComponent](const Weak<CollisionComponent>& other)
+		{
+			auto overlapped = overlappedComponent.lock();
+			if (!overlapped)
+			{
+				return false;
+			}
+
+			auto otherOverlapped = other.lock();
+			if (!otherOverlapped)
+			{
+				return false;
+			}
+
+			return overlapped == otherOverlapped;
+		});
+
+		return it != m_OverlappedComponents.end();
+	}
+
 
 	void RayComponent::RegisterComponent()
 	{
