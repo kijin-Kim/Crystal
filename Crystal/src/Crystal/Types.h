@@ -1,10 +1,13 @@
 #pragma once
 #include <boost/container_hash/hash.hpp>
+#include "Core/Core.h"
 
-#include "GamePlay/Objects/Actors/Actor.h"
 
 namespace Crystal {
 
+	class Actor;
+	class CollisionComponent;
+	
 
 	enum class EShadingModel
 	{
@@ -44,6 +47,13 @@ namespace Crystal {
 	struct HitResult
 	{
 		Weak<Actor> HitActor = {};
+		Weak<CollisionComponent> HitComponent = {};
+	};
+
+	struct OverlapResult
+	{
+		Weak<Actor> OverlappedActor = {};
+		Weak<CollisionComponent> OverlappedComponent = {};
 	};
 
 	struct CollisionParams

@@ -13,7 +13,7 @@ void MyPlayerPawn::Initialize()
 	Pawn::Initialize();
 
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	sphereComponent->SetRadius(50.0f);
 	sphereComponent->SetMass(7000.0f);
 	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)

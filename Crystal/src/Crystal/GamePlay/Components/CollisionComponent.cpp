@@ -41,18 +41,23 @@ namespace Crystal {
 		m_OnHitEvent = event;
 	}
 
-	void CollisionComponent::OnBeginOverlap(const Weak<CollisionComponent>& overlappedComponent)
+	void CollisionComponent::OnBeginOverlap(const OverlapResult& overlapResult)
 	{
 		CS_DEBUG_INFO("Begin Overlap");
-		m_OverlappedComponents.push_back(overlappedComponent);
+		m_OverlappedComponents.push_back(overlapResult.OverlappedComponent);
 	}
 
-	void CollisionComponent::OnEndOverlap(const Weak<CollisionComponent>& overlappedComponent)
+	void CollisionComponent::BindOnBeginOverlapEvent(const std::function<void(const OverlapResult&)>& event)
+	{
+		m_OnBeginOverlapEvent = event;
+	}
+
+	void CollisionComponent::OnEndOverlap(const OverlapResult& overlapResult)
 	{
 		CS_DEBUG_INFO("End Overlap");
-		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlappedComponent](const Weak<CollisionComponent>& other)
+		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlapResult](const Weak<CollisionComponent>& other)
 		{
-			auto overlapped = overlappedComponent.lock();
+			auto overlapped = overlapResult.OverlappedComponent.lock();
 			if (!overlapped)
 			{
 				return false;
@@ -73,6 +78,11 @@ namespace Crystal {
 			std::swap(*it, m_OverlappedComponents.back());
 			m_OverlappedComponents.erase(m_OverlappedComponents.end() - 1);
 		}
+	}
+
+	void CollisionComponent::BindOnEndOverlapEvent(const std::function<void(const OverlapResult&)>& event)
+	{
+		m_OnEndOverlapEvent = event;
 	}
 
 	bool CollisionComponent::IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent)

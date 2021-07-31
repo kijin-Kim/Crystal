@@ -47,26 +47,40 @@ namespace Crystal {
 				float totalDist = 0.0f;
 				if (sphereLhs.Intersects(sphereRhs, totalDist))
 				{
-
-					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
-					{
-						ResolveCollision(sphereCompLhs, sphereCompRhs, totalDist);
-						HitResult hitResult = {};
-						hitResult.HitActor = Cast<Actor>(sphereCompRhs->GetOuter());
-						sphereCompLhs->OnHit(hitResult);
-						continue;
-					}
 					
 					if (collisionTypeLhs == ECollisionType::CT_Overlap && !sphereCompLhs->IsOverlappedWith(sphereCompRhs))
 					{
 						// OnBeginOverlap
-						sphereCompLhs->OnBeginOverlap(sphereCompRhs);	
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompRhs->GetOuter());
+						overlappedResult.OverlappedComponent = sphereCompRhs;
+						
+						sphereCompLhs->OnBeginOverlap(overlappedResult);
 					}
 
 					if (collisionTypeRhs == ECollisionType::CT_Overlap && !sphereCompRhs->IsOverlappedWith(sphereCompLhs))
 					{
 						// OnBeginOverlap
-						sphereCompRhs->OnBeginOverlap(sphereCompLhs);
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompLhs->GetOuter());
+						overlappedResult.OverlappedComponent = sphereCompLhs;
+						
+						sphereCompRhs->OnBeginOverlap(overlappedResult);
+					}
+
+					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
+					{
+						ResolveCollision(sphereCompLhs, sphereCompRhs, totalDist);
+						
+						HitResult hitResultLhs = {};
+						hitResultLhs.HitActor = Cast<Actor>(sphereCompRhs->GetOuter());
+						hitResultLhs.HitComponent = sphereCompRhs;
+						sphereCompLhs->OnHit(hitResultLhs);
+
+						HitResult hitResultRhs = {};
+						hitResultRhs.HitActor = Cast<Actor>(sphereCompLhs->GetOuter());
+						hitResultRhs.HitComponent = sphereCompLhs;
+						sphereCompRhs->OnHit(hitResultRhs);
 					}
 					
 				}
@@ -74,14 +88,22 @@ namespace Crystal {
 				{
 					if (collisionTypeLhs == ECollisionType::CT_Overlap && sphereCompLhs->IsOverlappedWith(sphereCompRhs))
 					{
-						// OnBeginOverlap
-						sphereCompLhs->OnEndOverlap(sphereCompRhs);
+						// OnEndOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompRhs->GetOuter());
+						overlappedResult.OverlappedComponent = sphereCompRhs;
+						
+						sphereCompLhs->OnEndOverlap(overlappedResult);
 					}
 
 					if (collisionTypeRhs == ECollisionType::CT_Overlap && sphereCompRhs->IsOverlappedWith(sphereCompLhs))
 					{
-						// OnBeginOverlap
-						sphereCompRhs->OnEndOverlap(sphereCompLhs);
+						// OnEndOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompLhs->GetOuter());
+						overlappedResult.OverlappedComponent = sphereCompLhs;
+						
+						sphereCompRhs->OnEndOverlap(overlappedResult);
 					}
 				}
 			}

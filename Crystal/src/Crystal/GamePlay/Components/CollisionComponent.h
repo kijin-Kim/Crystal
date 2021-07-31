@@ -55,8 +55,12 @@ namespace Crystal {
 		void OnHit(const struct HitResult& hitResult);
 		void BindOnHitEvent(const std::function<void(const struct HitResult&)>& event);
 
-		void OnBeginOverlap(const Weak<CollisionComponent>& overlappedComponent);
-		void OnEndOverlap(const Weak<CollisionComponent>& overlappedComponent);
+		void OnBeginOverlap(const OverlapResult& overlapResult);
+		void BindOnBeginOverlapEvent(const std::function<void(const struct OverlapResult&)>& event);
+
+		void OnEndOverlap(const OverlapResult& overlapResult);
+		void BindOnEndOverlapEvent(const std::function<void(const struct OverlapResult&)>& event);
+
 		bool IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent);
 
 		const std::vector <Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
@@ -72,6 +76,11 @@ namespace Crystal {
 		std::vector <Weak<CollisionComponent>> m_OverlappedComponents;
 		
 		std::function<void(const struct HitResult&)> m_OnHitEvent;
+
+		std::function<void(const struct OverlapResult&)> m_OnBeginOverlapEvent;
+		std::function<void(const struct OverlapResult&)> m_OnEndOverlapEvent;
+
+		
 		ECollisionType m_CollisionType = ECollisionType::CT_Block;
 	};
 
