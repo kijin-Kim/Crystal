@@ -24,19 +24,20 @@ public:
 		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 
 
-		auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-		sphereComponent->SetRadius(804 / 2.0f);
-		sphereComponent->SetMass(800000.0f);
+		//auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		//sphereComponent->SetRadius(804 / 2.0f);
+		//sphereComponent->SetMass(800000.0f);
 
-		/*auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingFrustumComponent>("BoundingFrustumComponent");
-		boundingOrientedBoxComponent->SetFarWidth(1920.0f);
-		boundingOrientedBoxComponent->SetFarHeight(1080.0f);
-		boundingOrientedBoxComponent->SetNearZ(0.0f);
-		boundingOrientedBoxComponent->SetFarZ(2000.0f);*/
+		//auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingFrustumComponent>("BoundingFrustumComponent");
+		//boundingOrientedBoxComponent->SetFarWidth(1920.0f);
+		//boundingOrientedBoxComponent->SetFarHeight(1080.0f);
+		//boundingOrientedBoxComponent->SetNearZ(0.0f);
+		//boundingOrientedBoxComponent->SetFarZ(2000.0f);
 
 
-		/*auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-		boundingOrientedBoxComponent->SetExtents({ 4.9f / 2.0f * 100.0f, 2.8f / 2.0f * 100.0f, 11.0f / 2.0f * 100.0f});*/
+		auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+		boundingOrientedBoxComponent->SetExtents({ 4.9f / 2.0f * 100.0f, 2.8f / 2.0f * 100.0f, 11.0f / 2.0f * 100.0f});
+		boundingOrientedBoxComponent->SetMass(800000.0f);
 
 		
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
@@ -48,7 +49,7 @@ public:
 		skeletalMeshComponent->RotateYaw(180.0f);
 		
 		
-		m_MainComponent = sphereComponent;
+		m_MainComponent = boundingOrientedBoxComponent;
 
 		skeletalMeshComponent->AttachTo(m_MainComponent);
 	}
@@ -61,7 +62,9 @@ public:
 	
 		auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(m_Controller);
 		
-		spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("TargetLocation", { -5000.0f , 0.0f, 5000.0f });
+		//spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("TargetLocation", { -5000.0f , 0.0f, 5000.0f });
+		spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("TargetLocation", Crystal::Vector3::Zero);
+		
 		
 
 	}

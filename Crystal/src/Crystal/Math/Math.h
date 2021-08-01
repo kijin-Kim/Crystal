@@ -9,7 +9,15 @@
 
 namespace Crystal {
 
-	
+	inline bool Equal(float num1, float num2)
+	{
+		return fabs(num1 - num2) < MACHINE_EPSILON;
+	}
+
+	inline bool Equal(float num1, float num2, float epsilon)
+	{
+		return fabs(num1 - num2) < epsilon;
+	}
 
 	
 	inline float RandomFloatInRange(float min, float max)
@@ -43,6 +51,8 @@ namespace Crystal {
 		static const DirectX::XMFLOAT3 Cyan = {0.0f, 1.0f, 1.0f};
 		static const DirectX::XMFLOAT3 Magenta = {1.0f, 0.0f, 1.0f};
 		static const DirectX::XMFLOAT3 Yellow = {1.0f, 1.0f, 0.0f};
+
+		
 		
 
 
@@ -71,6 +81,14 @@ namespace Crystal {
 			position.z = r * cos(phi);
 			
 			return position;			
+		}
+
+		inline DirectX::XMFLOAT3 Negate(const DirectX::XMFLOAT3& v1)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorNegate(XMLoadFloat3(&v1));
+			XMStoreFloat3(&result, newVector);
+			return result;
 		}
 
 		inline DirectX::XMFLOAT3 Add(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2)

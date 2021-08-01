@@ -81,10 +81,15 @@ namespace Crystal {
 			ContainmentType Contains(_In_ const BoundingOrientedBox& box) const;
 			ContainmentType Contains(_In_ const BoundingFrustum& fr) const;
 
-			bool Intersects(_In_ const BoundingSphere& sh, _Out_ float& distance) const;
+			bool Intersects(_In_ const BoundingSphere& sh) const;
+			bool Intersects(_In_ const BoundingSphere& sh, _Out_ XMVECTOR& contactNormal,  _Out_ float& distance) const;
 			bool Intersects(_In_ const BoundingBox& box) const;
+	
 			bool Intersects(_In_ const BoundingOrientedBox& box) const;
+			bool Intersects(_In_ const BoundingOrientedBox& box, _Out_ XMVECTOR& contactNormal, _Out_ float& distance) const;
 			bool Intersects(_In_ const BoundingFrustum& fr) const;
+
+			
 
 			bool XM_CALLCONV Intersects(_In_ FXMVECTOR V0, _In_ FXMVECTOR V1, _In_ FXMVECTOR V2) const;
 			// Triangle-sphere test
@@ -229,8 +234,10 @@ namespace Crystal {
 			ContainmentType Contains(_In_ const BoundingFrustum& fr) const;
 
 			bool Intersects(_In_ const BoundingSphere& sh) const;
+			bool Intersects(_In_ const BoundingSphere& sh, _Out_ XMVECTOR& contactNormal, _Out_ float& distance) const;
 			bool Intersects(_In_ const BoundingBox& box) const;
 			bool Intersects(_In_ const BoundingOrientedBox& box) const;
+			bool Intersects(_In_ const BoundingOrientedBox& box, _Out_ XMVECTOR& contactNormal, _Out_ float& distance) const;
 			bool Intersects(_In_ const BoundingFrustum& fr) const;
 
 			bool XM_CALLCONV Intersects(_In_ FXMVECTOR V0, _In_ FXMVECTOR V1, _In_ FXMVECTOR V2) const;

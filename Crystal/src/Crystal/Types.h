@@ -48,6 +48,7 @@ namespace Crystal {
 	{
 		Weak<Actor> HitActor = {};
 		Weak<CollisionComponent> HitComponent = {};
+		DirectX::XMFLOAT3 Impulse = { 0.0f, 0.0f, 0.0f };
 	};
 
 	struct OverlapResult

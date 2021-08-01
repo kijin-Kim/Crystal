@@ -45,6 +45,11 @@ namespace Crystal {
 	{
 		CS_DEBUG_INFO("Begin Overlap");
 		m_OverlappedComponents.push_back(overlapResult.OverlappedComponent);
+
+		if(m_OnBeginOverlapEvent)
+		{
+			m_OnBeginOverlapEvent(overlapResult);
+		}
 	}
 
 	void CollisionComponent::BindOnBeginOverlapEvent(const std::function<void(const OverlapResult&)>& event)
@@ -77,6 +82,12 @@ namespace Crystal {
 			// Avoid erase copy
 			std::swap(*it, m_OverlappedComponents.back());
 			m_OverlappedComponents.erase(m_OverlappedComponents.end() - 1);
+		}
+
+
+		if (m_OnEndOverlapEvent)
+		{
+			m_OnEndOverlapEvent(overlapResult);
 		}
 	}
 
@@ -121,17 +132,11 @@ namespace Crystal {
 #endif
 	}
 
-	void BoundingBoxComponent::RegisterComponent()
+	BoundingOrientedBoxComponent::BoundingOrientedBoxComponent()
 	{
-		CollisionComponent::RegisterComponent();
-
-		auto owner = Cast<Actor>(GetOuter());
-		auto level = Cast<Level>(owner->GetOuter());
-		auto& scene = level->GetScene();
-
-#ifndef CS_NM_DEDICATED
-		scene->BoundingBoxComponents.push_back(Cast<BoundingBoxComponent>(shared_from_this()));
-#endif
+		m_BoundingOrientedBox.Center = Vector3::Zero;
+		m_BoundingOrientedBox.Extents = Vector3::Zero;
+		m_BoundingOrientedBox.Orientation = Vector4::Quaternion::Identity;
 	}
 
 	void BoundingOrientedBoxComponent::RegisterComponent()

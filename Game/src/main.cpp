@@ -73,11 +73,11 @@ public:
 
 		if (true)
 		{
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 1; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
-				//asteroid->SetPosition(Crystal::Vector3::Zero);
+				//asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
+				asteroid->SetPosition(Crystal::Vector3::Zero);
 			}
 
 			for (int i = 0; i < 0; i++)
@@ -119,7 +119,6 @@ public:
 		if(false)
 		{
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
-			//spaceWhale->SetPosition({ 5000.0f, 5000.0f, 5000.0f });
 			spaceWhale->SetPosition({ 2000.0f, 0.0f, 0.0f });
 			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
 			spaceWhaleController->Possess(spaceWhale);
@@ -154,19 +153,13 @@ public:
 			
 			
 
-			
-			
-			
-
-			
-			
-			
+		
 			selectorNode->AddChildNode(sequenceNode);
 			rootNode->AddChildNode(selectorNode);
 			
 
 			
-			//spaceWhaleController->SetBehaviorTree(behaviorTree);
+			spaceWhaleController->SetBehaviorTree(behaviorTree);
 			
 		}
 

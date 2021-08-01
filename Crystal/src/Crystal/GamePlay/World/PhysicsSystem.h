@@ -8,7 +8,6 @@ namespace Crystal {
 	class PhysicsSystem : public Object
 	{
 	public:
-	
 	public:
 		PhysicsSystem() = default;
 		~PhysicsSystem() override = default;
@@ -16,7 +15,8 @@ namespace Crystal {
 		void Update(const float deltaTime) override;
 
 
-		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const struct CollisionParams& collisionParams);
+		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+		                     const struct CollisionParams& collisionParams);
 
 
 		const Shared<Scene>& GetScene();
@@ -24,13 +24,15 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PhysicsSystem)
 	private:
-		void ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent,
-			const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration);
 
 		void ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent,
-			const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration);
+		                     const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& impulse);
 
 		void ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
-			const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration);
+		                        const std::shared_ptr<CollisionComponent>& rhsComponent, 
+			float penetration);
+
+		const DirectX::XMFLOAT3& CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
+			const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal);
 	};
 }

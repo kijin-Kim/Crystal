@@ -22,8 +22,13 @@ public:
 		material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 		material->ShadingModel = Crystal::EShadingModel::SM_Lit;
 
-		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+		/*auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 		boundingSphereComponent->SetRadius(40.0f);
+		boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);*/
+
+
+		auto boundingSphereComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+		boundingSphereComponent->SetExtents({ 50.0f, 50.0f, 50.0f });
 		boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 		
 
@@ -34,9 +39,11 @@ public:
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 		staticMeshComponent->AddMaterial(material);
 		staticMeshComponent->AttachTo(m_MainComponent);
+		staticMeshComponent->SetUnitScale(1.0f);
 
 
 		int randomNumber = rand() % 6;
+		randomNumber = 0;
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 		switch (randomNumber)
 		{
@@ -44,7 +51,8 @@ public:
 			material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_A.tga");
 			material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_R.tga");
 			material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_6_N.tga");
-			staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_6.fbx"));
+			//staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_6.fbx"));
+			staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/1M_Cube.fbx"));
 			break;
 		case 1:
 			material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid/AstOre_7_A.tga");
@@ -80,6 +88,7 @@ public:
 
 
 		auto randomScale = rand() % 5 + 1;
+		randomScale = 4;
 
 		m_MainComponent->RotateRoll(rand() % 360);
 		m_MainComponent->RotatePitch(rand() % 360);

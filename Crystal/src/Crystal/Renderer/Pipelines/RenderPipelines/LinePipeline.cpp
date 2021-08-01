@@ -71,41 +71,6 @@ namespace Crystal {
 			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
 		}
 
-		for (int i = 0; i < scene->BoundingBoxComponents.size(); i++)
-		{
-			auto component = scene->BoundingBoxComponents[i].lock();
-			if (!component)
-				continue;
-
-			if (component->GetHideInGame())
-			{
-				continue;
-			}
-
-			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetPostScaledTransform();
-
-
-			auto& materials = component->GetMaterials();
-			for (const auto& mat : materials)
-			{
-				auto material = mat.get();
-				perInstanceData.Color = material->AlbedoColor;
-
-			}
-
-
-			Shared<Renderable> renderable = scene->LineBoxMesh;
-
-			if (!renderable)
-			{
-				continue;
-			}
-
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-		}
-
-
 		for (int i = 0; i < scene->BoundingSphereComponents.size(); i++)
 		{
 			auto component = scene->BoundingSphereComponents[i].lock();

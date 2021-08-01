@@ -134,47 +134,10 @@ namespace Crystal {
 		float m_MaxDistance = 1.0f;
 	};
 
-	class BoundingBoxComponent : public CollisionComponent
-	{
-	public:
-		BoundingBoxComponent() = default;
-		~BoundingBoxComponent() override = default;
-
-		void RegisterComponent() override;
-
-
-		void Update(const float deltaTime) override
-		{
-			CollisionComponent::Update(deltaTime);
-
-			// Caculate Post Transform
-			DirectX::XMFLOAT4X4 postTransform = Matrix4x4::Scale(Vector3::Multiply(
-				m_BoundingBox.Extents, {2.0f, 2.0f, 2.0f}));
-			postTransform = Matrix4x4::Multiply(postTransform, Matrix4x4::Translation(m_BoundingBox.Center));
-			m_PostScaledTransform = Matrix4x4::Multiply(postTransform, m_WorldTransform);
-		}
-
-		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingBox.Center = center; }
-		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingBox.Extents = extent; }
-
-		Collision::BoundingBox GetWorldBoundingBox()
-		{
-			Collision::BoundingBox worldBoundingBox = {};
-			m_BoundingBox.Transform(worldBoundingBox, XMLoadFloat4x4(&m_WorldTransform));
-			return worldBoundingBox;
-		}
-
-
-		STATIC_TYPE_IMPLE(BoundingBoxComponent)
-
-	private:
-		Collision::BoundingBox m_BoundingBox = {};
-	};
-
 	class BoundingOrientedBoxComponent : public CollisionComponent
 	{
 	public:
-		BoundingOrientedBoxComponent() = default;
+		BoundingOrientedBoxComponent();
 		~BoundingOrientedBoxComponent() override = default;
 
 		void RegisterComponent() override;

@@ -59,7 +59,6 @@ namespace Crystal {
 		std::vector<Weak<SkeletalMeshComponent>> SkeletalMeshes;
 		std::vector<Weak<ParticleComponent>> Particles;
 
-		std::vector<Weak<BoundingBoxComponent>> BoundingBoxComponents;
 		std::vector<Weak<BoundingOrientedBoxComponent>> BoundingOrientedBoxComponents;
 		std::vector<Weak<BoundingSphereComponent>> BoundingSphereComponents;
 		std::vector<Weak<RayComponent>> RayComponents;

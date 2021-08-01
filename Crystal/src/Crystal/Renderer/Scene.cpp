@@ -129,17 +129,6 @@ namespace Crystal {
 			}
 		}
 
-		for (auto it = BoundingBoxComponents.begin(); it != BoundingBoxComponents.end();)
-		{
-			if (it->expired())
-			{
-				it = BoundingBoxComponents.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
 
 
 		for (auto it = BoundingOrientedBoxComponents.begin(); it != BoundingOrientedBoxComponents.end();)

@@ -18,133 +18,330 @@ namespace Crystal {
 
 		auto scene = GetScene();
 
-		for (int i = 0; i < scene->BoundingSphereComponents.size() - 1; i++)
+		// -------------------------------------------------------------------------
+		// Sphere vs. Sphere
+		// -------------------------------------------------------------------------
+
+		if (!scene->BoundingSphereComponents.empty())
 		{
-			auto sphereCompLhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[i]);
-
-			if (!sphereCompLhs)
-				continue;
-
-			
-			auto sphereLhs = sphereCompLhs->GetWorldBoundingSphere();
-			
-
-			auto collisionTypeLhs = sphereCompLhs->GetCollisionType();
-			
-			
-			// Bounding Sphere
-			for (int j = i + 1; j < scene->BoundingSphereComponents.size(); j++)
+			for (int i = 0; i < scene->BoundingSphereComponents.size() - 1; i++)
 			{
-				auto sphereCompRhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[j]);
-				if (!sphereCompRhs)
+				auto collisionCompLhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[i]);
+
+				if (!collisionCompLhs)
 					continue;
 
-				auto sphereRhs = sphereCompRhs->GetWorldBoundingSphere();
-
-				auto collisionTypeRhs = sphereCompRhs->GetCollisionType();
+				auto collisionLhs = collisionCompLhs->GetWorldBoundingSphere();
 
 
-				float totalDist = 0.0f;
-				if (sphereLhs.Intersects(sphereRhs, totalDist))
+				auto collisionTypeLhs = collisionCompLhs->GetCollisionType();
+
+
+				// Bounding Sphere
+				for (int j = i + 1; j < scene->BoundingSphereComponents.size(); j++)
 				{
-					
-					if (collisionTypeLhs == ECollisionType::CT_Overlap && !sphereCompLhs->IsOverlappedWith(sphereCompRhs))
-					{
-						// OnBeginOverlap
-						OverlapResult overlappedResult = {};
-						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompRhs->GetOuter());
-						overlappedResult.OverlappedComponent = sphereCompRhs;
-						
-						sphereCompLhs->OnBeginOverlap(overlappedResult);
-					}
+					auto collisionCompRhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[j]);
+					if (!collisionCompRhs)
+						continue;
 
-					if (collisionTypeRhs == ECollisionType::CT_Overlap && !sphereCompRhs->IsOverlappedWith(sphereCompLhs))
-					{
-						// OnBeginOverlap
-						OverlapResult overlappedResult = {};
-						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompLhs->GetOuter());
-						overlappedResult.OverlappedComponent = sphereCompLhs;
-						
-						sphereCompRhs->OnBeginOverlap(overlappedResult);
-					}
+					auto collisionRhs = collisionCompRhs->GetWorldBoundingSphere();
 
-					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
-					{
-						ResolveCollision(sphereCompLhs, sphereCompRhs, totalDist);
-						
-						HitResult hitResultLhs = {};
-						hitResultLhs.HitActor = Cast<Actor>(sphereCompRhs->GetOuter());
-						hitResultLhs.HitComponent = sphereCompRhs;
-						sphereCompLhs->OnHit(hitResultLhs);
+					auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
 
-						HitResult hitResultRhs = {};
-						hitResultRhs.HitActor = Cast<Actor>(sphereCompLhs->GetOuter());
-						hitResultRhs.HitComponent = sphereCompLhs;
-						sphereCompRhs->OnHit(hitResultRhs);
-					}
-					
-				}
-				else
-				{
-					if (collisionTypeLhs == ECollisionType::CT_Overlap && sphereCompLhs->IsOverlappedWith(sphereCompRhs))
-					{
-						// OnEndOverlap
-						OverlapResult overlappedResult = {};
-						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompRhs->GetOuter());
-						overlappedResult.OverlappedComponent = sphereCompRhs;
-						
-						sphereCompLhs->OnEndOverlap(overlappedResult);
-					}
 
-					if (collisionTypeRhs == ECollisionType::CT_Overlap && sphereCompRhs->IsOverlappedWith(sphereCompLhs))
+					float totalDist = 0.0f;
+					DirectX::XMVECTOR contactNormalVector;
+					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
 					{
-						// OnEndOverlap
-						OverlapResult overlappedResult = {};
-						overlappedResult.OverlappedActor = Cast<Actor>(sphereCompLhs->GetOuter());
-						overlappedResult.OverlappedComponent = sphereCompLhs;
-						
-						sphereCompRhs->OnEndOverlap(overlappedResult);
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompRhs;
+
+							collisionCompLhs->OnBeginOverlap(overlappedResult);
+						}
+
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompLhs;
+
+							collisionCompRhs->OnBeginOverlap(overlappedResult);
+						}
+
+						if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
+						{
+							DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
+							DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
+
+							auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
+							ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
+							ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+
+							HitResult hitResultLhs = {};
+							hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							hitResultLhs.HitComponent = collisionCompRhs;
+							hitResultLhs.Impulse = impulse;
+							collisionCompLhs->OnHit(hitResultLhs);
+
+							HitResult hitResultRhs = {};
+							hitResultRhs.HitActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							hitResultRhs.HitComponent = collisionCompLhs;
+							hitResultRhs.Impulse = impulse;
+							collisionCompRhs->OnHit(hitResultRhs);
+						}
+					}
+					else
+					{
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompRhs;
+
+							collisionCompLhs->OnEndOverlap(overlappedResult);
+						}
+
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompLhs;
+
+							collisionCompRhs->OnEndOverlap(overlappedResult);
+						}
 					}
 				}
 			}
 		}
 
+
+		// -------------------------------------------------------------------------
+		// Sphere vs. Oriented Box
+		// -------------------------------------------------------------------------
+
+		for (int i = 0; i < scene->BoundingSphereComponents.size(); i++)
+		{
+			auto collisionCompLhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[i]);
+
+			if (!collisionCompLhs)
+				continue;
+
+			auto collisionLhs = collisionCompLhs->GetWorldBoundingSphere();
+
+
+			auto collisionTypeLhs = collisionCompLhs->GetCollisionType();
+
+
+			// Bounding Sphere
+			for (int j = 0; j < scene->BoundingOrientedBoxComponents.size(); j++)
+			{
+				auto collisionCompRhs = Cast<BoundingOrientedBoxComponent>(scene->BoundingOrientedBoxComponents[j]);
+				if (!collisionCompRhs)
+					continue;
+
+				auto collisionRhs = collisionCompRhs->GetWorldBoundingOrientedBox();
+
+				auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
+
+				float totalDist = 0.0f;
+				DirectX::XMVECTOR contactNormalVector;
+
+				if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
+				{
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+					{
+						// OnBeginOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+						overlappedResult.OverlappedComponent = collisionCompRhs;
+
+						collisionCompLhs->OnBeginOverlap(overlappedResult);
+					}
+
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+					{
+						// OnBeginOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+						overlappedResult.OverlappedComponent = collisionCompLhs;
+
+						collisionCompRhs->OnBeginOverlap(overlappedResult);
+					}
+
+					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
+					{
+						DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
+						DirectX::XMStoreFloat3(&contactNormal, DirectX::XMVectorNegate(contactNormalVector));
+
+						auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
+						ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
+						ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+
+						HitResult hitResultLhs = {};
+						hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
+						hitResultLhs.HitComponent = collisionCompRhs;
+						hitResultLhs.Impulse = impulse;
+						collisionCompLhs->OnHit(hitResultLhs);
+
+						HitResult hitResultRhs = {};
+						hitResultRhs.HitActor = Cast<Actor>(collisionCompLhs->GetOuter());
+						hitResultRhs.HitComponent = collisionCompLhs;
+						hitResultRhs.Impulse = impulse;
+						collisionCompRhs->OnHit(hitResultRhs);
+					}
+				}
+				else
+				{
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+					{
+						// OnEndOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+						overlappedResult.OverlappedComponent = collisionCompRhs;
+
+						collisionCompLhs->OnEndOverlap(overlappedResult);
+					}
+
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+					{
+						// OnEndOverlap
+						OverlapResult overlappedResult = {};
+						overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+						overlappedResult.OverlappedComponent = collisionCompLhs;
+
+						collisionCompRhs->OnEndOverlap(overlappedResult);
+					}
+				}
+			}
+		}
+
+
+		// -------------------------------------------------------------------------
+		// Oriented Box vs. Oriented Box
+		// -------------------------------------------------------------------------
+	
+		if (!scene->BoundingOrientedBoxComponents.empty())
+		{
+			for (int i = 0; i < scene->BoundingOrientedBoxComponents.size() - 1; i++)
+			{
+				auto collisionCompLhs = Cast<BoundingOrientedBoxComponent>(scene->BoundingOrientedBoxComponents[i]);
+
+				if (!collisionCompLhs)
+					continue;
+
+				auto collisionLhs = collisionCompLhs->GetWorldBoundingOrientedBox();
+
+
+				auto collisionTypeLhs = collisionCompLhs->GetCollisionType();
+
+
+				// Bounding Sphere
+				for (int j = i + 1; j < scene->BoundingOrientedBoxComponents.size(); j++)
+				{
+					auto collisionCompRhs = Cast<BoundingOrientedBoxComponent>(scene->BoundingOrientedBoxComponents[j]);
+					if (!collisionCompRhs)
+						continue;
+
+					auto collisionRhs = collisionCompRhs->GetWorldBoundingOrientedBox();
+
+					auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
+
+
+					float totalDist = 0.0f;
+					DirectX::XMVECTOR contactNormalVector;
+					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
+					{
+						
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompRhs;
+
+							collisionCompLhs->OnBeginOverlap(overlappedResult);
+						}
+
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompLhs;
+
+							collisionCompRhs->OnBeginOverlap(overlappedResult);
+						}
+
+						if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
+						{
+							DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
+
+							DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
+							CS_DEBUG_INFO("Vector Length : %f", Vector3::Length(contactNormal));
+							auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
+							ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
+							ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+
+							HitResult hitResultLhs = {};
+							hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							hitResultLhs.HitComponent = collisionCompRhs;
+							hitResultLhs.Impulse = impulse;
+							collisionCompLhs->OnHit(hitResultLhs);
+
+							HitResult hitResultRhs = {};
+							hitResultRhs.HitActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							hitResultRhs.HitComponent = collisionCompLhs;
+							hitResultRhs.Impulse = impulse;
+							collisionCompRhs->OnHit(hitResultRhs);
+						}
+					}
+					else
+					{
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompRhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompRhs;
+
+							collisionCompLhs->OnEndOverlap(overlappedResult);
+						}
+
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = Cast<Actor>(collisionCompLhs->GetOuter());
+							overlappedResult.OverlappedComponent = collisionCompLhs;
+
+							collisionCompRhs->OnEndOverlap(overlappedResult);
+						}
+					}
+				}
+			}
+		}
 #endif
 	}
 
 
-	void PhysicsSystem::ResolveCollision(const std::shared_ptr<CollisionComponent>& lhsComponent,
-	                                     const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
-	{
-		ResolveVelocity(lhsComponent, rhsComponent, penetration);
-		ResolvePenetration(lhsComponent, rhsComponent, penetration);
-	}
-
 	void PhysicsSystem::ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent,
-	                                    const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	                                    const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& impulse)
 	{
-		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
-		                                                          rhsComponent->GetWorldPosition()));
-
-		float totalInverseMass = lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass();
-		if (totalInverseMass <= 0)
+		if (Vector3::Equal(impulse, Vector3::Zero))
+		{
 			return;
-
-		//========== Resolve velocity =================================
-		auto relativeVelocity = Vector3::Subtract(lhsComponent->GetVelocity(), rhsComponent->GetVelocity());
-		auto seperatingVelocity = Vector3::Dot(relativeVelocity, contactNormal);
-		if (seperatingVelocity > 0)
-			return;
-
-		// 분리속도, 충격량
-		const float restitution = 1.0f;
-		float newSepVelocity = -seperatingVelocity * restitution; // 충돌후 분리속도 = -충돌전 분리속도 * 반발계수
-		float deltaVelocity = newSepVelocity - seperatingVelocity; // 속도 변화량
+		}
 
 
-		float impulse = deltaVelocity / totalInverseMass; // 충격량
+		auto impulsePerIMass = Vector3::Divide(impulse, lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass());
 
-		auto impulsePerIMass = Vector3::Multiply(contactNormal, impulse); // InverseMass 당 impulse
 
 		lhsComponent->SetVelocity(Vector3::Add(lhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
 		                                                                                      lhsComponent->GetInverseMass())));
@@ -172,6 +369,24 @@ namespace Crystal {
 
 		lhsComponent->SetLocalPosition(Vector3::Add(lhsComponent->GetLocalPosition(), lhsDist));
 		rhsComponent->SetLocalPosition(Vector3::Add(rhsComponent->GetLocalPosition(), rhsDist));
+	}
+
+	const DirectX::XMFLOAT3& PhysicsSystem::CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
+	                                                         const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal)
+	{
+		//========== Resolve velocity =================================
+		auto relativeVelocity = Vector3::Subtract(lhsComponent->GetVelocity(), rhsComponent->GetVelocity());
+		auto seperatingVelocity = Vector3::Dot(relativeVelocity, contactNormal);
+		if (seperatingVelocity > 0)
+			return Vector3::Zero;
+
+		// 분리속도, 충격량
+		const float restitution = 2.0f;
+		float newSepVelocity = -seperatingVelocity * restitution; // 충돌후 분리속도 = -충돌전 분리속도 * 반발계수
+		float deltaVelocity = newSepVelocity - seperatingVelocity; // 속도 변화량
+
+
+		return Vector3::Multiply(contactNormal, deltaVelocity);
 	}
 
 	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,

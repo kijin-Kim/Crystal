@@ -18,15 +18,17 @@ namespace Crystal {
 		SetLocalPosition(position);
 
 		float inverseMass = GetInverseMass();
-		auto accelertion = Vector3::Multiply(m_ForceAccum, inverseMass);
+		auto acceleration = Vector3::Multiply(m_ForceAccum, inverseMass);
 
-		velocity = Vector3::Add(velocity, Vector3::Multiply(accelertion, deltaTime));
+		velocity = Vector3::Add(velocity, Vector3::Multiply(acceleration, deltaTime));
 
 		// Drag
 		const float damping = 0.3f;
 		velocity = Vector3::Multiply(velocity, pow(damping, deltaTime));
 		SetVelocity(velocity);
 
+
+		m_LastForceAccum = m_ForceAccum;
 		m_ForceAccum = Vector3::Zero;
 	}
 

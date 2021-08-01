@@ -91,6 +91,7 @@ namespace Crystal {
 		bool IsCollisionEnabled() const override;
 
 		void AddForce(const DirectX::XMFLOAT3& force) { m_ForceAccum = Vector3::Add(m_ForceAccum, force); }
+		const DirectX::XMFLOAT3& GetLastForceAccum() const { return m_LastForceAccum; }
 
 		STATIC_TYPE_IMPLE(TransformComponent)
 
@@ -117,6 +118,7 @@ namespace Crystal {
 
 		
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
+		DirectX::XMFLOAT3 m_LastForceAccum = Vector3::Zero;
 
 
 	};

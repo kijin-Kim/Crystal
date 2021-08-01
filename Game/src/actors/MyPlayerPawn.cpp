@@ -12,7 +12,7 @@ void MyPlayerPawn::Initialize()
 {
 	Pawn::Initialize();
 
-	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+	/*auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
 	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	sphereComponent->SetRadius(50.0f);
 	sphereComponent->SetMass(7000.0f);
@@ -23,22 +23,22 @@ void MyPlayerPawn::Initialize()
 
 		m_Health -= 1;
 		UpdateHealth();
+	});*/
+
+
+	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
+	boundingOrientedBoxComponent->SetMass(7000.0f);
+	boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	{
+		if (m_bIsInVunlnerable)
+			return;
+
+		m_Health -= 1;
+		UpdateHealth();
 	});
 
-
-	//auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	//boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
-	//boundingOrientedBoxComponent->SetMass(7000.0f);
-	//boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
-	//{
-	//	if (m_bIsInVunlnerable)
-	//		return;
-
-	//	m_Health -= 1;
-	//	UpdateHealth();
-	//});
-
-	m_MainComponent = sphereComponent;
+	m_MainComponent = boundingOrientedBoxComponent;
 
 
 	auto& resourceManager = Crystal::ResourceManager::Instance();

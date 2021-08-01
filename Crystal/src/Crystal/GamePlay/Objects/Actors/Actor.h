@@ -76,6 +76,7 @@ namespace Crystal {
 		std::weak_ptr<Component> GetComponentByName(const std::string& name);
 		std::weak_ptr<Component> GetComponentByClass(const std::string& classType);
 
+
 		void SetIsDead(bool bIsDead) { m_bIsDead = bIsDead; }
 		bool GetIsDead() const { return m_bIsDead; }
 		void Destroy() { m_bIsDead = true; }
@@ -106,5 +107,6 @@ namespace Crystal {
 
 		bool m_bIsDead = false;
 	};
+
 
 }
