@@ -26,7 +26,7 @@ public:
 
 		auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 		boundingOrientedBoxComponent->SetExtents({ 4.9f / 2.0f * 100.0f, 2.8f / 2.0f * 100.0f, 11.0f / 2.0f * 100.0f});
-		boundingOrientedBoxComponent->SetMass(800000.0f);
+		boundingOrientedBoxComponent->SetMass(80000.0f);
 
 		
 		auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");

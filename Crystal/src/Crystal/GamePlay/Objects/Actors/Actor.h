@@ -70,7 +70,15 @@ namespace Crystal {
 		void SetRotationQuat(const DirectX::XMFLOAT4& rotation);
 		DirectX::XMFLOAT4 GetRotationQuat() const;
 
+		
+		DirectX::XMFLOAT3 GetForwardVector() const;
+
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
+
+
+		void RotatePitch(float angle);
+		void RotateYaw(float angle);
+		void RotateRoll(float angle);
 
 		void AddForce(const DirectX::XMFLOAT3& force);
 

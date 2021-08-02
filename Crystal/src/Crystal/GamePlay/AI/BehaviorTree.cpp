@@ -92,7 +92,10 @@ namespace Crystal {
 		{
 			bool result = dec->Execute();
 			if (!result)
+			{
 				return false;
+			}
+				
 		}
 
 		return true;

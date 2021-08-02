@@ -9,7 +9,7 @@ void SpaceWhaleAIController::Initialize()
 	Crystal::AIController::Initialize();
 
 	m_AIPerceptionComponent->SetIsHearingEnabled(true);
-	m_AIPerceptionComponent->SetHearingRange(1000.0f);
+	m_AIPerceptionComponent->SetHearingRange(4000.0f);
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
 	m_AIPerceptionComponent->SetSightRange(5000.0f);
@@ -28,6 +28,17 @@ void SpaceWhaleAIController::Begin()
 		}
 		
 		CS_DEBUG_INFO("Find Noise");
+
+		auto instigator = noiseStimulus.Instigator.lock();
+		if (!instigator)
+		{
+			return;
+		}
+
+		if (instigator->StaticType() == "MyPlayerPawn")
+		{
+			m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", noiseStimulus.Position);
+		}
 	});
 
 	m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
@@ -47,7 +58,7 @@ void SpaceWhaleAIController::Begin()
 
 		if (instigator->StaticType() == "MyPlayerPawn")
 		{
-			m_BlackboardComponent->SetValueAsFloat3("TargetLocation", sightStimulus.Position);
+			m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", sightStimulus.Position);
 		}
 	});
 }

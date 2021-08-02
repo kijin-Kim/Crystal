@@ -15,6 +15,7 @@
 
 #include <sstream>
 
+#include "actors/CustomBTTask.h"
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
 #include "actors/KrakenAIController.h"
@@ -124,37 +125,86 @@ public:
 			
 			
 			auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
+			
 			auto rootNode = behaviorTree->GetRootNode();
-
-
 			auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
+			//rootNode->AddChildNode(selectorNode);
 			
 			
-			auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("Sequence");
-			auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
-			blackboardBasedDecorator->BlackboardKey = "TargetLocation";
-			blackboardBasedDecorator->bIsSet = true;
-			sequenceNode->AddDecorator(blackboardBasedDecorator);
+			//// MoveToLastSeen
+			//{
+			//	auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToLastSeen");
+			//	auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+			//	blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
+			//	blackboardBasedDecorator->bIsSet = true;
+			//	sequenceNode->AddDecorator(blackboardBasedDecorator);
 
-			auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("FaceLocation");
-			faceLocationNode->TargetLocationKey = "TargetLocation";
-			sequenceNode->AddChildNode(faceLocationNode);
+			//	auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
+			//	faceLocationNode->TargetLocationKey = "PlayerLocation";
+			//	faceLocationNode->TargetAngleTolerance = 10.0f;
+			//	sequenceNode->AddChildNode(faceLocationNode);
 
-			auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("MoveToLocation");
-			moveToLocationNode->TargetLocationKey = "TargetLocation";
-			moveToLocationNode->AcceptableRadius = 120.0f;
-			moveToLocationNode->MaxAcceleration = 300000000.0f;
-			sequenceNode->AddChildNode(moveToLocationNode);
+			//	auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
+			//	moveToLocationNode->TargetLocationKey = "PlayerLocation";
+			//	moveToLocationNode->AcceptableRadius = 120.0f;
+			//	moveToLocationNode->MaxAcceleration = 30000000.0f;
+			//	sequenceNode->AddChildNode(moveToLocationNode);
 
-			auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("ClearBlackboardValue");
-			clearValueNode->BlackboardKey = "TargetLocation";
-			sequenceNode->AddChildNode(clearValueNode);
+			//	auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
+			//	clearValueNode->BlackboardKey = "PlayerLocation";
+			//	sequenceNode->AddChildNode(clearValueNode);
+
+			//	
+			//	selectorNode->AddChildNode(sequenceNode);
+			//}
+
+
+			// MoveToLastSeen
+			{
+				auto sequenceNode = Crystal::CreateObject<Crystal::BTSelectorNode>("SequenceMoveToLastSeen");
+				auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+				blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
+				blackboardBasedDecorator->bIsSet = true;
+				sequenceNode->AddDecorator(blackboardBasedDecorator);
+
+				auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
+				faceLocationNode->TargetLocationKey = "PlayerLocation";
+				faceLocationNode->TargetAngleTolerance = 10.0f;
+				sequenceNode->AddChildNode(faceLocationNode);
+
+				auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
+				moveToLocationNode->TargetLocationKey = "PlayerLocation";
+				moveToLocationNode->AcceptableRadius = 120.0f;
+				moveToLocationNode->MaxAcceleration = 30000000.0f;
+				sequenceNode->AddChildNode(moveToLocationNode);
+
+				auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
+				clearValueNode->BlackboardKey = "PlayerLocation";
+				sequenceNode->AddChildNode(clearValueNode);
+
+
+				rootNode->AddChildNode(sequenceNode);
+			}
+
 			
-			
 
-		
-			selectorNode->AddChildNode(sequenceNode);
-			rootNode->AddChildNode(selectorNode);
+			// Keep Orbit
+			if(false)
+			{
+				auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
+
+				auto setTargetDirectionNode = Crystal::CreateObject<BTTaskNodeSetTargetDirection>("TaskSetTargetDirection");
+				setTargetDirectionNode->TargetDirectionKey = "TargetDirection";
+				sequenceNode->AddChildNode(setTargetDirectionNode);
+
+				auto moveTowardDirectionNode = Crystal::CreateObject<BTTaskNodeMoveTowardDirection>("TaskMoveTowardDirection");
+				moveTowardDirectionNode->TargetDirectionKey = "TargetDirection";
+				moveTowardDirectionNode->MaxAcceleration = 30000000.0f;
+				sequenceNode->AddChildNode(moveTowardDirectionNode);
+								
+				selectorNode->AddChildNode(sequenceNode);				
+			}
+			
 			
 
 			

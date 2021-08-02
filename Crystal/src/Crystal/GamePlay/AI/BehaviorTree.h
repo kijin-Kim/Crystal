@@ -13,7 +13,7 @@ namespace Crystal {
 	class BehaviorTree;
 	class BlackboardComponent;
 
-	
+
 	class BTNode : public Object
 	{
 	public:
@@ -22,7 +22,7 @@ namespace Crystal {
 
 		void SetParentNode(Weak<BTNode> parentNode) { m_ParentNode = parentNode; }
 		void AddDecorator(const Shared<Decorator>& decorator);
-		
+
 		Weak<BTNode> GetParentNode() const { return m_ParentNode; }
 		Weak<BTCompositeNode> GetRootNode();
 		Weak<BehaviorTree> GetBehaviorTree();
@@ -30,14 +30,36 @@ namespace Crystal {
 		Weak<AIController> GetAIController();
 		Weak<Pawn> GetPossessedPawn();
 		Weak<BlackboardComponent> GetBlackboardComponent();
-		
 
-		virtual bool Execute(float deltaTime)
+
+		virtual void Execute(float deltaTime)
 		{
-			return false;
+			
 		}
 
 		bool ExecuteDecorators() const;
+
+		void FinishExecute(bool bResult)
+		{
+			m_bIsExecutionFinished = true;
+			m_bExecutionResult = bResult;
+		}
+
+		void ClearExecutionFlags()
+		{
+			m_bIsExecutionFinished = false;
+			m_bExecutionResult = false;
+		}
+
+		bool GetExecutionResult() const
+		{
+			return m_bExecutionResult;
+		}
+
+		bool GetIsExecutionFinished() const
+		{
+			return m_bIsExecutionFinished;
+		}
 
 
 		STATIC_TYPE_IMPLE(BTNode)
@@ -45,8 +67,10 @@ namespace Crystal {
 	protected:
 		Weak<BTNode> m_ParentNode;
 		std::vector<Shared<Decorator>> m_Decorators;
+		bool m_bExecutionResult;
+		bool m_bIsExecutionFinished = false;
 	};
-	
+
 	class BTCompositeNode : public BTNode
 	{
 	public:
@@ -59,26 +83,15 @@ namespace Crystal {
 			childNode->SetParentNode(Cast<BTNode>(weak_from_this()));
 		}
 
-		virtual bool Execute(float deltaTime)
+		void Execute(float deltaTime) override
 		{
-			
-
-			bool result = ExecuteDecorators();
-			if(!result)
+			if(!m_ChildNodes.empty())
 			{
-				return false;
+				m_ChildNodes[0]->Execute(deltaTime);
 			}
-
-			for (auto& childNode : m_ChildNodes)
-			{
-				childNode->Execute(deltaTime);
-			}
-
-			
-			return true;
 		}
-		
-	
+
+
 		STATIC_TYPE_IMPLE(BTCompositeNode)
 
 	protected:
@@ -91,26 +104,32 @@ namespace Crystal {
 		BTSelectorNode() = default;
 		~BTSelectorNode() override = default;
 
-		bool Execute(float deltaTime) override
+		void Execute(float deltaTime) override
 		{
-			
-
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				bool result = childNode->Execute(deltaTime);
-				if(result)
+				childNode->Execute(deltaTime);
+				if(childNode->GetIsExecutionFinished())
 				{
-					return true;
+					bool bExecutionResult = childNode->GetExecutionResult();
+					childNode->ClearExecutionFlags();
+					if(bExecutionResult)
+					{
+						FinishExecute(true);
+						return;
+					}
 				}
 			}
 			// if all node failed
-			return false;
+			FinishExecute(false);
+			return;
 		}
 
 		STATIC_TYPE_IMPLE(BTSelectorNode)
@@ -122,26 +141,36 @@ namespace Crystal {
 		BTSequenceNode() = default;
 		~BTSequenceNode() override = default;
 
-		bool Execute(float deltaTime) override
+		void Execute(float deltaTime) override
 		{
-			
-
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				bool result = childNode->Execute(deltaTime);
-				if (!result)
+				childNode->Execute(deltaTime);
+				if (childNode->GetIsExecutionFinished())
 				{
-					return false;
+					bool bExecutionResult = childNode->GetExecutionResult();
+					childNode->ClearExecutionFlags();
+					if (!bExecutionResult)
+					{
+						FinishExecute(false);
+						return;
+					}
+				}
+				else
+				{
+					return;
 				}
 			}
 			// if all node succeed
-			return true;
+			FinishExecute(true);
+			return;
 		}
 
 		STATIC_TYPE_IMPLE(BTSequenceNode)
@@ -153,7 +182,7 @@ namespace Crystal {
 		BTTaskNode() = default;
 		~BTTaskNode() override = default;
 
-	
+
 		STATIC_TYPE_IMPLE(BTTaskNode)
 	};
 
@@ -163,35 +192,31 @@ namespace Crystal {
 		BTTaskNodeMoveToLocation() = default;
 		~BTTaskNodeMoveToLocation() override = default;
 
-		
-		bool Execute(float deltaTime) override
-		{
-			
 
+		void Execute(float deltaTime) override
+		{
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
-			
+
 
 			if (TargetLocationKey.empty())
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 			auto possessedPawn = GetPossessedPawn().lock();
 			if (!possessedPawn)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 
-			if(bArrivedAtTargetLocation)
-			{
-				return true;
-			}
-				
 			auto blackBoard = GetBlackboardComponent().lock();
 			auto targetLocation = blackBoard->GetValueAsFloat3(TargetLocationKey);
 
@@ -200,28 +225,25 @@ namespace Crystal {
 			float lengthSq = Vector3::LengthSquared(distance);
 			float acceptableRadiusSq = AcceptableRadius * AcceptableRadius;
 
-			
+
 			if (lengthSq <= acceptableRadiusSq)
 			{
-				bArrivedAtTargetLocation = true;
-				return true;
+				FinishExecute(true);
+				return;
 			}
 
 			auto direction = Vector3::Normalize(distance);
 
 			possessedPawn->AddForce(Vector3::Multiply(direction, MaxAcceleration));
-
-			return false;
 		}
-		
+
 		STATIC_TYPE_IMPLE(BTTaskNodeMoveToLocation)
 
 	public:
 		float AcceptableRadius = 0.0f;
 		float MaxAcceleration = 0.0f;
 		std::string TargetLocationKey;
-		
-		bool bArrivedAtTargetLocation = false;
+
 	};
 
 
@@ -232,34 +254,36 @@ namespace Crystal {
 		~BTTaskNodeFaceLocation() override = default;
 
 
-		bool Execute(float deltaTime) override
-		{		
-			
-
+		void Execute(float deltaTime) override
+		{
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
-			
+
 			if (TargetLocationKey.empty())
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 			auto possessedPawn = GetPossessedPawn().lock();
 			if (!possessedPawn)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
 
 			auto mainComponent = possessedPawn->GetMainComponent().lock();
 			if (!mainComponent)
 			{
-				return false;
+				FinishExecute(false);
+				return;
 			}
-			
+
 
 			auto blackBoard = GetBlackboardComponent().lock();
 			auto targetLocation = blackBoard->GetValueAsFloat3(TargetLocationKey);
@@ -271,24 +295,31 @@ namespace Crystal {
 
 			if (Vector3::IsZero(rotationAxis) || Vector3::Equal(normalizedForward, newFacing, 0.001f))
 			{
-				return true;
+				FinishExecute(true);
+				return;
 			}
 
 			auto angle = Vector3::AngleBetweenNormals(normalizedForward, newFacing);
+			if (fabs(angle) < DirectX::XMConvertToRadians(TargetAngleTolerance))
+			{
+				FinishExecute(true);
+				return;
+			}
+
+
 			auto quat = Vector4::QuaternionRotationAxis(rotationAxis, angle);
 
 			auto rotation = mainComponent->GetRotationQuat();
 			auto newQuat = Vector4::QuaternionMultiply(rotation, quat);
 			mainComponent->SetRotationQuat(newQuat);
-
-			return false;
 		}
 
 		STATIC_TYPE_IMPLE(BTTaskNodeFaceLocation)
 
-	
+
 	public:
 		std::string TargetLocationKey;
+		float TargetAngleTolerance = 0.0f;
 	};
 
 	class BTTaskNodeClearBlackboardValue : public BTTaskNode
@@ -297,22 +328,20 @@ namespace Crystal {
 		BTTaskNodeClearBlackboardValue() = default;
 		~BTTaskNodeClearBlackboardValue() override = default;
 
-		bool Execute(float deltaTime) override
+		void Execute(float deltaTime) override
 		{
 			auto blackboard = GetBlackboardComponent().lock();
 			blackboard->ClearValue(BlackboardKey);
 
-			return true;
+			FinishExecute(true);
 		}
-		
+
 
 		STATIC_TYPE_IMPLE(BTTaskNodeClearBlackboardValue)
 
 	public:
 		std::string BlackboardKey;
-		
 	};
-
 
 
 	class BehaviorTree : public Object
@@ -340,7 +369,6 @@ namespace Crystal {
 
 	private:
 		Shared<BTCompositeNode> m_RootNode = nullptr;
-
 	};
 
 	class BehaviorTreeComponent : public Component
@@ -355,11 +383,10 @@ namespace Crystal {
 		{
 			Component::Update(deltaTime);
 
-			if(m_BehaviorTree)
+			if (m_BehaviorTree)
 			{
 				m_BehaviorTree->Update(deltaTime);
 			}
-			
 		}
 
 		STATIC_TYPE_IMPLE(BehaviorTreeComponent)

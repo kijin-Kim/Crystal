@@ -162,9 +162,30 @@ namespace Crystal {
 		return m_MainComponent->GetRotationQuat();
 	}
 
+
+	DirectX::XMFLOAT3 Actor::GetForwardVector() const
+	{
+		return m_MainComponent->GetWorldForwardVector();
+	}
+
 	const DirectX::XMFLOAT4X4& Actor::GetWorldTransform() const
 	{
 		return m_MainComponent->GetWorldTransform();
+	}
+
+	void Actor::RotatePitch(float angle)
+	{
+		m_MainComponent->RotatePitch(angle);
+	}
+
+	void Actor::RotateYaw(float angle)
+	{
+		m_MainComponent->RotateYaw(angle);
+	}
+
+	void Actor::RotateRoll(float angle)
+	{
+		m_MainComponent->RotateRoll(angle);
 	}
 
 	void Actor::AddForce(const DirectX::XMFLOAT3& force)
