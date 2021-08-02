@@ -10,6 +10,8 @@ public:
 
 	void Initialize() override;
 
+	void Begin() override;
+
 
 	STATIC_TYPE_IMPLE(SpaceWhaleAIController)
 };

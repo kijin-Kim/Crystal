@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Objects/Object.h"
 #include "Crystal/Math/Math.h"
 
+
 namespace Crystal {
 	class Component;
 	class TransformComponent;
@@ -11,6 +12,7 @@ namespace Crystal {
 	class World;
 
 
+	
 	// Spawn-able object
 	class Actor : public Object
 	{

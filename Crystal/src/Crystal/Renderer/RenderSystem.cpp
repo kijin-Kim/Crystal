@@ -152,12 +152,8 @@ namespace Crystal {
 
 
 		{
-			/*simpleColorShader->SetInputLayout({
-				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-				});*/
 			simpleColorShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-
 				{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
@@ -537,21 +533,6 @@ namespace Crystal {
 
 
 
-
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-
-		
-		
-
-		m_Pipelines[0]->Begin();
-		m_Pipelines[0]->Record(commandList);
-		
-
-		
-
-
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 		/*m_Pipelines[11]->Begin();
 		m_Pipelines[11]->Record(commandList);*/
 
@@ -625,6 +606,15 @@ namespace Crystal {
 		m_Pipelines[10]->Begin();
 		m_Pipelines[10]->Record(commandList);
 
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		m_Pipelines[0]->Begin();
+		m_Pipelines[0]->Record(commandList);
+
+
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		
 
 		resourceBarrier.Transition.pResource = scene->FloatingPointBuffer->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE

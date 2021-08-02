@@ -226,7 +226,7 @@ namespace Crystal {
 		// -------------------------------------------------------------------------
 		// Oriented Box vs. Oriented Box
 		// -------------------------------------------------------------------------
-	
+
 		if (!scene->BoundingOrientedBoxComponents.empty())
 		{
 			for (int i = 0; i < scene->BoundingOrientedBoxComponents.size() - 1; i++)
@@ -258,7 +258,6 @@ namespace Crystal {
 					DirectX::XMVECTOR contactNormalVector;
 					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
 					{
-						
 						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
 						{
 							// OnBeginOverlap
@@ -284,7 +283,6 @@ namespace Crystal {
 							DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
 
 							DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
-							CS_DEBUG_INFO("Vector Length : %f", Vector3::Length(contactNormal));
 							auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
 							ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
 							ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
@@ -327,6 +325,95 @@ namespace Crystal {
 				}
 			}
 		}
+
+
+		for (int i = 0; i < scene->AIPerceptions.size(); i++)
+		{
+			auto perceptionComp = Cast<AIPerceptionComponent>(scene->AIPerceptions[i]);
+			if (!perceptionComp)
+			{
+				continue;
+			}
+
+			if (!perceptionComp->GetIsSightEnabled() && !perceptionComp->GetIsHearingEnabled())
+			{
+				continue;
+			}
+
+	
+			for (int j = 0; j < scene->AIPerceptionSources.size(); j++)
+			{
+				auto sourceComp = Cast<AIPerceptionSourceComponent>(scene->AIPerceptionSources[i]);
+				if (!sourceComp)
+				{
+					continue;
+				}
+
+				auto sourceOwner = Cast<Actor>(sourceComp->GetOuter());
+
+				if (perceptionComp->GetIsSightEnabled() && sourceComp->GetIsSightEnabled())
+				{
+					auto sightFrustum = perceptionComp->GetWorldSightFrustum();
+
+
+					auto sourceSight = sourceComp->GetSightStimulus();
+
+					if (sightFrustum.Contains(DirectX::XMLoadFloat3(&sourceSight.Position)))
+					{
+						if (!perceptionComp->GetIsAlreadyPercepted(sourceSight))
+						{
+							sourceSight.bIsSensed = true;
+							perceptionComp->ReceiveSightStimulus(sourceSight);
+							perceptionComp->OnSightUpdated(sourceSight);
+						}
+					}
+					else
+					{
+						if (perceptionComp->GetIsAlreadyPercepted(sourceSight))
+						{
+							sourceSight.bIsSensed = false;
+							perceptionComp->ForgetSightStimulus(sourceSight);
+							perceptionComp->OnSightUpdated(sourceSight);
+						}
+					}
+				}
+
+				if (perceptionComp->GetIsHearingEnabled() && sourceComp->GetIsHearingEnabled())
+				{
+					auto& noises = sourceComp->GetNoiseStimuli();
+
+					for (auto sourceNoise : noises)
+					{
+						auto hearingSphere = perceptionComp->GetWorldHearingSphere();
+						Collision::BoundingSphere noiseSphere;
+						noiseSphere.Center = sourceNoise.Position;
+						noiseSphere.Radius = sourceNoise.MaxRange;
+
+						if (hearingSphere.Intersects(noiseSphere))
+						{
+							if (!perceptionComp->GetIsAlreadyPercepted(sourceNoise))
+							{
+								sourceNoise.bIsSensed = true;
+								perceptionComp->ReceiveNoiseStimulus(sourceNoise);
+								perceptionComp->OnHearingUpdated(sourceNoise);
+							}
+						}
+						else
+						{
+							if (perceptionComp->GetIsAlreadyPercepted(sourceNoise))
+							{
+								sourceNoise.bIsSensed = false;
+								perceptionComp->ForgetNoiseStimulus(sourceNoise);
+								perceptionComp->OnHearingUpdated(sourceNoise);
+							}
+						}
+					}
+
+					sourceComp->ClearNoiseStimuli();
+				}
+			}
+		}
+
 #endif
 	}
 

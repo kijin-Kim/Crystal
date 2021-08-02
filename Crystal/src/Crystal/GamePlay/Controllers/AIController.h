@@ -20,6 +20,7 @@ namespace Crystal {
 		void SetBehaviorTree(Shared<BehaviorTree> behaviorTree);
 
 		Shared<BlackboardComponent> GetBlackboardComponent() const;
+		Shared<AIPerceptionComponent> GetAIPerceptionComponent() const;
 		
 
 		void MoveToLocation(const DirectX::XMFLOAT3& location, float maxAccel, float acceptableRadius = 2.0f);

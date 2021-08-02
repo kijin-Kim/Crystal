@@ -61,7 +61,7 @@ namespace Crystal {
 
 		virtual bool Execute(float deltaTime)
 		{
-			CS_DEBUG_INFO("BTCompositeNode : %s Execute", GetObjectName().c_str());
+			
 
 			bool result = ExecuteDecorators();
 			if(!result)
@@ -93,7 +93,7 @@ namespace Crystal {
 
 		bool Execute(float deltaTime) override
 		{
-			CS_DEBUG_INFO("BTSelectorNode : %s Execute", GetObjectName().c_str());
+			
 
 			bool result = ExecuteDecorators();
 			if (!result)
@@ -124,7 +124,7 @@ namespace Crystal {
 
 		bool Execute(float deltaTime) override
 		{
-			CS_DEBUG_INFO("BTSequenceNode : %s Execute", GetObjectName().c_str());
+			
 
 			bool result = ExecuteDecorators();
 			if (!result)
@@ -166,7 +166,7 @@ namespace Crystal {
 		
 		bool Execute(float deltaTime) override
 		{
-			CS_DEBUG_INFO("BTTaskNodeMoveToLocation : %s Execute", GetObjectName().c_str());
+			
 
 			bool result = ExecuteDecorators();
 			if (!result)
@@ -234,7 +234,7 @@ namespace Crystal {
 
 		bool Execute(float deltaTime) override
 		{		
-			CS_DEBUG_INFO("BTTaskNodeFaceLocation : %s Execute", GetObjectName().c_str());
+			
 
 			bool result = ExecuteDecorators();
 			if (!result)

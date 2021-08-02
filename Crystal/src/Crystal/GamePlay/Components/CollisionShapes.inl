@@ -760,6 +760,35 @@ inline ContainmentType BoundingSphere::Contains(const BoundingFrustum& fr) const
 //-----------------------------------------------------------------------------
 // Sphere vs. sphere test.
 //-----------------------------------------------------------------------------
+
+
+_Use_decl_annotations_
+
+inline bool BoundingSphere::Intersects(const BoundingSphere& sh) const
+{
+	// Load A.
+	XMVECTOR vCenterA = XMLoadFloat3(&Center);
+	XMVECTOR vRadiusA = XMVectorReplicatePtr(&Radius);
+
+	// Load B.
+	XMVECTOR vCenterB = XMLoadFloat3(&sh.Center);
+	XMVECTOR vRadiusB = XMVectorReplicatePtr(&sh.Radius);
+
+	// Distance squared between centers.    
+	XMVECTOR Delta = XMVectorSubtract(vCenterB, vCenterA);
+	XMVECTOR DistanceSquared = XMVector3LengthSq(Delta);
+
+	// Sum of the radii squared.
+	XMVECTOR RadiusSquared = XMVectorAdd(vRadiusA, vRadiusB);
+
+	RadiusSquared = XMVectorMultiply(RadiusSquared, RadiusSquared);
+
+	return XMVector3LessOrEqual(DistanceSquared, RadiusSquared);
+}
+
+
+
+
 _Use_decl_annotations_
 
 inline bool BoundingSphere::Intersects(const BoundingSphere& sh, XMVECTOR& contactNormal, float& distance) const

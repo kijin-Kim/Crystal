@@ -29,6 +29,11 @@ namespace Crystal {
 		
 	}
 
+	Shared<AIPerceptionComponent> AIController::GetAIPerceptionComponent() const
+	{
+		return m_AIPerceptionComponent;
+	}
+
 
 	void AIController::MoveToLocation(const DirectX::XMFLOAT3& location, float maxAccel, float acceptableRadius)
 	{

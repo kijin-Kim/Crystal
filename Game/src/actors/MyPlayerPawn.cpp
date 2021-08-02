@@ -3,6 +3,7 @@
 #include "Missile.h"
 #include "MyHUD.h"
 #include "Crystal/Types.h"
+#include "Crystal/GamePlay/Components/AIComponent.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/MovementComponent.h"
 
@@ -11,19 +12,6 @@ BOOST_CLASS_EXPORT(MyPlayerPawn)
 void MyPlayerPawn::Initialize()
 {
 	Pawn::Initialize();
-
-	/*auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
-	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
-	sphereComponent->SetRadius(50.0f);
-	sphereComponent->SetMass(7000.0f);
-	sphereComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
-	{
-		if (m_bIsInVunlnerable)
-			return;
-
-		m_Health -= 1;
-		UpdateHealth();
-	});*/
 
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
@@ -73,6 +61,11 @@ void MyPlayerPawn::Initialize()
 	m_MovementComponent = CreateComponent<Crystal::PawnMovementComponent>("MovementComponent");
 	m_MovementComponent->SetTargetComponent(m_MainComponent);
 	m_MovementComponent->SetMaxAcceleration(3000000.f);
+
+
+	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
+	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
+	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
 }
 
 void MyPlayerPawn::Begin()
@@ -151,6 +144,7 @@ void MyPlayerPawn::RollRight(float value)
 void MyPlayerPawn::BeginFire()
 {
 	CS_DEBUG_INFO("BeginFire!!");
+	m_AIPerceptionSourceComponent->MakeNoiseAtLocation(m_MainComponent->GetWorldPosition(), 100.0f);
 	m_bShouldFire = true;
 }
 

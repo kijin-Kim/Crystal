@@ -11,6 +11,7 @@
 
 
 namespace Crystal {
+	class AIPerceptionSourceComponent;
 	class PawnMovementComponent;
 }
 
@@ -68,8 +69,9 @@ private:
 	
 
 private:
-	std::shared_ptr<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
-	std::shared_ptr<Crystal::CameraComponent> m_CameraComponent = nullptr;
+	Crystal::Shared<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
+	Crystal::Shared<Crystal::CameraComponent> m_CameraComponent = nullptr;
+	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent;
 
 	bool m_bShouldFire = false;
 	float m_RoundPerMin = 500.0f;
@@ -84,4 +86,5 @@ private:
 	bool m_bIsInVunlnerable = false;
 
 	bool m_bHasItem[ItemTypeCount];
+
 };

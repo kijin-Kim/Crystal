@@ -7,7 +7,31 @@ namespace Crystal {
 
 	class Actor;
 	class CollisionComponent;
-	
+
+	template <class T>
+	class IDCounter
+	{
+	public:
+		IDCounter(const IDCounter&) = delete;
+		IDCounter& operator=(const IDCounter&) = delete;
+
+		static IDCounter<T>& Instance()
+		{
+			static IDCounter<T> instance;
+			return instance;
+		}
+
+		uint64_t GetNewID()
+		{
+			static uint64_t Count = -1;
+			return Count++;
+		}
+
+	private:
+		IDCounter() = default;
+		~IDCounter() = default;
+	};
+
 
 	enum class EShadingModel
 	{
@@ -39,16 +63,16 @@ namespace Crystal {
 		bool operator==(const PipelineStateKey& other) const
 		{
 			return BlendMode == other.BlendMode
-			&& bTwoSided == other.bTwoSided;
+				&& bTwoSided == other.bTwoSided;
 		}
 	};
-	
-	
+
+
 	struct HitResult
 	{
 		Weak<Actor> HitActor = {};
 		Weak<CollisionComponent> HitComponent = {};
-		DirectX::XMFLOAT3 Impulse = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 Impulse = {0.0f, 0.0f, 0.0f};
 	};
 
 	struct OverlapResult
@@ -80,11 +104,136 @@ namespace Crystal {
 		}
 	};
 
+	struct AIStimulus
+	{
+		uint64_t ID;
+		std::string Tag;
+		bool bIsSensed = true;
+	};
+
+	struct NoiseStimulus : public AIStimulus
+	{
+		Weak<Actor> Instigator = {};
+		DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };
+		float MaxRange = 0.0f;
+
+		~NoiseStimulus() = default;
+
+		NoiseStimulus(const NoiseStimulus& other)
+		{
+			ID = other.ID;
+			Tag = other.Tag;
+			bIsSensed = other.bIsSensed;
+			Instigator = other.Instigator;
+			Position = other.Position;
+			MaxRange = other.MaxRange;
+		}
+
+		NoiseStimulus& operator=(const NoiseStimulus& other)
+		{
+			NoiseStimulus stimulus = {};
+			stimulus.ID = other.ID;
+			stimulus.Tag = other.Tag;
+			stimulus.bIsSensed = other.bIsSensed;
+			stimulus.Instigator = other.Instigator;
+			stimulus.Position = other.Position;
+			stimulus.MaxRange = other.MaxRange;
+
+			return stimulus;
+		}
+
+		NoiseStimulus(NoiseStimulus&& other)
+		{
+			*this = std::move(other);
+		}
+
+		NoiseStimulus& operator=(NoiseStimulus&& other)
+		{
+			if (this != &other)
+			{
+				ID = other.ID;
+				Tag = other.Tag;
+				bIsSensed = other.bIsSensed;
+				Instigator = other.Instigator;
+				Position = other.Position;
+				MaxRange = other.MaxRange;
+			}
+			return *this;
+		}
+
+		static NoiseStimulus Create()
+		{
+			NoiseStimulus stimulus = {};
+			stimulus.ID = IDCounter<AIStimulus>::Instance().GetNewID();
+			return stimulus;
+		}
+
+	private:
+		NoiseStimulus() = default;
+	};
+
+	struct SightStimulus : public AIStimulus
+	{
+		Weak<Actor> Instigator = {};
+		DirectX::XMFLOAT3 Position = {0.0f, 0.0f, 0.0f};
+
+		~SightStimulus() = default;
+
+		SightStimulus(const SightStimulus& other)
+		{
+			ID = other.ID;
+			Tag = other.Tag;
+			bIsSensed = other.bIsSensed;
+			Instigator = other.Instigator;
+			Position = other.Position;
+		}
+		SightStimulus& operator=(const SightStimulus& other)
+		{
+			SightStimulus stimulus = {};
+			stimulus.ID = other.ID;
+			stimulus.Tag = other.Tag;
+			stimulus.bIsSensed = other.bIsSensed;
+			stimulus.Instigator = other.Instigator;
+			stimulus.Position = other.Position;
+			return stimulus;
+		}
+
+		SightStimulus(SightStimulus&& other)
+		{
+			*this = std::move(other);
+		}
+
+		SightStimulus& operator=(SightStimulus&& other)
+		{
+			if (this != &other)
+			{
+				ID = other.ID;
+				Tag = other.Tag;
+				bIsSensed = other.bIsSensed;
+				Instigator = other.Instigator;
+				Position = other.Position;
+			}
+
+			return *this;
+		}
+
+		static SightStimulus Create()
+		{
+			SightStimulus stimulus = {};
+			stimulus.ID = IDCounter<AIStimulus>::Instance().GetNewID();
+			return stimulus;
+		}
+
+
+	private:
+		SightStimulus() = default;
+	};
+
 }
 
 
 namespace std {
-	template<>
+	template <>
 	struct hash<Crystal::PipelineStateKey>
 	{
 		size_t operator()(const Crystal::PipelineStateKey& k) const

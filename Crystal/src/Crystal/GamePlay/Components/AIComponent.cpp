@@ -4,6 +4,7 @@
 #include "Crystal/GamePlay/Controllers/AIController.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/Scene.h"
+#include "Crystal/Types.h"
 
 namespace Crystal {
 
@@ -43,38 +44,92 @@ namespace Crystal {
 		}
 
 		auto pawn = Cast<Pawn>(controller->GetPossessedPawn());
-		if(!pawn)
+		if (!pawn)
 		{
 			return;
 		}
 
-		if(m_bIsHearingEnabled)
+		if (m_bIsHearingEnabled)
 		{
 			auto translation = Matrix4x4::Translation(pawn->GetPosition());
 			auto rotation = Matrix4x4::RotationQuaternion(pawn->GetRotationQuat());
 			auto worldTransform = Matrix4x4::Multiply(rotation, translation);
 
-			m_HearingSphereTransform = Matrix4x4::Multiply(Matrix4x4::Scale(m_HearingSphere.Radius), worldTransform);
+			m_HearingSphereTransform = Matrix4x4::Multiply(Matrix4x4::Scale(m_HearingRange), worldTransform);
 		}
 
-		if(m_bIsSightEnabled)
+		if (m_bIsSightEnabled)
 		{
 			auto translation = Matrix4x4::Translation(pawn->GetPosition());
 			auto rotation = Matrix4x4::RotationQuaternion(pawn->GetRotationQuat());
 			auto worldTransform = Matrix4x4::Multiply(rotation, translation);
 
-			m_SightFrustumTransform = Matrix4x4::Multiply(Matrix4x4::Scale(pawn->GetScale()), worldTransform);
+			m_SightFrustumTransform = worldTransform;
+		}
+	}
+
+	void AIPerceptionComponent::OnSightUpdated(const SightStimulus& stimuli)
+	{
+		if (m_OnSightUpdatedEvent)
+		{
+			m_OnSightUpdatedEvent(stimuli);
+		}
+	}
+
+	void AIPerceptionComponent::BindOnSightUpdatedEvent(const std::function<void(const SightStimulus&)>& event)
+	{
+		m_OnSightUpdatedEvent = event;
+	}
+
+	void AIPerceptionComponent::ReceiveSightStimulus(const SightStimulus& stimulus)
+	{
+		m_PerceptedSightStimuli.push_back(stimulus);
+	}
+
+	void AIPerceptionComponent::ForgetSightStimulus(const SightStimulus& stimulus)
+	{
+		auto it = FindSightStimulus(stimulus);
+		if (it != m_PerceptedSightStimuli.end())
+		{
+			m_PerceptedSightStimuli.erase(it);
+		}
+	}
+
+	void AIPerceptionComponent::OnHearingUpdated(const NoiseStimulus& stimuli)
+	{
+		if (m_OnHearingUpdatedEvent)
+		{
+			m_OnHearingUpdatedEvent(stimuli);
+		}
+	}
+
+	void AIPerceptionComponent::BindOnHearingUpdatedEvent(const std::function<void(const NoiseStimulus&)>& event)
+	{
+		m_OnHearingUpdatedEvent = event;
+	}
+
+	void AIPerceptionComponent::ReceiveNoiseStimulus(const NoiseStimulus& stimulus)
+	{
+		m_PerceptedNoiseStimuli.push_back(stimulus);
+	}
+
+	void AIPerceptionComponent::ForgetNoiseStimulus(const NoiseStimulus& stimulus)
+	{
+		auto it = FindNoiseStimulus(stimulus);
+		if (it != m_PerceptedNoiseStimuli.end())
+		{
+			m_PerceptedNoiseStimuli.erase(it);
 		}
 	}
 
 	void AIPerceptionComponent::SetHearingRange(float range)
 	{
-		m_HearingSphere.Radius = range;
+		m_HearingRange = range;
 	}
 
 	float AIPerceptionComponent::GetHearingRange() const
 	{
-		return m_HearingSphere.Radius;
+		return m_HearingRange;
 	}
 
 	void AIPerceptionComponent::SetSightRange(float range)
@@ -130,6 +185,47 @@ namespace Crystal {
 		return m_SightFrustum;
 	}
 
+	const Collision::BoundingSphere& AIPerceptionComponent::GetWorldHearingSphere() const
+	{
+		Collision::BoundingSphere worldBoundingSphere = {};
+		m_HearingSphere.Transform(worldBoundingSphere, XMLoadFloat4x4(&m_HearingSphereTransform));
+		return worldBoundingSphere;
+	}
+
+	const Collision::BoundingFrustum& AIPerceptionComponent::GetWorldSightFrustum() const
+	{
+		Collision::BoundingFrustum worldBoundingFrustum = {};
+		m_SightFrustum.Transform(worldBoundingFrustum, XMLoadFloat4x4(&m_SightFrustumTransform));
+		return worldBoundingFrustum;
+	}
+
+	std::vector<SightStimulus>::iterator AIPerceptionComponent::FindSightStimulus(const SightStimulus& stimulus)
+	{
+		return std::find_if(m_PerceptedSightStimuli.begin(), m_PerceptedSightStimuli.end(), [&stimulus](const SightStimulus& other)-> bool
+		{
+			return stimulus.ID == other.ID;
+		});
+	}
+
+	bool AIPerceptionComponent::GetIsAlreadyPercepted(const SightStimulus& stimulus)
+	{
+		return FindSightStimulus(stimulus) != m_PerceptedSightStimuli.end();
+	}
+
+	std::vector<NoiseStimulus>::iterator AIPerceptionComponent::FindNoiseStimulus(const NoiseStimulus& stimulus)
+	{
+		return std::find_if(m_PerceptedNoiseStimuli.begin(), m_PerceptedNoiseStimuli.end(), [&stimulus](const NoiseStimulus& other)-> bool
+		{
+			return stimulus.ID == other.ID;
+		});
+	}
+
+	bool AIPerceptionComponent::GetIsAlreadyPercepted(const NoiseStimulus& stimulus)
+	{
+		return FindNoiseStimulus(stimulus) != m_PerceptedNoiseStimuli.end();
+	}
+
+
 	void AIPerceptionComponent::ReCalculateBoundingFrustum()
 	{
 		m_SightFrustum.LeftSlope = -m_SightWidth * 0.5f / m_SightRange;
@@ -142,10 +238,15 @@ namespace Crystal {
 		m_SightFrustum.Far = m_SightRange;
 	}
 
+	void AIPerceptionSourceComponent::Begin()
+	{
+		m_SightStimulus.Instigator = Cast<Actor>(GetOuter());
+	}
+
 	void AIPerceptionSourceComponent::RegisterComponent()
 	{
 		Component::RegisterComponent();
-		
+
 		auto ownerActor = GetOuter().lock();
 		if (!ownerActor)
 		{
@@ -161,5 +262,23 @@ namespace Crystal {
 		level->GetScene()->AIPerceptionSources.push_back(Cast<AIPerceptionSourceComponent>(shared_from_this()));
 	}
 
-	
+
+	void AIPerceptionSourceComponent::MakeNoiseAtLocation(const DirectX::XMFLOAT3& position, float maxRange)
+	{
+		NoiseStimulus noiseStimulus = NoiseStimulus::Create();
+		noiseStimulus.Instigator = Cast<Actor>(GetOuter());
+		noiseStimulus.Position = position;
+		noiseStimulus.MaxRange = maxRange;
+
+		m_NoiseStimuli.push_back(noiseStimulus);
+	}
+
+	void AIPerceptionSourceComponent::Update(float deltaTime)
+	{
+		Component::Update(deltaTime);
+
+		m_SightStimulus.Position = Cast<Actor>(m_SightStimulus.Instigator)->GetPosition();
+	}
+
+
 }

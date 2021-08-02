@@ -75,7 +75,6 @@ namespace Crystal {
 		std::vector<Weak<AIPerceptionComponent>> AIPerceptions;
 
 		
-		
 		//===================================================================================
 
 		void SetMainCamera(const Shared<CameraComponent>& camera);

@@ -73,11 +73,10 @@ public:
 
 		if (true)
 		{
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				//asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
-				asteroid->SetPosition(Crystal::Vector3::Zero);
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
 			}
 
 			for (int i = 0; i < 0; i++)
@@ -116,7 +115,7 @@ public:
 			krakenController->Possess(kraken);
 		}
 
-		if(false)
+		if(true)
 		{
 			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
 			spaceWhale->SetPosition({ 2000.0f, 0.0f, 0.0f });
