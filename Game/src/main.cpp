@@ -128,40 +128,12 @@ public:
 			
 			auto rootNode = behaviorTree->GetRootNode();
 			auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
-			//rootNode->AddChildNode(selectorNode);
+			rootNode->AddChildNode(selectorNode);
 			
 			
 			//// MoveToLastSeen
-			//{
-			//	auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToLastSeen");
-			//	auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
-			//	blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
-			//	blackboardBasedDecorator->bIsSet = true;
-			//	sequenceNode->AddDecorator(blackboardBasedDecorator);
-
-			//	auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
-			//	faceLocationNode->TargetLocationKey = "PlayerLocation";
-			//	faceLocationNode->TargetAngleTolerance = 10.0f;
-			//	sequenceNode->AddChildNode(faceLocationNode);
-
-			//	auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
-			//	moveToLocationNode->TargetLocationKey = "PlayerLocation";
-			//	moveToLocationNode->AcceptableRadius = 120.0f;
-			//	moveToLocationNode->MaxAcceleration = 30000000.0f;
-			//	sequenceNode->AddChildNode(moveToLocationNode);
-
-			//	auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
-			//	clearValueNode->BlackboardKey = "PlayerLocation";
-			//	sequenceNode->AddChildNode(clearValueNode);
-
-			//	
-			//	selectorNode->AddChildNode(sequenceNode);
-			//}
-
-
-			// MoveToLastSeen
 			{
-				auto sequenceNode = Crystal::CreateObject<Crystal::BTSelectorNode>("SequenceMoveToLastSeen");
+				auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToLastSeen");
 				auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 				blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
 				blackboardBasedDecorator->bIsSet = true;
@@ -182,14 +154,14 @@ public:
 				clearValueNode->BlackboardKey = "PlayerLocation";
 				sequenceNode->AddChildNode(clearValueNode);
 
-
-				rootNode->AddChildNode(sequenceNode);
+				
+				selectorNode->AddChildNode(sequenceNode);
 			}
 
 			
 
 			// Keep Orbit
-			if(false)
+			if(true)
 			{
 				auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
 

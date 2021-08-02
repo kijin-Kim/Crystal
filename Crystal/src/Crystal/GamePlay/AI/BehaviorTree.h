@@ -126,6 +126,10 @@ namespace Crystal {
 						return;
 					}
 				}
+				else
+				{
+					return;
+				}
 			}
 			// if all node failed
 			FinishExecute(false);
