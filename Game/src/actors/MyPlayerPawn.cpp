@@ -1,5 +1,6 @@
 ﻿#include "MyPlayerPawn.h"
 
+#include "Laser.h"
 #include "Missile.h"
 #include "MyHUD.h"
 #include "Crystal/Types.h"
@@ -17,14 +18,14 @@ void MyPlayerPawn::Initialize()
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
 	boundingOrientedBoxComponent->SetMass(7000.0f);
-	boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	/*boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	{
 		if (m_bIsInVunlnerable)
 			return;
 
 		m_Health -= 1;
 		UpdateHealth();
-	});
+	});*/
 
 	m_MainComponent = boundingOrientedBoxComponent;
 
@@ -71,6 +72,7 @@ void MyPlayerPawn::Initialize()
 void MyPlayerPawn::Begin()
 {
 	Pawn::Begin();
+	m_Health = m_MaxHealth;
 	UpdateHealth();
 }
 
@@ -107,6 +109,9 @@ void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UsePowerItem));
 	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
 	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseShieldItem));
+
+	inputComponent->BindAction("ShowDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleShowDebugCollision));
+	inputComponent->BindAction("ShowDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleShowDebugAI));
 }
 
 void MyPlayerPawn::RotateYaw(float value)
@@ -193,7 +198,7 @@ void MyPlayerPawn::OnFire()
 {
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
-	const auto direction = m_CameraComponent->GetWorldForwardVector();
+	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
 	const float maxDistance = 10000.0f;
 
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
@@ -203,7 +208,16 @@ void MyPlayerPawn::OnFire()
 		Crystal::CollisionParams collisionParams = {};
 		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
 
+
+		Crystal::Actor::ActorSpawnParams spawnParams = {};
+
+		auto playerPosition = GetPosition();
+		spawnParams.Position = {playerPosition.x - 100.0f, playerPosition.y, playerPosition.z + 30.0f};
+
+
 		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
+
+		DirectX::XMFLOAT3 endDirection = direction;
 		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();
@@ -227,20 +241,35 @@ void MyPlayerPawn::OnFire()
 
 				hitActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
 			}
+
+			endDirection = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(hitResult.HitPosition, spawnParams.Position));
 		}
+
+		auto angle = Crystal::Vector3::AngleBetweenNormals(Crystal::Vector3::UnitZ, endDirection);
+		auto rotationAxis = Crystal::Vector3::Normalize(Crystal::Vector3::Cross(Crystal::Vector3::UnitZ, endDirection));
+
+		DirectX::XMFLOAT4 rotation = Crystal::Vector4::Quaternion::Identity;
+
+		if (!Crystal::Vector3::IsZero(rotationAxis) && !Crystal::Vector3::Equal(Crystal::Vector3::UnitZ, endDirection, 0.001f) && !Crystal::Equal(
+			fabs(angle), 0.0f))
+		{
+			rotation = Crystal::Vector4::QuaternionRotationAxis(rotationAxis, angle);
+		}
+
+		spawnParams.Rotation = rotation;
+		level->SpawnActor<Laser>(spawnParams);
 	}
 }
 
 void MyPlayerPawn::UpdateHealth()
 {
-	m_Health = max(m_Health, 0);
-	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
 	if (level)
 	{
 		auto hud = Crystal::Cast<MyHUD>(level->GetHUD());
 		if (hud)
 		{
-			hud->OnHealthUpdated(m_Health, 100);
+			hud->OnPlayerHealthUpdated(m_Health, m_MaxHealth);
 		}
 	}
 }
@@ -306,4 +335,28 @@ void MyPlayerPawn::UseShieldItem()
 	m_bHasItem[ItemType_Shield] = false;
 	UpdateItemStatus(ItemType_Shield, false);
 	m_bIsInVunlnerable = true;
+}
+
+void MyPlayerPawn::ToggleShowDebugCollision()
+{
+	auto world = GetWorld().lock();
+	if (!world)
+	{
+		return;
+	}
+
+	auto& worldConfig = world->GetWorldConfig();
+	world->SetShowDebugCollision(!worldConfig.bShowDebugCollision);
+}
+
+void MyPlayerPawn::ToggleShowDebugAI()
+{
+	auto world = GetWorld().lock();
+	if (!world)
+	{
+		return;
+	}
+
+	auto& worldConfig = world->GetWorldConfig();
+	world->SetShowDebugAI(!worldConfig.bShowDebugAI);
 }

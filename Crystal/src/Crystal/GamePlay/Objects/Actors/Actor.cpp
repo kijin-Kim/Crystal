@@ -244,4 +244,14 @@ namespace Crystal {
 		return {};
 	}
 
+	Weak<Level> Actor::GetLevel() const
+	{
+		return Cast<Level>(GetOuter());
+	}
+
+	Weak<World> Actor::GetWorld() const
+	{
+		return Cast<Level>(GetLevel())->GetWorld();
+	}
+
 }

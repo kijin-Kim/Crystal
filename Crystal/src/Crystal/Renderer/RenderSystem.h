@@ -8,6 +8,7 @@
 
 
 namespace Crystal {
+	struct WorldConfig;
 	class LightComponent;
 	class DescriptorAllocator;
 	class WindowsWindow;
@@ -37,7 +38,7 @@ namespace Crystal {
 		void CreateDepthStencilView();
 		
 
-
+		const WorldConfig& GetWorldConfig() const;
 	
 
 		template <class T>

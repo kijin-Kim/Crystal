@@ -76,7 +76,6 @@ namespace Crystal {
 		lineComponent->SetOrigin(origin);
 		lineComponent->SetDirection(direction);
 		lineComponent->SetMaxDistance(maxDistance);
-		lineComponent->SetLineColor(color);
 		debugLineActor->SetLifeTime(1.5f);
 	}
 
@@ -140,7 +139,6 @@ namespace Crystal {
 		lineComponent->SetOrigin(startPoint);
 		lineComponent->SetDirection(direction);
 		lineComponent->SetMaxDistance(maxDistance);
-		lineComponent->SetLineColor(color);
 		debugLineActor->SetLifeTime(1.5f);
 	}
 
@@ -358,5 +356,15 @@ namespace Crystal {
 	{
 		DrawDebugLine(origin, direction, dist, Crystal::Vector3::Green);
 		return m_PhysicsSystem->LineTraceSingle(outHitResult, origin, direction, dist, collisionParams);
+	}
+
+	const WorldConfig& Level::GetWorldConfig() const
+	{
+		return Cast<World>(GetOuter())->GetWorldConfig();
+	}
+
+	Weak<World> Level::GetWorld() const
+	{
+		return Cast<World>(GetOuter());
 	}
 }

@@ -24,15 +24,14 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PhysicsSystem)
 	private:
-
 		void ResolveVelocity(const std::shared_ptr<CollisionComponent>& lhsComponent,
 		                     const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& impulse);
 
 		void ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
-		                        const std::shared_ptr<CollisionComponent>& rhsComponent, 
-			float penetration);
+		                        const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal,
+		                        float penetration);
 
 		const DirectX::XMFLOAT3& CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
-			const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal);
+		                                          const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal);
 	};
 }

@@ -20,7 +20,7 @@
 #include "actors/Missile.h"
 #include "actors/KrakenAIController.h"
 #include "actors/MyHUD.h"
-#include "actors/PlayCircle.h"
+#include "actors/ShieldCircle.h"
 #include "actors/SpaceWhale.h"
 #include "Crystal/GamePlay/AI/BehaviorTree.h"
 #include "Crystal/GamePlay/AI/Blackboard.h"
@@ -43,6 +43,25 @@ public:
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
+		{
+			resourceManager.GetTexture("assets/textures/Whale Diffuse.jpg");
+			resourceManager.GetTexture("assets/textures/Whale Roughness.jpg");
+			resourceManager.GetTexture("assets/textures/Whale Normals.jpg");
+			resourceManager.GetTexture("assets/textures/Whale Emissive.jpg");
+
+			resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/Biomechanical Whale Animated.fbx");
+			resourceManager.GetAnimation("assets/models/Biomechanical Whale Animated.fbx");
+		}
+
+
+		{
+			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({ "1" }).lock();
+			playerStart->SetPosition({ 0.0f, 1000.0f, -3000.0f });
+		}
+
+		m_World->GetCurrentLevel()->OnClientConnect();
+
+		
 
 		{
 			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
@@ -77,8 +96,7 @@ public:
 			for (int i = 0; i < 0; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));
-			}
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));			}
 
 			for (int i = 0; i < 0; i++)
 			{
@@ -108,96 +126,20 @@ public:
 		}
 
 		
-		if (false)
+		if (true)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({ 0.0f, 0.0f, 0.0f });
 			auto krakenController = m_World->SpawnActor<KrakenAIController>({}).lock();
 			krakenController->Possess(kraken);
-		}
 
-		if(true)
-		{
-			auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
-			spaceWhale->SetPosition({ 2000.0f, 0.0f, 0.0f });
-			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
-			spaceWhaleController->Possess(spaceWhale);
-			
-			
-			auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
-			
-			auto rootNode = behaviorTree->GetRootNode();
-			auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
-			rootNode->AddChildNode(selectorNode);
-			
-			
-			//// MoveToLastSeen
-			{
-				auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToLastSeen");
-				auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
-				blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
-				blackboardBasedDecorator->bIsSet = true;
-				sequenceNode->AddDecorator(blackboardBasedDecorator);
-
-				auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
-				faceLocationNode->TargetLocationKey = "PlayerLocation";
-				faceLocationNode->TargetAngleTolerance = 10.0f;
-				sequenceNode->AddChildNode(faceLocationNode);
-
-				auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
-				moveToLocationNode->TargetLocationKey = "PlayerLocation";
-				moveToLocationNode->AcceptableRadius = 120.0f;
-				moveToLocationNode->MaxAcceleration = 30000000.0f;
-				sequenceNode->AddChildNode(moveToLocationNode);
-
-				auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
-				clearValueNode->BlackboardKey = "PlayerLocation";
-				sequenceNode->AddChildNode(clearValueNode);
-
-				
-				selectorNode->AddChildNode(sequenceNode);
-			}
-
-			
-
-			// Keep Orbit
-			if(true)
-			{
-				auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
-
-				auto setTargetDirectionNode = Crystal::CreateObject<BTTaskNodeSetTargetDirection>("TaskSetTargetDirection");
-				setTargetDirectionNode->TargetDirectionKey = "TargetDirection";
-				sequenceNode->AddChildNode(setTargetDirectionNode);
-
-				auto moveTowardDirectionNode = Crystal::CreateObject<BTTaskNodeMoveTowardDirection>("TaskMoveTowardDirection");
-				moveTowardDirectionNode->TargetDirectionKey = "TargetDirection";
-				moveTowardDirectionNode->MaxAcceleration = 30000000.0f;
-				sequenceNode->AddChildNode(moveTowardDirectionNode);
-								
-				selectorNode->AddChildNode(sequenceNode);				
-			}
-			
-			
-
-			
-			spaceWhaleController->SetBehaviorTree(behaviorTree);
-			
+			/*auto shieldCircle = m_World->SpawnActor<ShieldCircle>({}).lock();
+			shieldCircle->SetPosition(Crystal::Vector3::Zero);*/
 		}
 
 
-		{
-			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
-			playerStart->SetPosition({0.0f, 0.0f, -1000.0f});
-			auto playerStart2 = m_World->SpawnActor<Crystal::PlayerStartActor>({"2"}).lock();
-			playerStart2->SetPosition({0.0f, 0.0f, -4000.0f});
-			auto playerStart3 = m_World->SpawnActor<Crystal::PlayerStartActor>({"3"}).lock();
-			playerStart3->SetPosition({0.0f, 0.0f, -6000.0f});
-			auto playerStart4 = m_World->SpawnActor<Crystal::PlayerStartActor>({"4"}).lock();
-			playerStart4->SetPosition({0.0f, 0.0f, -8000.0f});
-		}
 
 
-		m_World->GetCurrentLevel()->OnClientConnect();
 
 
 		if (false)
@@ -226,7 +168,7 @@ public:
 
 		if(false)
 		{
-			auto playCircle = m_World->SpawnActor<PlayCircle>({ "" }).lock();
+			auto playCircle = m_World->SpawnActor<ShieldCircle>({ "" }).lock();
 		}
 
 

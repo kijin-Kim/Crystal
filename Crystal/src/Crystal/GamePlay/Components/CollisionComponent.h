@@ -31,17 +31,7 @@ namespace Crystal {
 
 		void Update(const float deltaTime) override;
 
-		void SetLineColor(const DirectX::XMFLOAT3& color)
-		{
-			GetMaterial(0)->AlbedoColor = color;
-		}
-
-		const DirectX::XMFLOAT3& GetLineColor() const
-		{
-			/*auto color = m_MaterialsOld[0]->GetFloatInput("Color");
-			return { color.x, color.y, color.z };*/
-		}
-
+	
 
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
@@ -63,7 +53,16 @@ namespace Crystal {
 
 		bool IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent);
 
-		const std::vector <Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
+		const std::vector<Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
+
+		const std::vector<std::string>& GetActorClassWhitelist() const { return m_ActorClassCollisionWhitelist; }
+		void IgnoreActorClassOf(const std::string& type) { m_ActorClassCollisionWhitelist.push_back(type); }
+		bool HasActorClassWhitelist() const { return !m_ActorClassCollisionWhitelist.empty(); }
+
+		bool IsWhitelistActorClass(const std::string& type) const
+		{
+			return std::find(m_ActorClassCollisionWhitelist.begin(), m_ActorClassCollisionWhitelist.end(), type) != m_ActorClassCollisionWhitelist.end();
+		}
 
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
@@ -73,15 +72,17 @@ namespace Crystal {
 	private:
 		bool m_bCollisionEnabled = true;
 
-		std::vector <Weak<CollisionComponent>> m_OverlappedComponents;
-		
+		std::vector<Weak<CollisionComponent>> m_OverlappedComponents;
+
 		std::function<void(const struct HitResult&)> m_OnHitEvent;
 
 		std::function<void(const struct OverlapResult&)> m_OnBeginOverlapEvent;
 		std::function<void(const struct OverlapResult&)> m_OnEndOverlapEvent;
 
-		
+
 		ECollisionType m_CollisionType = ECollisionType::CT_Block;
+
+		std::vector<std::string> m_ActorClassCollisionWhitelist;
 	};
 
 	class RayComponent : public CollisionComponent
@@ -137,7 +138,7 @@ namespace Crystal {
 	class BoundingOrientedBoxComponent : public CollisionComponent
 	{
 	public:
-		BoundingOrientedBoxComponent();
+		BoundingOrientedBoxComponent() = default;
 		~BoundingOrientedBoxComponent() override = default;
 
 		void RegisterComponent() override;
@@ -159,10 +160,10 @@ namespace Crystal {
 		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingOrientedBox.Extents = extent; }
 		void SetOrientation(const DirectX::XMFLOAT4& orientation) { m_BoundingOrientedBox.Orientation = orientation; }
 
-		Collision::BoundingOrientedBox GetWorldBoundingOrientedBox()
+		Collision::BoundingOrientedBox GetWorldBoundingOrientedBox() const
 		{
-			Collision::BoundingOrientedBox worldBoundingOrientedBox = {};
-			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, XMLoadFloat4x4(&m_WorldTransform));
+			Collision::BoundingOrientedBox worldBoundingOrientedBox = Collision::BoundingOrientedBox();
+			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, XMLoadFloat4x4(&m_WorldTransform));			
 			return worldBoundingOrientedBox;
 		}
 
@@ -174,7 +175,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BoundingOrientedBoxComponent)
 
 	private:
-		Collision::BoundingOrientedBox m_BoundingOrientedBox = {};
+		Collision::BoundingOrientedBox m_BoundingOrientedBox = Collision::BoundingOrientedBox();
 	};
 
 
@@ -239,9 +240,9 @@ namespace Crystal {
 		float GetFar() const { return m_BoundingFrustum.Far; }
 
 
-		Collision::BoundingFrustum GetWorldBoundingFrustum()
+		Collision::BoundingFrustum GetWorldBoundingFrustum() const
 		{
-			Collision::BoundingFrustum worldBoundingFrustum = {};
+			Collision::BoundingFrustum worldBoundingFrustum = Collision::BoundingFrustum();
 			m_BoundingFrustum.Transform(worldBoundingFrustum, XMLoadFloat4x4(&m_WorldTransform));
 			return worldBoundingFrustum;
 		}
@@ -255,7 +256,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BoundingFrustumComponent)
 
 	private:
-		Collision::BoundingFrustum m_BoundingFrustum = {};
+		Collision::BoundingFrustum m_BoundingFrustum = Collision::BoundingFrustum();
 
 		float m_FarWidth = 100.0f;
 		float m_FarHeight = 100.0f;
@@ -294,15 +295,15 @@ namespace Crystal {
 		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingSphere.Center = center; }
 		void SetRadius(const float radius) { m_BoundingSphere.Radius = radius; }
 
-		Collision::BoundingSphere GetWorldBoundingSphere()
+		Collision::BoundingSphere GetWorldBoundingSphere() const
 		{
-			Collision::BoundingSphere worldBoundingSphere = {};
+			Collision::BoundingSphere worldBoundingSphere = Collision::BoundingSphere();
 			m_BoundingSphere.Transform(worldBoundingSphere, XMLoadFloat4x4(&m_WorldTransform));
 			return worldBoundingSphere;
 		}
 
 		STATIC_TYPE_IMPLE(BoundingSphereComponent)
 	private:
-		Collision::BoundingSphere m_BoundingSphere = {};
+		Collision::BoundingSphere m_BoundingSphere = Collision::BoundingSphere();
 	};
 }

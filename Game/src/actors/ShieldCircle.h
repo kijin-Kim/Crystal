@@ -6,7 +6,7 @@
 #include "Crystal/Resources/Meshes.h"
 #include "Crystal/Resources/ResourceManager.h"
 
-class PlayCircle : public Crystal::Actor
+class ShieldCircle : public Crystal::Actor
 {
 	SERIALIZE_PROPERTIES
 	{
@@ -14,8 +14,8 @@ class PlayCircle : public Crystal::Actor
 	}
 
 public:
-	PlayCircle() = default;
-	~PlayCircle() override = default;
+	ShieldCircle() = default;
+	~ShieldCircle() override = default;
 
 	void Initialize() override
 	{
@@ -25,33 +25,49 @@ public:
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 		
 		auto material = Crystal::CreateShared<Crystal::Material>();
-		material->EmissiveColor = Crystal::Vector3::Red;
-		material->Opacity = 0.3f;
-		//material->OpacityTexture = resourceManager.GetTexture("assets/textures/T_HoneycombMask.tga");
+		material->EmissiveColor = { 252.0f / 255.0f * 1.0f, 226.0f / 255.0f * 1.0f, 5.0f / 255.0f * 1.0f };
+		material->TexCoordMultiplier = { 10.0f, 10.0f };
+		material->Opacity = 0.2f;
+		material->OpacityTexture = resourceManager.GetTexture("assets/textures/bump_reverse.png");
 		
 		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 		material->BlendMode = Crystal::EBlendMode::BM_Translucent;
-		material->bTwoSided = true;
+		material->bTwoSided = false;
 		
 		auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-		boundingSphereComponent->SetRadius(50.0f);
+		boundingSphereComponent->SetRadius(2300.0f);
+		boundingSphereComponent->IgnoreActorClassOf("Kraken");
+		boundingSphereComponent->IgnoreActorClassOf("SpaceWhale");
+		boundingSphereComponent->SetInverseMass(0.0f);
 		m_MainComponent = boundingSphereComponent;
-
-		
-		
 		
 
 		auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 		staticMeshComponent->AddMaterial(std::move(material));
-		staticMeshComponent->SetUnitScale(50.0f);
+		staticMeshComponent->SetUnitScale(2300.0f);
 		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/1M_Sphere.fbx"));
 		staticMeshComponent->AttachTo(m_MainComponent);
 		
-		
-
 		m_MainComponent = staticMeshComponent;
 	}
 
-	STATIC_TYPE_IMPLE(PlayCircle)
+	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override
+	{
+		m_Health -= damage;
+		if(m_Health <= 0.0f)
+		{
+			Destroy();
+		}
+	}
+
+	
+
+
+	STATIC_TYPE_IMPLE(ShieldCircle)
+
+	
+
+private:
+	float m_Health = 150.0f;
 };

@@ -62,6 +62,11 @@ namespace Crystal {
 		return level->GetScene();
 	}
 
+	const WorldConfig& Pipeline::GetWorldConfig() const
+	{
+		return Cast<RenderSystem>(GetOuter())->GetWorldConfig();
+	}
+
 	void RenderPipeline::OnCreate()
 	{
 		Pipeline::OnCreate();

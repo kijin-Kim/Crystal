@@ -23,7 +23,6 @@ namespace Crystal {
 
 		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 
-
 		Weak<Pawn> GetPossessedPawn() const { return m_PossessedPawn; }
 
 		STATIC_TYPE_IMPLE(Controller)

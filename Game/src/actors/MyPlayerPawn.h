@@ -51,7 +51,7 @@ public:
 	void EndFire();
 
 	void FireMissile();
-
+	
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
 	void UpdateHealth();
@@ -60,6 +60,10 @@ public:
 	void UsePowerItem();
 	void UseHealItem();
 	void UseShieldItem();
+
+	void ToggleShowDebugCollision();
+	void ToggleShowDebugAI();
+	
 
 
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
@@ -81,7 +85,9 @@ private:
 	Crystal::Timer m_FireTimer;
 
 
-	int m_Health = 100;
+	float m_Health = 0.0f;
+	float m_MaxHealth = 100.0f;
+	
 	float m_Power = 1.0f;
 	bool m_bIsInVunlnerable = false;
 

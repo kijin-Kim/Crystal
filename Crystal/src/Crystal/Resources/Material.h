@@ -34,6 +34,8 @@ namespace Crystal {
 		EShadingModel ShadingModel = EShadingModel::SM_Lit;
 		EBlendMode BlendMode = EBlendMode::BM_Opaque;
 
+		DirectX::XMFLOAT2 TexCoordMultiplier = { 1.0f, 1.0f };
+
 		bool UsingSameTextures(Material* material);
 
 		

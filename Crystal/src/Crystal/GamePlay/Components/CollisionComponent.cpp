@@ -132,12 +132,6 @@ namespace Crystal {
 #endif
 	}
 
-	BoundingOrientedBoxComponent::BoundingOrientedBoxComponent()
-	{
-		m_BoundingOrientedBox.Center = Vector3::Zero;
-		m_BoundingOrientedBox.Extents = Vector3::Zero;
-		m_BoundingOrientedBox.Orientation = Vector4::Quaternion::Identity;
-	}
 
 	void BoundingOrientedBoxComponent::RegisterComponent()
 	{

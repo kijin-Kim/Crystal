@@ -134,7 +134,7 @@ namespace Crystal {
 
 			while (scene->SkeletalMeshes.size() > m_PerObjectConstantBuffers.size())
 			{
-				auto buffer = std::make_unique<Buffer>(nullptr, sizeof(PerObjectData), 0, true, true);
+				auto buffer = CreateShared<Buffer>(nullptr, sizeof(PerObjectData), 0, true, true);
 				m_PerObjectConstantBuffers.push_back(std::move(buffer));
 			}
 
@@ -148,13 +148,12 @@ namespace Crystal {
 			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : 최적화 매우매우매우매우 비효율적
 			m_PerObjectConstantBuffers[i]->SetData(&perObjectData, 0, sizeof(perObjectData));
 
-
 			auto& materials = component->GetMaterials();
 			for (int j = 0; j < materials.size(); j++)
 			{
 				while (materials.size() > m_PerDrawConstantBuffers.size())
 				{
-					auto buffer = std::make_unique<Buffer>(nullptr, sizeof(PerDrawData), 0, true, true);
+					auto buffer = CreateShared<Buffer>(nullptr, sizeof(PerDrawData), 0, true, true);
 					m_PerDrawConstantBuffers.push_back(std::move(buffer));
 				}
 
@@ -274,7 +273,7 @@ namespace Crystal {
 		{
 			auto skeletalMesh = scene->SkeletalMeshes[i].lock();
 			if (!skeletalMesh)
-				return;
+				continue;
 
 			if (skeletalMesh->GetHideInGame())
 			{
@@ -283,7 +282,7 @@ namespace Crystal {
 
 			auto renderable = skeletalMesh->GetRenderable().lock();
 			if (!renderable)
-				return;
+				continue;
 
 			commandList->SetGraphicsRootConstantBufferView(1, m_PerObjectConstantBuffers[i]->GetGPUVirtualAddress());
 

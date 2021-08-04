@@ -69,6 +69,12 @@ namespace Crystal {
 
 	void LinePipeline::Begin()
 	{
+		auto& worldConfig = GetWorldConfig();
+		if(!worldConfig.bShowDebugAI || !worldConfig.bShowDebugCollision)
+		{
+			return;
+		}
+		
 		RenderPipeline::Begin();
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
@@ -78,131 +84,64 @@ namespace Crystal {
 		auto level = Cast<Level>(renderSystem->GetOuter());
 		auto& scene = level->GetScene();
 
-		auto camera = scene->Cameras[0].lock();
 
-
-
-		for (int i = 0; i < scene->BoundingOrientedBoxComponents.size(); i++)
+		if(worldConfig.bShowDebugCollision)
 		{
-			auto component = scene->BoundingOrientedBoxComponents[i].lock();
-			if (!component)
-				continue;
-
-			if (component->GetHideInGame())
+			for (int i = 0; i < scene->BoundingOrientedBoxComponents.size(); i++)
 			{
-				continue;
-			}
+				auto component = scene->BoundingOrientedBoxComponents[i].lock();
+				if (!component)
+					continue;
 
-			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetPostScaledTransform();
+				if (component->GetHideInGame())
+				{
+					continue;
+				}
 
-
-			auto& materials = component->GetMaterials();
-			for (const auto& mat : materials)
-			{
-				auto material = mat.get();
-				perInstanceData.Color = material->AlbedoColor;
-			}
-
-
-			Shared<Renderable> renderable = scene->LineBoxMesh;
-
-			if (!renderable)
-			{
-				continue;
-			}
-
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-		}
-
-		for (int i = 0; i < scene->BoundingSphereComponents.size(); i++)
-		{
-			auto component = scene->BoundingSphereComponents[i].lock();
-			if (!component)
-				continue;
-
-			if (component->GetHideInGame())
-			{
-				continue;
-			}
-
-			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetPostScaledTransform();
-
-
-			auto& materials = component->GetMaterials();
-			for (const auto& mat : materials)
-			{
-				auto material = mat.get();
-				perInstanceData.Color = material->AlbedoColor;
-			}
-
-
-			Shared<Renderable> renderable = scene->LineSphereMesh;
-
-			if (!renderable)
-			{
-				continue;
-			}
-
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-		}
-
-
-		for (int i = 0; i < scene->RayComponents.size(); i++)
-		{
-			auto component = scene->RayComponents[i].lock();
-			if (!component)
-				continue;
-
-			if (component->GetHideInGame())
-			{
-				continue;
-			}
-
-			PerInstanceData perInstanceData = {};
-			perInstanceData.World = component->GetPostScaledTransform();
-
-
-			auto& materials = component->GetMaterials();
-			for (const auto& mat : materials)
-			{
-				auto material = mat.get();
-				perInstanceData.Color = material->AlbedoColor;
-			}
-
-
-			Shared<Renderable> renderable = scene->LineMesh;
-
-			if (!renderable)
-			{
-				continue;
-			}
-
-			m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-		}
-
-		for (int i = 0; i < scene->BoundingFrustumComponents.size(); i++)
-		{
-			auto component = Cast<BoundingFrustumComponent>(scene->BoundingFrustumComponents[i]);
-			if (!component)
-				continue;
-
-			CalculateBoundingFrustumTransform(component->GetBoundingFrustum(), component->GetWorldTransform());
-		}
-
-
-		for (int i = 0; i < scene->AIPerceptions.size(); i++)
-		{
-			auto component = Cast<AIPerceptionComponent>(scene->AIPerceptions[i]);
-			if (!component)
-				continue;
-
-			if (component->GetIsHearingEnabled())
-			{
 				PerInstanceData perInstanceData = {};
-				perInstanceData.World = component->GetHearingSphereTransform();
-				perInstanceData.Color = Vector3::Green;
+				perInstanceData.World = component->GetPostScaledTransform();
+
+
+				auto& materials = component->GetMaterials();
+				for (const auto& mat : materials)
+				{
+					auto material = mat.get();
+					perInstanceData.Color = material->AlbedoColor;
+				}
+
+
+				Shared<Renderable> renderable = scene->LineBoxMesh;
+
+				if (!renderable)
+				{
+					continue;
+				}
+
+				m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+			}
+
+			for (int i = 0; i < scene->BoundingSphereComponents.size(); i++)
+			{
+				auto component = scene->BoundingSphereComponents[i].lock();
+				if (!component)
+					continue;
+
+				if (component->GetHideInGame())
+				{
+					continue;
+				}
+
+				PerInstanceData perInstanceData = {};
+				perInstanceData.World = component->GetPostScaledTransform();
+
+
+				auto& materials = component->GetMaterials();
+				for (const auto& mat : materials)
+				{
+					auto material = mat.get();
+					perInstanceData.Color = material->AlbedoColor;
+				}
+
 
 				Shared<Renderable> renderable = scene->LineSphereMesh;
 
@@ -212,24 +151,94 @@ namespace Crystal {
 				}
 
 				m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-
-
-				
-				for(auto& noise : component->GetPerceptedNoiseStimuli())
-				{
-					perInstanceData.World = Matrix4x4::Multiply(Matrix4x4::Scale(noise.MaxRange), Matrix4x4::Translation(noise.Position));
-					perInstanceData.Color = Vector3::Blue;
-					m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
-				}	
 			}
 
-			if (component->GetIsSightEnabled())
+
+			for (int i = 0; i < scene->RayComponents.size(); i++)
 			{
-				CalculateBoundingFrustumTransform(component->GetSightFrustum(), component->GetSightFrustumTransform());
+				auto component = scene->RayComponents[i].lock();
+				if (!component)
+					continue;
+
+				if (component->GetHideInGame())
+				{
+					continue;
+				}
+
+				PerInstanceData perInstanceData = {};
+				perInstanceData.World = component->GetPostScaledTransform();
+
+
+				auto& materials = component->GetMaterials();
+				for (const auto& mat : materials)
+				{
+					auto material = mat.get();
+					perInstanceData.Color = material->AlbedoColor;
+				}
+
+
+				Shared<Renderable> renderable = scene->LineMesh;
+
+				if (!renderable)
+				{
+					continue;
+				}
+
+				m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+			}
+
+			for (int i = 0; i < scene->BoundingFrustumComponents.size(); i++)
+			{
+				auto component = Cast<BoundingFrustumComponent>(scene->BoundingFrustumComponents[i]);
+				if (!component)
+					continue;
+
+				CalculateBoundingFrustumTransform(component->GetBoundingFrustum(), component->GetWorldTransform());
 			}
 		}
 
+		
+		if(worldConfig.bShowDebugAI)
+		{
+			for (int i = 0; i < scene->AIPerceptions.size(); i++)
+			{
+				auto component = Cast<AIPerceptionComponent>(scene->AIPerceptions[i]);
+				if (!component)
+					continue;
 
+				if (component->GetIsHearingEnabled())
+				{
+					PerInstanceData perInstanceData = {};
+					perInstanceData.World = component->GetHearingSphereTransform();
+					perInstanceData.Color = Vector3::Green;
+
+					Shared<Renderable> renderable = scene->LineSphereMesh;
+
+					if (!renderable)
+					{
+						continue;
+					}
+
+					m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+
+
+
+					for (auto& noise : component->GetPerceptedNoiseStimuli())
+					{
+						perInstanceData.World = Matrix4x4::Multiply(Matrix4x4::Scale(noise.MaxRange), Matrix4x4::Translation(noise.Position));
+						perInstanceData.Color = Vector3::Blue;
+						m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+					}
+				}
+
+				if (component->GetIsSightEnabled())
+				{
+					CalculateBoundingFrustumTransform(component->GetSightFrustum(), component->GetSightFrustumTransform());
+				}
+			}
+		}
+
+		
 		for (auto& pair : m_InstanceBatches)
 		{
 			auto& instanceBatches = pair.second;

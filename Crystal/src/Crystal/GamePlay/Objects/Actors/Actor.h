@@ -89,9 +89,12 @@ namespace Crystal {
 
 		void SetIsDead(bool bIsDead) { m_bIsDead = bIsDead; }
 		bool GetIsDead() const { return m_bIsDead; }
-		void Destroy() { m_bIsDead = true; }
+		virtual void Destroy() { m_bIsDead = true; }
 
 		virtual void OnTakeDamage(float damage, Weak<Actor> damageCauser) {}
+
+		Weak<Level> GetLevel() const;
+		Weak<World> GetWorld() const;
 
 
 		STATIC_TYPE_IMPLE(Actor)

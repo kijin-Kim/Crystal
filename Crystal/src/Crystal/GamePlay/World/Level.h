@@ -64,6 +64,10 @@ namespace Crystal {
 		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float,
 		                     const struct CollisionParams& collisionParams);
 
+
+		const WorldConfig& GetWorldConfig() const;
+		Weak<World> GetWorld() const;
+
 		STATIC_TYPE_IMPLE(Level)
 
 	protected:

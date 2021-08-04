@@ -83,6 +83,11 @@ namespace Crystal {
 			return position;			
 		}
 
+		inline bool IsNan(const DirectX::XMFLOAT3& v1)
+		{
+			return DirectX::XMVector3IsNaN(XMLoadFloat3(&v1));
+		}
+
 		inline DirectX::XMFLOAT3 Negate(const DirectX::XMFLOAT3& v1)
 		{
 			DirectX::XMFLOAT3 result;

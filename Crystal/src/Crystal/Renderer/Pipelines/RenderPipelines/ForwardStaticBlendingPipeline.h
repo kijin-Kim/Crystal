@@ -43,6 +43,7 @@ namespace Crystal {
 			float _pad2;
 			float RoughnessConstant = 0.0f;
 			float MetallicConstant = 0.0f;
+			DirectX::XMFLOAT2 TexCoordMultiplier = { 1.0f, 1.0f };
 			
 			int bShouldLit = true;
 			float Opacity = 1.0f;

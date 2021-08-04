@@ -17,7 +17,6 @@ namespace Crystal {
 		void Tick();
 		void Reset();
 
-		void HandleCallback();
 
 		float GetDeltaSeconds() const { return (float)m_DeltaTime; }
 		float GetElapsedTime() const { return (float)m_ElapsedTime; }
@@ -25,8 +24,8 @@ namespace Crystal {
 
 		void Pause();
 		void Resume();
-		
-		
+
+			
 
 	private:
 		double m_SecondsPerCount = 0.0;

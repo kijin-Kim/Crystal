@@ -26,7 +26,7 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetInputVector() const { return m_InputVector; }
 		void ClearInputVector() { m_InputVector = Vector3::Zero; }
 
-
+		void Destroy() override;
 
 		STATIC_TYPE_IMPLE(Pawn)
 	protected:

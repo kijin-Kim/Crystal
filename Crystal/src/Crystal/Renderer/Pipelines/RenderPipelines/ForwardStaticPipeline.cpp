@@ -189,6 +189,7 @@ namespace Crystal {
 			if (!meshComponent)
 				continue;
 
+
 			auto materials = meshComponent->GetMaterials();
 
 			if (materials.empty())

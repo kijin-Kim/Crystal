@@ -7,6 +7,14 @@
 
 namespace Crystal {
 
+
+	struct WorldConfig
+	{
+		bool bShowDebugCollision = false;
+		bool bShowDebugAI = false;
+	};
+
+
 	class PlayerController;
 
 	class World : public Object
@@ -34,6 +42,9 @@ namespace Crystal {
 		void SetCurrentLevelByName(const std::string& name);
 		void SetCurrentLevelByIndex(int iIndex);
 
+		const WorldConfig& GetWorldConfig() const { return m_WorldConfig; }
+		void SetShowDebugCollision(bool show) { m_WorldConfig.bShowDebugCollision = show; }
+		void SetShowDebugAI(bool show) { m_WorldConfig.bShowDebugAI = show; }
 
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -43,6 +54,7 @@ namespace Crystal {
 	private:
 		Level* m_CurrentLevel = nullptr;
 		std::vector<std::shared_ptr<Level>> m_Levels;
+		WorldConfig m_WorldConfig = {};
 	};
 
 	template <class T>

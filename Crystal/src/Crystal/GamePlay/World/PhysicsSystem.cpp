@@ -32,8 +32,6 @@ namespace Crystal {
 					continue;
 
 				auto collisionLhs = collisionCompLhs->GetWorldBoundingSphere();
-
-
 				auto collisionTypeLhs = collisionCompLhs->GetCollisionType();
 
 
@@ -43,6 +41,18 @@ namespace Crystal {
 					auto collisionCompRhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[j]);
 					if (!collisionCompRhs)
 						continue;
+
+					if(collisionCompLhs->HasActorClassWhitelist() || collisionCompRhs->HasActorClassWhitelist())
+					{
+						auto actorTypeLhs = Cast<Actor>(collisionCompLhs->GetOuter())->StaticType();
+						auto actorTypeRhs = Cast<Actor>(collisionCompRhs->GetOuter())->StaticType();
+
+						if(collisionCompLhs->IsWhitelistActorClass(actorTypeRhs) || collisionCompRhs->IsWhitelistActorClass(actorTypeLhs))
+						{
+							continue;
+						}
+					}
+					
 
 					auto collisionRhs = collisionCompRhs->GetWorldBoundingSphere();
 
@@ -76,11 +86,11 @@ namespace Crystal {
 						if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
 						{
 							DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
-							DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
+							DirectX::XMStoreFloat3(&contactNormal, DirectX::XMVectorNegate(contactNormalVector));
 
 							auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
 							ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
-							ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+							ResolvePenetration(collisionCompLhs, collisionCompRhs, contactNormal, totalDist);
 
 							HitResult hitResultLhs = {};
 							hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
@@ -146,7 +156,19 @@ namespace Crystal {
 				if (!collisionCompRhs)
 					continue;
 
+				if (collisionCompLhs->HasActorClassWhitelist() || collisionCompRhs->HasActorClassWhitelist())
+				{
+					auto actorTypeLhs = Cast<Actor>(collisionCompLhs->GetOuter())->StaticType();
+					auto actorTypeRhs = Cast<Actor>(collisionCompRhs->GetOuter())->StaticType();
+
+					if (collisionCompLhs->IsWhitelistActorClass(actorTypeRhs) || collisionCompRhs->IsWhitelistActorClass(actorTypeLhs))
+					{
+						continue;
+					}
+				}
+
 				auto collisionRhs = collisionCompRhs->GetWorldBoundingOrientedBox();
+				
 
 				auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
 
@@ -178,11 +200,11 @@ namespace Crystal {
 					if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
 					{
 						DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
-						DirectX::XMStoreFloat3(&contactNormal, DirectX::XMVectorNegate(contactNormalVector));
+						DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
 
 						auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
 						ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
-						ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+						ResolvePenetration(collisionCompLhs, collisionCompRhs, contactNormal, totalDist);
 
 						HitResult hitResultLhs = {};
 						hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
@@ -249,6 +271,18 @@ namespace Crystal {
 					if (!collisionCompRhs)
 						continue;
 
+					if (collisionCompLhs->HasActorClassWhitelist() || collisionCompRhs->HasActorClassWhitelist())
+					{
+						auto actorTypeLhs = Cast<Actor>(collisionCompLhs->GetOuter())->StaticType();
+						auto actorTypeRhs = Cast<Actor>(collisionCompRhs->GetOuter())->StaticType();
+
+						if (collisionCompLhs->IsWhitelistActorClass(actorTypeRhs) || collisionCompRhs->IsWhitelistActorClass(actorTypeLhs))
+						{
+							continue;
+						}
+					}
+					
+
 					auto collisionRhs = collisionCompRhs->GetWorldBoundingOrientedBox();
 
 					auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
@@ -257,7 +291,7 @@ namespace Crystal {
 					float totalDist = 0.0f;
 					DirectX::XMVECTOR contactNormalVector;
 					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
-					{
+					{		
 						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
 						{
 							// OnBeginOverlap
@@ -281,11 +315,10 @@ namespace Crystal {
 						if (collisionTypeLhs == ECollisionType::CT_Block && collisionTypeRhs == ECollisionType::CT_Block)
 						{
 							DirectX::XMFLOAT3 contactNormal = Vector3::Zero;
-
-							DirectX::XMStoreFloat3(&contactNormal, contactNormalVector);
+							DirectX::XMStoreFloat3(&contactNormal, DirectX::XMVectorNegate(contactNormalVector));
 							auto impulse = CalculateImpulse(collisionCompLhs, collisionCompRhs, contactNormal);
 							ResolveVelocity(collisionCompLhs, collisionCompRhs, impulse);
-							ResolvePenetration(collisionCompLhs, collisionCompRhs, totalDist);
+							ResolvePenetration(collisionCompLhs, collisionCompRhs, contactNormal, totalDist);
 
 							HitResult hitResultLhs = {};
 							hitResultLhs.HitActor = Cast<Actor>(collisionCompRhs->GetOuter());
@@ -343,7 +376,7 @@ namespace Crystal {
 	
 			for (int j = 0; j < scene->AIPerceptionSources.size(); j++)
 			{
-				auto sourceComp = Cast<AIPerceptionSourceComponent>(scene->AIPerceptionSources[i]);
+				auto sourceComp = Cast<AIPerceptionSourceComponent>(scene->AIPerceptionSources[j]);
 				if (!sourceComp)
 				{
 					continue;
@@ -354,8 +387,7 @@ namespace Crystal {
 				if (perceptionComp->GetIsSightEnabled() && sourceComp->GetIsSightEnabled())
 				{
 					auto sightFrustum = perceptionComp->GetWorldSightFrustum();
-
-
+					
 					auto sourceSight = sourceComp->GetSightStimulus();
 
 					if (sightFrustum.Contains(DirectX::XMLoadFloat3(&sourceSight.Position)))
@@ -409,9 +441,20 @@ namespace Crystal {
 						}
 					}
 
-					sourceComp->ClearNoiseStimuli();
 				}
 			}
+
+			
+		}
+
+		for (int i = 0; i < scene->AIPerceptionSources.size(); i++)
+		{
+			auto sourceComp = Cast<AIPerceptionSourceComponent>(scene->AIPerceptionSources[i]);
+			if (!sourceComp)
+			{
+				continue;
+			}
+			sourceComp->ClearNoiseStimuli();
 		}
 
 #endif
@@ -426,7 +469,6 @@ namespace Crystal {
 			return;
 		}
 
-
 		auto impulsePerIMass = Vector3::Divide(impulse, lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass());
 
 
@@ -438,11 +480,16 @@ namespace Crystal {
 	}
 
 	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
-	                                       const std::shared_ptr<CollisionComponent>& rhsComponent, float penetration)
+	                                       const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNorm, float penetration)
 	{
-		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(),
-		                                                          rhsComponent->GetWorldPosition()));
+		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(), rhsComponent->GetWorldPosition()));
 
+		if(Equal(penetration, 0.0f) || Vector3::IsZero(contactNormal))
+		{
+			return;
+		}
+
+		
 		float totalInverseMass = lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass();
 		if (totalInverseMass <= 0)
 			return;
@@ -459,8 +506,16 @@ namespace Crystal {
 	}
 
 	const DirectX::XMFLOAT3& PhysicsSystem::CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
-	                                                         const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal)
+	                                                         const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNorm)
 	{
+		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(), rhsComponent->GetWorldPosition()));
+		
+		if(Vector3::IsNan(contactNormal))
+		{
+			return Vector3::Zero;
+		}
+
+		
 		//========== Resolve velocity =================================
 		auto relativeVelocity = Vector3::Subtract(lhsComponent->GetVelocity(), rhsComponent->GetVelocity());
 		auto seperatingVelocity = Vector3::Dot(relativeVelocity, contactNormal);
@@ -468,7 +523,7 @@ namespace Crystal {
 			return Vector3::Zero;
 
 		// 분리속도, 충격량
-		const float restitution = 2.0f;
+		const float restitution = 1.0f;
 		float newSepVelocity = -seperatingVelocity * restitution; // 충돌후 분리속도 = -충돌전 분리속도 * 반발계수
 		float deltaVelocity = newSepVelocity - seperatingVelocity; // 속도 변화량
 
@@ -487,34 +542,65 @@ namespace Crystal {
 
 		auto scene = GetScene();
 
+		
+
 		for (const auto& lhsWeak : scene->BoundingSphereComponents)
 		{
-			auto sphereComplhs = Cast<BoundingSphereComponent>(lhsWeak);
-			if (!sphereComplhs)
+			auto collisionComplhs = Cast<BoundingSphereComponent>(lhsWeak);
+			if (!collisionComplhs)
 				continue;
 
-			auto ownerActor = Cast<Actor>(sphereComplhs->GetOuter());
+			auto ownerActor = Cast<Actor>(collisionComplhs->GetOuter());
 			if (collisionParams.ShouldBeIgnored(ownerActor))
 			{
 				continue;
 			}
 
-			auto sphereLhs = sphereComplhs->GetWorldBoundingSphere();
-
+			auto collisionLhs = collisionComplhs->GetWorldBoundingSphere();
 
 			DirectX::XMVECTOR originVector = DirectX::XMLoadFloat3(&origin);
 			DirectX::XMVECTOR directionVector = DirectX::XMLoadFloat3(&direction);
 
-			bool currentResult = sphereLhs.Intersects(originVector, directionVector, dist);
+			bool currentResult = collisionLhs.Intersects(originVector, directionVector, dist);
 			if (currentResult && dist < nearest)
 			{
 				nearest = dist;
 				outHitResult.HitActor = ownerActor;
+				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
 			}
-
 
 			result |= currentResult;
 		}
+
+
+		for (const auto& lhsWeak : scene->BoundingOrientedBoxComponents)
+		{
+			auto collisionComplhs = Cast<BoundingOrientedBoxComponent>(lhsWeak);
+			if (!collisionComplhs)
+				continue;
+
+			auto ownerActor = Cast<Actor>(collisionComplhs->GetOuter());
+			if (collisionParams.ShouldBeIgnored(ownerActor))
+			{
+				continue;
+			}
+
+			auto collisionLhs = collisionComplhs->GetWorldBoundingOrientedBox();
+
+			DirectX::XMVECTOR originVector = DirectX::XMLoadFloat3(&origin);
+			DirectX::XMVECTOR directionVector = DirectX::XMLoadFloat3(&direction);
+
+			bool currentResult = collisionLhs.Intersects(originVector, directionVector, dist);
+			if (currentResult && dist < nearest)
+			{
+				nearest = dist;
+				outHitResult.HitActor = ownerActor;
+				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
+			}
+
+			result |= currentResult;
+		}
+		
 
 		return result;
 	}

@@ -26,8 +26,10 @@ public:
 		boundingSphereComponent->SetRadius(40.0f);
 		boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 
+		/*auto boundingSphereComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingSphereComponent");
+		boundingSphereComponent->SetExtents({ 40.0f, 40.0f, 40.0f });
+		boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);*/
 
-	
 		m_MainComponent = boundingSphereComponent;
 
 

@@ -68,7 +68,20 @@ namespace Crystal {
 		useShieldItemActionMapping.bCtrlDown = false;
 		useShieldItemActionMapping.bShiftDown = false;
 		AddActionMapping("UseShieldItem", useShieldItemActionMapping);
-		
+
+		Crystal::ActionMapping toggleShowDebugCollisionActionMapping = {};
+		toggleShowDebugCollisionActionMapping.CrystalCode = Crystal::Keyboard::Num9;
+		toggleShowDebugCollisionActionMapping.bAltDown = false;
+		toggleShowDebugCollisionActionMapping.bCtrlDown = false;
+		toggleShowDebugCollisionActionMapping.bShiftDown = false;
+		AddActionMapping("ShowDebugCollision", toggleShowDebugCollisionActionMapping);
+
+		Crystal::ActionMapping toggleShowDebugAIActionMapping = {};
+		toggleShowDebugAIActionMapping.CrystalCode = Crystal::Keyboard::Num0;
+		toggleShowDebugAIActionMapping.bAltDown = false;
+		toggleShowDebugAIActionMapping.bCtrlDown = false;
+		toggleShowDebugAIActionMapping.bShiftDown = false;
+		AddActionMapping("ShowDebugAI", toggleShowDebugAIActionMapping);		
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

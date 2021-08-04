@@ -316,6 +316,8 @@ namespace Crystal {
 			auto rotation = mainComponent->GetRotationQuat();
 			auto newQuat = Vector4::QuaternionMultiply(rotation, quat);
 			mainComponent->SetRotationQuat(newQuat);
+
+			
 		}
 
 		STATIC_TYPE_IMPLE(BTTaskNodeFaceLocation)

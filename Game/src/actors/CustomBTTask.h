@@ -25,7 +25,7 @@ public:
 			return;
 		}
 
-		possessedPawn->RotateYaw(1.0f);
+		possessedPawn->RotateYaw(0.1f);
 
 	
 		auto blackBoard = GetBlackboardComponent().lock();

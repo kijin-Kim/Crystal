@@ -533,8 +533,8 @@ namespace Crystal {
 
 
 
-		/*m_Pipelines[11]->Begin();
-		m_Pipelines[11]->Record(commandList);*/
+		m_Pipelines[11]->Begin();
+		m_Pipelines[11]->Record(commandList);
 
 
 		m_Pipelines[1]->Begin();
@@ -977,6 +977,11 @@ namespace Crystal {
 		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
+	}
+
+	const WorldConfig& RenderSystem::GetWorldConfig() const
+	{
+		return Cast<Level>(GetOuter())->GetWorldConfig();
 	}
 
 }

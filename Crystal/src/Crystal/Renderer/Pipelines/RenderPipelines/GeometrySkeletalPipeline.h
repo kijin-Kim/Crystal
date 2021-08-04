@@ -48,8 +48,8 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 		Unique<Buffer> m_PerFrameConstantBuffer = nullptr;
-		std::vector<Unique<Buffer>> m_PerObjectConstantBuffers;
-		std::vector<Unique<Buffer>> m_PerDrawConstantBuffers;
+		std::vector<Shared<Buffer>> m_PerObjectConstantBuffers;
+		std::vector<Shared<Buffer>> m_PerDrawConstantBuffers;
 		
 	};
 }

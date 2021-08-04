@@ -1,6 +1,8 @@
 ﻿#include "cspch.h"
 #include "Pawn.h"
 
+#include "Crystal/GamePlay/Controllers/Controller.h"
+
 BOOST_CLASS_EXPORT(Crystal::Pawn)
 
 namespace Crystal {
@@ -13,6 +15,15 @@ namespace Crystal {
 	void Pawn::OnPossessed(Weak<Controller> controller)
 	{
 		m_Controller = controller;
+	}
+
+	void Pawn::Destroy()
+	{
+		Actor::Destroy();
+
+		auto controller = Cast<Controller>(m_Controller);
+		controller->Destroy();
+		
 	}
 
 

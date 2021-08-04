@@ -23,9 +23,7 @@ namespace Crystal {
 		m_World->OnCreate();
 		m_World->SetObjectName("DefaultWorld");
 		m_World->CreateNewLevel("DefaultLevel");
-		m_World->SetCurrentLevelByName("DefaultLevel");
-
-		
+		m_World->SetCurrentLevelByName("DefaultLevel");	
 	}
 
 	Application::~Application()

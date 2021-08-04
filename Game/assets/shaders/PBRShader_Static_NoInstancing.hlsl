@@ -55,6 +55,7 @@ cbuffer PerDrawData : register(b2)
     float padding2;
     float RoughnessConstant;
     float MetallicConstant;
+    float2 TexCoordMultiplier;
 
     bool bShouldLit;
     float Opacity;
@@ -76,8 +77,8 @@ PS_INPUT vsMain(VS_INPUT input)
     output.WorldPosition = mul(float4(input.Position, 1.0f), World);
 
 
-    // input.TexCoord.x *= 40.0f;
-    // input.TexCoord.y *= 16.0f;
+    input.TexCoord.x *= TexCoordMultiplier.x;
+    input.TexCoord.y *= TexCoordMultiplier.y;
     
     output.TexCoord = input.TexCoord;
     output.WorldNormal = mul(input.Normal, (float3x3) World);
