@@ -42,6 +42,7 @@ public:
 
 		m_LightComponent->SetLocalPosition(Crystal::Vector3::Zero);
 		m_LightComponent->AttachTo(m_MainComponent);
+		
 	}
 
 	STATIC_TYPE_IMPLE(Sun)

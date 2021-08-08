@@ -62,5 +62,6 @@ void csMain(uint3 dispatchThreadID : SV_DispatchThreadID)
         }
     }
     irradiance = PI * irradiance / sampleCount;
+    irradiance *= 2.0f;
     OutputTexture[dispatchThreadID] = float4(irradiance, 1.0f);    
 }

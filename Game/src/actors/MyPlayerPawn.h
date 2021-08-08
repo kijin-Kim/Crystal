@@ -10,6 +10,8 @@
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
 
+class PlayerShield;
+
 namespace Crystal {
 	class AIPerceptionSourceComponent;
 	class PawnMovementComponent;
@@ -63,8 +65,6 @@ public:
 
 	void ToggleShowDebugCollision();
 	void ToggleShowDebugAI();
-	
-
 
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
 
@@ -73,12 +73,17 @@ private:
 	
 
 private:
+	Crystal::Shared<Crystal::StaticMeshComponent> m_StaticMeshComponent = nullptr;
+	Crystal::Shared<Crystal::TransformComponent> m_LeftSocketComponent = nullptr;
+	Crystal::Shared<Crystal::TransformComponent> m_RightSocketComponent = nullptr;
 	Crystal::Shared<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
 	Crystal::Shared<Crystal::CameraComponent> m_CameraComponent = nullptr;
 	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent;
 
+	Crystal::Weak<PlayerShield> m_PlayerShield = {};
+
 	bool m_bShouldFire = false;
-	float m_RoundPerMin = 500.0f;
+	float m_RoundPerMin = 1000.0f;
 	float m_RoundPerSec = m_RoundPerMin / 60.0f;
 	float m_FireInterval = 1.0f / m_RoundPerSec;
 
@@ -92,5 +97,7 @@ private:
 	bool m_bIsInVunlnerable = false;
 
 	bool m_bHasItem[ItemTypeCount];
+
+
 
 };

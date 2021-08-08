@@ -83,7 +83,7 @@ public:
 		}
 
 
-		auto randomScale = rand() % 5 + 1;
+		auto randomScale = rand() % 15 + 10;
 
 		m_MainComponent->RotateRoll(rand() % 360);
 		m_MainComponent->RotatePitch(rand() % 360);
@@ -92,10 +92,6 @@ public:
 		m_MainComponent->SetMass(500.0f * randomScale);
 	}
 
-	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override
-	{
-		Destroy();
-	}
 
 
 	STATIC_TYPE_IMPLE(Asteroid)

@@ -4,6 +4,8 @@
 #include "SpaceWhaleAIController.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "MyHUD.h"
+#include "PolluteCircle.h"
+#include "ShieldCircle.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/Resources/Meshes.h"
@@ -55,6 +57,8 @@ void Kraken::Begin()
 {
 	Crystal::Pawn::Begin();
 
+	SetPhase(2);
+
 	m_Health = m_MaxHealth;
 
 	UpdateHealth();
@@ -74,7 +78,15 @@ void Kraken::Update(float deltaTime)
 		{
 			for (int i = 0; i < 3; i++)
 			{
-				auto spaceWhale = level->SpawnActor<SpaceWhale>({}).lock();
+				if(m_CurrentKrakenSpawnCount >= m_MaxKrakenSpawnCount)
+				{
+					break;
+				}
+
+				ActorSpawnParams spawnParams = {};
+				spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
+
+				auto spaceWhale = level->SpawnActor<SpaceWhale>(spawnParams).lock();
 				spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
 				spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
 				spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
@@ -82,6 +94,7 @@ void Kraken::Update(float deltaTime)
 
 				auto spaceWhaleController = level->SpawnActor<SpaceWhaleAIController>({}).lock();
 				spaceWhaleController->Possess(spaceWhale);
+				++m_CurrentKrakenSpawnCount;
 			}
 		}
 	}
@@ -118,4 +131,52 @@ void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
 	m_Health -= damage;
 	UpdateHealth();
+
+	if (m_Health / m_MaxHealth <= 0.5f)
+	{
+		if(GetPhase() != 3)
+		{
+			SetPhase(3);
+		}
+	}
+}
+
+void Kraken::SetPhase(uint32_t phase)
+{
+	m_CurrentPhase = phase;
+
+	switch (m_CurrentPhase)
+	{
+	case 1:
+		{
+			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+			if (level)
+			{
+				ActorSpawnParams spawnParams = {};
+				spawnParams.Instigator = Crystal::Cast<Crystal::Actor>(weak_from_this());
+				spawnParams.Position = GetPosition();
+
+				level->SpawnActor<ShieldCircle>(spawnParams);
+			}
+		}
+		break;
+	case 3:
+		{
+			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+			if (level)
+			{
+				ActorSpawnParams spawnParams = {};
+				spawnParams.Instigator = Crystal::Cast<Crystal::Actor>(weak_from_this());
+				spawnParams.Position = GetPosition();
+
+				level->SpawnActor<PolluteCircle>(spawnParams);
+
+
+				auto myHud = Crystal::Cast<MyHUD>(level->GetHUD());
+				myHud->SetPolluteGague(300.0f);
+			}
+			
+		}
+		break;
+	}
 }

@@ -23,15 +23,26 @@ struct PS_INPUT
 
 
 
+
+#define LT_Directional 0
+#define LT_Point 1
+
 struct Light
 {
-    float3 Direction;
-    float padding0;
-    float4 Color;
+    int LightType;
     float Intensity;
-    float3 padding1;
-};
+    float AttenuationRadius;
+    int bCastShadow;
 
+    float3 Direction;
+    float padding2;
+
+    float3 Position;
+    float padding3;
+
+    float3 Color;
+    float padding4;
+};
 
 cbuffer PerFrameData : register(b0)
 {
@@ -39,8 +50,10 @@ cbuffer PerFrameData : register(b0)
     float4x4 LightViewProjection : packoffset(c4);
     float4 WorldCameraPosition : packoffset(c8);
     Light Lights[100] : packoffset(c9);
-    int LightCount : packoffset(c309);
+    int LightCount : packoffset(c409);
 }
+
+
 
 cbuffer PerObjectData : register(b1)
 {
@@ -59,6 +72,7 @@ cbuffer PerDrawData : register(b2)
 
     bool bShouldLit;
     float Opacity;
+    float OpacityMultiplier;
     bool bToggleAlbedoTexture;
     bool bToggleMetallicTexture;
     bool bToggleRoughnessTexture;
@@ -79,6 +93,7 @@ PS_INPUT vsMain(VS_INPUT input)
 
     input.TexCoord.x *= TexCoordMultiplier.x;
     input.TexCoord.y *= TexCoordMultiplier.y;
+
     
     output.TexCoord = input.TexCoord;
     output.WorldNormal = mul(input.Normal, (float3x3) World);
@@ -193,11 +208,13 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     //Current we have only one directional light
     float3 emissive = bToggleEmissiveTexture ? Textures[TEXTURE_TYPE_EMISSIVE].Sample(DefaultSampler, input.TexCoord).rgb : EmissiveColor;
     float opacity = bToggleOpacityTexture ? Textures[TEXTURE_TYPE_OPACITY].Sample(DefaultSampler, input.TexCoord).r : Opacity;
+    opacity *= OpacityMultiplier;
     if(!bShouldLit)
     {
-        float3 finalColor = emissive;
-        return float4(finalColor, opacity);
+        return float4(emissive, opacity);
     }
+    
+
 
     float3 albedo = bToggleAlbedoTexture ? pow(Textures[TEXTURE_TYPE_ALBEDO].Sample(DefaultSampler, input.TexCoord).rgb, float3(2.2f, 2.2f, 2.2f)) : AlbedoColor.rgb;
     float roughness = bToggleRoughnessTexture ? 
@@ -228,19 +245,33 @@ float4 psMain(PS_INPUT input) : SV_TARGET
 
         // L()
         //float3 L = normalize(Lights[i].WorldPosition.xyz - worldPosition);
-        float3 L = -Lights[i].Direction;
+        float attenuation = 0.0f; // No attenuation
+        float3 L  = 0.0f;
+        if(Lights[i].LightType == LT_Directional)
+        {
+            L = -Lights[i].Direction;
+            attenuation = 1.0f;
+        } 
+        else if(Lights[i].LightType == LT_Point)
+        {
+            float3 diff = Lights[i].Position - input.WorldPosition.xyz;
+            L = normalize(diff);
+            float r = saturate(length(diff) / Lights[i].AttenuationRadius);
+            attenuation = saturate(1.0 - r);
+        }        
         float3 H = normalize(V + L);
-        float attenuation = 1.0f; // No attenuation
-        float3 radiance = finalLightColor * attenuation;
+
+
         
         float dotNV = max(dot(input.WorldNormal, V), 0.0f); // Dot ( Normal, View )
         float dotNL = max(dot(input.WorldNormal, L), 0.0f); // Dot ( Normal, OutgoingLight )
         float dotNH = max(dot(input.WorldNormal, H), 0.0f); // Dot ( Normal, Halfway )
         
         //Cook-Torrance BRDF
+        float3 fresnel = FresnelSchlick(max(dot(H, V), 0.0f), F0);
         float normalDistribution = NormalDistributionGGX(dotNH, roughness);
         float geometry = GeometrySmith(dotNV, dotNL, roughness);
-        float3 fresnel = FresnelSchlick(max(dot(H, V), 0.0f), F0);
+        
 
         float3 numerator = normalDistribution * geometry * fresnel;
         float denominator = 4 * dotNV * dotNL;
@@ -254,10 +285,21 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         //No Diffuse for Conductor
         kD *= 1.0f - metallic;
         
-        Lo += (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+        float3 radiance = finalLightColor * attenuation;
+
+        float3 finalL = (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+        if(Lights[i].bCastShadow)
+        {
+            float shadow = CalculateShadow(mul(float4(input.WorldPosition.xyz, 1.0f), LightViewProjection));
+            finalL *= (1.0f - shadow);
+        }
+        Lo += finalL;
+
+
+
     }
 
-    
+
     // AMBIENT
     float3 kS = FresnelSchlickRoughness(max(dot(input.WorldNormal, V), 0.0f), F0, roughness);
     float3 kD = 1.0f - kS;
@@ -265,8 +307,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 ambient =  kD * diffuse;
 
 
-    float shadow = CalculateShadow(mul(input.WorldPosition, LightViewProjection));
-    float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
+    float3 finalColor = emissive + Lo + ambient;
 
 
     return float4(finalColor, opacity);

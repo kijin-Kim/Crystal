@@ -51,54 +51,81 @@ public:
 
 			resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/Biomechanical Whale Animated.fbx");
 			resourceManager.GetAnimation("assets/models/Biomechanical Whale Animated.fbx");
+
+
+			resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_BODY_BaseColor.tga");
+			resourceManager.GetTexture("assets/textures/Kraken/T_M_KRAKEN_Mat_KRAKEN_MAIN_BODY_Roughness.tga");
+			resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_BODY_NRM.tga");
+
+			resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_BaseColor.tga");
+			resourceManager.GetTexture("assets/textures/Kraken/T_M_KRAKEN_Mat_TENTACLES_LEGS_CLAWS_Roughness.tga");
+			resourceManager.GetTexture("assets/textures/Kraken/Tex_KRAKEN_LEG_TENTACLE_CLAW_NRM.tga");
+
+			resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx");
+
+
+			resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx");
+			resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx");
+
 		}
 
 
 		{
-			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({ "1" }).lock();
-			playerStart->SetPosition({ 0.0f, 1000.0f, -3000.0f });
+			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
+			playerStart->SetPosition({0.0f, 1000.0f, -3000.0f});
 		}
 
 		m_World->GetCurrentLevel()->OnClientConnect();
 
-		
+
 
 		{
 			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
-			sun->SetPosition({0.0f, 20000.0f, 20000.0f});
+			sun->SetPosition({+10000.0f, 20000.0f, 0.0f});
 
+			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun->GetComponentByClass("DirectionalLightComponent"));
+			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f});
+			lightComponent->SetLightIntensity(7.0f);
+			lightComponent->RotateYaw(-90.0f);
+			lightComponent->RotatePitch(45.0f);
+			lightComponent->SetCastShadow(true);
 
 			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 			auto sunMat = sunMesh->GetMaterial(0);
-			sunMat->EmissiveColor = DirectX::XMFLOAT3(1.0f * 3.0f, 1.0f * 3.0f, 0.4f * 3.0f);
+			sunMat->EmissiveColor = { 1.0f * 7.0f, 1.0f * 7.0f, 1.0f * 7.0f };
 		}
 
 		{
-			auto sun2 = m_World->SpawnActor<Sun>({"Sun"}).lock();
-			sun2->SetPosition({+10000.0f, -20000.0f, +20000.0f});
-
-
-			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun2->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({243.0f / 255.0f, 138.0f / 255.0f, 110.0f / 255.0f});
-			lightComponent->SetLightIntensity(3.0f);
+			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({ "LightActor1" }).lock();
+			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(lightActor->GetComponentByClass("DirectionalLightComponent"));
+			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
+			lightComponent->SetLightIntensity(1.0f);
 			lightComponent->RotatePitch(90.0f);
-			lightComponent->SetCastShadow(true);
-			
-
-			auto sunMesh2 = Crystal::Cast<Crystal::StaticMeshComponent>(sun2->GetComponentByClass("StaticMeshComponent"));
-			auto sunMat2 = sunMesh2->GetMaterial(0);
-			sunMat2->EmissiveColor = {243.0f / 255.0f * 3.0f, 138.0f / 255.0f * 3.0f, 110.0f / 255.0f * 3.0f};
+			lightComponent->SetCastShadow(false);
 		}
+
+		/*{
+			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({ "LightActor2" }).lock();
+			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(lightActor->GetComponentByClass("DirectionalLightComponent"));
+			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
+			lightComponent->SetLightIntensity(1.0f);
+			lightComponent->RotatePitch(90.0f);
+			lightComponent->SetCastShadow(false);
+		}*/
+
+
+
 
 
 		if (true)
 		{
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 20; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 1000.0f));			}
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+			}
 
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -125,21 +152,14 @@ public:
 			}
 		}
 
-		
+
 		if (true)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
-			kraken->SetPosition({ 0.0f, 0.0f, 0.0f });
+			kraken->SetPosition({0.0f, 0.0f, 0.0f});
 			auto krakenController = m_World->SpawnActor<KrakenAIController>({}).lock();
 			krakenController->Possess(kraken);
-
-			/*auto shieldCircle = m_World->SpawnActor<ShieldCircle>({}).lock();
-			shieldCircle->SetPosition(Crystal::Vector3::Zero);*/
 		}
-
-
-
-
 
 
 		if (false)
@@ -166,15 +186,11 @@ public:
 		}
 
 
-		if(false)
+		if (false)
 		{
-			auto playCircle = m_World->SpawnActor<ShieldCircle>({ "" }).lock();
+			auto playCircle = m_World->SpawnActor<ShieldCircle>({""}).lock();
 		}
 
-
-		
-		
-		
 
 #endif
 

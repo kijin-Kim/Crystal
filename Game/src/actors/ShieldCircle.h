@@ -1,4 +1,5 @@
 #pragma once
+#include "Kraken.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/LightComponent.h"
@@ -21,14 +22,13 @@ public:
 	{
 		Crystal::Actor::Initialize();
 
-
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 		
 		auto material = Crystal::CreateShared<Crystal::Material>();
-		material->EmissiveColor = { 252.0f / 255.0f * 1.0f, 226.0f / 255.0f * 1.0f, 5.0f / 255.0f * 1.0f };
-		material->TexCoordMultiplier = { 10.0f, 10.0f };
+		material->EmissiveColor = { 80.0f / 255.0f * 3.0f, 226.0f / 255.0f * 3.0f, 0.0f };
+		material->TexCoordMultiplier = { 7.0f, 7.0f };
 		material->Opacity = 0.2f;
-		material->OpacityTexture = resourceManager.GetTexture("assets/textures/bump_reverse.png");
+		material->OpacityTexture = resourceManager.GetTexture("assets/textures/bump.png");
 		
 		material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 		material->BlendMode = Crystal::EBlendMode::BM_Translucent;
@@ -58,6 +58,7 @@ public:
 		if(m_Health <= 0.0f)
 		{
 			Destroy();
+			Crystal::Cast<Kraken>(GetInstigator())->SetPhase(2);
 		}
 	}
 

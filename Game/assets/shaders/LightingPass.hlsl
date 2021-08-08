@@ -15,15 +15,25 @@ struct PS_INPUT
 };
 
 
-
+#define LT_Directional 0
+#define LT_Point 1
 
 struct Light
 {
-    float3 Direction;
-    float padding0;
-    float4 Color;
+    int LightType;
     float Intensity;
-    float3 padding1;
+    float AttenuationRadius;
+    int bCastShadow;
+
+    float3 Direction;
+    float padding2;
+
+    float3 Position;
+    float padding3;
+
+    float3 Color;
+    float padding4;
+
 };
 
 cbuffer PerFrameData : register(b0)
@@ -32,7 +42,7 @@ cbuffer PerFrameData : register(b0)
     float4x4 LightViewProjection : packoffset(c4);
     float4 WorldCameraPosition : packoffset(c8);
     Light Lights[100] : packoffset(c9);
-    int LightCount : packoffset(c309);
+    int LightCount : packoffset(c409);
 }
 
 
@@ -160,11 +170,23 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     {  
         float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
 
-        // L()
-        //float3 L = normalize(Lights[i].WorldPosition.xyz - worldPosition);
-        float3 L = -Lights[i].Direction;
+        float attenuation = 0.0f; // No attenuation
+        float3 L  = 0.0f;
+        if(Lights[i].LightType == LT_Directional)
+        {
+            L = -Lights[i].Direction;
+            attenuation = 1.0f;
+        } 
+        else if(Lights[i].LightType == LT_Point)
+        {
+            float3 diff = Lights[i].Position - worldPosition;
+            L = normalize(diff);
+            float r = saturate(length(diff) / Lights[i].AttenuationRadius);
+            attenuation = saturate(1.0 - r);
+        }        
         float3 H = normalize(V + L);
-        float attenuation = 1.0f; // No attenuation
+
+        
         float3 radiance = finalLightColor * attenuation;
         
         float dotNV = max(dot(worldNormal, V), 0.0f); // Dot ( Normal, View )
@@ -177,7 +199,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         float3 fresnel = FresnelSchlick(max(dot(H, V), 0.0f), F0);
 
         float3 numerator = normalDistribution * geometry * fresnel;
-        float denominator = 4 * dotNV * dotNL;
+        float denominator = 4.0f * dotNV * dotNL;
         float3 specularBRDF = numerator / max(denominator, 0.001f);
 
         //Energy Conservation
@@ -187,8 +209,14 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         
         //No Diffuse for Conductor
         kD *= 1.0f - roughnessMetallicAO.g;
-        
-        Lo += (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+
+        float3 finalL = (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+        if(Lights[i].bCastShadow)
+        {
+            float shadow = CalculateShadow(mul(float4(worldPosition, 1.0f), LightViewProjection));
+            finalL *= (1.0f - shadow);
+        }
+        Lo += finalL;
     }
 
     
@@ -199,10 +227,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 ambient =  kD * diffuse;
 
 
-    float shadow = CalculateShadow(mul(float4(worldPosition, 1.0f), LightViewProjection));
-    float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
-
-    float brightness = dot(finalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+    float3 finalColor = emissive + Lo + ambient;
 
     return float4(finalColor, 1.0f);
     

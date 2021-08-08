@@ -21,6 +21,9 @@ public:
 
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
+	uint32_t GetPhase() const { return m_CurrentPhase;  }
+	void SetPhase(uint32_t phase);
+
 
 	STATIC_TYPE_IMPLE(Kraken)
 
@@ -30,5 +33,10 @@ private:
 	float m_SpaceWhaleSpawnInterval = 5.0f;
 	float m_Health;
 	float m_MaxHealth = 300.0f;
+
+	uint32_t m_CurrentPhase = 1;
+
+	uint32_t m_CurrentKrakenSpawnCount = 0;
+	uint32_t m_MaxKrakenSpawnCount = 0;
 };
 

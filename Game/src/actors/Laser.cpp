@@ -1,5 +1,4 @@
 #include "Laser.h"
-
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/ProjectileMovementComponent.h"
 #include "Crystal/GamePlay/World/Level.h"
@@ -8,11 +7,13 @@
 
 void Laser::Initialize()
 {
+	Crystal::PointLightActor::Initialize();
+	
 	auto material = std::make_unique<Crystal::Material>();
 
 	material->ShadingModel = Crystal::EShadingModel::SM_Unlit;;
 	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
-	material->EmissiveColor = {120 / 255.0f * 10.0f, 250 / 255.0f * 10.0f, 0.7f * 10.0f};
+	material->EmissiveColor = { 255.0f/ 255.0f * 3.0f, 127.0f / 255.0f * 3.0f, 0.0f };
 
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 	sphereComponent->SetRadius(1.0f);
@@ -23,6 +24,7 @@ void Laser::Initialize()
 		{
 			Destroy();
 		});
+	sphereComponent->SetDamping(1.0f);
 
 	m_MainComponent = sphereComponent;
 
@@ -37,7 +39,24 @@ void Laser::Initialize()
 
 	auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 	projectileMovementComponent->SetTargetComponent(m_MainComponent);
-	projectileMovementComponent->SetProjectileMaxAcceleration(300000.0f);
+	projectileMovementComponent->SetProjectileMaxAcceleration(100000.0f);
 
+
+	m_LightComponent->SetLightColor({ 255.0f / 255.0f * 3.0f, 127.0f / 255.0f * 3.0f, 0.0f });
+	m_LightComponent->SetAttenuationRadius(500.0f);
+	m_LightComponent->SetLightIntensity(3.0f);
+	m_LightComponent->AttachTo(m_MainComponent);
+}
+
+void Laser::Update(float deltaTime)
+{
+	Crystal::PointLightActor::Update(deltaTime);
+
+	m_LaserLifeTimer.Tick();
+
+	if(m_LaserLifeTimer.GetElapsedTime() >= m_LaserLifeTime)
+	{
+		Destroy();
+	}
 }
 

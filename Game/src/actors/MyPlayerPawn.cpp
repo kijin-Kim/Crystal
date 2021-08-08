@@ -3,6 +3,7 @@
 #include "Laser.h"
 #include "Missile.h"
 #include "MyHUD.h"
+#include "PlayerShield.h"
 #include "Crystal/Types.h"
 #include "Crystal/GamePlay/Components/AIComponent.h"
 #include "Crystal/GamePlay/World/Level.h"
@@ -32,20 +33,53 @@ void MyPlayerPawn::Initialize()
 
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 
-	auto material = Crystal::CreateShared<Crystal::Material>();
-	material->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-	material->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-	material->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-	material->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
-	material->ShadingModel = Crystal::EShadingModel::SM_Lit;
-	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+	auto baseMat = Crystal::CreateShared<Crystal::Material>();
+	baseMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_InterceptorBaseV3_BaseColor.tga");
+	baseMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_InterceptorBaseV3_Metalness.tga");
+	baseMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_InterceptorBaseV3_Roughness.tga");
+	baseMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_InterceptorBaseV3_Normal.tga");
+	baseMat->ShadingModel = Crystal::EShadingModel::SM_Lit;
+	baseMat->BlendMode = Crystal::EBlendMode::BM_Translucent;
+
+	auto partsMat = Crystal::CreateShared<Crystal::Material>();
+	partsMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_InterceptorPartsV3_BaseColor.tga");
+	partsMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_InterceptorPartsV3_Metalness.tga");
+	partsMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_InterceptorPartsV3_Roughness.tga");
+	partsMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_InterceptorPartsV3_Normal.tga");
+	partsMat->ShadingModel = Crystal::EShadingModel::SM_Lit;
+	partsMat->BlendMode = Crystal::EBlendMode::BM_Translucent;
 
 
-	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
-	staticMeshComponent->AddMaterial(material);
-	staticMeshComponent->AttachTo(m_MainComponent);
-	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
+	m_StaticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("MeshComponent");
+	m_StaticMeshComponent->AddMaterial(baseMat);
+	m_StaticMeshComponent->AddMaterial(partsMat);
+	m_StaticMeshComponent->AttachTo(m_MainComponent);
+	m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_MK3InterceptorMainLite.fbx"));
 
+
+	m_LeftSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftSocketComponent");
+	m_LeftSocketComponent->SetLocalPosition({ -42.0f, -4.1f, 0.0f });
+	m_LeftSocketComponent->AttachTo(m_StaticMeshComponent);
+	
+	m_RightSocketComponent = CreateComponent<Crystal::TransformComponent>("RightSocketComponent");
+	m_RightSocketComponent->SetLocalPosition({ 42.0f, -4.1f, 0.0f });
+	m_RightSocketComponent->AttachTo(m_StaticMeshComponent);
+
+
+	//m_ThrustMat = Crystal::CreateShared<Crystal::Material>();
+	//m_ThrustMat->EmissiveColor = { 255.0f / 255.0f * 1.0f, 127.0f / 255.0f * 1.0f, 0.0f };
+	//m_ThrustMat->OpacityTexture = resourceManager.GetTexture("assets/textures/TilingNoise05.tga");
+	//m_ThrustMat->ShadingModel = Crystal::EShadingModel::SM_Unlit;
+	//m_ThrustMat->BlendMode = Crystal::EBlendMode::BM_Translucent;
+
+
+	//m_ThrustsStaticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("ThrustStaticMeshComponent");
+	//m_ThrustsStaticMeshComponent->SetLocalPosition({ 0.0f, 4.0f, -30.0f});
+	//m_ThrustsStaticMeshComponent->AddMaterial(m_ThrustMat);
+	//m_ThrustsStaticMeshComponent->AttachTo(m_StaticMeshComponent);
+	//m_ThrustsStaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_RocketFlare.fbx"));
+	//m_ThrustsStaticMeshComponent->SetUnitScale(1.0f);
+	
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
@@ -67,11 +101,14 @@ void MyPlayerPawn::Initialize()
 	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
 	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
 	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
+
+
 }
 
 void MyPlayerPawn::Begin()
 {
 	Pawn::Begin();
+	
 	m_Health = m_MaxHealth;
 	UpdateHealth();
 }
@@ -80,6 +117,19 @@ void MyPlayerPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
 
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	if(level)
+	{
+		auto myHud = Crystal::Cast<MyHUD>(level->GetHUD());
+		if(myHud->GetPolluteGauge() >= myHud->GetMaxPolluteGauge())
+		{
+			m_Health -= 0.5f;
+			UpdateHealth();
+		}
+	}
+	
+
+	
 	m_FireTimer.Tick();
 
 	if (m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)
@@ -87,6 +137,13 @@ void MyPlayerPawn::Update(const float deltaTime)
 		m_FireTimer.Reset();
 		OnFire();
 	}
+
+
+	if(!m_PlayerShield.expired())
+	{
+		m_PlayerShield.lock()->SetPosition(Crystal::Vector3::Add(GetPosition(), { 0.0f, 0.0f, -0.5f}));
+	}
+
 }
 
 void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
@@ -199,25 +256,34 @@ void MyPlayerPawn::OnFire()
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
-	const float maxDistance = 10000.0f;
+	const float maxDistance = 100000.0f;
 
+	static bool bUseLeftSocket = true;
+	
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
 	if (level)
 	{
 		Crystal::HitResult hitResult = {};
 		Crystal::CollisionParams collisionParams = {};
 		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
+		collisionParams.IgnoreClasses.push_back("PolluteCircle");
 
 
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
-		auto playerPosition = GetPosition();
-		spawnParams.Position = {playerPosition.x - 100.0f, playerPosition.y, playerPosition.z + 30.0f};
+		if(bUseLeftSocket)
+		{
+			spawnParams.Position = m_LeftSocketComponent->GetWorldPosition();
+			bUseLeftSocket = false;
+		}
+		else
+		{
+			spawnParams.Position = m_RightSocketComponent->GetWorldPosition();
+			bUseLeftSocket = true;
+		}
 
-
+		DirectX::XMFLOAT3 endDirection = m_CameraComponent->GetWorldForwardVector();
 		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
-
-		DirectX::XMFLOAT3 endDirection = direction;
 		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();
@@ -241,10 +307,11 @@ void MyPlayerPawn::OnFire()
 
 				hitActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
 			}
-
-			endDirection = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(hitResult.HitPosition, spawnParams.Position));
 		}
 
+
+		
+		
 		auto angle = Crystal::Vector3::AngleBetweenNormals(Crystal::Vector3::UnitZ, endDirection);
 		auto rotationAxis = Crystal::Vector3::Normalize(Crystal::Vector3::Cross(Crystal::Vector3::UnitZ, endDirection));
 
@@ -335,6 +402,16 @@ void MyPlayerPawn::UseShieldItem()
 	m_bHasItem[ItemType_Shield] = false;
 	UpdateItemStatus(ItemType_Shield, false);
 	m_bIsInVunlnerable = true;
+
+
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	if (level)
+	{
+		ActorSpawnParams spawnParams;
+		spawnParams.Position = GetPosition();
+		//m_PlayerShield = level->SpawnActor<PlayerShield>(spawnParams);
+	}
+
 }
 
 void MyPlayerPawn::ToggleShowDebugCollision()

@@ -166,6 +166,7 @@ public:
 	}
 
 	float GetPolluteGauge() const { return m_CurrentPolluteGauge; }
+	float GetMaxPolluteGauge() const { return m_MaxPolluteGauge; }
 	void SetPolluteGague(float polluteGauge)
 	{
 		m_CurrentPolluteGauge = polluteGauge;

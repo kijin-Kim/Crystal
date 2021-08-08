@@ -79,5 +79,5 @@ void SpaceWhale::Update(float deltaTime)
 
 void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
-	Destroy();
+	//Destroy();
 }

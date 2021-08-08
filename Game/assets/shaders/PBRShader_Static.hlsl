@@ -57,15 +57,25 @@ struct PS_INPUT
 
 
 
+#define LT_Directional 0
+#define LT_Point 1
+
 struct Light
 {
-    float3 Direction;
-    float padding0;
-    float4 Color;
+    int LightType;
     float Intensity;
-    float3 padding1;
-};
+    float AttenuationRadius;
+    int bCastShadow;
 
+    float3 Direction;
+    float padding2;
+
+    float3 Position;
+    float padding3;
+
+    float3 Color;
+    float padding4;
+};
 
 cbuffer PerFrameData : register(b0)
 {
@@ -73,7 +83,7 @@ cbuffer PerFrameData : register(b0)
     float4x4 LightViewProjection : packoffset(c4);
     float4 WorldCameraPosition : packoffset(c8);
     Light Lights[100] : packoffset(c9);
-    int LightCount : packoffset(c309);
+    int LightCount : packoffset(c409);
 }
 
 PS_INPUT vsMain(VS_INPUT input)
@@ -178,7 +188,6 @@ float CalculateShadow(float4 lightSpacePosition)
 
     float2 texCoord = float2(projected.x * 0.5f + 0.5f, -projected.y * 0.5f + 0.5f); // [-1 , 1] to [0 , 1] range excepct z
 
-
     float shadow = 0.0f;
 
     uint shadowMapWidth = 0;
@@ -235,11 +244,24 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     {  
         float3 finalLightColor = Lights[i].Color * Lights[i].Intensity;
 
-        // L()
-        //float3 L = normalize(Lights[i].WorldPosition.xyz - worldPosition);
-        float3 L = -Lights[i].Direction;
+        
+        float attenuation = 0.0f; // No attenuation
+        float3 L  = 0.0f;
+        if(Lights[i].LightType == LT_Directional)
+        {
+            L = -Lights[i].Direction;
+            attenuation = 1.0f;
+        } 
+        else if(Lights[i].LightType == LT_Point)
+        {
+            float3 diff = Lights[i].Position - input.WorldPosition.xyz;
+            L = normalize(diff);
+            float r = saturate(length(diff) / Lights[i].AttenuationRadius);
+            attenuation = saturate(1.0 - r);
+        }        
         float3 H = normalize(V + L);
-        float attenuation = 1.0f; // No attenuation
+
+
         float3 radiance = finalLightColor * attenuation;
         
         float dotNV = max(dot(input.WorldNormal, V), 0.0f); // Dot ( Normal, View )
@@ -263,7 +285,14 @@ float4 psMain(PS_INPUT input) : SV_TARGET
         //No Diffuse for Conductor
         kD *= 1.0f - metallic;
         
-        Lo += (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+        float3 finalL = (kD * albedo / PI + specularBRDF) * radiance * dotNL;
+        if(Lights[i].bCastShadow)
+        {
+            float shadow = CalculateShadow(mul(float4(input.WorldPosition.xyz, 1.0f), LightViewProjection));
+            finalL *= (1.0f - shadow);
+        }
+        Lo += finalL;
+        
     }
 
     
@@ -274,8 +303,7 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 ambient =  kD * diffuse;
 
 
-    float shadow = CalculateShadow(mul(input.WorldPosition, LightViewProjection));
-    float3 finalColor = emissive + Lo * (1.0f - shadow) + ambient;
+    float3 finalColor = emissive + Lo + ambient;
 
     return float4(finalColor, 1.0f);
     
