@@ -14,16 +14,61 @@ namespace Crystal {
 	class BlackboardComponent;
 
 
-	class BTNode : public Object
+	class BTCompositeNode : public Object
 	{
 	public:
-		BTNode() = default;
-		~BTNode() override = default;
+		BTCompositeNode() = default;
+		~BTCompositeNode() override = default;
 
-		void SetParentNode(Weak<BTNode> parentNode) { m_ParentNode = parentNode; }
+		void AddChildNode(Shared<BTCompositeNode> childNode)
+		{
+			m_ChildNodes.push_back(childNode);
+			childNode->SetParentNode(Cast<BTCompositeNode>(weak_from_this()));
+		}
+
+		virtual void Execute(float deltaTime)
+		{
+			if(!m_ChildNodes.empty())
+			{
+				m_ChildNodes[0]->Execute(deltaTime);
+			}
+		}
+
+		void ClearChildNodeExecutionFlags()
+		{
+			for(auto& childNode : m_ChildNodes)
+			{
+				childNode->ClearExecutionFlags();
+			}
+		}
+
+		void Abort()
+		{
+			auto parentNode = Cast<BTCompositeNode>(GetParentNode());
+			if(parentNode == Cast<BTCompositeNode>(GetRootNode()))
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			if(parentNode->StaticType() == "BTSelectorNode")
+			{
+				FinishExecute(true);
+			}
+			else // BTSequenceNode
+			{
+				FinishExecute(false);
+			}
+		}
+
+
+		void SetParentNode(Weak<BTCompositeNode> parentNode) { m_ParentNode = parentNode; }
 		void AddDecorator(const Shared<Decorator>& decorator);
+		void AddAbortDecorator(Weak<Decorator> decorator);
+		void AddAbortDecoratorToChilds(Weak<Decorator> decorator);
+		void PrepareAbortDecorators();
 
-		Weak<BTNode> GetParentNode() const { return m_ParentNode; }
+		Weak<BTCompositeNode> GetParentNode() const { return m_ParentNode; }
 		Weak<BTCompositeNode> GetRootNode();
 		Weak<BehaviorTree> GetBehaviorTree();
 		Weak<BehaviorTreeComponent> GetBehaviorTreeComponent();
@@ -32,12 +77,8 @@ namespace Crystal {
 		Weak<BlackboardComponent> GetBlackboardComponent();
 
 
-		virtual void Execute(float deltaTime)
-		{
-			
-		}
-
 		bool ExecuteDecorators() const;
+		bool CheckAbortDecorators() const;
 
 		void FinishExecute(bool bResult)
 		{
@@ -61,49 +102,24 @@ namespace Crystal {
 			return m_bIsExecutionFinished;
 		}
 
-
-		STATIC_TYPE_IMPLE(BTNode)
-
-	protected:
-		Weak<BTNode> m_ParentNode;
-		std::vector<Shared<Decorator>> m_Decorators;
-		bool m_bExecutionResult;
-		bool m_bIsExecutionFinished = false;
-	};
-
-	class BTCompositeNode : public BTNode
-	{
-	public:
-		BTCompositeNode() = default;
-		~BTCompositeNode() override = default;
-
-		void AddChildNode(Shared<BTNode> childNode)
+		bool GetHasDecorators() const
 		{
-			m_ChildNodes.push_back(childNode);
-			childNode->SetParentNode(Cast<BTNode>(weak_from_this()));
+			return !m_Decorators.empty();
 		}
 
-		void Execute(float deltaTime) override
-		{
-			if(!m_ChildNodes.empty())
-			{
-				m_ChildNodes[0]->Execute(deltaTime);
-			}
-		}
 
-		void ClearChildNodeExecutionFlags()
-		{
-			for(auto& childNode : m_ChildNodes)
-			{
-				childNode->ClearExecutionFlags();
-			}
-		}
-
+		const std::vector<Shared<Decorator>>& GetDecorators() const { return m_Decorators; }
+		const std::vector<Shared<BTCompositeNode>>& GetChildNodes() const { return m_ChildNodes; }
 
 		STATIC_TYPE_IMPLE(BTCompositeNode)
 
 	protected:
-		std::vector<Shared<BTNode>> m_ChildNodes;
+		std::vector<Shared<BTCompositeNode>> m_ChildNodes;
+		Weak<BTCompositeNode> m_ParentNode;
+		std::vector<Shared<Decorator>> m_Decorators;
+		std::vector<Weak<Decorator>> m_AbortDecorators;
+		bool m_bExecutionResult;
+		bool m_bIsExecutionFinished = false;
 	};
 
 	class BTSelectorNode : public BTCompositeNode
@@ -114,6 +130,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
@@ -156,6 +179,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
@@ -208,6 +238,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
@@ -269,6 +306,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
@@ -277,7 +321,7 @@ namespace Crystal {
 			}
 
 			m_Timer.Tick();
-			if(m_Timer.GetElapsedTime() >= WaitTime)
+			if (m_Timer.GetElapsedTime() >= WaitTime)
 			{
 				m_Timer.Reset();
 				FinishExecute(true);
@@ -304,6 +348,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{
@@ -361,7 +412,7 @@ namespace Crystal {
 			auto newQuat = Vector4::QuaternionMultiply(rotation, quat);
 			mainComponent->SetRotationQuat(newQuat);
 
-			
+
 		}
 
 		STATIC_TYPE_IMPLE(BTTaskNodeFaceLocation)
@@ -383,6 +434,13 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
 			bool result = ExecuteDecorators();
 			if (!result)
 			{

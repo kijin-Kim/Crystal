@@ -8,7 +8,7 @@ namespace Crystal {
 
 	Weak<BlackboardComponent> Decorator::GetBlackboardComponent()
 	{
-		auto btNode = Cast<BTNode>(GetOuter());
+		auto btNode = Cast<BTCompositeNode>(GetOuter());
 		if(btNode)
 		{
 			return btNode->GetBlackboardComponent();

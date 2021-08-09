@@ -34,6 +34,7 @@ void DroneAIController::Begin()
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 		blackboardBasedDecorator->BlackboardKey = "PlayerPawnObject";
 		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::DecoratorAbortType::DAT_LowerPriority;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 
@@ -59,6 +60,7 @@ void DroneAIController::Begin()
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 		blackboardBasedDecorator->BlackboardKey = "LastSeenLocation";
 		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::DecoratorAbortType::DAT_LowerPriority;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -96,9 +98,9 @@ void DroneAIController::Begin()
 		moveToLocationNode->MaxAcceleration = 48000.0f;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
-		/*auto waitNode = Crystal::CreateObject<Crystal::BTTaskNodeWait>("TaskNodeWait");
+		auto waitNode = Crystal::CreateObject<Crystal::BTTaskNodeWait>("TaskNodeWait");
 		waitNode->WaitTime = 3.0f;
-		sequenceNode->AddChildNode(waitNode);*/
+		sequenceNode->AddChildNode(waitNode);
 
 		selectorNode->AddChildNode(sequenceNode);
 	}

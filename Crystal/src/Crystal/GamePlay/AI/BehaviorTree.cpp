@@ -7,26 +7,93 @@
 namespace Crystal {
 
 
-	void BTNode::AddDecorator(const Shared<Decorator>& decorator)
+	void BTCompositeNode::AddDecorator(const Shared<Decorator>& decorator)
 	{
 		decorator->SetOuter(weak_from_this());
 		m_Decorators.push_back(decorator);
 	}
 
-	Weak<BTCompositeNode> BTNode::GetRootNode()
+	void BTCompositeNode::AddAbortDecorator(Weak<Decorator> decWeak)
+	{
+		m_AbortDecorators.push_back(decWeak);
+	}
+
+	void BTCompositeNode::AddAbortDecoratorToChilds(Weak<Decorator> decWeak)
+	{
+		for (auto& childNode : m_ChildNodes)
+		{
+			childNode->AddAbortDecorator(decWeak);
+		}
+	}
+
+	void BTCompositeNode::PrepareAbortDecorators()
+	{
+		for(auto& child : m_ChildNodes)
+		{
+			child->PrepareAbortDecorators();
+		}
+
+		if (GetHasDecorators())
+		{
+			auto& decorators = GetDecorators();
+			for (auto& decorator : decorators)
+			{
+				auto abortType = decorator->GetDecoratorAbortType();
+				switch (abortType)
+				{
+				case DecoratorAbortType::DAT_None: break;
+				case DecoratorAbortType::DAT_Self:
+				{
+					AddAbortDecorator(decorator);
+				}
+				break;
+				case DecoratorAbortType::DAT_LowerPriority:
+				{
+					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
+
+					auto& siblings = parentNode->GetChildNodes();
+					auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
+					++it;
+					for (it; it != siblings.end(); ++it)
+					{
+						(*it)->AddAbortDecoratorToChilds(decorator);
+					}
+				}
+				break;
+				case DecoratorAbortType::DAT_Both:
+				{
+					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
+
+					auto& siblings = parentNode->GetChildNodes();
+					auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
+					for (it; it != siblings.end(); ++it)
+					{
+						(*it)->AddAbortDecoratorToChilds(decorator);
+					}
+				}
+				break;
+				default:
+					CS_FATAL(false, "");
+				}
+			}
+		}
+	}
+
+
+	Weak<BTCompositeNode> BTCompositeNode::GetRootNode()
 	{
 		Shared<BTCompositeNode> parentNode = Cast<BTCompositeNode>(GetParentNode());
 		Shared<BTCompositeNode> root = Cast<BTCompositeNode>(shared_from_this());
-		while(parentNode)
+		while (parentNode)
 		{
 			root = parentNode;
 			parentNode = Cast<BTCompositeNode>(parentNode->GetParentNode());
 		}
-		
+
 		return root;
 	}
 
-	Weak<BehaviorTree> BTNode::GetBehaviorTree()
+	Weak<BehaviorTree> BTCompositeNode::GetBehaviorTree()
 	{
 		auto rootNode = GetRootNode().lock();
 		if (rootNode)
@@ -37,7 +104,7 @@ namespace Crystal {
 		return {};
 	}
 
-	Weak<BehaviorTreeComponent> BTNode::GetBehaviorTreeComponent()
+	Weak<BehaviorTreeComponent> BTCompositeNode::GetBehaviorTreeComponent()
 	{
 		auto behaviorTree = GetBehaviorTree().lock();
 		if (behaviorTree)
@@ -48,7 +115,7 @@ namespace Crystal {
 		return {};
 	}
 
-	Weak<AIController> BTNode::GetAIController()
+	Weak<AIController> BTCompositeNode::GetAIController()
 	{
 		auto behaviorTreeComponent = GetBehaviorTreeComponent().lock();
 		if (behaviorTreeComponent)
@@ -59,7 +126,7 @@ namespace Crystal {
 		return {};
 	}
 
-	Weak<Pawn> BTNode::GetPossessedPawn()
+	Weak<Pawn> BTCompositeNode::GetPossessedPawn()
 	{
 		auto aiController = GetAIController().lock();
 		if (aiController)
@@ -70,7 +137,7 @@ namespace Crystal {
 		return {};
 	}
 
-	Weak<BlackboardComponent> BTNode::GetBlackboardComponent()
+	Weak<BlackboardComponent> BTCompositeNode::GetBlackboardComponent()
 	{
 		auto aiController = GetAIController().lock();
 		if (aiController)
@@ -81,7 +148,7 @@ namespace Crystal {
 		return {};
 	}
 
-	bool BTNode::ExecuteDecorators() const
+	bool BTCompositeNode::ExecuteDecorators() const
 	{
 		if (m_Decorators.empty())
 		{
@@ -95,7 +162,31 @@ namespace Crystal {
 			{
 				return false;
 			}
-				
+		}
+
+		return true;
+	}
+
+	bool BTCompositeNode::CheckAbortDecorators() const
+	{
+		if (m_AbortDecorators.empty())
+		{
+			return true;
+		}
+
+		for (auto& dec : m_AbortDecorators)
+		{
+			auto abortDec = dec.lock();
+			if(!abortDec)
+			{
+				continue;
+			}
+
+			bool result = abortDec->Execute();
+			if(result != abortDec->GetLastResult())
+			{
+				return false;
+			}
 		}
 
 		return true;
@@ -106,5 +197,57 @@ namespace Crystal {
 	{
 		m_BehaviorTree = behaviorTree;
 		m_BehaviorTree->SetOuter(weak_from_this());
+
+		
+		m_BehaviorTree->GetRootNode()->PrepareAbortDecorators();
+
+		//auto& childNodes = m_BehaviorTree->GetRootNode()->GetChildNodes();
+		/*for (auto& childNode : childNodes)
+		{
+			if (childNode->GetHasDecorators())
+			{
+				auto& decorators = childNode->GetDecorators();
+				for (auto& decorator : decorators)
+				{
+					auto abortType = decorator->GetDecoratorAbortType();
+					switch (abortType)
+					{
+					case DecoratorAbortType::DAT_None: break;
+					case DecoratorAbortType::DAT_Self:
+						{
+							childNode->AddAbortDecorator(decorator);
+						}
+						break;
+					case DecoratorAbortType::DAT_LowerPriority:
+					{
+						auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
+
+						auto& siblings = parentNode->GetChildNodes();
+						auto it = std::find(siblings.begin(), siblings.end(), childNode);
+						++it;
+						for (it; it != siblings.end(); ++it)
+						{
+							(*it)->AddAbortDecoratorToChilds(decorator);
+						}
+					}
+						break;
+					case DecoratorAbortType::DAT_Both:
+						{
+							auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
+
+							auto& siblings = parentNode->GetChildNodes();
+							auto it = std::find(siblings.begin(), siblings.end(), childNode);
+							for (it; it != siblings.end(); ++it)
+							{
+								(*it)->AddAbortDecoratorToChilds(decorator);
+							}
+						}
+						break;
+					default:
+						CS_FATAL(false, "");
+					}
+				}
+			}
+		}*/
 	}
 }

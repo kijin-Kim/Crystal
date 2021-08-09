@@ -11,6 +11,13 @@ public:
 
 	void Execute(float deltaTime) override
 	{
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+
 		bool result = ExecuteDecorators();
 		if (!result)
 		{
@@ -43,6 +50,13 @@ public:
 
 	void Execute(float deltaTime) override
 	{
+
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
 		CS_DEBUG_INFO("Set");
 		bool result = ExecuteDecorators();
 		if (!result)
@@ -85,6 +99,13 @@ public:
 
 	void Execute(float deltaTime) override
 	{
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+
 		bool result = ExecuteDecorators();
 		if (!result)
 		{
@@ -101,7 +122,7 @@ public:
 
 		possessedPawn->RotateYaw(0.1f);
 
-	
+
 		auto blackBoard = GetBlackboardComponent().lock();
 		blackBoard->SetValueAsFloat3(TargetDirectionKey, possessedPawn->GetForwardVector());
 
@@ -124,6 +145,13 @@ public:
 
 	void Execute(float deltaTime) override
 	{
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+
 		bool result = ExecuteDecorators();
 		if (!result)
 		{
@@ -170,6 +198,13 @@ public:
 
 	void Execute(float deltaTime) override
 	{
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+
 		bool result = ExecuteDecorators();
 		if (!result)
 		{
