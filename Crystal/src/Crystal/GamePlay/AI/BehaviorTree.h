@@ -123,31 +123,26 @@ namespace Crystal {
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				if(!childNode->GetIsExecutionFinished())
-				{
-					childNode->Execute(deltaTime);
-				}
-
 				if(childNode->GetIsExecutionFinished())
 				{
 					bool bExecutionResult = childNode->GetExecutionResult();
-					if(bExecutionResult)
+					if(bExecutionResult) // if child succeed break
 					{
-						FinishExecute(true);
 						ClearChildNodeExecutionFlags();
+						FinishExecute(true);
 						return;
 					}
 				}
 				else
 				{
+					childNode->Execute(deltaTime);
 					return;
 				}
 			}
 
-			ClearChildNodeExecutionFlags();
 			// if all node failed
+			ClearChildNodeExecutionFlags();
 			FinishExecute(false);
-			return;
 		}
 
 		STATIC_TYPE_IMPLE(BTSelectorNode)
@@ -170,30 +165,25 @@ namespace Crystal {
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				if(!childNode->GetIsExecutionFinished())
-				{
-					childNode->Execute(deltaTime);
-				}
-
 				if (childNode->GetIsExecutionFinished())
 				{
 					bool bExecutionResult = childNode->GetExecutionResult();
 					if (!bExecutionResult)
 					{
-						FinishExecute(false);
 						ClearChildNodeExecutionFlags();
+						FinishExecute(false);
 						return;
 					}
 				}
 				else
 				{
+					childNode->Execute(deltaTime);
 					return;
 				}
 			}
 			// if all node succeed
 			ClearChildNodeExecutionFlags();
 			FinishExecute(true);
-			return;
 		}
 
 		STATIC_TYPE_IMPLE(BTSequenceNode)

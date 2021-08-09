@@ -397,7 +397,8 @@ namespace Crystal {
 					auto sourceSight = sourceComp->GetSightStimulus();
 
 					if (sightFrustum.Contains(DirectX::XMLoadFloat3(&sourceSight.Position))
-						&& IsFirstVisible(sightFrustum.Origin, sourceSight.Position, sourceOwner, perceptionOwner))
+						&& IsFirstVisible(sightFrustum.Origin, sourceSight.Position, sourceOwner, perceptionOwner,
+						                  perceptionComp->GetActorClassVisibilityWhitelist()))
 					{
 						if (!perceptionComp->GetIsAlreadyPercepted(sourceSight))
 						{
@@ -535,10 +536,11 @@ namespace Crystal {
 		return Vector3::Multiply(contactNormal, deltaVelocity);
 	}
 
-	bool PhysicsSystem::IsFirstVisible(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, Weak<Actor> target, Weak<Actor> self)
+	bool PhysicsSystem::IsFirstVisible(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, Weak<Actor> target, Weak<Actor> self,
+	                                   const std::vector<std::string>& visibilityWhitelist)
 	{
 		auto targetActor = Cast<Actor>(target.lock());
-		if(!targetActor)
+		if (!targetActor)
 		{
 			return false;
 		}
@@ -546,6 +548,8 @@ namespace Crystal {
 		Crystal::HitResult hitResult = {};
 		Crystal::CollisionParams collisionParams = {};
 		collisionParams.IgnoreActors.push_back(self);
+		collisionParams.IgnoreClasses = visibilityWhitelist;
+
 
 		auto diff = Crystal::Vector3::Subtract(end, start);
 		auto length = Crystal::Vector3::Length(diff);

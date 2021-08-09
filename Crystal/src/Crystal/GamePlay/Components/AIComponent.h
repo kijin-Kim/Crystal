@@ -69,6 +69,21 @@ namespace Crystal {
 		std::vector<NoiseStimulus>::iterator FindNoiseStimulus(const NoiseStimulus& stimulus);
 		bool GetIsAlreadyPercepted(const NoiseStimulus& stimulus);
 		const std::vector<NoiseStimulus>& GetPerceptedNoiseStimuli() const { return m_PerceptedNoiseStimuli; }
+
+		const std::vector<std::string>& GetActorClassVisibilityWhitelist() const { return m_ActorClassVisibilityWhitelist; }
+		void IgnoreVisibilityActorClassOf(const std::string& type) { m_ActorClassVisibilityWhitelist.push_back(type); }
+		void RemoveIgnoreVisibilityActorClassOf(const std::string& type);
+		bool HasActorClassVisibilityWhitelist() const { return !m_ActorClassVisibilityWhitelist.empty(); }
+
+		bool IsVisibilityWhitelistActorClass(const std::string& type)
+		{
+			return FindActorClassFromVisibilityWhitelist(type) != m_ActorClassVisibilityWhitelist.end();
+		}
+
+		std::vector<std::string>::iterator FindActorClassFromVisibilityWhitelist(const std::string& type)
+		{
+			return std::find(m_ActorClassVisibilityWhitelist.begin(), m_ActorClassVisibilityWhitelist.end(), type);
+		}
 		
 		
 		
@@ -98,6 +113,9 @@ namespace Crystal {
 
 		std::vector<SightStimulus> m_PerceptedSightStimuli;
 		std::vector<NoiseStimulus> m_PerceptedNoiseStimuli;
+
+		std::vector<std::string> m_ActorClassVisibilityWhitelist;
+
 		
 	};
 
@@ -122,12 +140,13 @@ namespace Crystal {
 		void SetIsSightEnabled(bool bEnable) { m_bIsSightEnabled = bEnable; }
 		bool GetIsSightEnabled() const { return m_bIsSightEnabled; }
 		
-
+		
 
 		const SightStimulus& GetSightStimulus() const { return m_SightStimulus; }
 		const std::vector<NoiseStimulus>& GetNoiseStimuli() const { return m_NoiseStimuli; }
 		void ClearNoiseStimuli() { m_NoiseStimuli.clear(); }
-		
+
+
 		
 
 		STATIC_TYPE_IMPLE(AIPerceptionSourceComponent)
@@ -139,6 +158,5 @@ namespace Crystal {
 
 		SightStimulus m_SightStimulus = SightStimulus::Create();
 		std::vector<NoiseStimulus> m_NoiseStimuli;
-		
 	};
 }

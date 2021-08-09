@@ -29,6 +29,7 @@ void Drone::Initialize()
 
 	m_FireSocketComponent = CreateComponent<Crystal::TransformComponent>("FireSocektComponent");
 	m_FireSocketComponent->SetLocalPosition({ 0.0f, 0.0f, 20.0f });
+	m_FireSocketComponent->AttachTo(m_MainComponent);
 }
 
 void Drone::OnFire()
