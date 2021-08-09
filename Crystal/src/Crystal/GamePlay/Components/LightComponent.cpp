@@ -6,7 +6,6 @@
 #include "Crystal/Renderer/Scene.h"
 
 BOOST_CLASS_EXPORT(Crystal::LightComponent)
-BOOST_CLASS_EXPORT(Crystal::LocalLightComponent)
 BOOST_CLASS_EXPORT(Crystal::DirectionalLightComponent)
 
 

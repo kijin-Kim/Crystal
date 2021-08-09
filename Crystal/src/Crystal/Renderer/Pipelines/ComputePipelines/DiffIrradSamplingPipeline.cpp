@@ -26,12 +26,12 @@ namespace Crystal {
 		//	for (const auto& mat : materials)
 		//	{
 		//		if (!IsValidForThisPipeline(mat)
-		//			|| !mat->HasTextureInput("CubemapTexture") || !mat->HasTextureInput("OutputTexture"))
+		//			|| !mat->HasTextureInput("CubemapColorTexture") || !mat->HasTextureInput("OutputTexture"))
 		//			continue;
 
 
 		//		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		//		device->CopyDescriptorsSimple(1, handle, mat->GetTextureInput("CubemapTexture")->GetShaderResourceView(),
+		//		device->CopyDescriptorsSimple(1, handle, mat->GetTextureInput("CubemapColorTexture")->GetShaderResourceView(),
 		//			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		//		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -50,7 +50,7 @@ namespace Crystal {
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		device->CopyDescriptorsSimple(1, handle, scene->CubemapTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE),
+		device->CopyDescriptorsSimple(1, handle, scene->CubemapColorTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE),
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

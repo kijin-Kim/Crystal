@@ -69,18 +69,20 @@ namespace Crystal {
 		RenderPipeline::Begin();
 
 
+		auto device = Device::Instance().GetD3DDevice();
+
+		auto& scene = GetScene();
+		if (scene->Lights.empty())
+		{
+			return;
+		}
+
+
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
 
-		auto device = Device::Instance().GetD3DDevice();
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
 
-		
-	
-		
 
 		PerFrameData perFrameData = {};
 
@@ -88,6 +90,11 @@ namespace Crystal {
 		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
 		
 		auto shadowLightSource = scene->Lights[0].lock();
+		if(!shadowLightSource)
+		{
+			return;
+		}
+
 		perFrameData.LightViewProjection = Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection());
 		
 		perFrameData.CameraPositionInWorld = camera->GetWorldPosition();
@@ -108,17 +115,35 @@ namespace Crystal {
 			if (!lightComponent)
 				continue;
 
+			if (!lightComponent->GetAffectsWorld())
+			{
+				continue;
+			}
+
 
 			perFrameData.Lights[lightCount].Direction = lightComponent->GetLocalForwardVector();
-
+			perFrameData.Lights[lightCount].Position = lightComponent->GetWorldPosition();
 			perFrameData.Lights[lightCount].Color = lightComponent->GetLightColor();
 			perFrameData.Lights[lightCount].Intensity = lightComponent->GetLightIntensity();
+
+
+			auto staticType = lightComponent->StaticType();
+			if (staticType == "PointLightComponent")
+			{
+				perFrameData.Lights[lightCount].AttenuationRadius = Crystal::Cast<PointLightComponent>(lightComponent)->GetAttenuationRadius();
+				perFrameData.Lights[lightCount].LightType = LT_Point;
+			}
+			else if (staticType == "DirectionalLightComponent")
+			{
+				perFrameData.Lights[lightCount].LightType = LT_Directional;
+			}
 
 
 			lightCount++;
 		}
 
 		perFrameData.LightCount = lightCount;
+		perFrameData.Lights[0].bCastShadow = true;
 
 		m_PerFrameConstantBuffer->SetData((void*)&perFrameData, 0, sizeof(perFrameData));
 
@@ -165,6 +190,78 @@ namespace Crystal {
 		                              scene->ShadowMapTexture->
 		                                     GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R32_FLOAT),
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	{
+
+		auto device = Device::Instance().GetD3DDevice();
+		auto rootSignature = m_Shader->GetRootSignature();
+
+		auto& scene = GetScene();
+		if(scene->Lights.empty())
+		{
+			return;
+		}
+
+
+		commandList->SetPipelineState(m_PipelineState.Get());
+		commandList->SetGraphicsRootSignature(rootSignature.GetData());
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+		int rootParameterIndex = 0;
+
+		if (rootSignature.HasPerFrameParameter())
+		{
+			commandList->
+				SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
+			descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+				* rootSignature.GetPerFrameDescriptorCount();
+		}
+
+		for (const auto& component : m_Components)
+		{
+			auto meshComponent = component.lock();
+			if (!meshComponent)
+				continue;
+
+			if (rootSignature.HasPerObjectParameter())
+			{
+				commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerObjectParameterIndex(),
+					descriptorHeapHandle); // PerObject
+				descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
+					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+					* rootSignature.GetPerObjectDescriptorCount();
+			}
+
+
+			auto renderable = meshComponent->GetRenderable().lock();
+			auto& materials = meshComponent->GetMaterials();
+
+			if (!renderable)
+			{
+				continue;
+			}
+
+			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
+			{
+				if (j < materials.size() && materials[j])
+				{
+					if (rootSignature.GetPerExecuteDescriptorCount())
+					{
+						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(),
+							descriptorHeapHandle); // PerMaterial
+						descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
+							D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+							* rootSignature.GetPerExecuteDescriptorCount();
+					}
+				}
+				renderable->Render(commandList, j);
+			}
+		}
 	}
 
 

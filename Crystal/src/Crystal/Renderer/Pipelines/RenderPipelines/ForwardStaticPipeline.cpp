@@ -129,11 +129,23 @@ namespace Crystal {
 
 		auto& scene = GetScene();
 
+		if(scene->Lights.empty())
+		{
+			return;
+		}
+
 
 		PerFrameData perFrameData = {};
 
 
 		perFrameData.ViewProjection = Matrix4x4::Transpose(scene->Cameras[0].lock()->GetViewProjection());
+		auto shadowLightSource = scene->Lights[0].lock();
+		if(!shadowLightSource)
+		{
+			return;
+		}
+
+		perFrameData.LightViewProjection = Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection());
 
 		const int maxLightCount = 100;
 		int lightCount = 0;
@@ -147,11 +159,28 @@ namespace Crystal {
 			if (!lightComponent)
 				continue;
 
+			if (!lightComponent->GetAffectsWorld())
+			{
+				continue;
+			}
+
 
 			perFrameData.Lights[lightCount].Direction = lightComponent->GetLocalForwardVector();
-
+			perFrameData.Lights[lightCount].Position = lightComponent->GetWorldPosition();
 			perFrameData.Lights[lightCount].Color = lightComponent->GetLightColor();
 			perFrameData.Lights[lightCount].Intensity = lightComponent->GetLightIntensity();
+
+
+			auto staticType = lightComponent->StaticType();
+			if (staticType == "PointLightComponent")
+			{
+				perFrameData.Lights[lightCount].AttenuationRadius = Crystal::Cast<PointLightComponent>(lightComponent)->GetAttenuationRadius();
+				perFrameData.Lights[lightCount].LightType = LT_Point;
+			}
+			else if (staticType == "DirectionalLightComponent")
+			{
+				perFrameData.Lights[lightCount].LightType = LT_Directional;
+			}
 
 
 			lightCount++;
@@ -159,7 +188,7 @@ namespace Crystal {
 
 
 		perFrameData.LightCount = lightCount;
-
+		perFrameData.Lights[0].bCastShadow = true;
 
 
 		
@@ -222,7 +251,13 @@ namespace Crystal {
 	{
 		Pipeline::Record(commandList);
 
+
 		auto& device = Device::Instance();
+		auto& scene = GetScene();
+		if(scene->Lights.empty())
+		{
+			return;
+		}
 
 
 		commandList->SetGraphicsRootSignature(m_RootSignature.Get());

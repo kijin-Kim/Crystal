@@ -1,7 +1,4 @@
 #pragma once
-#include <functional>
-
-#include "Core.h"
 
 namespace Crystal {
 

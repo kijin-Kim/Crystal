@@ -73,13 +73,7 @@ namespace Crystal {
 		UINT64 GetHeight() const { return m_Resource->GetDesc().Height; }
 
 	private:
-		
-		
-		
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_Resource = nullptr;
-		
-	
-
 
 		std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_ShaderResourceViews;
 		std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_UnorderedAccessViews;

@@ -52,6 +52,7 @@ namespace Crystal {
 		void SetVelocity(const DirectX::XMFLOAT3& velocity);
 		void SetMass(const float mass);
 		void SetInverseMass(const float inverseMass);
+		void SetDamping(const float damping) { m_Damping = damping; }
 
 		void SetRotationQuat(const DirectX::XMFLOAT4& rotation);
 
@@ -120,6 +121,8 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_ForceAccum = Vector3::Zero;
 		DirectX::XMFLOAT3 m_LastForceAccum = Vector3::Zero;
 
+
+		float m_Damping = 0.3f;
 
 	};
 }

@@ -312,6 +312,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\actors\Asteroid.cpp" />
+    <ClCompile Include="src\actors\Drone.cpp" />
+    <ClCompile Include="src\actors\DroneAIController.cpp" />
+    <ClCompile Include="src\actors\DroneLaser.cpp" />
     <ClCompile Include="src\actors\Kraken.cpp" />
     <ClCompile Include="src\actors\Laser.cpp" />
     <ClCompile Include="src\actors\Missile.cpp" />
@@ -327,6 +330,9 @@
   <ItemGroup>
     <ClInclude Include="src\actors\Asteroid.h" />
     <ClInclude Include="src\actors\CustomBTTask.h" />
+    <ClInclude Include="src\actors\Drone.h" />
+    <ClInclude Include="src\actors\DroneAIController.h" />
+    <ClInclude Include="src\actors\DroneLaser.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Laser.h" />
     <ClInclude Include="src\actors\Missile.h" />

@@ -16,6 +16,8 @@
 #include <sstream>
 
 #include "actors/CustomBTTask.h"
+#include "actors/Drone.h"
+#include "actors/DroneAIController.h"
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
 #include "actors/KrakenAIController.h"
@@ -25,6 +27,7 @@
 #include "Crystal/GamePlay/AI/BehaviorTree.h"
 #include "Crystal/GamePlay/AI/Blackboard.h"
 #include "Crystal/GamePlay/AI/Decorator.h"
+#include "Crystal/GamePlay/Objects/Actors/BoundingOrientedBoxActor.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
@@ -72,11 +75,17 @@ public:
 
 		{
 			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
-			playerStart->SetPosition({0.0f, 1000.0f, -3000.0f});
+			playerStart->SetPosition({0.0f, 1000.0f, 0.0f});
 		}
 
 		m_World->GetCurrentLevel()->OnClientConnect();
 
+		{
+			auto drone = m_World->SpawnActor<Drone>({ "Drone" }).lock();
+
+			auto droneController = m_World->SpawnActor<DroneAIController>({}).lock();
+			droneController->Possess(drone);
+		}
 
 
 		{
@@ -84,7 +93,8 @@ public:
 			sun->SetPosition({+10000.0f, 20000.0f, 0.0f});
 
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f});
+			lightComponent->SetLightColor({1.0f, 1.0f , 1.0f });
+			
 			lightComponent->SetLightIntensity(7.0f);
 			lightComponent->RotateYaw(-90.0f);
 			lightComponent->RotatePitch(45.0f);
@@ -92,40 +102,91 @@ public:
 
 			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 			auto sunMat = sunMesh->GetMaterial(0);
-			sunMat->EmissiveColor = { 1.0f * 7.0f, 1.0f * 7.0f, 1.0f * 7.0f };
+			sunMat->EmissiveColor = { 1.0f  * 7.0f, 1.0f * 7.0f, 90.0f / 255.0f * 7.0f};
 		}
+
 
 		{
-			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({ "LightActor1" }).lock();
-			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(lightActor->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
-			lightComponent->SetLightIntensity(1.0f);
-			lightComponent->RotatePitch(90.0f);
-			lightComponent->SetCastShadow(false);
-		}
-
-		/*{
 			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({ "LightActor2" }).lock();
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(lightActor->GetComponentByClass("DirectionalLightComponent"));
 			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
-			lightComponent->SetLightIntensity(1.0f);
-			lightComponent->RotatePitch(90.0f);
+			lightComponent->SetLightIntensity(2.0f);
+			lightComponent->RotateYaw(135.0f);
+			lightComponent->RotatePitch(30.0f);
 			lightComponent->SetCastShadow(false);
-		}*/
+		}
 
-
-
-
-
-		if (true)
 		{
-			for (int i = 0; i < 20; i++)
+			const float distFromCenter = 15000.0f;
+			const float boundingOrientedBoxWidth = 500.0f;
+
+			auto boundingOrientedBoxActor1 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor1" }).lock();
+			boundingOrientedBoxActor1->SetPosition({ +distFromCenter + boundingOrientedBoxWidth, 0.0f, 0.0f });
+			boundingOrientedBoxActor1->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			
+			auto boundingOrientedBoxActor2 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor2" }).lock();
+			boundingOrientedBoxActor2->SetPosition({ -distFromCenter - boundingOrientedBoxWidth, 0.0f, 0.0f });
+			boundingOrientedBoxActor2->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+
+			auto boundingOrientedBoxActor3 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor3" }).lock();
+			boundingOrientedBoxActor3->SetPosition({ 0.0f, +distFromCenter + boundingOrientedBoxWidth, 0.0f });
+			boundingOrientedBoxActor3->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			boundingOrientedBoxActor3->RotateRoll(90.0f);
+			auto boundingOrientedBoxActor4 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor4" }).lock();
+			boundingOrientedBoxActor4->SetPosition({ 0.0f, -distFromCenter - boundingOrientedBoxWidth, 0.0f });
+			boundingOrientedBoxActor4->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			boundingOrientedBoxActor4->RotateRoll(90.0f);
+
+			auto boundingOrientedBoxActor5 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor5" }).lock();
+			boundingOrientedBoxActor5->SetPosition({ 0.0f, 0.0f, +distFromCenter + boundingOrientedBoxWidth });
+			boundingOrientedBoxActor5->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			boundingOrientedBoxActor5->RotateYaw(90.0f);
+
+			auto boundingOrientedBoxActor6 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor6" }).lock();
+			boundingOrientedBoxActor6->SetPosition({ 0.0f, 0.0f, -distFromCenter - boundingOrientedBoxWidth });
+			boundingOrientedBoxActor6->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			boundingOrientedBoxActor6->RotateYaw(90.0f);
+		}
+
+		if(true)
+		{
+			auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
+			asteroid->SetPosition({0.0f, 0.0f, 600.0f});
+			asteroid->SetUnitScale(5.0f);
+		}
+
+		
+
+		if(false)
+		{
+			Crystal::Actor::ActorSpawnParams spawnParams = {};
+
+			auto spaceWhale = m_World->SpawnActor<SpaceWhale>(spawnParams).lock();
+			spaceWhale->SetPosition(Crystal::Vector3::Zero);
+			spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
+			spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
+			spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
+
+			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
+			spaceWhaleController->Possess(spaceWhale);
+		}
+
+		if (false)
+		{
+			for (int i = 0; i < 100; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
 			}
 
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 0; i++)
+			{
+				auto asteroid = m_World->SpawnActor<FakeAsteroid>({}).lock();
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
+			}
+
+
+			for (int i = 0; i < 0; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -133,19 +194,19 @@ public:
 				case 0:
 					{
 						auto asteroid = m_World->SpawnActor<HealAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
 						break;
 					}
 				case 1:
 					{
 						auto asteroid = m_World->SpawnActor<PowerAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
 						break;
 					}
 				case 2:
 					{
 						auto asteroid = m_World->SpawnActor<ShieldAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
 						break;
 					}
 				}
@@ -153,7 +214,7 @@ public:
 		}
 
 
-		if (true)
+		if (false)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({0.0f, 0.0f, 0.0f});

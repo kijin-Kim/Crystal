@@ -113,6 +113,16 @@ namespace Crystal {
 
 		auto& scene = GetScene();
 
+		if(scene->Lights.empty())
+		{
+			return;
+		}
+
+		if (scene->Lights[0].expired())
+		{
+			return;
+		}
+
 		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(scene->Lights[0].lock()->GetLightViewProjection()), 0);
 
 		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)

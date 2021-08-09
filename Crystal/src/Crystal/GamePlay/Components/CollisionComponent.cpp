@@ -118,6 +118,15 @@ namespace Crystal {
 		return it != m_OverlappedComponents.end();
 	}
 
+	void CollisionComponent::RemoveIgnoreActorClassOf(const std::string& type)
+	{
+		auto it = FindActorClassFromWhitelist(type);
+		if(it != m_ActorClassCollisionWhitelist.end())
+		{
+			m_ActorClassCollisionWhitelist.erase(it);
+		}
+	}
+
 
 	void RayComponent::RegisterComponent()
 	{

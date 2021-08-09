@@ -2,12 +2,12 @@
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
+	class Actor;
 	class CollisionComponent;
 	struct Scene;
 
 	class PhysicsSystem : public Object
 	{
-	public:
 	public:
 		PhysicsSystem() = default;
 		~PhysicsSystem() override = default;
@@ -33,5 +33,7 @@ namespace Crystal {
 
 		const DirectX::XMFLOAT3& CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
 		                                          const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal);
+
+		bool IsFirstVisible(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, Weak<Actor> actor, Weak<Actor> selfActor);
 	};
 }

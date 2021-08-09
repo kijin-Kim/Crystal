@@ -61,13 +61,6 @@ namespace Crystal {
 
 
 		{
-			/*		pbrStaticShader->SetInputLayout({
-						{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-						{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-						});*/
 
 			geometryShaderStatic->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -174,7 +167,7 @@ namespace Crystal {
 				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 			});
 
-			RootParameter perFrame = {1, 1, 0};
+			RootParameter perFrame = {1, 4, 0};
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
@@ -241,7 +234,7 @@ namespace Crystal {
 
 
 			brightColorExtractingShader->SetRootSignature({ perFrame, perObject, perExecute });
-			brightColorExtractingShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 1 });			
+			brightColorExtractingShader->SetDispatchThreadGroupCounts({ 1920 / 8.0f, 1080 / 8.0f, 1 });			
 		}
 
 		{
@@ -290,7 +283,6 @@ namespace Crystal {
 
 
 		m_LightPipelines.push_back(CreatePipeline<GeometryStaticPipeline>(geometryShaderStatic, "PBRStaticPipeline"));
-		//m_LightPipelines.push_back(CreatePipeline<LightingSkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<GeometrySkeletalPipeline>(pbrSkeletalShader, "PBRSkeletalPipeline"));
 		m_LightPipelines.push_back(CreatePipeline<LightingPipeline>(lightingPassShader, "LightingPipeline"));
 
@@ -316,12 +308,32 @@ namespace Crystal {
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
 
-		scene->PanoramaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_11_HybridNoise.hdr").lock();
-
-		scene->CubemapTexture = CreateShared<Texture>(2048, 2048, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+		scene->PanoramaCubeColorTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_HybridNoise.hdr").lock();
+		scene->CubemapColorTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
 		                                              D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
 		                                              D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+		scene->PanoramaCubeAlphaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_Alpha.hdr").lock();
+		scene->CubemapAlphaTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+		scene->PanoramaStarFarTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Far_Green.hdr").lock();
+		scene->CubemapStarFarTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+
+
+		scene->PanoramaStarNearTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Near_Large.hdr").lock();
+		scene->CubemapStarNearTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
 
 
 		scene->IrradianceTexture = CreateShared<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -339,7 +351,7 @@ namespace Crystal {
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
-		resourceBarrier.Transition.pResource = scene->CubemapTexture->GetResource();
+		resourceBarrier.Transition.pResource = scene->CubemapColorTexture->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 			| D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -724,7 +736,7 @@ namespace Crystal {
 		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
-		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
+		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth / 3.0f, m_ResHeight / 3.0f, 1, 1,
 		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
@@ -806,7 +818,7 @@ namespace Crystal {
 		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
-		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
+		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth / 3.0f, m_ResHeight / 3.0f, 1, 1,
 		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
@@ -914,7 +926,7 @@ namespace Crystal {
 		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
-		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
+		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth / 3.0f, m_ResHeight / 3.0f, 1, 1,
 		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,

@@ -28,6 +28,7 @@ namespace Crystal {
 
 		Weak<Texture> OpacityTexture = {};
 		float Opacity = 1.0f;
+		float OpacityMultiplier = 1.0f;
 
 		bool bTwoSided = false;
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
+#include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/Buffer.h"
 
 

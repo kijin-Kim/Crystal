@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/container_hash/hash.hpp>
 #include "Core/Core.h"
+#include "GamePlay/Objects/Actors/Actor.h"
 
 
 namespace Crystal {
@@ -30,6 +31,12 @@ namespace Crystal {
 	private:
 		IDCounter() = default;
 		~IDCounter() = default;
+	};
+
+	enum ELightType
+	{
+		LT_Directional = 0,
+		LT_Point
 	};
 
 
@@ -73,7 +80,7 @@ namespace Crystal {
 		Weak<Actor> HitActor = {};
 		Weak<CollisionComponent> HitComponent = {};
 		DirectX::XMFLOAT3 Impulse = {0.0f, 0.0f, 0.0f};
-		DirectX::XMFLOAT3 HitPosition = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 HitPosition = {0.0f, 0.0f, 0.0f};
 	};
 
 	struct OverlapResult
@@ -85,11 +92,23 @@ namespace Crystal {
 	struct CollisionParams
 	{
 		std::vector<Weak<Actor>> IgnoreActors;
-
+		std::vector<std::string> IgnoreClasses;
 
 		bool ShouldBeIgnored(const Shared<Actor>& actor) const
 		{
-			auto it = std::find_if(IgnoreActors.begin(), IgnoreActors.end(), [&actor](const Weak<Actor>& other)-> bool
+			bool result = false;
+
+			auto staticType = actor->StaticType();
+
+			auto it = std::find_if(IgnoreClasses.begin(), IgnoreClasses.end(), [&staticType](const std::string& otherType)-> bool
+			{
+				return staticType == otherType;
+			});
+
+
+			result |= (it != IgnoreClasses.end());
+
+			auto it2 = std::find_if(IgnoreActors.begin(), IgnoreActors.end(), [&actor](const Weak<Actor>& other)-> bool
 			{
 				auto otherActor = other.lock();
 				if (!otherActor)
@@ -101,7 +120,9 @@ namespace Crystal {
 			});
 
 
-			return it != IgnoreActors.end();
+			result |= it2 != IgnoreActors.end();
+
+			return result;
 		}
 	};
 
@@ -115,7 +136,7 @@ namespace Crystal {
 	struct NoiseStimulus : public AIStimulus
 	{
 		Weak<Actor> Instigator = {};
-		DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 Position = {0.0f, 0.0f, 0.0f};
 		float MaxRange = 0.0f;
 
 		~NoiseStimulus() = default;
@@ -188,6 +209,7 @@ namespace Crystal {
 			Instigator = other.Instigator;
 			Position = other.Position;
 		}
+
 		SightStimulus& operator=(const SightStimulus& other)
 		{
 			SightStimulus stimulus = {};

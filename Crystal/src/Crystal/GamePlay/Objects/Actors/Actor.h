@@ -38,6 +38,7 @@ namespace Crystal {
 			DirectX::XMFLOAT3 Position = Vector3::Zero;
 			DirectX::XMFLOAT4 Rotation = Vector4::Zero;
 			float Scale = 0.0f;
+			Weak<Actor> Instigator;
 			Level* Level = nullptr;
 		};
 
@@ -96,6 +97,9 @@ namespace Crystal {
 		Weak<Level> GetLevel() const;
 		Weak<World> GetWorld() const;
 
+		void SetInstigator(Weak<Actor> instigator) { m_Instigator = instigator; }
+		Weak<Actor> GetInstigator() const { return m_Instigator; }
+
 
 		STATIC_TYPE_IMPLE(Actor)
 	protected:
@@ -119,6 +123,8 @@ namespace Crystal {
 		std::vector<std::shared_ptr<TransformComponent>> m_TransformHierarchy;
 
 		bool m_bIsDead = false;
+
+		Weak<Actor> m_Instigator = {};
 	};
 
 

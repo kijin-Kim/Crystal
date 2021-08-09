@@ -114,6 +114,11 @@ namespace Crystal {
 			newActor->SetUnitScale(spawnParams.Scale);
 		}
 
+		if(!spawnParams.Instigator.expired())
+		{
+			newActor->SetInstigator(spawnParams.Instigator);
+		}
+
 
 		newActor->Begin();
 

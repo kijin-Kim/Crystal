@@ -6,6 +6,7 @@
 #include "Crystal/GamePlay/Components/PrimitiveComponent.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
+#include "Crystal/Renderer/Scene.h"
 #include "Crystal/Resources/Material.h"
 
 namespace Crystal {

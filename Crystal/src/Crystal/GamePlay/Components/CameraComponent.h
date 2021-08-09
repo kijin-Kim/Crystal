@@ -54,6 +54,8 @@ namespace Crystal {
 		float GetNearPlane() const { return m_NearPlane; }
 		float GetFarPlane() const { return m_FarPlane; }
 
+		
+
 		STATIC_TYPE_IMPLE(CameraComponent)
 
 	private:

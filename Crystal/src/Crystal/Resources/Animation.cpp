@@ -25,6 +25,9 @@ namespace Crystal {
 				m_AnimationChannelMaps[i][animationChannel->mNodeName.C_Str()] = j;
 			}
 		}
+
+		CS_DEBUG_INFO("%s 애니메이션 데이터를 로드하였습니다.", filePath.c_str());
+
 	}
 
 	Animation::~Animation()

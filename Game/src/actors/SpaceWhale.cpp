@@ -22,6 +22,16 @@ void SpaceWhale::Initialize()
 	boundingOrientedBoxComponent->SetMass(80000.0f);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("SpaceWhale");
 	boundingOrientedBoxComponent->IgnoreActorClassOf("Kraken");
+	boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	{
+		auto staticType = hitResult.HitActor.lock()->StaticType();
+		if (staticType == "BoundingOrientedBoxActor")
+		{
+			auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
+			auto blackboardComponent = spaceWhaleController->GetBlackboardComponent();
+			blackboardComponent->SetValueAsFloat3("RandomPositionInCircle", Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 300.0f));
+		}
+	});
 
 
 	auto skeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
@@ -50,7 +60,6 @@ void SpaceWhale::End()
 			hud->SetPolluteGague(currGauge - 10.0f);
 		}
 	}
-	
 }
 
 
@@ -59,7 +68,7 @@ void SpaceWhale::Update(float deltaTime)
 	Crystal::Pawn::Update(deltaTime);
 
 	m_PolluteGaugeIncrementTimer.Tick();
-	if(m_PolluteGaugeIncrementTimer.GetElapsedTime() >= m_PolluteGaugeIncrementInterval)
+	if (m_PolluteGaugeIncrementTimer.GetElapsedTime() >= m_PolluteGaugeIncrementInterval)
 	{
 		m_PolluteGaugeIncrementTimer.Reset();
 
@@ -72,9 +81,8 @@ void SpaceWhale::Update(float deltaTime)
 				float currGauge = hud->GetPolluteGauge();
 				hud->SetPolluteGague(currGauge + 1.5f);
 			}
-		}	
+		}
 	}
-	
 }
 
 void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)

@@ -17,14 +17,11 @@ namespace Crystal {
 	{
 		RenderPipeline::OnCreate();
 
+
 		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
 		m_StaticMeshComponent->OnCreate();
-
-
 		auto& scene = GetScene();
-		
 		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
-
 		m_Components.push_back(m_StaticMeshComponent);
 	}
 
@@ -60,15 +57,22 @@ namespace Crystal {
 			m_PerFrameConstantBuffer->AsConstantBufferView(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		
-;		
+
 		device->CopyDescriptorsSimple(1, descHandle,
-			scene->CubemapTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			scene->CubemapColorTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		
+		device->CopyDescriptorsSimple(1, descHandle,
+			scene->CubemapAlphaTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+		device->CopyDescriptorsSimple(1, descHandle,
+			scene->CubemapStarFarTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+		device->CopyDescriptorsSimple(1, descHandle,
+			scene->CubemapStarNearTexture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURECUBE), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		
 	}

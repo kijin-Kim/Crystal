@@ -57,9 +57,38 @@ void SpaceWhaleAIController::Begin()
 		selectorNode->AddChildNode(sequenceNode);
 	}
 
+	// MoveToRandomPositionInCenter
+	{
+		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToRandomPositionInSphere");
+		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+		blackboardBasedDecorator->BlackboardKey = "RandomPositionInSphere";
+		blackboardBasedDecorator->bIsSet = true;
+		sequenceNode->AddDecorator(blackboardBasedDecorator);
+
+		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
+		faceLocationNode->TargetLocationKey = "RandomPositionInSphere";
+		faceLocationNode->TargetAngleTolerance = 10.0f;
+		sequenceNode->AddChildNode(faceLocationNode);
+
+		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
+		moveToLocationNode->TargetLocationKey = "RandomPositionInSphere";
+		moveToLocationNode->AcceptableRadius = 120.0f;
+		moveToLocationNode->MaxAcceleration = 30000000.0f;
+		sequenceNode->AddChildNode(moveToLocationNode);
+
+		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
+		clearValueNode->BlackboardKey = "RandomPositionInSphere";
+		sequenceNode->AddChildNode(clearValueNode);
+
+		selectorNode->AddChildNode(sequenceNode);
+	}
+
 	// Keep Orbit
 	{
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
+
+		auto rotateNode = Crystal::CreateObject<BTTaskNodeRotate>("TaskRotate");
+		sequenceNode->AddChildNode(rotateNode);
 
 		auto setTargetDirectionNode = Crystal::CreateObject<BTTaskNodeSetTargetDirection>("TaskSetTargetDirection");
 		setTargetDirectionNode->TargetDirectionKey = "TargetDirection";

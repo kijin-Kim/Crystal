@@ -43,9 +43,21 @@ namespace Crystal {
 		Shared<Texture> IrradianceBuffer = nullptr;
 		Shared<Texture> WorldPositionBuffer = nullptr;
 
-		Shared<Texture> PanoramaTexture = nullptr;
-		Shared<Texture> CubemapTexture = nullptr;
+		Shared<Texture> PanoramaCubeColorTexture = nullptr;
+		Shared<Texture> CubemapColorTexture = nullptr;
 		Shared<Texture> IrradianceTexture = nullptr;
+
+		Shared<Texture> PanoramaCubeAlphaTexture = nullptr;
+		Shared<Texture> CubemapAlphaTexture = nullptr;
+
+		Shared<Texture> PanoramaStarFarTexture = nullptr;
+		Shared<Texture> CubemapStarFarTexture = nullptr;
+
+		Shared<Texture> PanoramaStarNearTexture = nullptr;
+		Shared<Texture> CubemapStarNearTexture = nullptr;
+
+		
+
 	
 		Shared<Texture> ShadowMapTexture = nullptr;
 		Shared<Texture> ShadowMapDummyColorBuffer = nullptr;

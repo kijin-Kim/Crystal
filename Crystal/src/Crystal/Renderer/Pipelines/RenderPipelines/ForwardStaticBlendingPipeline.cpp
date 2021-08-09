@@ -111,6 +111,11 @@ namespace Crystal {
 		auto device = Device::Instance().GetD3DDevice();
 
 		auto& scene = GetScene();
+		if (scene->Lights.empty())
+		{
+			return;
+		}
+
 
 
 		PerFrameData perFrameData = {};
@@ -118,6 +123,13 @@ namespace Crystal {
 
 		auto cameraComponent = scene->Cameras[0].lock();
 		perFrameData.ViewProjection = Matrix4x4::Transpose(cameraComponent->GetViewProjection());
+		auto shadowLightSource = scene->Lights[0].lock();
+		if(!shadowLightSource)
+		{
+			return;
+		}
+		perFrameData.LightViewProjection = Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection());
+
 
 		const int maxLightCount = 100;
 		int lightCount = 0;
@@ -131,18 +143,35 @@ namespace Crystal {
 			if (!lightComponent)
 				continue;
 
+			if(!lightComponent->GetAffectsWorld())
+			{
+				continue;
+			}
+
 
 			perFrameData.Lights[lightCount].Direction = lightComponent->GetLocalForwardVector();
-
+			perFrameData.Lights[lightCount].Position = lightComponent->GetWorldPosition();
 			perFrameData.Lights[lightCount].Color = lightComponent->GetLightColor();
 			perFrameData.Lights[lightCount].Intensity = lightComponent->GetLightIntensity();
 
+
+			auto staticType = lightComponent->StaticType();
+			if(staticType == "PointLightComponent")
+			{
+				perFrameData.Lights[lightCount].AttenuationRadius = Crystal::Cast<PointLightComponent>(lightComponent)->GetAttenuationRadius();
+				perFrameData.Lights[lightCount].LightType = LT_Point;
+			}
+			else if(staticType == "DirectionalLightComponent")
+			{
+				perFrameData.Lights[lightCount].LightType = LT_Directional;
+			}
 
 			lightCount++;
 		}
 
 
 		perFrameData.LightCount = lightCount;
+		perFrameData.Lights[0].bCastShadow = true;
 
 		m_PerFrameConstantBuffer = BufferManager::Instance().GetConstantBuffer(&perFrameData, sizeof(perFrameData));
 
@@ -181,17 +210,22 @@ namespace Crystal {
 			if (materials.empty())
 				continue;
 
+	
+
 			if(materials[0]->BlendMode == EBlendMode::BM_Opaque)
 				continue;
 				
 
-			auto lengthSquared = Vector3::LengthSquared(Vector3::Subtract(cameraComponent->GetWorldPosition(), meshComponent->GetWorldPosition()));
 			
-			m_AlphaSortedStaticMeshes.insert({ lengthSquared, meshComponent});
-
+			auto lengthSquared = Vector3::LengthSquared(Vector3::Subtract(cameraComponent->GetWorldPosition(), meshComponent->GetWorldPosition()));
+			auto it = m_AlphaSortedStaticMeshes.insert({ lengthSquared, RenderData() });
+			it.first->second.Component = meshComponent;
+			
 			
 			for (auto& mat : materials)
 			{
+				it.first->second.DescriptorHeapOffsets.push_back(destHeapHandle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr);
+
 				auto matRow = mat.get();
 
 				PerDrawData perDrawData = {};
@@ -207,6 +241,7 @@ namespace Crystal {
 
 				perDrawData.bShouldLit = matRow->ShadingModel == EShadingModel::SM_Lit ? true : false;
 				perDrawData.Opacity = matRow->Opacity;
+				perDrawData.OpacityMultiplier = matRow->OpacityMultiplier;
 				perDrawData.bToggleAlbedoTexture = !matRow->AlbedoTexture.expired() ? true : false;
 				perDrawData.bToggleMetallicTexture = !matRow->MetallicTexture.expired() ? true : false;
 				perDrawData.bToggleRoughnessTexture = !matRow->RoughnessTexture.expired() ? true : false;
@@ -281,6 +316,8 @@ namespace Crystal {
 				
 			}
 
+			
+
 		}
 
 	}
@@ -288,6 +325,12 @@ namespace Crystal {
 	void ForwardStaticBlendingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
+
+		auto& scene = GetScene();
+		if (scene->Lights.empty())
+		{
+			return;
+		}
 
 		auto device = Device::Instance().GetD3DDevice();
 
@@ -300,13 +343,14 @@ namespace Crystal {
 		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
 		descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 3;
 
-		auto& scene = GetScene();
+
+
 
 
 		auto it = m_AlphaSortedStaticMeshes.rbegin();		
 		for (it; it != m_AlphaSortedStaticMeshes.rend(); ++it)
 		{
-			auto meshComponent = it->second.lock();
+			auto meshComponent = it->second.Component.lock();
 			if (!meshComponent)
 			{
 				continue;
@@ -354,19 +398,23 @@ namespace Crystal {
 
 					perDrawData.bShouldLit = materials[j]->ShadingModel == EShadingModel::SM_Lit ? true : false;
 					perDrawData.Opacity = materials[j]->Opacity;
+					perDrawData.OpacityMultiplier = materials[j]->OpacityMultiplier;
 					perDrawData.bToggleAlbedoTexture = !materials[j]->AlbedoTexture.expired() ? true : false;
 					perDrawData.bToggleMetallicTexture = !materials[j]->MetallicTexture.expired() ? true : false;
 					perDrawData.bToggleRoughnessTexture = !materials[j]->RoughnessTexture.expired() ? true : false;
 					perDrawData.bToggleNormalTexture = !materials[j]->NormalTexture.expired() ? true : false;
 					perDrawData.bToggleEmissiveTexture = !materials[j]->EmissiveTexture.expired() ? true : false;
-					perDrawData.bToggleOpacityTexture= !materials[j]->OpacityTexture.expired() ? true : false;
+					perDrawData.bToggleOpacityTexture = !materials[j]->OpacityTexture.expired() ? true : false;
 
 					perDrawData.bToggleIrradianceTexture = true; // TEMP
 					
 					
 					commandList->SetGraphicsRootConstantBufferView(2, BufferManager::Instance().GetConstantBuffer(&perDrawData, sizeof(perDrawData))->GetGPUVirtualAddress());
-					commandList->SetGraphicsRootDescriptorTable(3, descriptorHeapHandle); // PerMaterial
-					descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 6;
+
+					auto descriptorHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+					descriptorHandle.ptr += it->second.DescriptorHeapOffsets[j];
+
+					commandList->SetGraphicsRootDescriptorTable(3, descriptorHandle); // PerMaterial
 
 
 					commandList->SetPipelineState(m_PipelineStates[{materials[j]->BlendMode, materials[j]->bTwoSided}].Get());

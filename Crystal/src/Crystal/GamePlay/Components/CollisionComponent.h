@@ -57,11 +57,17 @@ namespace Crystal {
 
 		const std::vector<std::string>& GetActorClassWhitelist() const { return m_ActorClassCollisionWhitelist; }
 		void IgnoreActorClassOf(const std::string& type) { m_ActorClassCollisionWhitelist.push_back(type); }
+		void RemoveIgnoreActorClassOf(const std::string& type);
 		bool HasActorClassWhitelist() const { return !m_ActorClassCollisionWhitelist.empty(); }
 
-		bool IsWhitelistActorClass(const std::string& type) const
+		bool IsWhitelistActorClass(const std::string& type)
 		{
-			return std::find(m_ActorClassCollisionWhitelist.begin(), m_ActorClassCollisionWhitelist.end(), type) != m_ActorClassCollisionWhitelist.end();
+			return FindActorClassFromWhitelist(type) != m_ActorClassCollisionWhitelist.end();
+		}
+
+		std::vector<std::string>::iterator FindActorClassFromWhitelist(const std::string& type)
+		{
+			return std::find(m_ActorClassCollisionWhitelist.begin(), m_ActorClassCollisionWhitelist.end(), type);
 		}
 
 

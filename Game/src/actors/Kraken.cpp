@@ -57,7 +57,7 @@ void Kraken::Begin()
 {
 	Crystal::Pawn::Begin();
 
-	SetPhase(2);
+	SetPhase(1);
 
 	m_Health = m_MaxHealth;
 

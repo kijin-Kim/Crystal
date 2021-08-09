@@ -135,6 +135,11 @@ namespace Crystal {
 
 
 		auto shadowLightSource = scene->Lights[0].lock();
+		if(!shadowLightSource)
+		{
+			return;
+		}
+
 		commandList->SetGraphicsRoot32BitConstants(0, 16, &Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection()), 0);
 		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
 

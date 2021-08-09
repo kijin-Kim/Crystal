@@ -91,6 +91,14 @@ namespace Crystal {
 			}
 		}
 
+		void ClearChildNodeExecutionFlags()
+		{
+			for(auto& childNode : m_ChildNodes)
+			{
+				childNode->ClearExecutionFlags();
+			}
+		}
+
 
 		STATIC_TYPE_IMPLE(BTCompositeNode)
 
@@ -115,14 +123,18 @@ namespace Crystal {
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				childNode->Execute(deltaTime);
+				if(!childNode->GetIsExecutionFinished())
+				{
+					childNode->Execute(deltaTime);
+				}
+
 				if(childNode->GetIsExecutionFinished())
 				{
 					bool bExecutionResult = childNode->GetExecutionResult();
-					childNode->ClearExecutionFlags();
 					if(bExecutionResult)
 					{
 						FinishExecute(true);
+						ClearChildNodeExecutionFlags();
 						return;
 					}
 				}
@@ -131,6 +143,8 @@ namespace Crystal {
 					return;
 				}
 			}
+
+			ClearChildNodeExecutionFlags();
 			// if all node failed
 			FinishExecute(false);
 			return;
@@ -156,14 +170,18 @@ namespace Crystal {
 
 			for (auto& childNode : m_ChildNodes)
 			{
-				childNode->Execute(deltaTime);
+				if(!childNode->GetIsExecutionFinished())
+				{
+					childNode->Execute(deltaTime);
+				}
+
 				if (childNode->GetIsExecutionFinished())
 				{
 					bool bExecutionResult = childNode->GetExecutionResult();
-					childNode->ClearExecutionFlags();
 					if (!bExecutionResult)
 					{
 						FinishExecute(false);
+						ClearChildNodeExecutionFlags();
 						return;
 					}
 				}
@@ -173,6 +191,7 @@ namespace Crystal {
 				}
 			}
 			// if all node succeed
+			ClearChildNodeExecutionFlags();
 			FinishExecute(true);
 			return;
 		}
@@ -248,6 +267,41 @@ namespace Crystal {
 		float MaxAcceleration = 0.0f;
 		std::string TargetLocationKey;
 
+	};
+
+
+	class BTTaskNodeWait : public BTTaskNode
+	{
+	public:
+		BTTaskNodeWait() = default;
+		~BTTaskNodeWait() override = default;
+
+
+		void Execute(float deltaTime) override
+		{
+			bool result = ExecuteDecorators();
+			if (!result)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			m_Timer.Tick();
+			if(m_Timer.GetElapsedTime() >= WaitTime)
+			{
+				m_Timer.Reset();
+				FinishExecute(true);
+			}
+		}
+
+		STATIC_TYPE_IMPLE(BTTaskNodeWait)
+
+	public:
+		float WaitTime = 5.0f;
+
+	private:
+
+		Timer m_Timer = {};
 	};
 
 
@@ -327,6 +381,93 @@ namespace Crystal {
 		std::string TargetLocationKey;
 		float TargetAngleTolerance = 0.0f;
 	};
+
+
+
+	class BTTaskNodeFaceActor : public BTTaskNode
+	{
+	public:
+		BTTaskNodeFaceActor() = default;
+		~BTTaskNodeFaceActor() override = default;
+
+
+		void Execute(float deltaTime) override
+		{
+			bool result = ExecuteDecorators();
+			if (!result)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+
+			if (TargetActorKey.empty())
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			auto possessedPawn = GetPossessedPawn().lock();
+			if (!possessedPawn)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			auto mainComponent = possessedPawn->GetMainComponent().lock();
+			if (!mainComponent)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			auto blackBoard = GetBlackboardComponent().lock();
+			
+			auto targetActor = Cast<Actor>(blackBoard->GetValueAsObject(TargetActorKey));
+			if(!targetActor)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			auto targetLocation = targetActor->GetPosition();
+
+			auto newFacing = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(targetLocation, mainComponent->GetWorldPosition()));
+
+			auto normalizedForward = Crystal::Vector3::Normalize(mainComponent->GetWorldForwardVector());
+			auto rotationAxis = Crystal::Vector3::Normalize(Crystal::Vector3::Cross(normalizedForward, newFacing));
+
+			if (Vector3::IsZero(rotationAxis) || Vector3::Equal(normalizedForward, newFacing, 0.001f))
+			{
+				FinishExecute(true);
+				return;
+			}
+
+			auto angle = Vector3::AngleBetweenNormals(normalizedForward, newFacing);
+			if (fabs(angle) < DirectX::XMConvertToRadians(TargetAngleTolerance))
+			{
+				FinishExecute(true);
+				return;
+			}
+
+
+			auto quat = Vector4::QuaternionRotationAxis(rotationAxis, angle);
+
+			auto rotation = mainComponent->GetRotationQuat();
+			auto newQuat = Vector4::QuaternionMultiply(rotation, quat);
+			mainComponent->SetRotationQuat(newQuat);
+
+
+		}
+
+		STATIC_TYPE_IMPLE(BTTaskNodeFaceActor)
+
+
+	public:
+		std::string TargetActorKey;
+		float TargetAngleTolerance = 0.0f;
+	};
+
 
 	class BTTaskNodeClearBlackboardValue : public BTTaskNode
 	{

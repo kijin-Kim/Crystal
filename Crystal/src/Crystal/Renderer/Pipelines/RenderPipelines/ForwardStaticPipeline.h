@@ -9,14 +9,19 @@ namespace Crystal {
 	public:
 		struct Light
 		{
-			DirectX::XMFLOAT3 Direction = Vector3::Zero;
-			float _pad1;
+			ELightType LightType;
+			float Intensity;
+			float AttenuationRadius;
+			bool bCastShadow = false;
 
-			DirectX::XMFLOAT3 Color = Vector3::White;
+			DirectX::XMFLOAT3 Direction = Vector3::Zero;
 			float _pad2;
 
-			float Intensity;
-			float _pad3[3];
+			DirectX::XMFLOAT3 Position = Vector3::Zero;
+			float _pad3;
+
+			DirectX::XMFLOAT3 Color = Vector3::White;
+			float _pad4;
 		};
 
 		struct PerFrameData

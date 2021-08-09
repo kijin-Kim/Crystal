@@ -61,13 +61,10 @@ namespace Crystal {
 
 	void ParticleComponent::SpawnNewParticle()
 	{
-		DirectX::XMFLOAT3 minVel = {-100.0f, 500.0f, -100.0f};
-		DirectX::XMFLOAT3 maxVel = {+100.0f, 1000.0f, +100.0f};
-
-
+		
 		if (m_Particles.size() < m_ParticleSpawnCount)
 		{
-			m_Particles.emplace_back(GetWorldPosition(), Vector3::Zero, GetScale().x, 45.0f, 100.0f);
+			m_Particles.emplace_back(GetWorldPosition(), Vector3::RandomInRange({0.0f, 0.0f, 0.0f}, { 500.0f, 500.0f, 500.0f }), GetScale().x, RandomFloatInRange(0.0f, 359.0f), 2.0f);
 		}
 	}
 

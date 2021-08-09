@@ -28,6 +28,8 @@ namespace Crystal {
 
 		void Destroy() override;
 
+		Weak<Controller> GetController() const { return m_Controller; }
+
 		STATIC_TYPE_IMPLE(Pawn)
 	protected:
 		DirectX::XMFLOAT3 m_InputVector = Vector3::Zero;

@@ -37,6 +37,6 @@ private:
 	uint32_t m_CurrentPhase = 1;
 
 	uint32_t m_CurrentKrakenSpawnCount = 0;
-	uint32_t m_MaxKrakenSpawnCount = 0;
+	uint32_t m_MaxKrakenSpawnCount = 5;
 };
 

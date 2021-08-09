@@ -81,7 +81,7 @@ namespace Crystal {
 		float m_InitScale = 100.0f;
 		DirectX::XMFLOAT3 m_InitVelocity = {0.0f, 500.0f, 0.0f};
 		float m_InitLifeTime = 1.0f;
-		uint64_t m_ParticleSpawnCount = 1;
+		uint64_t m_ParticleSpawnCount = 5;
 		uint32_t m_HorizontalSubImageCount = 0;
 		uint32_t m_VerticalSubImageCount = 0;
 
