@@ -1,18 +1,16 @@
-#include "PolluteCircle.h"
+#include "PolluteSphere.h"
 
 #include "MyPlayerPawn.h"
 
-void PolluteCircle::Initialize()
+void PolluteSphere::Initialize()
 {
 	Crystal::Actor::Initialize();
 
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 
 	auto material = Crystal::CreateShared<Crystal::Material>();
-	material->EmissiveColor = { 80.0f / 255.0f * 1.0f, 226.0f / 255.0f * 1.0f, 0.0f };
+	material->EmissiveColor = { 195.0f / 255.0f * 0.5f, 195.0f / 255.0f * 0.5f, 1.0f / 255.0f * 0.5f };
 	material->Opacity = 0.1f;
-	//material->TexCoordMultiplier = { 16.0f, 16.0f };
-	//material->OpacityTexture = resourceManager.GetTexture("assets/textures/bump_reverse.png");
 		
 	material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 	material->BlendMode = Crystal::EBlendMode::BM_Translucent;
@@ -23,8 +21,7 @@ void PolluteCircle::Initialize()
 	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
 	boundingSphereComponent->SetRadius(2300.0f);
 	boundingSphereComponent->IgnoreActorClassOf("Kraken");
-	boundingSphereComponent->IgnoreActorClassOf("Laser");
-	boundingSphereComponent->IgnoreActorClassOf("SpaceWhale");
+	boundingSphereComponent->IgnoreActorClassOf("DroneLaser");
 	boundingSphereComponent->SetInverseMass(0.0f);
 
 	boundingSphereComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult& overlapResult)
@@ -33,6 +30,7 @@ void PolluteCircle::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
+				Crystal::Cast<MyPlayerPawn>(actor)->SetIsPolluteDamagable(false);
 				auto& mat = m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = true;
 			}
@@ -43,6 +41,7 @@ void PolluteCircle::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
+				Crystal::Cast<MyPlayerPawn>(actor)->SetIsPolluteDamagable(true);
 				auto& mat= m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = false;
 			}

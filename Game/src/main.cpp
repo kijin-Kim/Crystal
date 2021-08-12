@@ -22,12 +22,13 @@
 #include "actors/Missile.h"
 #include "actors/KrakenAIController.h"
 #include "actors/MyHUD.h"
-#include "actors/ShieldCircle.h"
+#include "actors/ShieldSphere.h"
 #include "actors/SpaceWhale.h"
 #include "Crystal/GamePlay/AI/BehaviorTree.h"
 #include "Crystal/GamePlay/AI/Blackboard.h"
 #include "Crystal/GamePlay/AI/Decorator.h"
 #include "Crystal/GamePlay/Objects/Actors/BoundingOrientedBoxActor.h"
+#include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 #include "Crystal/GamePlay/Objects/Actors/StaticMeshActor.h"
 
 
@@ -42,7 +43,6 @@ public:
 	{
 		Crystal::Application::Start();
 
-#if defined(CS_NM_STANDALONE) || defined(CS_NM_DEDICATED)
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
@@ -80,11 +80,18 @@ public:
 
 		m_World->GetCurrentLevel()->OnClientConnect();
 
+		if(true)
 		{
-			auto drone = m_World->SpawnActor<Drone>({ "Drone" }).lock();
+			for(int i=0; i< 0; i++)
+			{
+				auto drone = m_World->SpawnActor<Drone>({ "Drone" }).lock();
+				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
 
-			auto droneController = m_World->SpawnActor<DroneAIController>({}).lock();
-			droneController->Possess(drone);
+				auto droneController = m_World->SpawnActor<DroneAIController>({}).lock();
+				droneController->Possess(drone);
+				
+			}
+			
 		}
 
 
@@ -149,32 +156,11 @@ public:
 			boundingOrientedBoxActor6->RotateYaw(90.0f);
 		}
 
-		if(true)
+	
+
+		if (true)
 		{
-			auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
-			asteroid->SetPosition({0.0f, 0.0f, 600.0f});
-			asteroid->SetUnitScale(5.0f);
-		}
-
-		
-
-		if(false)
-		{
-			Crystal::Actor::ActorSpawnParams spawnParams = {};
-
-			auto spaceWhale = m_World->SpawnActor<SpaceWhale>(spawnParams).lock();
-			spaceWhale->SetPosition(Crystal::Vector3::Zero);
-			spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
-			spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
-			spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
-
-			auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
-			spaceWhaleController->Possess(spaceWhale);
-		}
-
-		if (false)
-		{
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
@@ -187,7 +173,7 @@ public:
 			}
 
 
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 30; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -215,7 +201,7 @@ public:
 		}
 
 
-		if (false)
+		if (true)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({0.0f, 0.0f, 0.0f});
@@ -229,36 +215,106 @@ public:
 			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({""}).lock();
 		}
 
-		if (false)
-		{
-			auto staticMeshActor = m_World->SpawnActor<Crystal::StaticMeshActor>({""}).lock();
-			staticMeshActor->SetPosition({0.0f, -1000.0f, 0.0f});
-			staticMeshActor->SetUnitScale(50.0f);
-
-
-			auto staticMeshComponent = Crystal::Cast<Crystal::StaticMeshComponent>(
-				staticMeshActor->GetComponentByName("StaticMeshComponent"));
-			staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/floor.fbx"));
-
-			staticMeshComponent->RotatePitch(90.0f);
-
-			auto& materials = staticMeshComponent->GetMaterials();
-			auto pbrMat = materials[0].get();
-			pbrMat->AlbedoColor = Crystal::Vector3::White;
-		}
-
 
 		if (false)
 		{
-			auto playCircle = m_World->SpawnActor<ShieldCircle>({""}).lock();
+			auto playCircle = m_World->SpawnActor<ShieldSphere>({""}).lock();
 		}
 
+		if (true)
+		{
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "GreenTintPostProcess" }).lock();
+			postProcessActor->SetPostProcessOrder(0);
+			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
+			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
+			postProcessActor->SetSphereRadius(2300.0f);
+			postProcessActor->SetPosition(Crystal::Vector3::Zero);
+			postProcessActor->SetIsEnabled(false);
+			
+			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
 
-#endif
+			auto mat = postProcessComponent->GetMaterials()[0];
+			mat->TintColor = { 0.2f, 0.2f, 0.05f };
 
-#ifdef CS_NM_CLIENT
+			auto kraken = Crystal::Cast<Kraken>(m_World->GetCurrentLevel()->GetActorByClass("Kraken"));
+			kraken->GreenTintVolumeActor = postProcessActor;
+		}
 
-#endif
+		if (true)
+		{
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "VignettePostProcess"}).lock();
+			postProcessActor->SetPostProcessOrder(2);
+			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
+			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
+			postProcessActor->SetSphereRadius(2300.0f);
+			postProcessActor->SetIsEnabled(false);
+
+			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
+
+			auto mat = postProcessComponent->GetMaterials()[0];
+			mat->SceneColorMaskTexture = resourceManager.GetTexture("assets/textures/radial_gradient.png");
+
+			auto kraken = Crystal::Cast<Kraken>(m_World->GetCurrentLevel()->GetActorByClass("Kraken"));
+			kraken->VignetteVolumeActor = postProcessActor;
+		}
+
+		if(true)
+		{
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterDamagedPostProcess" }).lock();
+			postProcessActor->SetPostProcessOrder(3);
+			postProcessActor->SetUnBound(true);
+
+
+			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
+
+			auto mat = postProcessComponent->GetMaterials()[0];
+			mat->AlbedoColor = Crystal::Vector3::Red;
+			mat->OpacityTexture = resourceManager.GetTexture("assets/textures/radial_gradient2_inv.png");
+			mat->OpacityMultiplier = 0.0f;
+
+			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
+			myPlayerPawn->DamagedPostProcessActor = postProcessActor;
+		}
+
+		if (true)
+		{
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterHealPostProcess" }).lock();
+			postProcessActor->SetPostProcessOrder(3);
+			postProcessActor->SetUnBound(true);
+
+
+			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
+
+			auto mat = postProcessComponent->GetMaterials()[0];
+			mat->AlbedoColor = { 51.0f / 255.0f, 165.0f / 255.0f, 50.0f / 255.0f };
+			mat->OpacityTexture = resourceManager.GetTexture("assets/textures/radial_gradient_inv.png");
+			mat->OpacityMultiplier = 0.0f;
+
+			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
+			myPlayerPawn->HealPostProcessActor = postProcessActor;
+		}
+
+		if (true)
+		{
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterShieldPostProcess" }).lock();
+			postProcessActor->SetPostProcessOrder(1);
+			postProcessActor->SetUnBound(true);
+			postProcessActor->SetHiddenInGame(true);
+
+			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
+
+			auto mat = postProcessComponent->GetMaterials()[0];
+			mat->AlbedoColor = { 21.0f / 255.0f, 105.0f / 255.0f, 199.0f / 255.0f };
+			mat->OpacityTexture = resourceManager.GetTexture("assets/textures/bump_reverse.png");
+			mat->TexCoordMultiplier = { 3.0f, 3.0f * (1080.0f / 1920.0f) };
+			mat->OpacityMultiplier = 0.3f;
+			
+
+			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
+			myPlayerPawn->ShieldPostProcess = postProcessActor;
+		}
+
+		
 	}
 };
 

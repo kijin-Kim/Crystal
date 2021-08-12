@@ -32,7 +32,7 @@ public:
 			return;
 		}
 
-		possessedPawn->RotateYaw(0.1f);
+		possessedPawn->RotateYaw(0.1f * deltaTime);
 
 		FinishExecute(true);
 	}
@@ -57,7 +57,6 @@ public:
 			Abort();
 			return;
 		}
-		CS_DEBUG_INFO("Set");
 		bool result = ExecuteDecorators();
 		if (!result)
 		{
@@ -73,7 +72,7 @@ public:
 		}
 
 		auto blackBoard = GetBlackboardComponent().lock();
-		blackBoard->SetValueAsFloat3(RandomPositionKey, Crystal::Vector3::RandomPositionInSphere(Center, Radius));
+		blackBoard->SetValueAsFloat3(RandomPositionKey, Crystal::Vector3::RandomPositionInSphere(possessedPawn->GetPosition(), Radius));
 
 		FinishExecute(true);
 	}
@@ -82,7 +81,6 @@ public:
 
 public:
 	std::string RandomPositionKey;
-	DirectX::XMFLOAT3 Center;
 	float Radius;
 };
 
@@ -120,9 +118,6 @@ public:
 			return;
 		}
 
-		possessedPawn->RotateYaw(0.1f);
-
-
 		auto blackBoard = GetBlackboardComponent().lock();
 		blackBoard->SetValueAsFloat3(TargetDirectionKey, possessedPawn->GetForwardVector());
 
@@ -136,11 +131,11 @@ public:
 };
 
 
-class BTTaskNodeMoveTowardDirection : public Crystal::BTTaskNode
+class BTTaskNodeOrbit : public Crystal::BTTaskNode
 {
 public:
-	BTTaskNodeMoveTowardDirection() = default;
-	~BTTaskNodeMoveTowardDirection() override = default;
+	BTTaskNodeOrbit() = default;
+	~BTTaskNodeOrbit() override = default;
 
 
 	void Execute(float deltaTime) override
@@ -159,13 +154,6 @@ public:
 			return;
 		}
 
-
-		if (TargetDirectionKey.empty())
-		{
-			FinishExecute(false);
-			return;
-		}
-
 		auto possessedPawn = GetPossessedPawn().lock();
 		if (!possessedPawn)
 		{
@@ -173,18 +161,16 @@ public:
 			return;
 		}
 
-		auto blackBoard = GetBlackboardComponent().lock();
-		auto targetDirection = blackBoard->GetValueAsFloat3(TargetDirectionKey);
-
+		possessedPawn->RotateYaw(10.0f * deltaTime);
+		auto targetDirection = Crystal::Vector3::Normalize(possessedPawn->GetForwardVector());
 		possessedPawn->AddForce(Crystal::Vector3::Multiply(targetDirection, MaxAcceleration));
 
-		FinishExecute(true);
+//		FinishExecute(true);
 	}
 
-	STATIC_TYPE_IMPLE(BTTaskNodeMoveTowardDirection)
+	STATIC_TYPE_IMPLE(BTTaskNodeOrbit)
 
 public:
-	std::string TargetDirectionKey;
 	float MaxAcceleration = 0.0f;
 };
 

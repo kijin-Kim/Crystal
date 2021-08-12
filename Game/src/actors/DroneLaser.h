@@ -18,4 +18,5 @@ public:
 private:
 	Crystal::Timer m_LaserLifeTimer = {};
 	float m_LaserLifeTime = 2.0f;
+	float m_Damage = 1.0f;
 };

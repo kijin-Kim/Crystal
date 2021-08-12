@@ -9,10 +9,11 @@
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
-
 class PlayerShield;
 
 namespace Crystal {
+	class TextureComponent;
+	class PostProcessVolumeActor;
 	class AIPerceptionSourceComponent;
 	class PawnMovementComponent;
 }
@@ -66,16 +67,27 @@ public:
 	void ToggleShowDebugCollision();
 	void ToggleShowDebugAI();
 
+	void OnItemDestroyed(ItemType itemType);
+
+	void SetIsPolluteDamagable(bool bIsDamagable)
+	{
+		m_bIsPolluteDamagable = bIsDamagable;
+	}
+	bool GetIsPolluteDamagable() const { return m_bIsPolluteDamagable; }
+
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
 
 private:
 	void OnFire();
-	
+	void AddDamagedOpacityMultiplier(float opacity);
+	void AddHealOpacityMultiplier(float opacity);
+
+
 
 private:
 	Crystal::Shared<Crystal::StaticMeshComponent> m_StaticMeshComponent = nullptr;
-	Crystal::Shared<Crystal::TransformComponent> m_LeftSocketComponent = nullptr;
-	Crystal::Shared<Crystal::TransformComponent> m_RightSocketComponent = nullptr;
+	Crystal::Shared<Crystal::TransformComponent> m_LeftFireSocketComponent = nullptr;
+	Crystal::Shared<Crystal::TransformComponent> m_RightFireSocketComponent = nullptr;
 	Crystal::Shared<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
 	Crystal::Shared<Crystal::CameraComponent> m_CameraComponent = nullptr;
 	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent;
@@ -88,16 +100,28 @@ private:
 	float m_FireInterval = 1.0f / m_RoundPerSec;
 
 	Crystal::Timer m_FireTimer;
-
-
-	float m_Health = 0.0f;
-	float m_MaxHealth = 100.0f;
 	
-	float m_Power = 1.0f;
-	bool m_bIsInVunlnerable = false;
+
+	const float m_MaxHealth = 100.0f;
+	float m_Health = m_MaxHealth;
+	
+	float m_Power = 5.0f;
 
 	bool m_bHasItem[ItemTypeCount];
 
 
+	bool m_bIsPolluteDamagable = false;
+
+	Crystal::Timer m_HealTimer;
+	Crystal::Timer m_HealIntervalTimer;
+	const float m_MaxHealTime = 10.0f;
+	const float m_HealInterval = 1.0f;
+	const float m_HealAmount = 2.0f;
+	bool m_bShouldHeal = false;
+
+public:
+	Crystal::Weak<Crystal::PostProcessVolumeActor> DamagedPostProcessActor;
+	Crystal::Weak<Crystal::PostProcessVolumeActor> HealPostProcessActor;
+	Crystal::Weak<Crystal::PostProcessVolumeActor> ShieldPostProcess;
 
 };

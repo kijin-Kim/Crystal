@@ -16,8 +16,8 @@ void SpaceWhaleAIController::Initialize()
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
 	m_AIPerceptionComponent->SetSightRange(5000.0f);
-	m_AIPerceptionComponent->SetSightWidth(1366.0f);
-	m_AIPerceptionComponent->SetSightHeight(720.0f);
+	m_AIPerceptionComponent->SetSightWidth(3000.0f);
+	m_AIPerceptionComponent->SetSightHeight(3000.0f);
 }
 
 void SpaceWhaleAIController::Begin()
@@ -36,6 +36,7 @@ void SpaceWhaleAIController::Begin()
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 		blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
 		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -45,7 +46,7 @@ void SpaceWhaleAIController::Begin()
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "PlayerLocation";
-		moveToLocationNode->AcceptableRadius = 120.0f;
+		moveToLocationNode->AcceptableRadius = 60.0f;
 		moveToLocationNode->MaxAcceleration = 30000000.0f;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
@@ -57,12 +58,13 @@ void SpaceWhaleAIController::Begin()
 		selectorNode->AddChildNode(sequenceNode);
 	}
 
-	// MoveToRandomPositionInCenter
+	// GoToRandom
 	{
-		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToRandomPositionInSphere");
+		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceGoToRandom");
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 		blackboardBasedDecorator->BlackboardKey = "RandomPositionInSphere";
 		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -72,7 +74,7 @@ void SpaceWhaleAIController::Begin()
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "RandomPositionInSphere";
-		moveToLocationNode->AcceptableRadius = 120.0f;
+		moveToLocationNode->AcceptableRadius = 60.0f;
 		moveToLocationNode->MaxAcceleration = 30000000.0f;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
@@ -83,21 +85,14 @@ void SpaceWhaleAIController::Begin()
 		selectorNode->AddChildNode(sequenceNode);
 	}
 
+
 	// Keep Orbit
 	{
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
 
-		auto rotateNode = Crystal::CreateObject<BTTaskNodeRotate>("TaskRotate");
-		sequenceNode->AddChildNode(rotateNode);
-
-		auto setTargetDirectionNode = Crystal::CreateObject<BTTaskNodeSetTargetDirection>("TaskSetTargetDirection");
-		setTargetDirectionNode->TargetDirectionKey = "TargetDirection";
-		sequenceNode->AddChildNode(setTargetDirectionNode);
-
-		auto moveTowardDirectionNode = Crystal::CreateObject<BTTaskNodeMoveTowardDirection>("TaskMoveTowardDirection");
-		moveTowardDirectionNode->TargetDirectionKey = "TargetDirection";
-		moveTowardDirectionNode->MaxAcceleration = 30000000.0f;
-		sequenceNode->AddChildNode(moveTowardDirectionNode);
+		auto orbitNode = Crystal::CreateObject<BTTaskNodeOrbit>("TaskOrbit");
+		orbitNode->MaxAcceleration = 30000000.0f;
+		sequenceNode->AddChildNode(orbitNode);
 
 		selectorNode->AddChildNode(sequenceNode);
 	}
@@ -107,7 +102,7 @@ void SpaceWhaleAIController::Begin()
 
 	
 	
-	m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
+	/*m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
 	{
 		if(!noiseStimulus.bIsSensed)
 		{
@@ -126,14 +121,11 @@ void SpaceWhaleAIController::Begin()
 		{
 			m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", noiseStimulus.Position);
 		}
-	});
+	});*/
 
 	m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
 	{
-		if(!sightStimulus.bIsSensed)
-		{
-			return;
-		}
+		
 
 		CS_DEBUG_INFO("Find Sight");
 
@@ -145,7 +137,17 @@ void SpaceWhaleAIController::Begin()
 
 		if (instigator->StaticType() == "MyPlayerPawn")
 		{
-			m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", sightStimulus.Position);
+
+			if (sightStimulus.bIsSensed)
+			{
+				m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", sightStimulus.Position);
+			}
+			else
+			{
+				//m_BlackboardComponent->ClearValue("PlayerLocation");
+			}
+			
 		}
+		
 	});
 }

@@ -6,7 +6,7 @@
 #include "Crystal/Resources/Material.h"
 #include "Crystal/Resources/ResourceManager.h"
 
-class PolluteCircle : public Crystal::Actor
+class PolluteSphere : public Crystal::Actor
 {
 	SERIALIZE_PROPERTIES
 	{
@@ -14,16 +14,16 @@ class PolluteCircle : public Crystal::Actor
 	}
 
 public:
-	PolluteCircle() = default;
-	~PolluteCircle() override = default;
+	PolluteSphere() = default;
+	~PolluteSphere() override = default;
 
 	void Initialize() override;
 
 
-	STATIC_TYPE_IMPLE(PolluteCircle)
+	STATIC_TYPE_IMPLE(PolluteSphere)
 
 
 private:
-	float m_Health = 150.0f;
 	Crystal::Shared<Crystal::StaticMeshComponent> m_StaticMeshComponent = nullptr;
+	
 };

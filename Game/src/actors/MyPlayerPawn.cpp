@@ -8,6 +8,7 @@
 #include "Crystal/GamePlay/Components/AIComponent.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/MovementComponent.h"
+#include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 
 BOOST_CLASS_EXPORT(MyPlayerPawn)
 
@@ -19,15 +20,6 @@ void MyPlayerPawn::Initialize()
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
 	boundingOrientedBoxComponent->SetMass(7000.0f);
-	/*boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
-	{
-		if (m_bIsInVunlnerable)
-			return;
-
-		m_Health -= 1;
-		UpdateHealth();
-	});*/
-
 	m_MainComponent = boundingOrientedBoxComponent;
 
 
@@ -57,29 +49,14 @@ void MyPlayerPawn::Initialize()
 	m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_MK3InterceptorMainLite.fbx"));
 
 
-	m_LeftSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftSocketComponent");
-	m_LeftSocketComponent->SetLocalPosition({ -42.0f, -4.1f, 0.0f });
-	m_LeftSocketComponent->AttachTo(m_StaticMeshComponent);
+	m_LeftFireSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftFireSocketComponent");
+	m_LeftFireSocketComponent->SetLocalPosition({ -42.0f, -4.1f, 0.0f });
+	m_LeftFireSocketComponent->AttachTo(m_StaticMeshComponent);
 	
-	m_RightSocketComponent = CreateComponent<Crystal::TransformComponent>("RightSocketComponent");
-	m_RightSocketComponent->SetLocalPosition({ 42.0f, -4.1f, 0.0f });
-	m_RightSocketComponent->AttachTo(m_StaticMeshComponent);
+	m_RightFireSocketComponent = CreateComponent<Crystal::TransformComponent>("RightFireSocketComponent");
+	m_RightFireSocketComponent->SetLocalPosition({ 42.0f, -4.1f, 0.0f });
+	m_RightFireSocketComponent->AttachTo(m_StaticMeshComponent);
 
-
-	//m_ThrustMat = Crystal::CreateShared<Crystal::Material>();
-	//m_ThrustMat->EmissiveColor = { 255.0f / 255.0f * 1.0f, 127.0f / 255.0f * 1.0f, 0.0f };
-	//m_ThrustMat->OpacityTexture = resourceManager.GetTexture("assets/textures/TilingNoise05.tga");
-	//m_ThrustMat->ShadingModel = Crystal::EShadingModel::SM_Unlit;
-	//m_ThrustMat->BlendMode = Crystal::EBlendMode::BM_Translucent;
-
-
-	//m_ThrustsStaticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("ThrustStaticMeshComponent");
-	//m_ThrustsStaticMeshComponent->SetLocalPosition({ 0.0f, 4.0f, -30.0f});
-	//m_ThrustsStaticMeshComponent->AddMaterial(m_ThrustMat);
-	//m_ThrustsStaticMeshComponent->AttachTo(m_StaticMeshComponent);
-	//m_ThrustsStaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_RocketFlare.fbx"));
-	//m_ThrustsStaticMeshComponent->SetUnitScale(1.0f);
-	
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
@@ -101,15 +78,12 @@ void MyPlayerPawn::Initialize()
 	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
 	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
 	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
-
-
 }
 
 void MyPlayerPawn::Begin()
 {
 	Pawn::Begin();
 	
-	m_Health = m_MaxHealth;
 	UpdateHealth();
 }
 
@@ -117,19 +91,6 @@ void MyPlayerPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
 
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if(level)
-	{
-		auto myHud = Crystal::Cast<MyHUD>(level->GetHUD());
-		if(myHud->GetPolluteGauge() >= myHud->GetMaxPolluteGauge())
-		{
-			m_Health -= 0.5f;
-			UpdateHealth();
-		}
-	}
-	
-
-	
 	m_FireTimer.Tick();
 
 	if (m_bShouldFire && m_FireTimer.GetElapsedTime() >= m_FireInterval)
@@ -141,7 +102,41 @@ void MyPlayerPawn::Update(const float deltaTime)
 
 	if(!m_PlayerShield.expired())
 	{
-		m_PlayerShield.lock()->SetPosition(Crystal::Vector3::Add(GetPosition(), { 0.0f, 0.0f, -0.5f}));
+		
+
+		auto shield = Crystal::Cast<PlayerShield>(m_PlayerShield);
+
+		auto direction = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(m_StaticMeshComponent->GetWorldPosition(), m_CameraComponent->GetWorldPosition()));
+		shield->SetPosition(Crystal::Vector3::Add(m_StaticMeshComponent->GetWorldPosition(), Crystal::Vector3::Multiply(direction, 2.0f)));
+	}
+	else
+	{
+		auto shieldPostProcess = Crystal::Cast<Crystal::PostProcessVolumeActor>(ShieldPostProcess);
+		shieldPostProcess->SetHiddenInGame(true);
+	}
+
+
+	AddDamagedOpacityMultiplier(-deltaTime);
+	AddHealOpacityMultiplier(-deltaTime);
+
+	if(m_bShouldHeal)
+	{
+		m_HealIntervalTimer.Tick();
+		if(m_HealIntervalTimer.GetElapsedTime() >= m_HealInterval)
+		{
+			m_HealIntervalTimer.Reset();
+			AddHealOpacityMultiplier(0.7f);
+			m_Health += m_HealAmount;
+			m_Health = min(m_Health, m_MaxHealth);
+			UpdateHealth();
+		}
+
+		m_HealTimer.Tick();
+		if (m_HealTimer.GetElapsedTime() >= m_MaxHealTime)
+		{
+			m_HealTimer.Reset();
+			m_bShouldHeal = false;
+		}
 	}
 
 }
@@ -235,9 +230,6 @@ void MyPlayerPawn::FireMissile()
 
 void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
-	if (m_bIsInVunlnerable)
-		return;
-
 	auto actorCausedDamage = damageCauser.lock();
 	if (!actorCausedDamage)
 	{
@@ -245,9 +237,18 @@ void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	}
 
 	auto staticType = actorCausedDamage->StaticType();
-	if (staticType == "MyPlayerPawn")
+
+	auto shield = Crystal::Cast<PlayerShield>(m_PlayerShield);
+
+	if (!shield)
 	{
 		m_Health -= damage;
+		UpdateHealth();
+		AddDamagedOpacityMultiplier(0.7f);
+	}
+	else
+	{
+		shield->OnTakeDamage(damage, damageCauser);
 	}
 }
 
@@ -256,7 +257,7 @@ void MyPlayerPawn::OnFire()
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
-	const float maxDistance = 100000.0f;
+	const float maxDistance = 7000.0f;
 
 	static bool bUseLeftSocket = true;
 	
@@ -266,19 +267,19 @@ void MyPlayerPawn::OnFire()
 		Crystal::HitResult hitResult = {};
 		Crystal::CollisionParams collisionParams = {};
 		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
-		collisionParams.IgnoreClasses.push_back("PolluteCircle");
-
+		collisionParams.IgnoreClasses.push_back("BoundingOrientedBoxActor");
+		collisionParams.IgnoreClasses.push_back("PolluteSphere");
 
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
 		if(bUseLeftSocket)
 		{
-			spawnParams.Position = m_LeftSocketComponent->GetWorldPosition();
+			spawnParams.Position = m_LeftFireSocketComponent->GetWorldPosition();
 			bUseLeftSocket = false;
 		}
 		else
 		{
-			spawnParams.Position = m_RightSocketComponent->GetWorldPosition();
+			spawnParams.Position = m_RightFireSocketComponent->GetWorldPosition();
 			bUseLeftSocket = true;
 		}
 
@@ -289,24 +290,10 @@ void MyPlayerPawn::OnFire()
 			auto hitActor = hitResult.HitActor.lock();
 			if (hitActor)
 			{
-				if (hitActor->StaticType() == "HealAsteroid")
-				{
-					m_bHasItem[ItemType_Heal] = true;
-					UpdateItemStatus(ItemType_Heal, true);
-				}
-				else if (hitActor->StaticType() == "PowerAsteroid")
-				{
-					m_bHasItem[ItemType_Power] = true;
-					UpdateItemStatus(ItemType_Power, true);
-				}
-				else if (hitActor->StaticType() == "ShieldAsteroid")
-				{
-					m_bHasItem[ItemType_Shield] = true;
-					UpdateItemStatus(ItemType_Shield, true);
-				}
-
 				hitActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
 			}
+
+			Crystal::Cast<MyHUD>(level->GetHUD())->OnPlayerHitSucceed();
 		}
 
 
@@ -325,6 +312,30 @@ void MyPlayerPawn::OnFire()
 
 		spawnParams.Rotation = rotation;
 		level->SpawnActor<Laser>(spawnParams);
+	}
+}
+
+void MyPlayerPawn::AddDamagedOpacityMultiplier(float opacity)
+{
+	auto damagedPostProcess = DamagedPostProcessActor.lock();
+	if (damagedPostProcess)
+	{
+		auto postProcessComponent = damagedPostProcess->GetPostProcessComponent();
+		auto mat = postProcessComponent->GetMaterials()[0];
+		mat->OpacityMultiplier += opacity;
+		mat->OpacityMultiplier = std::clamp(mat->OpacityMultiplier, 0.0f, 1.0f);
+	}
+}
+
+void MyPlayerPawn::AddHealOpacityMultiplier(float opacity)
+{
+	auto healPostProcess = HealPostProcessActor.lock();
+	if (healPostProcess)
+	{
+		auto postProcessComponent = healPostProcess->GetPostProcessComponent();
+		auto mat = postProcessComponent->GetMaterials()[0];
+		mat->OpacityMultiplier += opacity;
+		mat->OpacityMultiplier = std::clamp(mat->OpacityMultiplier, 0.0f, 1.0f);
 	}
 }
 
@@ -387,9 +398,9 @@ void MyPlayerPawn::UseHealItem()
 
 	m_bHasItem[ItemType_Heal] = false;
 	UpdateItemStatus(ItemType_Heal, false);
-	m_Health += 10;
-	m_Health = min(m_Health, 100);
-	UpdateHealth();
+	m_bShouldHeal = true;
+	m_HealTimer.Reset();
+	m_HealIntervalTimer.Reset();
 }
 
 void MyPlayerPawn::UseShieldItem()
@@ -401,7 +412,6 @@ void MyPlayerPawn::UseShieldItem()
 
 	m_bHasItem[ItemType_Shield] = false;
 	UpdateItemStatus(ItemType_Shield, false);
-	m_bIsInVunlnerable = true;
 
 
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
@@ -409,8 +419,11 @@ void MyPlayerPawn::UseShieldItem()
 	{
 		ActorSpawnParams spawnParams;
 		spawnParams.Position = GetPosition();
-		//m_PlayerShield = level->SpawnActor<PlayerShield>(spawnParams);
+		m_PlayerShield = level->SpawnActor<PlayerShield>(spawnParams);
 	}
+
+	auto shieldPostProcess = Crystal::Cast<Crystal::PostProcessVolumeActor>(ShieldPostProcess);
+	shieldPostProcess->SetHiddenInGame(false);
 
 }
 
@@ -436,4 +449,10 @@ void MyPlayerPawn::ToggleShowDebugAI()
 
 	auto& worldConfig = world->GetWorldConfig();
 	world->SetShowDebugAI(!worldConfig.bShowDebugAI);
+}
+
+void MyPlayerPawn::OnItemDestroyed(ItemType itemType)
+{
+	m_bHasItem[itemType] = true;
+	UpdateItemStatus(itemType, true);
 }

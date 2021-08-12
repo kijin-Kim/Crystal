@@ -15,18 +15,25 @@ void DroneLaser::Initialize()
 	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 	material->EmissiveColor = { 191.0f / 255.0f * 3.0f, 1.0f * 3.0f, 0.0f };
 
-	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-	sphereComponent->SetRadius(1.0f);
-	sphereComponent->SetMass(1.0f);
-	sphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
-	sphereComponent->IgnoreActorClassOf("Drone");
-	sphereComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult&)
+	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
+	boundingOrientedBoxComponent->SetExtents({ 2.0f, 2.0f, 18.0f });
+	boundingOrientedBoxComponent->SetMass(1.0f);
+	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	boundingOrientedBoxComponent->IgnoreActorClassOf("Drone");
+	boundingOrientedBoxComponent->IgnoreActorClassOf("PolluteSphere");
+	boundingOrientedBoxComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult& overlapResult)
 		{
-			Destroy();
+			auto overlappedActor = overlapResult.OverlappedActor.lock();
+			if(overlappedActor)
+			{
+				overlappedActor->OnTakeDamage(m_Damage, GetInstigator());
+				Destroy();
+			}
 		});
-	sphereComponent->SetDamping(1.0f);
+	boundingOrientedBoxComponent->SetDamping(1.0f);
 
-	m_MainComponent = sphereComponent;
+
+	m_MainComponent = boundingOrientedBoxComponent;
 
 	auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	meshComponent->AddMaterial(std::move(material));

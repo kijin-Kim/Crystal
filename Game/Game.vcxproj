@@ -316,11 +316,13 @@
     <ClCompile Include="src\actors\DroneAIController.cpp" />
     <ClCompile Include="src\actors\DroneLaser.cpp" />
     <ClCompile Include="src\actors\Kraken.cpp" />
+    <ClCompile Include="src\actors\KrakenAIController.cpp" />
     <ClCompile Include="src\actors\Laser.cpp" />
     <ClCompile Include="src\actors\Missile.cpp" />
+    <ClCompile Include="src\actors\MyHUD.cpp" />
     <ClCompile Include="src\actors\PlayerShield.cpp" />
-    <ClCompile Include="src\actors\PolluteCircle.cpp" />
-    <ClCompile Include="src\actors\ShieldCircle.cpp" />
+    <ClCompile Include="src\actors\PolluteSphere.cpp" />
+    <ClCompile Include="src\actors\ShieldSphere.cpp" />
     <ClCompile Include="src\actors\SpaceWhale.cpp" />
     <ClCompile Include="src\actors\SpaceWhaleAIController.cpp" />
     <ClCompile Include="src\actors\Sun.cpp" />
@@ -339,8 +341,8 @@
     <ClInclude Include="src\actors\KrakenAIController.h" />
     <ClInclude Include="src\actors\MyHUD.h" />
     <ClInclude Include="src\actors\PlayerShield.h" />
-    <ClInclude Include="src\actors\PolluteCircle.h" />
-    <ClInclude Include="src\actors\ShieldCircle.h" />
+    <ClInclude Include="src\actors\PolluteSphere.h" />
+    <ClInclude Include="src\actors\ShieldSphere.h" />
     <ClInclude Include="src\actors\SpaceCombatTypes.h" />
     <ClInclude Include="src\actors\SpaceWhale.h" />
     <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
