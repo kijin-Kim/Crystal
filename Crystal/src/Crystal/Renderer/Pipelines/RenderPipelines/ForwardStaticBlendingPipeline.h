@@ -90,7 +90,7 @@ namespace Crystal {
 			std::vector<SIZE_T> DescriptorHeapOffsets;
 		};
 
-		std::map<float, RenderData> m_AlphaSortedStaticMeshes;
+		std::multimap<float, RenderData> m_AlphaSortedStaticMeshes;
 
 		
 	};

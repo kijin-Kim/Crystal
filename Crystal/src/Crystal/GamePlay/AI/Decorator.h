@@ -6,7 +6,7 @@ namespace Crystal {
 
 	class BlackboardComponent;
 
-	enum class DecoratorAbortType
+	enum class EDecoratorAbortType
 	{
 		DAT_None,
 		DAT_Self,
@@ -30,7 +30,7 @@ namespace Crystal {
 
 		bool GetLastResult() const { return m_bLastResult; }
 
-		DecoratorAbortType GetDecoratorAbortType() const { return AbortType; }
+		EDecoratorAbortType GetDecoratorAbortType() const { return AbortType; }
 
 		STATIC_TYPE_IMPLE(Decorator)
 
@@ -39,7 +39,7 @@ namespace Crystal {
 		bool m_bCurrentResult = false;
 
 	public:
-		DecoratorAbortType AbortType = DecoratorAbortType::DAT_None;
+		EDecoratorAbortType AbortType = EDecoratorAbortType::DAT_None;
 	};
 
 	class BlackboardBasedDecorator : public Decorator

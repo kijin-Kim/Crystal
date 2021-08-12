@@ -254,4 +254,9 @@ namespace Crystal {
 		return Cast<Level>(GetLevel())->GetWorld();
 	}
 
+	float Actor::GetDeltaTime() const
+	{
+		return Cast<Level>(GetLevel())->GetDeltaTime();
+	}
+
 }

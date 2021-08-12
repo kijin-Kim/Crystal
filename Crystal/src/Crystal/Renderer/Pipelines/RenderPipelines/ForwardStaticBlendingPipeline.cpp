@@ -200,7 +200,7 @@ namespace Crystal {
 			if (!meshComponent)
 				continue;
 
-			if(meshComponent->GetHideInGame())
+			if(meshComponent->GetHiddenInGame())
 			{
 				continue;
 			}
@@ -219,13 +219,13 @@ namespace Crystal {
 			
 			auto lengthSquared = Vector3::LengthSquared(Vector3::Subtract(cameraComponent->GetWorldPosition(), meshComponent->GetWorldPosition()));
 			auto it = m_AlphaSortedStaticMeshes.insert({ lengthSquared, RenderData() });
-			it.first->second.Component = meshComponent;
+			it->second.Component = meshComponent;
 			
 			
 			for (auto& mat : materials)
 			{
-				it.first->second.DescriptorHeapOffsets.push_back(destHeapHandle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr);
-
+				it->second.DescriptorHeapOffsets.push_back(destHeapHandle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr);
+				
 				auto matRow = mat.get();
 
 				PerDrawData perDrawData = {};
@@ -356,7 +356,7 @@ namespace Crystal {
 				continue;
 			}
 
-			if (meshComponent->GetHideInGame())
+			if (meshComponent->GetHiddenInGame())
 			{
 				continue;
 			}

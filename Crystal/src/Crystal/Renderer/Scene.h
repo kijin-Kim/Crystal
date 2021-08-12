@@ -8,7 +8,8 @@
 #include "Crystal/GamePlay/Components/TextureComponent.h""
 
 namespace Crystal {
-	
+	class PostProcessComponent;
+
 	/*
 	 * 렌더링에 사용되는 리소스들을 준비합니다.
 	 */
@@ -79,12 +80,14 @@ namespace Crystal {
 		
 		std::vector<Weak<TextureComponent>> Textures;
 
+		std::vector<Weak<PostProcessComponent>> PostProcesses;
 
 		std::vector<Weak<LightComponent>> Lights;
 		std::vector<Weak<CameraComponent>> Cameras;
 
 		std::vector<Weak<AIPerceptionSourceComponent>> AIPerceptionSources;
 		std::vector<Weak<AIPerceptionComponent>> AIPerceptions;
+
 
 		
 		//===================================================================================

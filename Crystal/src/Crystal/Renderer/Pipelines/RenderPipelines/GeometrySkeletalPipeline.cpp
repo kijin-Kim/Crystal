@@ -126,7 +126,7 @@ namespace Crystal {
 			if (!component)
 				continue;
 
-			if (component->GetHideInGame())
+			if (component->GetHiddenInGame())
 			{
 				continue;
 			}
@@ -275,7 +275,7 @@ namespace Crystal {
 			if (!skeletalMesh)
 				continue;
 
-			if (skeletalMesh->GetHideInGame())
+			if (skeletalMesh->GetHiddenInGame())
 			{
 				continue;
 			}

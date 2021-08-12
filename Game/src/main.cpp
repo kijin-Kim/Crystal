@@ -82,7 +82,7 @@ public:
 
 		if(true)
 		{
-			for(int i=0; i< 0; i++)
+			for(int i=0; i < 0; i++)
 			{
 				auto drone = m_World->SpawnActor<Drone>({ "Drone" }).lock();
 				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
@@ -160,10 +160,11 @@ public:
 
 		if (true)
 		{
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
+				//asteroid->SetPosition(Crystal::Vector3::Zero);
 			}
 
 			for (int i = 0; i < 0; i++)
@@ -173,7 +174,7 @@ public:
 			}
 
 
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -201,7 +202,7 @@ public:
 		}
 
 
-		if (true)
+		if (false)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({0.0f, 0.0f, 0.0f});
@@ -221,7 +222,7 @@ public:
 			auto playCircle = m_World->SpawnActor<ShieldSphere>({""}).lock();
 		}
 
-		if (true)
+		if (false)
 		{
 			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "GreenTintPostProcess" }).lock();
 			postProcessActor->SetPostProcessOrder(0);
@@ -240,7 +241,7 @@ public:
 			kraken->GreenTintVolumeActor = postProcessActor;
 		}
 
-		if (true)
+		if (false)
 		{
 			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "VignettePostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(2);
@@ -258,7 +259,7 @@ public:
 			kraken->VignetteVolumeActor = postProcessActor;
 		}
 
-		if(true)
+		if(false)
 		{
 			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterDamagedPostProcess" }).lock();
 			postProcessActor->SetPostProcessOrder(3);
@@ -276,7 +277,7 @@ public:
 			myPlayerPawn->DamagedPostProcessActor = postProcessActor;
 		}
 
-		if (true)
+		if (false)
 		{
 			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterHealPostProcess" }).lock();
 			postProcessActor->SetPostProcessOrder(3);
@@ -294,7 +295,7 @@ public:
 			myPlayerPawn->HealPostProcessActor = postProcessActor;
 		}
 
-		if (true)
+		if (false)
 		{
 			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterShieldPostProcess" }).lock();
 			postProcessActor->SetPostProcessOrder(1);

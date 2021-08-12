@@ -129,7 +129,7 @@ namespace Crystal {
 			{
 				continue;
 			}
-			if(particleComponent->GetHideInGame())
+			if(particleComponent->GetHiddenInGame())
 			{
 				continue;
 			}

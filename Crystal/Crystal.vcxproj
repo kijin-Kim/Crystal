@@ -449,6 +449,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\ParticleComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\PostProcessComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
@@ -465,6 +466,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\PlaneQuadActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\PostProcessVolumeActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Actors\StaticMeshActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\Objects\Object.h" />
     <ClInclude Include="src\Crystal\GamePlay\World\Level.h" />
@@ -472,6 +474,7 @@
     <ClInclude Include="src\Crystal\Renderer\InstancedStaticMesh.h" />
     <ClInclude Include="src\Crystal\Renderer\PipelineStateObject.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BrightColorExtractingPipeline.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PostProcessPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\PipelineStateHelper.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.h" />
@@ -542,6 +545,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\LightComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\MovementComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\ParticleComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\PostProcessComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
@@ -559,6 +563,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\Pawn.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlaneQuadActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PlayerStartActor.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Objects\Actors\PostProcessVolumeActor.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Objects\Object.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\Level.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\World\PhysicsSystem.cpp" />
@@ -569,6 +574,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BrightColorExtractingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PostProcessPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UIPipeline.cpp" />

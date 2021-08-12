@@ -41,11 +41,12 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
-#ifdef CS_NM_DEDICATED // 멀티 플레이어 서버 인풋을 넘겨받은걸로 적절한 playercontroller 한테 넘겨줘야한다.
+		m_DeltaTime = deltaTime;
 
-#endif
+		m_bIsUpdating = true;
 
 		AddPendingSpawnedActors();
+		
 		for (const auto& actor : m_Actors)
 		{
 			actor->Update(deltaTime);
@@ -61,10 +62,14 @@ namespace Crystal {
 
 		// TODO : 렌더링 준비과정
 
+
+
 		if (m_RenderSystem)
 		{
 			m_RenderSystem->Update(deltaTime);
 		}
+
+		m_bIsUpdating = false;
 
 	}
 
@@ -81,7 +86,13 @@ namespace Crystal {
 
 	void Level::AddActor(const std::shared_ptr<Actor>& actor)
 	{
-		m_PendingSpawnedActors.push_back(actor);
+		if(m_bIsUpdating)
+		{
+			m_PendingSpawnedActors.push_back(actor);
+			return;
+		}
+
+		m_Actors.push_back(actor);
 	}
 
 	void Level::AddPendingSpawnedActors()

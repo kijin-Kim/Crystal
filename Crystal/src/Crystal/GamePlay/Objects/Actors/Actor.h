@@ -51,7 +51,7 @@ namespace Crystal {
 		void OnCreate() override;
 
 		void Begin() override;
-
+		
 		void UpdateComponents(float deltaTime);
 		/*Component를 actor의 컨테이너에 저장하고 Owner를 현재 Actor로 지정합니다.*/
 		void AddComponent(const std::shared_ptr<Component>& component);
@@ -96,6 +96,8 @@ namespace Crystal {
 
 		Weak<Level> GetLevel() const;
 		Weak<World> GetWorld() const;
+
+		float GetDeltaTime() const;
 
 		void SetInstigator(Weak<Actor> instigator) { m_Instigator = instigator; }
 		Weak<Actor> GetInstigator() const { return m_Instigator; }

@@ -28,6 +28,11 @@ namespace Crystal {
 		}
 	}
 
+	void CollisionComponent::AddImpulse(const DirectX::XMFLOAT3& impulse)
+	{
+		SetVelocity(Vector3::Add(GetVelocity(), impulse));
+	}
+
 	void CollisionComponent::OnHit(const HitResult& hitResult)
 	{
 		if (m_OnHitEvent)
@@ -43,7 +48,7 @@ namespace Crystal {
 
 	void CollisionComponent::OnBeginOverlap(const OverlapResult& overlapResult)
 	{
-		CS_DEBUG_INFO("Begin Overlap");
+		m_bIsFirstTimeCheckOverlap = false;
 		m_OverlappedComponents.push_back(overlapResult.OverlappedComponent);
 
 		if(m_OnBeginOverlapEvent)
@@ -59,7 +64,7 @@ namespace Crystal {
 
 	void CollisionComponent::OnEndOverlap(const OverlapResult& overlapResult)
 	{
-		CS_DEBUG_INFO("End Overlap");
+		m_bIsFirstTimeCheckOverlap = false;
 		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlapResult](const Weak<CollisionComponent>& other)
 		{
 			auto overlapped = overlapResult.OverlappedComponent.lock();
@@ -79,7 +84,6 @@ namespace Crystal {
 
 		if (it != m_OverlappedComponents.end())
 		{
-			// Avoid erase copy
 			std::swap(*it, m_OverlappedComponents.back());
 			m_OverlappedComponents.erase(m_OverlappedComponents.end() - 1);
 		}

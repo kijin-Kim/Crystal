@@ -86,7 +86,7 @@ namespace Crystal {
 				continue;
 			if (!meshComponent->GetCastShadow())
 				continue;
-			if (meshComponent->GetHideInGame())
+			if (meshComponent->GetHiddenInGame())
 				return;
 
 			auto staticMesh = Cast<StaticMesh>(meshComponent->GetRenderable()).get();

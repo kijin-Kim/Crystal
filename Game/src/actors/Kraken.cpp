@@ -40,6 +40,10 @@ void Kraken::Initialize()
 	sphereComponent->SetRadius(804 / 2.0f);
 	sphereComponent->SetInverseMass(0.0f);
 
+	m_ImpulseBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("ImpulseBoxComponent");
+	m_ImpulseBoxComponent->SetExtents({ 500.0f, 500.0f, 1800.0f });
+	m_ImpulseBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+
 
 	m_SkeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
 	m_SkeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx"));
@@ -51,10 +55,11 @@ void Kraken::Initialize()
 	m_SkeletalMeshComponent->RotatePitch(-90.0f);
 	m_SkeletalMeshComponent->SetLocalPosition({0.0f, 400.0f, 0.0f});
 
-
 	m_MainComponent = sphereComponent;
 
 	m_SkeletalMeshComponent->AttachTo(m_MainComponent);
+	m_ImpulseBoxComponent->AttachTo(m_MainComponent);
+	
 
 
 	auto barBgMat = Crystal::CreateShared<Crystal::Material>();
@@ -200,6 +205,7 @@ void Kraken::OnAttack()
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 	m_SkeletalMeshComponent->PlayAnimationWithEndEvent(resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx"), false,
 	                                                   CS_ANIMATION_FN(Kraken::OnIdle));
+
 }
 
 void Kraken::OnIdle()

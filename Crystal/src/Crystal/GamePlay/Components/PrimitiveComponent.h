@@ -13,7 +13,7 @@ namespace Crystal {
 		SERIALIZE_PROPERTIES
 		{
 			boost::serialization::base_object<TransformComponent>(*this);
-			ar & m_bHideInGame;
+			ar & m_bHiddenInGame;
 		}
 
 	public:
@@ -48,8 +48,8 @@ namespace Crystal {
 		bool CanBeRendered() const override { return true; }
 		bool IsCollisionEnabled() const override { return false; }
 
-		void SetHideInGame(bool bHide) { m_bHideInGame = bHide; }
-		bool GetHideInGame() const { return m_bHideInGame; }
+		void SetHiddenInGame(bool bHide) { m_bHiddenInGame = bHide; }
+		bool GetHiddenInGame() const { return m_bHiddenInGame; }
 
 		STATIC_TYPE_IMPLE(PrimitiveComponent)
 	protected:
@@ -57,6 +57,6 @@ namespace Crystal {
 
 		std::vector<Shared<Material>> m_Materials;
 
-		bool m_bHideInGame = false;
+		bool m_bHiddenInGame = false;
 	};
 }

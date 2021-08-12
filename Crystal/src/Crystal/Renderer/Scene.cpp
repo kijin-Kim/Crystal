@@ -178,6 +178,18 @@ namespace Crystal {
 				++it;
 			}
 		}
+
+		for (auto it = PostProcesses.begin(); it != PostProcesses.end();)
+		{
+			if (it->expired())
+			{
+				it = PostProcesses.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
 
 

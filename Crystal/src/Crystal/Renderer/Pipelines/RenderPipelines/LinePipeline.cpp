@@ -3,6 +3,8 @@
 
 #include "Crystal/Core/Device.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/GamePlay/Components/PostProcessComponent.h"
+#include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Resources/DescriptorAllocator.h"
@@ -93,10 +95,7 @@ namespace Crystal {
 				if (!component)
 					continue;
 
-				if (component->GetHideInGame())
-				{
-					continue;
-				}
+			
 
 				PerInstanceData perInstanceData = {};
 				perInstanceData.World = component->GetPostScaledTransform();
@@ -125,11 +124,6 @@ namespace Crystal {
 				auto component = scene->BoundingSphereComponents[i].lock();
 				if (!component)
 					continue;
-
-				if (component->GetHideInGame())
-				{
-					continue;
-				}
 
 				PerInstanceData perInstanceData = {};
 				perInstanceData.World = component->GetPostScaledTransform();
@@ -160,10 +154,7 @@ namespace Crystal {
 				if (!component)
 					continue;
 
-				if (component->GetHideInGame())
-				{
-					continue;
-				}
+
 
 				PerInstanceData perInstanceData = {};
 				perInstanceData.World = component->GetPostScaledTransform();
@@ -195,7 +186,45 @@ namespace Crystal {
 
 				CalculateBoundingFrustumTransform(component->GetBoundingFrustum(), component->GetWorldTransform());
 			}
+
+			for(int i = 0; i < scene->PostProcesses.size(); i++)
+			{
+				auto component = scene->PostProcesses[i].lock();
+				if (!component)
+					continue;
+
+
+				auto volumeActor = Cast<PostProcessVolumeActor>(component->GetOuter());
+				
+				PerInstanceData perInstanceData = {};
+				perInstanceData.World = volumeActor->GetPostScaledTransform();
+				perInstanceData.Color = { 0.5f, 0.5f, 0.5f };
+
+
+				Shared<Renderable> renderable;
+
+				auto type = volumeActor->GetVolumeType();
+				switch (type)
+				{
+				case EVolumeType::VT_Box:
+					renderable = scene->LineBoxMesh;
+					break;
+				case EVolumeType::VT_Sphere:
+					renderable = scene->LineSphereMesh;
+					break;
+				default: ;
+				}
+
+				if (!renderable)
+				{
+					continue;
+				}
+
+				m_InstanceBatches[renderable.get()].PerInstanceDatas.push_back(perInstanceData);
+				
+			}
 		}
+
 
 		
 		if(worldConfig.bShowDebugAI)

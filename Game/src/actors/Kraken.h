@@ -5,6 +5,7 @@
 
 namespace Crystal {
 	class TextureComponent;
+	class BoundingOrientedBoxComponent;
 }
 
 class Kraken : public Crystal::Pawn
@@ -41,6 +42,7 @@ public:
 
 private:
 	Crystal::Shared<Crystal::SkeletalMeshComponent> m_SkeletalMeshComponent = nullptr;
+	Crystal::Shared<Crystal::BoundingOrientedBoxComponent> m_ImpulseBoxComponent = nullptr;
 	Crystal::Timer m_SpaceWhaleSpawnTimer = {};
 	float m_SpaceWhaleSpawnInterval = 5.0f;
 	float m_CurrentHealth;
@@ -49,7 +51,7 @@ private:
 	uint32_t m_CurrentPhase = 1;
 
 	uint32_t m_CurrentKrakenSpawnCount = 0;
-	uint32_t m_MaxKrakenSpawnCount = 0;
+	uint32_t m_MaxKrakenSpawnCount = 5;
 
 
 	float m_CurrentPolluteGauge = 0.0f;

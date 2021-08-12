@@ -41,13 +41,13 @@ namespace Crystal {
 				auto abortType = decorator->GetDecoratorAbortType();
 				switch (abortType)
 				{
-				case DecoratorAbortType::DAT_None: break;
-				case DecoratorAbortType::DAT_Self:
+				case EDecoratorAbortType::DAT_None: break;
+				case EDecoratorAbortType::DAT_Self:
 				{
 					AddAbortDecorator(decorator);
 				}
 				break;
-				case DecoratorAbortType::DAT_LowerPriority:
+				case EDecoratorAbortType::DAT_LowerPriority:
 				{
 					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
 
@@ -60,7 +60,7 @@ namespace Crystal {
 					}
 				}
 				break;
-				case DecoratorAbortType::DAT_Both:
+				case EDecoratorAbortType::DAT_Both:
 				{
 					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
 
@@ -212,13 +212,13 @@ namespace Crystal {
 					auto abortType = decorator->GetDecoratorAbortType();
 					switch (abortType)
 					{
-					case DecoratorAbortType::DAT_None: break;
-					case DecoratorAbortType::DAT_Self:
+					case EDecoratorAbortType::DAT_None: break;
+					case EDecoratorAbortType::DAT_Self:
 						{
 							childNode->AddAbortDecorator(decorator);
 						}
 						break;
-					case DecoratorAbortType::DAT_LowerPriority:
+					case EDecoratorAbortType::DAT_LowerPriority:
 					{
 						auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
 
@@ -231,7 +231,7 @@ namespace Crystal {
 						}
 					}
 						break;
-					case DecoratorAbortType::DAT_Both:
+					case EDecoratorAbortType::DAT_Both:
 						{
 							auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
 

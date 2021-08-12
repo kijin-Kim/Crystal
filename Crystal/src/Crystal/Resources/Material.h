@@ -14,6 +14,7 @@ namespace Crystal {
 	{
 		Weak<Texture> AlbedoTexture = {};
 		DirectX::XMFLOAT3 AlbedoColor = Vector3::Zero;
+		DirectX::XMFLOAT3 TintColor = {1.0f, 1.0f, 1.0f };
 
 		Weak<Texture> MetallicTexture = {};
 		float MetallicConstant = 0.0f;
@@ -27,6 +28,10 @@ namespace Crystal {
 		DirectX::XMFLOAT3 EmissiveColor = Vector3::Zero;
 
 		Weak<Texture> OpacityTexture = {};
+		Weak<Texture> SceneColorMaskTexture = {};
+
+		bool bUseAlbedoTextureAlpha = false;
+
 		float Opacity = 1.0f;
 		float OpacityMultiplier = 1.0f;
 

@@ -32,6 +32,22 @@ namespace Crystal {
 		computeViewProjection();
 	}
 
+	DirectX::XMFLOAT2 CameraComponent::ProjectWorldToCameraSpace(const DirectX::XMFLOAT3& worldPosition)
+	{
+		auto projected = Crystal::Vector4::Transform({worldPosition.x, worldPosition.y, worldPosition.z, 1.0f}, m_ViewProjection);
+		DirectX::XMFLOAT2 cameraSpacePosition = {projected.x, projected.y};
+		if (projected.w > 0.0f)
+		{
+			float invW = 1.0f / projected.w;
+			cameraSpacePosition = {cameraSpacePosition.x * invW, cameraSpacePosition.y * invW};
+		}
+
+		cameraSpacePosition.x = cameraSpacePosition.x / 2.0f * m_Viewport.Width;
+		cameraSpacePosition.y = cameraSpacePosition.y / 2.0f * m_Viewport.Height;
+
+		return cameraSpacePosition;
+	}
+
 	void CameraComponent::computeViewProjection()
 	{
 		const auto& worldTransform = GetWorldTransform();

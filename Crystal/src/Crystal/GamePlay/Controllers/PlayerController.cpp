@@ -190,4 +190,27 @@ namespace Crystal {
 			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Released);
 		}
 	}
+
+	DirectX::XMFLOAT2 PlayerController::ProjectWorldToCameraSpace(const DirectX::XMFLOAT3& worldPosition)
+	{
+		auto level = Cast<Level>(GetLevel());
+		if(!level)
+		{
+			return { 0.0f, 0.0f };
+		}
+
+		auto playerPawn = Cast<Pawn>(level->GetPlayerPawn());
+		if(!playerPawn)
+		{
+			return { 0.0f, 0.0f };
+		}
+
+		auto cameraComponent = Cast<CameraComponent>(playerPawn->GetComponentByClass("CameraComponent"));
+		if(!cameraComponent)
+		{
+			return { 0.0f, 0.0f };
+		}
+
+		return cameraComponent->ProjectWorldToCameraSpace(worldPosition);
+	}
 }

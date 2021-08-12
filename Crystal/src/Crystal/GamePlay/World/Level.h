@@ -68,6 +68,8 @@ namespace Crystal {
 		const WorldConfig& GetWorldConfig() const;
 		Weak<World> GetWorld() const;
 
+		float GetDeltaTime() const { return m_DeltaTime; }
+
 		STATIC_TYPE_IMPLE(Level)
 
 	protected:
@@ -90,6 +92,9 @@ namespace Crystal {
 
 
 		bool m_bHasDeadActors = false;
+		bool m_bIsUpdating = false;
+
+		float m_DeltaTime = 0.0f;
 	};
 
 	template <class T>

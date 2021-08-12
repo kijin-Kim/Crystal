@@ -31,7 +31,7 @@ namespace Crystal {
 		                        const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal,
 		                        float penetration);
 
-		const DirectX::XMFLOAT3& CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
+		DirectX::XMFLOAT3 CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
 		                                          const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNormal);
 
 		bool IsFirstVisible(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, Weak<Actor> actor, Weak<Actor> selfActor, const std::vector<std::string>& visibilityWhitelist);

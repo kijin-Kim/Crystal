@@ -8,7 +8,7 @@ namespace Crystal {
 	void InstancedStaticMesh::AddInstance(const Shared<StaticMeshComponent>& meshComponent, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 		uint32_t descriptorTableOffset)
 	{
-		if (meshComponent->GetHideInGame())
+		if (meshComponent->GetHiddenInGame())
 		{
 			return;
 		}

@@ -31,7 +31,7 @@ namespace Crystal {
 
 		void Update(const float deltaTime) override;
 
-	
+		void AddImpulse(const DirectX::XMFLOAT3& impulse);
 
 		const DirectX::XMFLOAT4X4& GetPostScaledTransform() const { return m_PostScaledTransform; }
 
@@ -70,6 +70,15 @@ namespace Crystal {
 			return std::find(m_ActorClassCollisionWhitelist.begin(), m_ActorClassCollisionWhitelist.end(), type);
 		}
 
+		bool SetIsFirstTimeCheckOverlapped(bool firstTimeCheckOverlap)
+		{
+			m_bIsFirstTimeCheckOverlap = firstTimeCheckOverlap;
+		}
+
+		bool GetIsFirstTimeCheckOverlapped() const
+		{
+			return m_bIsFirstTimeCheckOverlap;
+		}
 
 		STATIC_TYPE_IMPLE(CollisionComponent)
 	protected:
@@ -89,6 +98,8 @@ namespace Crystal {
 		ECollisionType m_CollisionType = ECollisionType::CT_Block;
 
 		std::vector<std::string> m_ActorClassCollisionWhitelist;
+
+		bool m_bIsFirstTimeCheckOverlap = true;
 	};
 
 	class RayComponent : public CollisionComponent
@@ -300,6 +311,9 @@ namespace Crystal {
 
 		void SetCenter(const DirectX::XMFLOAT3& center) { m_BoundingSphere.Center = center; }
 		void SetRadius(const float radius) { m_BoundingSphere.Radius = radius; }
+
+		const DirectX::XMFLOAT3& GetCenter() const { return m_BoundingSphere.Center; }
+		float GetRadius() const { return m_BoundingSphere.Radius; }
 
 		Collision::BoundingSphere GetWorldBoundingSphere() const
 		{

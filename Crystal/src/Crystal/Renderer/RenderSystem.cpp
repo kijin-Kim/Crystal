@@ -29,6 +29,7 @@
 #include "Pipelines/RenderPipelines/UnlitPipeline.h"
 #include "Pipelines/RenderPipelines/UIPipeline.h"
 #include "Crystal/Renderer/Scene.h"
+#include "Pipelines/ComputePipelines/PostProcessPipeline.h"
 
 namespace Crystal {
 
@@ -58,10 +59,9 @@ namespace Crystal {
 		auto shadowMapSkeletalShader = resourceManager.GetShader("assets/shaders/ShadowPass_Skeletal.hlsl").lock();
 		auto unlitShader2D = resourceManager.GetShader("assets/shaders/UnlitShader2D.hlsl").lock();
 		auto brightColorExtractingShader = resourceManager.GetShader("assets/shaders/BrightColorExtracting.hlsl").lock();
-
+		auto postProcessShader = resourceManager.GetShader("assets/shaders/PostProcessShader.hlsl").lock();
 
 		{
-
 			geometryShaderStatic->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -209,7 +209,7 @@ namespace Crystal {
 			RootParameter perExecute = {};
 
 
-			additiveBlendingHdrShader->SetRootSignature({perFrame, perObject, perExecute});
+			additiveBlendingHdrShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
 			additiveBlendingHdrShader->SetDispatchThreadGroupCounts({1920 / 8, 1080 / 8, 1});
 		}
 
@@ -228,14 +228,25 @@ namespace Crystal {
 		}
 
 		{
-			RootParameter perFrame = { 0, 1, 1 };
+			RootParameter perFrame = {0, 1, 1};
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
 
-			brightColorExtractingShader->SetRootSignature({ perFrame, perObject, perExecute });
-			brightColorExtractingShader->SetDispatchThreadGroupCounts({ 1920 / 8.0f, 1080 / 8.0f, 1 });			
+			brightColorExtractingShader->SetRootSignature({perFrame, perObject, perExecute});
+			brightColorExtractingShader->SetDispatchThreadGroupCounts({1920 / 8.0f, 1080 / 8.0f, 1});
 		}
+
+		{
+			RootParameter perFrame = {0, 0, 1};
+			RootParameter perObject = {};
+			RootParameter perExecute = {1, 3, 0};
+
+
+			postProcessShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			postProcessShader->SetDispatchThreadGroupCounts({1920 / 8.0f, 1080 / 8.0f, 1});
+		}
+
 
 		{
 			lightingPassShader->SetInputLayout({
@@ -290,11 +301,9 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<LinePipeline>(simpleColorShader, "SimpleColorLinePipeline"));
 		m_Pipelines.push_back(CreatePipeline<CubemapPipeline>(skyboxShader, "CubemapPipeline"));
 		m_Pipelines.push_back(CreatePipeline<PanoToCubemapPipeline>(panoToCubemapShader, "PanoToCubemapPipeline"));
-		m_Pipelines.push_back(
-			CreatePipeline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
+		m_Pipelines.push_back(CreatePipeline<DiffIrradSamplingPipeline>(diffIrradianceShader, "DiffIradiancePipeline"));
 		m_Pipelines.push_back(CreatePipeline<BlurPipeline>(gaussianBlurShader, "GaussianBlurPipeline"));
-		m_Pipelines.push_back(
-			CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
+		m_Pipelines.push_back(CreatePipeline<AdditiveBlendingPipeline>(additiveBlendingHdrShader, "AdditiveBlendingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<TonemappingPipeline>(toneMappingShader, "TonemappingPipeline"));
 		m_Pipelines.push_back(CreatePipeline<UnlitPipeline>(unlitShader, "UnlitPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ShadowMapStaticPipeline>(shadowMapStaticShader, "ShadowMapStaticPipeline"));
@@ -303,6 +312,7 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<ForwardStaticPipeline>(forwardShaderStatic, "ForwardStaticPipeline"));
 		m_Pipelines.push_back(CreatePipeline<ForwardStaticBlendingPipeline>(forwardBlendingShaderStatic, "ForwardStaticPipeline"));
 		m_Pipelines.push_back(CreatePipeline<BrightColorExtractingPipeline>(brightColorExtractingShader, "BrightColorExtractingPipeline"));
+		m_Pipelines.push_back(CreatePipeline<PostProcessPipeline>(postProcessShader, "PostProcessPipeline"));
 
 
 		auto level = Cast<Level>(GetOuter());
@@ -310,30 +320,28 @@ namespace Crystal {
 
 		scene->PanoramaCubeColorTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_HybridNoise.hdr").lock();
 		scene->CubemapColorTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                              D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                              D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                   D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                                   D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 		scene->PanoramaCubeAlphaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_Alpha.hdr").lock();
 		scene->CubemapAlphaTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                   D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                                   D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 		scene->PanoramaStarFarTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Far_Green.hdr").lock();
 		scene->CubemapStarFarTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
+		                                                     D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                     D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                                     D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
 		scene->PanoramaStarNearTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Near_Large.hdr").lock();
 		scene->CubemapStarNearTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
+		                                                      D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+		                                                      D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+		                                                      D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
 		scene->IrradianceTexture = CreateShared<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -373,8 +381,6 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		
-		
 
 		m_Pipelines[3]->Begin();
 		m_Pipelines[3]->Record(commandList);
@@ -389,8 +395,6 @@ namespace Crystal {
 		CS_INFO("HDRI로부터 Cubemap 생성중...");
 		commandQueue->Flush();
 		CS_INFO("HDRI로부터 Cubemap 생성 완료");
-
-		
 	}
 
 	void RenderSystem::Update(const float deltaTime)
@@ -515,11 +519,10 @@ namespace Crystal {
 			                                D3D12_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D32_FLOAT));
 
 		D3D12_VIEWPORT viewPort = {0, 0, 2048, 2048, 0.0f, 1.0f};
-		D3D12_RECT rect = { 0, 0, 2048, 2048 };
-		
+		D3D12_RECT rect = {0, 0, 2048, 2048};
+
 		commandList->RSSetViewports(1, &viewPort);
 		commandList->RSSetScissorRects(1, &rect);
-		
 
 
 		m_Pipelines[8]->Begin();
@@ -544,7 +547,6 @@ namespace Crystal {
 		m_LightPipelines[2]->Record(commandList);
 
 
-
 		m_Pipelines[11]->Begin();
 		m_Pipelines[11]->Record(commandList);
 
@@ -555,15 +557,13 @@ namespace Crystal {
 		m_Pipelines[12]->Begin();
 		m_Pipelines[12]->Record(commandList);
 
+
 		m_Pipelines[13]->Begin();
 		m_Pipelines[13]->Record(commandList);
 
-		
 
 		m_Pipelines[7]->Begin();
 		m_Pipelines[7]->Record(commandList);
-
-		
 
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();
@@ -591,6 +591,10 @@ namespace Crystal {
 
 		m_Pipelines[5]->Begin();
 		m_Pipelines[5]->Record(commandList);
+
+
+		m_Pipelines[14]->Begin();
+		m_Pipelines[14]->Record(commandList);
 
 		resourceBarrier.Transition.pResource = scene->FloatingPointBuffer->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -626,7 +630,6 @@ namespace Crystal {
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		
 
 		resourceBarrier.Transition.pResource = scene->FloatingPointBuffer->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -663,6 +666,7 @@ namespace Crystal {
 		m_Pipelines[8]->End();
 		m_Pipelines[11]->End();
 		m_Pipelines[12]->End();
+		m_Pipelines[14]->End();
 
 		m_RtvIndex++;
 		m_RtvIndex = m_RtvIndex % 2;
@@ -839,7 +843,6 @@ namespace Crystal {
 		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
-
 
 
 		DXGI_MODE_DESC targetParam = {};

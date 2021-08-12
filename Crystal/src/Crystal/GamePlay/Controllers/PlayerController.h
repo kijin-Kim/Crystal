@@ -86,6 +86,8 @@ namespace Crystal {
 		uint8_t GetNetworkId() const { return m_NetworkId; }
 		void SetNetworkId(uint8_t id) { m_NetworkId = id; }
 
+		DirectX::XMFLOAT2 ProjectWorldToCameraSpace(const DirectX::XMFLOAT3& worldPosition);
+
 		STATIC_TYPE_IMPLE(PlayerController)
 	private:
 		/*유저 인터페이스 인풋*/

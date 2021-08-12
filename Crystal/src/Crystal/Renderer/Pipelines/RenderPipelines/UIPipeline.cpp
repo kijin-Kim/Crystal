@@ -22,7 +22,7 @@ namespace Crystal {
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
+			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
 		};
 
 		CD3DX12_ROOT_PARAMETER1 rootParameters[2];
@@ -51,10 +51,18 @@ namespace Crystal {
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 		{
 			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+
 			{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+
+			{"TOGGLE_ALBEDO_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"TOGGLE_OPACITY_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"USE_ALBEDO_ALPHA", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"ALBEDO_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"OPACITY", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"OPACITY_MULTIPLIER", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 		};
 
 
@@ -111,7 +119,7 @@ namespace Crystal {
 			{
 				continue;
 			}
-			if (textureComponent->GetHideInGame())
+			if (textureComponent->GetHiddenInGame())
 			{
 				continue;
 			}
@@ -121,6 +129,8 @@ namespace Crystal {
 
 
 			perInstanceData.World = textureComponent->GetWorldTransform();
+
+
 
 
 			// 같은 텍스쳐를 쓰면 ㅂ묶을 수 있음
@@ -134,8 +144,16 @@ namespace Crystal {
 					continue;
 				}
 
+				perInstanceData.AlbedoColor = mat->AlbedoColor;
+				perInstanceData.Opacity = mat->Opacity;
+				perInstanceData.OpacityMultiplier = mat->OpacityMultiplier;
 
-				auto it = m_InstanceBatches.find(texture.get()); // 같은 텍스쳐를 쓰고있는 배치가 있으면,
+				perInstanceData.bToggleAlbedoTexture = !mat->AlbedoTexture.expired() ? true : false;
+				perInstanceData.bToggleOpacityTexture = !mat->OpacityTexture.expired() ? true : false;
+				perInstanceData.bUseAlbedoTextureAlpha = mat->bUseAlbedoTextureAlpha;
+
+
+				auto it = m_InstanceBatches.find(mat.get()); // 같은 텍스쳐를 쓰고있는 배치가 있으면,
 				if (it != m_InstanceBatches.end())
 				{
 					++it->second.InstanceCount;
@@ -143,14 +161,25 @@ namespace Crystal {
 					continue;
 				}
 
-				auto result = m_InstanceBatches.insert({texture.get(), InstanceBatch()});
+				auto result = m_InstanceBatches.insert({ mat.get(), InstanceBatch()});
 				auto& newInstanceBatch = result.first->second;
 
 				newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 
 				// 텍스쳐를 Heap에 Copy
-				d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-				                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+				if(perInstanceData.bToggleAlbedoTexture)
+				{
+					d3dDevice->CopyDescriptorsSimple(1, handle, mat->AlbedoTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				}
+				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+				if (perInstanceData.bToggleOpacityTexture)
+				{
+					d3dDevice->CopyDescriptorsSimple(1, handle, mat->OpacityTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				}
 				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 

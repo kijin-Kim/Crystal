@@ -36,7 +36,8 @@ void Asteroid::Initialize()
 	staticMeshComponent->AttachTo(m_MainComponent);
 
 
-	int randomNumber = Crystal::RandomFloatInRange(0, 5);
+	//int randomNumber = Crystal::RandomFloatInRange(0, 5);
+	int randomNumber = 3;
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 	switch (randomNumber)
 	{

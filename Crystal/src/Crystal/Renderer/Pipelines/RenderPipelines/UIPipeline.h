@@ -1,5 +1,6 @@
 #pragma once
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
+#include "Crystal/Resources/Material.h"
 
 namespace Crystal {
 
@@ -37,7 +38,13 @@ namespace Crystal {
 		struct PerInstanceData
 		{
 			DirectX::XMFLOAT4X4 World = Matrix4x4::Identity();
-			uint32_t SubUVIndex = 0;
+
+			int bToggleAlbedoTexture = false;
+			int bToggleOpacityTexture = false;
+			int bUseAlbedoTextureAlpha = false;
+			DirectX::XMFLOAT3 AlbedoColor = Vector3::Cyan;
+			float Opacity = 1.0f;
+			float OpacityMultiplier = 1.0f;
 		};
 
 
@@ -56,7 +63,7 @@ namespace Crystal {
 			Unique<Buffer> InstanceVertexBuffer = nullptr;
 		};
 
-		std::unordered_map<Texture*, InstanceBatch> m_InstanceBatches;
+		std::unordered_map<Material*, InstanceBatch> m_InstanceBatches;
 		std::vector<DrawData> m_DrawDatas;
 
 

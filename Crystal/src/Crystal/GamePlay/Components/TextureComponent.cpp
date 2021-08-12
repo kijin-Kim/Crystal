@@ -18,9 +18,7 @@ namespace Crystal {
 		auto level = Cast<Level>(owner->GetOuter());
 		auto& scene = level->GetScene();
 
-#ifndef CS_NM_DEDICATED
 		scene->Textures.push_back(Cast<TextureComponent>(shared_from_this()));
-#endif
 
 		
 	}
@@ -44,7 +42,8 @@ namespace Crystal {
 		}
 		
 		const auto scale = Matrix4x4::Scale({ scaleX, scaleY, scaleZ });
-		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::RotationQuaternion(m_RotationQuat);
+		const DirectX::XMFLOAT4X4 rotation = Matrix4x4::
+		RotationQuaternion(m_RotationQuat);
 		const auto translation = Matrix4x4::Translation(position);
 
 		m_LocalTransform = Matrix4x4::Multiply(scale, rotation);

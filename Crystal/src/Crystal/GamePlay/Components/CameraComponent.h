@@ -54,7 +54,7 @@ namespace Crystal {
 		float GetNearPlane() const { return m_NearPlane; }
 		float GetFarPlane() const { return m_FarPlane; }
 
-		
+		DirectX::XMFLOAT2 ProjectWorldToCameraSpace(const DirectX::XMFLOAT3& worldPosition);
 
 		STATIC_TYPE_IMPLE(CameraComponent)
 

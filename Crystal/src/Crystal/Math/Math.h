@@ -35,6 +35,42 @@ namespace Crystal {
 	}
 
 
+	namespace Vector2 {
+		inline DirectX::XMFLOAT2 Add(const DirectX::XMFLOAT2& v1, const DirectX::XMFLOAT2& v2)
+		{
+			DirectX::XMFLOAT2 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorAdd(XMLoadFloat2(&v1), XMLoadFloat2(&v2));
+			XMStoreFloat2(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT2 Subtract(const DirectX::XMFLOAT2& v1, const DirectX::XMFLOAT2& v2)
+		{
+			DirectX::XMFLOAT2 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorSubtract(XMLoadFloat2(&v1), XMLoadFloat2(&v2));
+			XMStoreFloat2(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT2 Multiply(const DirectX::XMFLOAT2& v1, const DirectX::XMFLOAT2& v2)
+		{
+			DirectX::XMFLOAT2 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVectorMultiply(XMLoadFloat2(&v1), XMLoadFloat2(&v2));
+			XMStoreFloat2(&result, newVector);
+			return result;
+		}
+
+		inline float Length(const DirectX::XMFLOAT2& v1)
+		{
+			DirectX::XMFLOAT2 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector3Length(XMLoadFloat2(&v1));
+			XMStoreFloat2(&result, newVector);
+			return result.x;
+		}
+
+	}
+
+
 	namespace Vector3 {
 		static const DirectX::XMFLOAT3 UnitX = {1.0f, 0.0f, 0.0f};
 		static const DirectX::XMFLOAT3 UnitY = {0.0f, 1.0f, 0.0f};
@@ -82,6 +118,7 @@ namespace Crystal {
 			
 			return position;			
 		}
+
 
 		inline bool IsNan(const DirectX::XMFLOAT3& v1)
 		{
@@ -169,10 +206,10 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT3 result;
 			DirectX::XMVECTOR newVector = DirectX::XMVector3Length(XMLoadFloat3(&v1));
+
 			XMStoreFloat3(&result, newVector);
 			return result.x;
 		}
-
 		inline float LengthSquared(const DirectX::XMFLOAT3& v1)
 		{
 			DirectX::XMFLOAT3 result;
@@ -226,6 +263,15 @@ namespace Crystal {
 			DirectX::XMFLOAT3 result;
 			DirectX::XMVECTOR newVector = DirectX::XMVector3Rotate(XMLoadFloat3(&v1), XMLoadFloat4(&quaternion));
 			
+			XMStoreFloat3(&result, newVector);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT3 Transform(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT4X4& m1)
+		{
+			DirectX::XMFLOAT3 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector3Transform(XMLoadFloat3(&v1), XMLoadFloat4x4(&m1));
+
 			XMStoreFloat3(&result, newVector);
 			return result;
 		}
@@ -344,6 +390,16 @@ namespace Crystal {
 			DirectX::XMFLOAT4 result;
 			DirectX::XMVECTOR newVector = DirectX::XMQuaternionRotationRollPitchYaw((rollPitchYaw.y),
 			                                                                        (rollPitchYaw.z), (rollPitchYaw.x));
+			XMStoreFloat4(&result, newVector);
+			return result;
+		}
+
+
+		inline DirectX::XMFLOAT4 Transform(const DirectX::XMFLOAT4& v1, const DirectX::XMFLOAT4X4& m1)
+		{
+			DirectX::XMFLOAT4 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector4Transform(XMLoadFloat4(&v1), XMLoadFloat4x4(&m1));
+
 			XMStoreFloat4(&result, newVector);
 			return result;
 		}
@@ -473,6 +529,14 @@ namespace Crystal {
 		{
 			DirectX::XMFLOAT4X4 result;
 			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixOrthographicLH(viewWidth, viewHeight, nearPlane, farPlane);
+			XMStoreFloat4x4(&result, newMatrix);
+			return result;
+		}
+
+		inline DirectX::XMFLOAT4X4 OrthoGraphicOffCenter(float left, float right, float bottom, float top, float nearPlane, float farPlane)
+		{
+			DirectX::XMFLOAT4X4 result;
+			DirectX::XMMATRIX newMatrix = DirectX::XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nearPlane, farPlane);
 			XMStoreFloat4x4(&result, newMatrix);
 			return result;
 		}

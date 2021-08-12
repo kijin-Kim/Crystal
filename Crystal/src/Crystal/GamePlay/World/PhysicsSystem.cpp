@@ -4,8 +4,11 @@
 #include "Level.h"
 #include "Crystal/Types.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
+#include "Crystal/GamePlay/Components/PostProcessComponent.h"
 #include "Crystal/GamePlay/Controllers/AIController.h"
+#include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 #include "Crystal/Renderer/Scene.h"
+#include "Crystal/GamePlay/Components/CameraComponent.h"
 
 
 namespace Crystal {
@@ -14,8 +17,6 @@ namespace Crystal {
 	void PhysicsSystem::Update(const float deltaTime)
 	{
 		Object::Update(deltaTime);
-
-#if 1
 
 		auto scene = GetScene();
 
@@ -55,6 +56,8 @@ namespace Crystal {
 					}
 
 
+
+
 					auto collisionRhs = collisionCompRhs->GetWorldBoundingSphere();
 
 					auto collisionTypeRhs = collisionCompRhs->GetCollisionType();
@@ -64,7 +67,7 @@ namespace Crystal {
 					DirectX::XMVECTOR contactNormalVector;
 					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
 					{
-						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && (!collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnBeginOverlap
 							OverlapResult overlappedResult = {};
@@ -74,7 +77,7 @@ namespace Crystal {
 							collisionCompLhs->OnBeginOverlap(overlappedResult);
 						}
 
-						if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && (!collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnBeginOverlap
 							OverlapResult overlappedResult = {};
@@ -108,7 +111,7 @@ namespace Crystal {
 					}
 					else
 					{
-						if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && (collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnEndOverlap
 							OverlapResult overlappedResult = {};
@@ -118,7 +121,7 @@ namespace Crystal {
 							collisionCompLhs->OnEndOverlap(overlappedResult);
 						}
 
-						if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && (collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnEndOverlap
 							OverlapResult overlappedResult = {};
@@ -157,6 +160,7 @@ namespace Crystal {
 				if (!collisionCompRhs)
 					continue;
 
+
 				if (collisionCompLhs->HasActorClassWhitelist() || collisionCompRhs->HasActorClassWhitelist())
 				{
 					auto actorTypeLhs = Cast<Actor>(collisionCompLhs->GetOuter())->StaticType();
@@ -178,7 +182,8 @@ namespace Crystal {
 
 				if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
 				{
-					if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && (!collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 					{
 						// OnBeginOverlap
 						OverlapResult overlappedResult = {};
@@ -188,7 +193,7 @@ namespace Crystal {
 						collisionCompLhs->OnBeginOverlap(overlappedResult);
 					}
 
-					if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && (!collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 					{
 						// OnBeginOverlap
 						OverlapResult overlappedResult = {};
@@ -222,7 +227,7 @@ namespace Crystal {
 				}
 				else
 				{
-					if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+					if (collisionTypeLhs == ECollisionType::CT_Overlap && (collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 					{
 						// OnEndOverlap
 						OverlapResult overlappedResult = {};
@@ -232,7 +237,7 @@ namespace Crystal {
 						collisionCompLhs->OnEndOverlap(overlappedResult);
 					}
 
-					if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+					if (collisionTypeRhs == ECollisionType::CT_Overlap && (collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 					{
 						// OnEndOverlap
 						OverlapResult overlappedResult = {};
@@ -293,7 +298,7 @@ namespace Crystal {
 					DirectX::XMVECTOR contactNormalVector;
 					if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
 					{
-						if (collisionTypeLhs == ECollisionType::CT_Overlap && !collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && (!(collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped())))
 						{
 							// OnBeginOverlap
 							OverlapResult overlappedResult = {};
@@ -303,7 +308,7 @@ namespace Crystal {
 							collisionCompLhs->OnBeginOverlap(overlappedResult);
 						}
 
-						if (collisionTypeRhs == ECollisionType::CT_Overlap && !collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && (!(collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped())))
 						{
 							// OnBeginOverlap
 							OverlapResult overlappedResult = {};
@@ -336,7 +341,7 @@ namespace Crystal {
 					}
 					else
 					{
-						if (collisionTypeLhs == ECollisionType::CT_Overlap && collisionCompLhs->IsOverlappedWith(collisionCompRhs))
+						if (collisionTypeLhs == ECollisionType::CT_Overlap && (collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnEndOverlap
 							OverlapResult overlappedResult = {};
@@ -346,7 +351,7 @@ namespace Crystal {
 							collisionCompLhs->OnEndOverlap(overlappedResult);
 						}
 
-						if (collisionTypeRhs == ECollisionType::CT_Overlap && collisionCompRhs->IsOverlappedWith(collisionCompLhs))
+						if (collisionTypeRhs == ECollisionType::CT_Overlap && (collisionCompRhs->IsOverlappedWith(collisionCompLhs) || collisionCompLhs->GetIsFirstTimeCheckOverlapped() || collisionCompRhs->GetIsFirstTimeCheckOverlapped()))
 						{
 							// OnEndOverlap
 							OverlapResult overlappedResult = {};
@@ -462,7 +467,103 @@ namespace Crystal {
 			sourceComp->ClearNoiseStimuli();
 		}
 
-#endif
+
+		// -------------------------------------------------------------------------
+		// PostProcess-Volume
+		// -------------------------------------------------------------------------
+		for (int i = 0; i < scene->PostProcesses.size(); i++)
+		{
+			auto postProcessComponent = Cast<PostProcessComponent>(scene->PostProcesses[i]);
+
+			if (!postProcessComponent)
+				continue;
+
+
+			auto volumeActor = Cast<PostProcessVolumeActor>(postProcessComponent->GetOuter());
+			if (!volumeActor->GetIsEnabled())
+			{
+				continue;
+			}
+
+			if(volumeActor->GetUnbound())
+			{
+				continue;
+			}
+
+			auto playerPawn = Cast<Pawn>(Cast<Level>(GetOuter())->GetPlayerPawn());
+			if (!playerPawn)
+			{
+				continue;
+			}
+			auto camera = Cast<CameraComponent>(playerPawn->GetComponentByClass("CameraComponent"));
+			if (!camera)
+			{
+				continue;
+			}
+
+			auto volumeType = volumeActor->GetVolumeType();
+			auto cameraPosition = camera->GetWorldPosition();
+			auto cameraPositionVector = DirectX::XMLoadFloat3(&cameraPosition);
+
+			switch (volumeType)
+			{
+			case EVolumeType::VT_Box:
+				{
+					auto collisionLhs = volumeActor->GetWorldBoundingOrientedBox();
+
+					if (collisionLhs.Contains(cameraPositionVector))
+					{
+						if (!volumeActor->GetIsOverlapped() || volumeActor->GetIsFirstTimeCheckOverlapped())
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = playerPawn;
+
+							volumeActor->OnBeginOverlap(overlappedResult);
+						}
+					}
+					else
+					{
+						if (volumeActor->GetIsOverlapped() || volumeActor->GetIsFirstTimeCheckOverlapped())
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = playerPawn;
+
+							volumeActor->OnEndOverlap(overlappedResult);
+						}
+					}
+				}
+				break;
+			case EVolumeType::VT_Sphere:
+				{
+					auto collisionLhs = volumeActor->GetWorldBoundingSphere();
+
+					if (collisionLhs.Contains(cameraPositionVector))
+					{
+						if (!volumeActor->GetIsOverlapped() || volumeActor->GetIsFirstTimeCheckOverlapped())
+						{
+							// OnBeginOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = playerPawn;
+
+							volumeActor->OnBeginOverlap(overlappedResult);
+						}
+					}
+					else
+					{
+						if (volumeActor->GetIsOverlapped() || volumeActor->GetIsFirstTimeCheckOverlapped())
+						{
+							// OnEndOverlap
+							OverlapResult overlappedResult = {};
+							overlappedResult.OverlappedActor = playerPawn;
+
+							volumeActor->OnEndOverlap(overlappedResult);
+						}
+					}
+				}
+			}
+		}
 	}
 
 
@@ -475,13 +576,18 @@ namespace Crystal {
 		}
 
 		auto impulsePerIMass = Vector3::Divide(impulse, lhsComponent->GetInverseMass() + rhsComponent->GetInverseMass());
+		if(lhsComponent->HasFiniteMass())
+		{
+			lhsComponent->SetVelocity(Vector3::Add(lhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
+				lhsComponent->GetInverseMass())));
+		}
 
-
-		lhsComponent->SetVelocity(Vector3::Add(lhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-		                                                                                      lhsComponent->GetInverseMass())));
-
-		rhsComponent->SetVelocity(Vector3::Add(rhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
-		                                                                                      -rhsComponent->GetInverseMass())));
+		
+		if(rhsComponent->HasFiniteMass())
+		{
+			rhsComponent->SetVelocity(Vector3::Add(rhsComponent->GetVelocity(), Vector3::Multiply(impulsePerIMass,
+				-rhsComponent->GetInverseMass())));
+		}
 	}
 
 	void PhysicsSystem::ResolvePenetration(const std::shared_ptr<CollisionComponent>& lhsComponent,
@@ -510,7 +616,7 @@ namespace Crystal {
 		rhsComponent->SetLocalPosition(Vector3::Add(rhsComponent->GetLocalPosition(), rhsDist));
 	}
 
-	const DirectX::XMFLOAT3& PhysicsSystem::CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
+	DirectX::XMFLOAT3 PhysicsSystem::CalculateImpulse(const std::shared_ptr<CollisionComponent>& lhsComponent,
 	                                                         const std::shared_ptr<CollisionComponent>& rhsComponent, const DirectX::XMFLOAT3& contactNorm)
 	{
 		auto contactNormal = Vector3::Normalize(Vector3::Subtract(lhsComponent->GetWorldPosition(), rhsComponent->GetWorldPosition()));

@@ -20,6 +20,7 @@ void MyPlayerPawn::Initialize()
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
 	boundingOrientedBoxComponent->SetMass(7000.0f);
+
 	m_MainComponent = boundingOrientedBoxComponent;
 
 
@@ -112,7 +113,11 @@ void MyPlayerPawn::Update(const float deltaTime)
 	else
 	{
 		auto shieldPostProcess = Crystal::Cast<Crystal::PostProcessVolumeActor>(ShieldPostProcess);
-		shieldPostProcess->SetHiddenInGame(true);
+		if(shieldPostProcess)
+		{
+			shieldPostProcess->SetHiddenInGame(true);
+		}
+		
 	}
 
 
@@ -423,7 +428,10 @@ void MyPlayerPawn::UseShieldItem()
 	}
 
 	auto shieldPostProcess = Crystal::Cast<Crystal::PostProcessVolumeActor>(ShieldPostProcess);
-	shieldPostProcess->SetHiddenInGame(false);
+	if(shieldPostProcess)
+	{
+		shieldPostProcess->SetHiddenInGame(false);
+	}
 
 }
 
