@@ -7,7 +7,7 @@
 
 void DroneLaser::Initialize()
 {
-	Crystal::PointLightActor::Initialize();
+	Crystal::Actor::Initialize();
 
 	auto material = std::make_unique<Crystal::Material>();
 
@@ -15,14 +15,14 @@ void DroneLaser::Initialize()
 	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 	material->EmissiveColor = { 191.0f / 255.0f * 3.0f, 1.0f * 3.0f, 0.0f };
 
-	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({ 2.0f, 2.0f, 18.0f });
-	boundingOrientedBoxComponent->SetMass(1.0f);
-	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
-	boundingOrientedBoxComponent->IgnoreActorClassOf("Drone");
-	boundingOrientedBoxComponent->IgnoreActorClassOf("DroneLaser");
-	boundingOrientedBoxComponent->IgnoreActorClassOf("PolluteSphere");
-	boundingOrientedBoxComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult& overlapResult)
+	auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+	boundingSphereComponent->SetRadius(15.0f);
+	boundingSphereComponent->SetMass(1.0f);
+	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	boundingSphereComponent->IgnoreActorClassOf("Drone");
+	boundingSphereComponent->IgnoreActorClassOf("DroneLaser");
+	boundingSphereComponent->IgnoreActorClassOf("PolluteSphere");
+	boundingSphereComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult& overlapResult)
 		{
 			auto overlappedActor = overlapResult.OverlappedActor.lock();
 			if(overlappedActor)
@@ -31,10 +31,10 @@ void DroneLaser::Initialize()
 				Destroy();
 			}
 		});
-	boundingOrientedBoxComponent->SetDamping(1.0f);
+	boundingSphereComponent->SetDamping(1.0f);
 
 
-	m_MainComponent = boundingOrientedBoxComponent;
+	m_MainComponent = boundingSphereComponent;
 
 	auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	meshComponent->AddMaterial(std::move(material));
@@ -47,18 +47,12 @@ void DroneLaser::Initialize()
 
 	auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 	projectileMovementComponent->SetTargetComponent(m_MainComponent);
-	projectileMovementComponent->SetProjectileMaxAcceleration(500000.0f);
-
-
-	m_LightComponent->SetLightColor({ 191.0f / 255.0f * 3.0f, 1.0f * 3.0f, 0.0f });
-	m_LightComponent->SetAttenuationRadius(250.0f);
-	m_LightComponent->SetLightIntensity(3.0f);
-	m_LightComponent->AttachTo(m_MainComponent);
+	projectileMovementComponent->SetProjectileMaxAcceleration(200000.0f);
 }
 
 void DroneLaser::Update(float deltaTime)
 {
-	Crystal::PointLightActor::Update(deltaTime);
+	Crystal::Actor::Update(deltaTime);
 
 	m_LaserLifeTimer.Tick();
 

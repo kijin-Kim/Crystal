@@ -79,7 +79,7 @@ void Asteroid::Initialize()
 	}
 
 
-	auto randomScale = Crystal::RandomFloatInRange(1.0f, 10.0f);
+	auto randomScale = Crystal::RandomFloatInRange(5.0f, 10.0f);
 	m_MainComponent->RotateRoll(rand() % 360);
 	m_MainComponent->RotatePitch(rand() % 360);
 	m_MainComponent->RotateYaw(rand() % 360);
@@ -195,21 +195,28 @@ void DestructibleAsteroid::Update(float deltaTime)
 {
 	Actor::Update(deltaTime);
 
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if (level)
+	if (m_bShouldShowHealthBar)
 	{
-		float healthPercent = m_CurrentHealth / m_MaxHealth;
-		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
+		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+		if (level)
+		{
+			float healthPercent = m_CurrentHealth / m_MaxHealth;
+			healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 
 
-		auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
-		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-		position2D.y += 100.0f;
-		m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
-		m_HealthBarFillComponent->SetWorldPosition({
-			position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
-		});
+			auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+			if (playerController)
+			{
+				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+				position2D.y += 100.0f;
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
+				m_HealthBarFillComponent->SetWorldPosition({
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+				});
+			}
+		}
 	}
+
 
 	if (m_bShouldShowHealthBar)
 	{

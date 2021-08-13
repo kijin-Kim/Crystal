@@ -161,17 +161,40 @@ public:
 			return;
 		}
 
-		possessedPawn->RotateYaw(10.0f * deltaTime);
-		auto targetDirection = Crystal::Vector3::Normalize(possessedPawn->GetForwardVector());
-		possessedPawn->AddForce(Crystal::Vector3::Multiply(targetDirection, MaxAcceleration));
 
-//		FinishExecute(true);
+		if(!Crystal::Equal(MaxOrbitTravelDistance, 0.0f))
+		{
+			if (m_TravelledDistanceSq >= MaxOrbitTravelDistance * MaxOrbitTravelDistance)
+			{
+				m_TravelledDistanceSq = 0.0f;
+				FinishExecute(true);
+				return;
+			}
+		}
+		
+
+
+		auto targetDirection = Crystal::Vector3::Normalize(possessedPawn->GetForwardVector());
+		auto force = Crystal::Vector3::Multiply(targetDirection, MaxAcceleration);
+		auto acceleration = Crystal::Vector3::Multiply(force, possessedPawn->GetInverseMass());
+		auto deltaDistanceSq = Crystal::Vector3::LengthSquared(Crystal::Vector3::Add(possessedPawn->GetVelocity(), Crystal::Vector3::Multiply(acceleration, deltaTime)));
+		m_TravelledDistanceSq += deltaDistanceSq;
+
+		possessedPawn->RotateYaw(YawAngle * deltaTime);
+		possessedPawn->AddForce(force);
+
+
 	}
 
 	STATIC_TYPE_IMPLE(BTTaskNodeOrbit)
 
+private:
+	float m_TravelledDistanceSq = 0.0f;
+
 public:
+	float YawAngle = 10.0f;
 	float MaxAcceleration = 0.0f;
+	float MaxOrbitTravelDistance = 0.0f;
 };
 
 

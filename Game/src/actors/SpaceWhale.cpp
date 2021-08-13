@@ -36,12 +36,19 @@ void SpaceWhale::Initialize()
 			blackboardComponent->SetValueAsFloat3("RandomPositionInSphere", Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 300.0f));
 		}
 
-		if(staticType == "MyPlayerPawn")
+		if (staticType == "MyPlayerPawn")
 		{
 			auto playerPawn = Crystal::Cast<MyPlayerPawn>(hitResult.HitActor);
-			if(playerPawn)
+			if (playerPawn)
 			{
 				playerPawn->OnTakeDamage(m_Power, Crystal::Cast<Crystal::Actor>(weak_from_this()));
+			}
+
+			auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
+			if (spaceWhaleController)
+			{
+				auto blackboardComponent = spaceWhaleController->GetBlackboardComponent();
+				blackboardComponent->SetValueAsBool("bDamagedPlayer", true);
 			}
 		}
 	});
@@ -84,6 +91,8 @@ void SpaceWhale::Initialize()
 
 	UpdateHealth();
 
+
+	m_DamagePerceptionTimer.SetElapsedTime(m_DamagePerceptionInterval);
 }
 
 void SpaceWhale::End()
@@ -91,11 +100,13 @@ void SpaceWhale::End()
 	Crystal::Pawn::End();
 
 	auto kraken = Crystal::Cast<Kraken>(GetInstigator());
-	if(kraken)
+	if (kraken)
 	{
-		kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() - 10.0f);
+		if (kraken->GetPhase() != 3)
+		{
+			kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() - 10.0f);
+		}
 	}
-	
 }
 
 
@@ -109,27 +120,31 @@ void SpaceWhale::Update(float deltaTime)
 		m_PolluteGaugeIncrementTimer.Reset();
 
 		auto kraken = Crystal::Cast<Kraken>(GetInstigator());
-		if(kraken)
+		if (kraken)
 		{
 			kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() + 1.5f);
 		}
-		
 	}
 
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if (level)
+	if (m_bShouldShowHealthBar)
 	{
-		float healthPercent = m_CurrentHealth / m_MaxHealth;
-		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
+		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+		if (level)
+		{
+			float healthPercent = m_CurrentHealth / m_MaxHealth;
+			healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 
-
-		auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
-		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-		position2D.y += 100.0f;
-		m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
-		m_HealthBarFillComponent->SetWorldPosition({
-			position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
-			});
+			auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+			if (playerController)
+			{
+				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+				position2D.y += 100.0f;
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
+				m_HealthBarFillComponent->SetWorldPosition({
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+				});
+			}
+		}
 	}
 
 
@@ -143,12 +158,13 @@ void SpaceWhale::Update(float deltaTime)
 		}
 	}
 
+	m_DamagePerceptionTimer.Tick();
 }
 
 void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
 	auto damageCauser = causer.lock();
-	if(damageCauser->StaticType() != "MyPlayerPawn")
+	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}
@@ -161,10 +177,15 @@ void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 		Destroy();
 	}
 
-	auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
-	if(spaceWhaleController)
+	if (m_DamagePerceptionTimer.GetElapsedTime() >= m_DamagePerceptionInterval)
 	{
-		spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("PlayerLocation", damageCauser->GetPosition());
+		m_DamagePerceptionTimer.Reset();
+
+		auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
+		if (spaceWhaleController)
+		{
+			spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("PlayerLocation", damageCauser->GetPosition());
+		}
 	}
 }
 

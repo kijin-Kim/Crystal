@@ -69,29 +69,26 @@ public:
 
 			resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx");
 			resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx");
-
 		}
 
 
 		{
 			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
-			playerStart->SetPosition({0.0f, 1000.0f, 0.0f});
+			playerStart->SetPosition({7000.0f, 7000.0f, 0.0f});
 		}
 
 		m_World->GetCurrentLevel()->OnClientConnect();
 
-		if(true)
+		if (false)
 		{
-			for(int i=0; i < 0; i++)
+			for (int i = 0; i < 5; i++)
 			{
-				auto drone = m_World->SpawnActor<Drone>({ "Drone" }).lock();
+				auto drone = m_World->SpawnActor<Drone>({"Drone"}).lock();
 				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
 
 				auto droneController = m_World->SpawnActor<DroneAIController>({}).lock();
 				droneController->Possess(drone);
-				
 			}
-			
 		}
 
 
@@ -100,8 +97,8 @@ public:
 			sun->SetPosition({+10000.0f, 20000.0f, 0.0f});
 
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({1.0f, 1.0f , 1.0f });
-			
+			lightComponent->SetLightColor({1.0f, 1.0f, 1.0f});
+
 			lightComponent->SetLightIntensity(7.0f);
 			lightComponent->RotateYaw(-90.0f);
 			lightComponent->RotatePitch(45.0f);
@@ -109,15 +106,14 @@ public:
 
 			auto sunMesh = Crystal::Cast<Crystal::StaticMeshComponent>(sun->GetComponentByClass("StaticMeshComponent"));
 			auto sunMat = sunMesh->GetMaterial(0);
-			sunMat->EmissiveColor = { 1.0f  * 7.0f, 1.0f * 7.0f, 90.0f / 255.0f * 7.0f};
+			sunMat->EmissiveColor = {1.0f * 7.0f, 1.0f * 7.0f, 90.0f / 255.0f * 7.0f};
 		}
 
 
-
 		{
-			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({ "LightActor2" }).lock();
+			auto lightActor = m_World->SpawnActor<Crystal::DirectionalLightActor>({"LightActor2"}).lock();
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(lightActor->GetComponentByClass("DirectionalLightComponent"));
-			lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
+			lightComponent->SetLightColor({1.0f, 1.0f, 1.0f});
 			lightComponent->SetLightIntensity(2.0f);
 			lightComponent->RotateYaw(135.0f);
 			lightComponent->RotatePitch(30.0f);
@@ -128,52 +124,63 @@ public:
 			const float distFromCenter = 15000.0f;
 			const float boundingOrientedBoxWidth = 500.0f;
 
-			auto boundingOrientedBoxActor1 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor1" }).lock();
-			boundingOrientedBoxActor1->SetPosition({ +distFromCenter + boundingOrientedBoxWidth, 0.0f, 0.0f });
-			boundingOrientedBoxActor1->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
-			
-			auto boundingOrientedBoxActor2 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor2" }).lock();
-			boundingOrientedBoxActor2->SetPosition({ -distFromCenter - boundingOrientedBoxWidth, 0.0f, 0.0f });
-			boundingOrientedBoxActor2->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			auto boundingOrientedBoxActor1 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor1"}).lock();
+			boundingOrientedBoxActor1->SetPosition({+distFromCenter + boundingOrientedBoxWidth, 0.0f, 0.0f});
+			boundingOrientedBoxActor1->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
 
-			auto boundingOrientedBoxActor3 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor3" }).lock();
-			boundingOrientedBoxActor3->SetPosition({ 0.0f, +distFromCenter + boundingOrientedBoxWidth, 0.0f });
-			boundingOrientedBoxActor3->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			auto boundingOrientedBoxActor2 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor2"}).lock();
+			boundingOrientedBoxActor2->SetPosition({-distFromCenter - boundingOrientedBoxWidth, 0.0f, 0.0f});
+			boundingOrientedBoxActor2->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
+
+			auto boundingOrientedBoxActor3 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor3"}).lock();
+			boundingOrientedBoxActor3->SetPosition({0.0f, +distFromCenter + boundingOrientedBoxWidth, 0.0f});
+			boundingOrientedBoxActor3->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
 			boundingOrientedBoxActor3->RotateRoll(90.0f);
-			auto boundingOrientedBoxActor4 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor4" }).lock();
-			boundingOrientedBoxActor4->SetPosition({ 0.0f, -distFromCenter - boundingOrientedBoxWidth, 0.0f });
-			boundingOrientedBoxActor4->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			auto boundingOrientedBoxActor4 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor4"}).lock();
+			boundingOrientedBoxActor4->SetPosition({0.0f, -distFromCenter - boundingOrientedBoxWidth, 0.0f});
+			boundingOrientedBoxActor4->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
 			boundingOrientedBoxActor4->RotateRoll(90.0f);
 
-			auto boundingOrientedBoxActor5 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor5" }).lock();
-			boundingOrientedBoxActor5->SetPosition({ 0.0f, 0.0f, +distFromCenter + boundingOrientedBoxWidth });
-			boundingOrientedBoxActor5->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			auto boundingOrientedBoxActor5 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor5"}).lock();
+			boundingOrientedBoxActor5->SetPosition({0.0f, 0.0f, +distFromCenter + boundingOrientedBoxWidth});
+			boundingOrientedBoxActor5->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
 			boundingOrientedBoxActor5->RotateYaw(90.0f);
 
-			auto boundingOrientedBoxActor6 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor6" }).lock();
-			boundingOrientedBoxActor6->SetPosition({ 0.0f, 0.0f, -distFromCenter - boundingOrientedBoxWidth });
-			boundingOrientedBoxActor6->SetExtents({ boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f });
+			auto boundingOrientedBoxActor6 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor6"}).lock();
+			boundingOrientedBoxActor6->SetPosition({0.0f, 0.0f, -distFromCenter - boundingOrientedBoxWidth});
+			boundingOrientedBoxActor6->SetExtents({
+				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
+			});
 			boundingOrientedBoxActor6->RotateYaw(90.0f);
 		}
 
-	
 
-		if (true)
+		/*if (true)
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 300; i++)
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
 			}
 
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 1000; i++)
 			{
 				auto asteroid = m_World->SpawnActor<FakeAsteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
 			}
 
 
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 40; i++)
 			{
 				int randomNumber = rand() % 3;
 				switch (randomNumber)
@@ -198,10 +205,10 @@ public:
 					}
 				}
 			}
-		}
+		}*/
 
 
-		if (false)
+		if (true)
 		{
 			auto kraken = m_World->SpawnActor<Kraken>({}).lock();
 			kraken->SetPosition({0.0f, 0.0f, 0.0f});
@@ -210,34 +217,38 @@ public:
 		}
 
 
-		if (false)
+		if (true)
 		{
 			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({""}).lock();
+			particleActor->SetPosition({ 0.0f, 0.0f, -3000.0f });
 		}
 
 
-		if (false)
+		if (true)
 		{
-			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "GreenTintPostProcess" }).lock();
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({"GreenTintPostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(0);
 			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
 			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
 			postProcessActor->SetSphereRadius(2300.0f);
 			postProcessActor->SetPosition(Crystal::Vector3::Zero);
 			postProcessActor->SetIsEnabled(false);
-			
+
 			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
 
 			auto mat = postProcessComponent->GetMaterials()[0];
-			mat->TintColor = { 0.2f, 0.2f, 0.05f };
+			mat->TintColor = {0.2f, 0.2f, 0.05f};
 
 			auto kraken = Crystal::Cast<Kraken>(m_World->GetCurrentLevel()->GetActorByClass("Kraken"));
-			kraken->GreenTintVolumeActor = postProcessActor;
+			if (kraken)
+			{
+				kraken->GreenTintVolumeActor = postProcessActor;
+			}
 		}
 
-		if (false)
+		if (true)
 		{
-			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "VignettePostProcess"}).lock();
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({"VignettePostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(2);
 			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
 			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
@@ -250,12 +261,15 @@ public:
 			mat->SceneColorMaskTexture = resourceManager.GetTexture("assets/textures/radial_gradient.png");
 
 			auto kraken = Crystal::Cast<Kraken>(m_World->GetCurrentLevel()->GetActorByClass("Kraken"));
-			kraken->VignetteVolumeActor = postProcessActor;
+			if (kraken)
+			{
+				kraken->VignetteVolumeActor = postProcessActor;
+			}
 		}
 
-		if(false)
+		if (true)
 		{
-			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterDamagedPostProcess" }).lock();
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({"CharacterDamagedPostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(3);
 			postProcessActor->SetUnBound(true);
 
@@ -268,12 +282,15 @@ public:
 			mat->OpacityMultiplier = 0.0f;
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
-			myPlayerPawn->DamagedPostProcessActor = postProcessActor;
+			if (myPlayerPawn)
+			{
+				myPlayerPawn->DamagedPostProcessActor = postProcessActor;
+			}
 		}
 
-		if (false)
+		if (true)
 		{
-			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterHealPostProcess" }).lock();
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({"CharacterHealPostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(3);
 			postProcessActor->SetUnBound(true);
 
@@ -281,17 +298,20 @@ public:
 			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
 
 			auto mat = postProcessComponent->GetMaterials()[0];
-			mat->AlbedoColor = { 51.0f / 255.0f, 165.0f / 255.0f, 50.0f / 255.0f };
+			mat->AlbedoColor = {51.0f / 255.0f, 165.0f / 255.0f, 50.0f / 255.0f};
 			mat->OpacityTexture = resourceManager.GetTexture("assets/textures/radial_gradient_inv.png");
 			mat->OpacityMultiplier = 0.0f;
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
-			myPlayerPawn->HealPostProcessActor = postProcessActor;
+			if (myPlayerPawn)
+			{
+				myPlayerPawn->HealPostProcessActor = postProcessActor;
+			}
 		}
 
-		if (false)
+		if (true)
 		{
-			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({ "CharacterShieldPostProcess" }).lock();
+			auto postProcessActor = m_World->SpawnActor<Crystal::PostProcessVolumeActor>({"CharacterShieldPostProcess"}).lock();
 			postProcessActor->SetPostProcessOrder(1);
 			postProcessActor->SetUnBound(true);
 			postProcessActor->SetHiddenInGame(true);
@@ -299,26 +319,34 @@ public:
 			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
 
 			auto mat = postProcessComponent->GetMaterials()[0];
-			mat->AlbedoColor = { 21.0f / 255.0f, 105.0f / 255.0f, 199.0f / 255.0f };
+			mat->AlbedoColor = {21.0f / 255.0f, 105.0f / 255.0f, 199.0f / 255.0f};
 			mat->OpacityTexture = resourceManager.GetTexture("assets/textures/bump_reverse.png");
-			mat->TexCoordMultiplier = { 3.0f, 3.0f * (1080.0f / 1920.0f) };
+			mat->TexCoordMultiplier = {3.0f, 3.0f * (1080.0f / 1920.0f)};
 			mat->OpacityMultiplier = 0.3f;
-			
+
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(m_World->GetCurrentLevel()->GetActorByClass("MyPlayerPawn"));
-			myPlayerPawn->ShieldPostProcess = postProcessActor;
+			if (myPlayerPawn)
+			{
+				myPlayerPawn->ShieldPostProcess = postProcessActor;
+			}
 		}
 
 
+		//for (int i = 0; i < 10; i++)
+		//{
+		//	auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
+		//	spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
+		//	spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
+		//	spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
+		//	spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
 
-		auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
-		spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
-		spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
-		spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
-		spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
+		//	auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
+		//	spaceWhaleController->Possess(spaceWhale);
+		//}
 
-		auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
-		spaceWhaleController->Possess(spaceWhale);
+
+		
 	}
 };
 

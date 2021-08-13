@@ -1,5 +1,7 @@
 #include "SpaceWhaleAIController.h"
 
+#include <iso646.h>
+
 #include "CustomBTTask.h"
 #include "Crystal/GamePlay/Components/AIComponent.h"
 #include "Crystal/Types.h"
@@ -24,10 +26,35 @@ void SpaceWhaleAIController::Begin()
 {
 	Crystal::AIController::Begin();
 
+	const float maxAcceleration = 60000000.0f;
+
 	auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
 	auto rootNode = behaviorTree->GetRootNode();
 	auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
 	rootNode->AddChildNode(selectorNode);
+
+	// Sequence Orbit After Attack
+	{
+		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbitAfterAttack");
+		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+		blackboardBasedDecorator->BlackboardKey = "bDamagedPlayer";
+		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnResultChange;
+		sequenceNode->AddDecorator(blackboardBasedDecorator);
+
+		auto orbitNode = Crystal::CreateObject<BTTaskNodeOrbit>("TaskOrbit");
+		orbitNode->MaxAcceleration = maxAcceleration;
+		orbitNode->MaxOrbitTravelDistance = 13000.0f;
+		orbitNode->YawAngle = 20.0f;
+		sequenceNode->AddChildNode(orbitNode);
+
+		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
+		clearValueNode->BlackboardKey = "bDamagedPlayer";
+		sequenceNode->AddChildNode(clearValueNode);
+
+		selectorNode->AddChildNode(sequenceNode);
+	}
 
 
 	// MoveToLastSeen
@@ -48,7 +75,7 @@ void SpaceWhaleAIController::Begin()
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "PlayerLocation";
 		moveToLocationNode->AcceptableRadius = 60.0f;
-		moveToLocationNode->MaxAcceleration = 30000000.0f;
+		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
 		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
@@ -59,7 +86,7 @@ void SpaceWhaleAIController::Begin()
 		selectorNode->AddChildNode(sequenceNode);
 	}
 
-	// GoToRandom
+	//// GoToRandom
 	{
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceGoToRandom");
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
@@ -77,7 +104,7 @@ void SpaceWhaleAIController::Begin()
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "RandomPositionInSphere";
 		moveToLocationNode->AcceptableRadius = 60.0f;
-		moveToLocationNode->MaxAcceleration = 30000000.0f;
+		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
 		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
@@ -87,13 +114,12 @@ void SpaceWhaleAIController::Begin()
 		selectorNode->AddChildNode(sequenceNode);
 	}
 
-
 	// Keep Orbit
 	{
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceOrbit");
 
 		auto orbitNode = Crystal::CreateObject<BTTaskNodeOrbit>("TaskOrbit");
-		orbitNode->MaxAcceleration = 30000000.0f;
+		orbitNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(orbitNode);
 
 		selectorNode->AddChildNode(sequenceNode);

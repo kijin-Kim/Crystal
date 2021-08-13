@@ -103,8 +103,6 @@ void MyPlayerPawn::Update(const float deltaTime)
 
 	if(!m_PlayerShield.expired())
 	{
-		
-
 		auto shield = Crystal::Cast<PlayerShield>(m_PlayerShield);
 
 		auto direction = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(m_StaticMeshComponent->GetWorldPosition(), m_CameraComponent->GetWorldPosition()));
@@ -272,6 +270,8 @@ void MyPlayerPawn::OnFire()
 		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
 		collisionParams.IgnoreClasses.push_back("BoundingOrientedBoxActor");
 		collisionParams.IgnoreClasses.push_back("PolluteSphere");
+		collisionParams.IgnoreClasses.push_back("Laser");
+		collisionParams.IgnoreClasses.push_back("DroneLaser");
 
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
@@ -288,6 +288,7 @@ void MyPlayerPawn::OnFire()
 
 		DirectX::XMFLOAT3 endDirection = m_CameraComponent->GetWorldForwardVector();
 		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
+
 		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();

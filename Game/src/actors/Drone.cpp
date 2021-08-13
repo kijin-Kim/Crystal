@@ -15,11 +15,22 @@ void Drone::Initialize()
 	Crystal::Pawn::Initialize();
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({ 90.0f * 2.0f, 30.0f * 2.0f, 85.0f * 2.0f});
+	boundingOrientedBoxComponent->SetExtents({90.0f * 2.0f, 30.0f * 2.0f, 85.0f * 2.0f});
 	boundingOrientedBoxComponent->SetMass(10000.0f);
 	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("ShieldSphere");
 	boundingOrientedBoxComponent->IgnoreActorClassOf("Kraken");
+	boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
+	{
+		auto staticType = hitResult.HitActor.lock()->StaticType();
+		if (staticType == "BoundingOrientedBoxActor")
+		{
+			auto droneAIController = Crystal::Cast<DroneAIController>(GetController());
+			auto blackboardComponent = droneAIController->GetBlackboardComponent();
+			blackboardComponent->SetValueAsFloat3("RandomPositionFromCenter", Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 500.0f));
+		}
+	});
+
 
 	m_MainComponent = boundingOrientedBoxComponent;
 
@@ -33,7 +44,7 @@ void Drone::Initialize()
 	material->MetallicTexture = resourceManager.GetTexture("assets/textures/T_LightFrigate_GK3_M.tga");
 	material->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_LightFrigate_GK3_R.tga");
 	material->NormalTexture = resourceManager.GetTexture("assets/textures/T_LightFrigate_GK3_Norm.tga");
-	
+
 
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_LightFrigate_GK3.fbx"));
@@ -42,11 +53,11 @@ void Drone::Initialize()
 	staticMeshComponent->SetUnitScale(8.0f);
 
 	m_LeftFireSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftFireSocketComponent");
-	m_LeftFireSocketComponent->SetLocalPosition({ -26.0f, 0.0f, 49.0f });
+	m_LeftFireSocketComponent->SetLocalPosition({-26.0f, 0.0f, 49.0f});
 	m_LeftFireSocketComponent->AttachTo(staticMeshComponent);
 
 	m_RightFireSocketComponent = CreateComponent<Crystal::TransformComponent>("RightFireSocketComponent");
-	m_RightFireSocketComponent->SetLocalPosition({ 26.0f, 0.0f, 49.0f });
+	m_RightFireSocketComponent->SetLocalPosition({26.0f, 0.0f, 49.0f});
 	m_RightFireSocketComponent->AttachTo(staticMeshComponent);
 
 
@@ -80,22 +91,27 @@ void Drone::Update(float deltaTime)
 {
 	Actor::Update(deltaTime);
 
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if (level)
+	if (m_bShouldShowHealthBar)
 	{
-		float healthPercent = m_CurrentHealth / m_MaxHealth;
-		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
+		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+		if (level)
+		{
+			float healthPercent = m_CurrentHealth / m_MaxHealth;
+			healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 
 
-		auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
-		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-		position2D.y += 100.0f;
-		m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
-		m_HealthBarFillComponent->SetWorldPosition({
-			position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
-			});
+			auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+			if (playerController)
+			{
+				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+				position2D.y += 100.0f;
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
+				m_HealthBarFillComponent->SetWorldPosition({
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+				});
+			}
+		}
 	}
-
 
 	if (m_bShouldShowHealthBar)
 	{
@@ -106,18 +122,16 @@ void Drone::Update(float deltaTime)
 			SetShowHealthBar(false);
 		}
 	}
-		
 }
 
 void Drone::OnFire()
 {
-
 	Crystal::Actor::ActorSpawnParams spawnParams = {};
 	spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
 
 	static bool bUseLeftSocket = false;
 
-	if(bUseLeftSocket)
+	if (bUseLeftSocket)
 	{
 		spawnParams.Position = m_LeftFireSocketComponent->GetWorldPosition();
 		bUseLeftSocket = false;
@@ -129,7 +143,7 @@ void Drone::OnFire()
 	}
 
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if(level)
+	if (level)
 	{
 		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
 		auto playerPosition = playerPawn->GetPosition();
@@ -150,8 +164,6 @@ void Drone::OnFire()
 		spawnParams.Rotation = rotation;
 		level->SpawnActor<DroneLaser>(spawnParams);
 	}
-
-	
 }
 
 void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)

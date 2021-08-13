@@ -11,7 +11,6 @@ void PolluteSphere::Initialize()
 	auto material = Crystal::CreateShared<Crystal::Material>();
 	material->EmissiveColor = { 195.0f / 255.0f * 0.5f, 195.0f / 255.0f * 0.5f, 1.0f / 255.0f * 0.5f };
 	material->Opacity = 0.1f;
-		
 	material->ShadingModel = Crystal::EShadingModel::SM_Unlit;
 	material->BlendMode = Crystal::EBlendMode::BM_Translucent;
 	material->bTwoSided = false;
@@ -30,7 +29,7 @@ void PolluteSphere::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
-				Crystal::Cast<MyPlayerPawn>(actor)->SetIsPolluteDamagable(false);
+				Crystal::Cast<MyPlayerPawn>(actor)->SetIsNotInPolluteSphere(false);
 				auto& mat = m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = true;
 			}
@@ -41,7 +40,7 @@ void PolluteSphere::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
-				Crystal::Cast<MyPlayerPawn>(actor)->SetIsPolluteDamagable(true);
+				Crystal::Cast<MyPlayerPawn>(actor)->SetIsNotInPolluteSphere(true);
 				auto& mat= m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = false;
 			}

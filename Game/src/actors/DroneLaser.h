@@ -1,8 +1,8 @@
 #pragma once
 #include "Crystal/Core/Timer.h"
-#include "Crystal/GamePlay/Objects/Actors/LightActor.h"
+#include "Crystal/GamePlay/Objects/Actors/Actor.h"
 
-class DroneLaser : public Crystal::PointLightActor
+class DroneLaser : public Crystal::Actor
 {
 public:
 	DroneLaser() = default;

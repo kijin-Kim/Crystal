@@ -48,4 +48,8 @@ private:
 	Crystal::Timer m_HealthBarShowTimer = {};
 	const float m_HealthBarShowTime = 3.0f;
 	bool m_bShouldShowHealthBar = false;
+
+	Crystal::Timer m_DamagePerceptionTimer = {};
+	const float m_DamagePerceptionInterval = 2.0f;
+
 };

@@ -23,6 +23,8 @@ void DroneAIController::Begin()
 {
 	Crystal::AIController::Begin();
 
+	const float maxAcceleration = 50000000.0f;
+
 	auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
 	auto rootNode = behaviorTree->GetRootNode();
 	auto selectorNode = Crystal::CreateObject<Crystal::BTSelectorNode>("Selector");
@@ -73,11 +75,39 @@ void DroneAIController::Begin()
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "LastSeenLocation";
 		moveToLocationNode->AcceptableRadius = 60.0f;
-		moveToLocationNode->MaxAcceleration = 5000000.0f;
+		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
 		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
 		clearValueNode->BlackboardKey = "LastSeenLocation";
+		sequenceNode->AddChildNode(clearValueNode);
+
+		selectorNode->AddChildNode(sequenceNode);
+	}
+
+	// GoToRandom
+	{
+		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceGoToRandom");
+		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
+		blackboardBasedDecorator->BlackboardKey = "RandomPositionFromCenter";
+		blackboardBasedDecorator->bIsSet = true;
+		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnResultChange;
+		sequenceNode->AddDecorator(blackboardBasedDecorator);
+
+		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
+		faceLocationNode->TargetLocationKey = "RandomPositionFromCenter";
+		faceLocationNode->TargetAngleTolerance = 10.0f;
+		sequenceNode->AddChildNode(faceLocationNode);
+
+		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
+		moveToLocationNode->TargetLocationKey = "RandomPositionFromCenter";
+		moveToLocationNode->AcceptableRadius = 60.0f;
+		moveToLocationNode->MaxAcceleration = maxAcceleration;
+		sequenceNode->AddChildNode(moveToLocationNode);
+
+		auto clearValueNode = Crystal::CreateObject<Crystal::BTTaskNodeClearBlackboardValue>("TaskClearBlackboardValue");
+		clearValueNode->BlackboardKey = "RandomPositionFromCenter";
 		sequenceNode->AddChildNode(clearValueNode);
 
 		selectorNode->AddChildNode(sequenceNode);
@@ -101,7 +131,7 @@ void DroneAIController::Begin()
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "RandomPositionInSphere";
 		moveToLocationNode->AcceptableRadius = 60.0f;
-		moveToLocationNode->MaxAcceleration = 5000000.0f;
+		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
 		auto waitNode = Crystal::CreateObject<Crystal::BTTaskNodeWait>("TaskNodeWait");

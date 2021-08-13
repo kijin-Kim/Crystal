@@ -110,14 +110,32 @@ void Kraken::Update(float deltaTime)
 		{
 			auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
 
-			if (playerPawn && playerPawn->GetIsPolluteDamagable())
+			if (playerPawn)
 			{
-				m_PolluteDamageTimer.Tick();
-				if (m_PolluteDamageTimer.GetElapsedTime() >= m_PolluteDamageInterval)
+				if(m_CurrentPhase == 3)
 				{
-					m_PolluteDamageTimer.Reset();
-					playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
+					if(playerPawn->GetIsNotInPolluteSphere())
+					{
+						m_PolluteDamageTimer.Tick();
+						if (m_PolluteDamageTimer.GetElapsedTime() >= m_PolluteDamageInterval)
+						{
+							m_PolluteDamageTimer.Reset();
+							playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
+						}
+					}
+
 				}
+				else
+				{
+					m_PolluteDamageTimer.Tick();
+					if (m_PolluteDamageTimer.GetElapsedTime() >= m_PolluteDamageInterval)
+					{
+						m_PolluteDamageTimer.Reset();
+						playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
+					}
+				}
+
+				
 			}
 		}
 	}
@@ -133,7 +151,7 @@ void Kraken::Update(float deltaTime)
 		{
 			for (int i = 0; i < 3; i++)
 			{
-				if (m_CurrentKrakenSpawnCount >= m_MaxKrakenSpawnCount)
+				if (m_CurrentWhaleSpawnCount >= m_MaxWhaleSpawnCount)
 				{
 					break;
 				}
@@ -149,28 +167,35 @@ void Kraken::Update(float deltaTime)
 
 				auto spaceWhaleController = level->SpawnActor<SpaceWhaleAIController>({}).lock();
 				spaceWhaleController->Possess(spaceWhale);
-				++m_CurrentKrakenSpawnCount;
+				++m_CurrentWhaleSpawnCount;
 			}
 		}
 	}
 
 
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	if (level)
+	if(m_bShouldShowHealthBar)
 	{
-		float healthPercent = m_CurrentHealth / m_MaxHealth;
-		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
+		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+		if (level)
+		{
+			float healthPercent = m_CurrentHealth / m_MaxHealth;
+			healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 
+			auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+			if (playerController)
+			{
+				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+				position2D.y += 100.0f;
+				m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+				m_HealthBarFillComponent->SetWorldPosition({
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+					});
+			}
 
-		auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
-		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-		position2D.y += 100.0f;
-		m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
-		m_HealthBarFillComponent->SetWorldPosition({
-			position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
-		});
+		}
+
 	}
-
+	
 
 	if (m_bShouldShowHealthBar)
 	{
@@ -292,12 +317,16 @@ void Kraken::SetPolluteGauge(float polluteGauge)
 	if (m_CurrentPolluteGauge >= m_MaxPolluteGauge)
 	{
 		GreenTintVolumeActor->SetIsEnabled(true);
+		GreenTintVolumeActor->SetHiddenInGame(false);
 		VignetteVolumeActor->SetIsEnabled(true);
+		VignetteVolumeActor->SetHiddenInGame(false);
 	}
 	else
 	{
 		GreenTintVolumeActor->SetIsEnabled(false);
+		GreenTintVolumeActor->SetHiddenInGame(true);
 		VignetteVolumeActor->SetIsEnabled(false);
+		VignetteVolumeActor->SetHiddenInGame(true);
 	}
 }
 

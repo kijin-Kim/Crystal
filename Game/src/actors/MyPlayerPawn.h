@@ -69,11 +69,11 @@ public:
 
 	void OnItemDestroyed(ItemType itemType);
 
-	void SetIsPolluteDamagable(bool bIsDamagable)
+	void SetIsNotInPolluteSphere(bool bIsNotInSphere)
 	{
-		m_bIsPolluteDamagable = bIsDamagable;
+		m_bIsNotInPolluteSphere = bIsNotInSphere;
 	}
-	bool GetIsPolluteDamagable() const { return m_bIsPolluteDamagable; }
+	bool GetIsNotInPolluteSphere() const { return m_bIsNotInPolluteSphere; }
 
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
 
@@ -110,7 +110,7 @@ private:
 	bool m_bHasItem[ItemTypeCount];
 
 
-	bool m_bIsPolluteDamagable = false;
+	bool m_bIsNotInPolluteSphere = false;
 
 	Crystal::Timer m_HealTimer;
 	Crystal::Timer m_HealIntervalTimer;
