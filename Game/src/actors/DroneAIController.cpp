@@ -10,12 +10,12 @@ void DroneAIController::Initialize()
 	Crystal::AIController::Initialize();
 
 	m_AIPerceptionComponent->SetIsHearingEnabled(true);
-	m_AIPerceptionComponent->SetHearingRange(400.0f);
+	m_AIPerceptionComponent->SetHearingRange(4000.0f);
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
-	m_AIPerceptionComponent->SetSightRange(1500.0f);
-	m_AIPerceptionComponent->SetSightWidth(1366.0f);
-	m_AIPerceptionComponent->SetSightHeight(720.0f);
+	m_AIPerceptionComponent->SetSightRange(2500.0f);
+	m_AIPerceptionComponent->SetSightWidth(1500.0f* 2.0f);
+	m_AIPerceptionComponent->SetSightHeight(900.0f * 2.5f);
 	m_AIPerceptionComponent->IgnoreVisibilityActorClassOf("DroneLaser");
 }
 
@@ -35,6 +35,7 @@ void DroneAIController::Begin()
 		blackboardBasedDecorator->BlackboardKey = "PlayerPawnObject";
 		blackboardBasedDecorator->bIsSet = true;
 		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnResultChange;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 
@@ -47,7 +48,7 @@ void DroneAIController::Begin()
 		sequenceNode->AddChildNode(fireNode);
 
 		auto waitNode = Crystal::CreateObject<Crystal::BTTaskNodeWait>("TaskNodeWait");
-		waitNode->WaitTime = 0.4f;
+		waitNode->WaitTime = m_FireInterval;
 		sequenceNode->AddChildNode(waitNode);
 
 		selectorNode->AddChildNode(sequenceNode);
@@ -61,6 +62,7 @@ void DroneAIController::Begin()
 		blackboardBasedDecorator->BlackboardKey = "LastSeenLocation";
 		blackboardBasedDecorator->bIsSet = true;
 		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnResultChange;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -87,13 +89,13 @@ void DroneAIController::Begin()
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToRandomPositionInSphere");
 
 		auto setRandomPositionNode = Crystal::CreateObject<BTTaskNodeSetRandomPositionInSphere>("TaskSetRandomPositionInSphere");
-		setRandomPositionNode->Radius = 2000.0f;
+		setRandomPositionNode->Radius = 10000.0f;
 		setRandomPositionNode->RandomPositionKey = "RandomPositionInSphere";
 		sequenceNode->AddChildNode(setRandomPositionNode);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
 		faceLocationNode->TargetLocationKey = "RandomPositionInSphere";
-		faceLocationNode->TargetAngleTolerance = 10.0f;
+		faceLocationNode->TargetAngleTolerance = 2.0f;
 		sequenceNode->AddChildNode(faceLocationNode);
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
@@ -110,6 +112,8 @@ void DroneAIController::Begin()
 	}
 
 	SetBehaviorTree(behaviorTree);
+	
+	
 
 
 
@@ -145,5 +149,25 @@ void DroneAIController::Begin()
 			
 		});
 
+
+	m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
+	{
+			CS_DEBUG_INFO("Find Noise");
+
+			auto instigator = noiseStimulus.Instigator.lock();
+			if (!instigator)
+			{
+				return;
+			}
+
+			if (noiseStimulus.bIsSensed)
+			{
+				if (instigator->StaticType() == "MyPlayerPawn")
+				{
+					m_BlackboardComponent->SetValueAsFloat3("LastSeenLocation", noiseStimulus.Position);
+				}
+			}
+
+	});
 
 }

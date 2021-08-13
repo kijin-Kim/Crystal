@@ -12,7 +12,7 @@ void SpaceWhaleAIController::Initialize()
 	Crystal::AIController::Initialize();
 
 	m_AIPerceptionComponent->SetIsHearingEnabled(true);
-	m_AIPerceptionComponent->SetHearingRange(2000.0f);
+	m_AIPerceptionComponent->SetHearingRange(4000.0f);
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
 	m_AIPerceptionComponent->SetSightRange(5000.0f);
@@ -36,7 +36,8 @@ void SpaceWhaleAIController::Begin()
 		auto blackboardBasedDecorator = Crystal::CreateObject<Crystal::BlackboardBasedDecorator>();
 		blackboardBasedDecorator->BlackboardKey = "PlayerLocation";
 		blackboardBasedDecorator->bIsSet = true;
-		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_Both;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnValueChange;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -65,6 +66,7 @@ void SpaceWhaleAIController::Begin()
 		blackboardBasedDecorator->BlackboardKey = "RandomPositionInSphere";
 		blackboardBasedDecorator->bIsSet = true;
 		blackboardBasedDecorator->AbortType = Crystal::EDecoratorAbortType::DAT_LowerPriority;
+		blackboardBasedDecorator->AbortCondition = Crystal::EAbortCondition::AC_OnResultChange;
 		sequenceNode->AddDecorator(blackboardBasedDecorator);
 
 		auto faceLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeFaceLocation>("TaskFaceLocation");
@@ -98,37 +100,27 @@ void SpaceWhaleAIController::Begin()
 	}
 
 	SetBehaviorTree(behaviorTree);
-	
 
-	
-	
-	/*m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
+
+	m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
 	{
-		if(!noiseStimulus.bIsSensed)
-		{
-			return;
-		}
-		
-		CS_DEBUG_INFO("Find Noise");
-
 		auto instigator = noiseStimulus.Instigator.lock();
 		if (!instigator)
 		{
 			return;
 		}
 
-		if (instigator->StaticType() == "MyPlayerPawn")
+		if (noiseStimulus.bIsSensed)
 		{
-			m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", noiseStimulus.Position);
+			if (instigator->StaticType() == "MyPlayerPawn")
+			{
+				m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", noiseStimulus.Position);
+			}
 		}
-	});*/
+	});
 
 	m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
 	{
-		
-
-		CS_DEBUG_INFO("Find Sight");
-
 		auto instigator = sightStimulus.Instigator.lock();
 		if (!instigator)
 		{
@@ -137,7 +129,6 @@ void SpaceWhaleAIController::Begin()
 
 		if (instigator->StaticType() == "MyPlayerPawn")
 		{
-
 			if (sightStimulus.bIsSensed)
 			{
 				m_BlackboardComponent->SetValueAsFloat3("PlayerLocation", sightStimulus.Position);
@@ -146,8 +137,6 @@ void SpaceWhaleAIController::Begin()
 			{
 				//m_BlackboardComponent->ClearValue("PlayerLocation");
 			}
-			
 		}
-		
 	});
 }

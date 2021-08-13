@@ -205,8 +205,6 @@ void MyPlayerPawn::RollRight(float value)
 
 void MyPlayerPawn::BeginFire()
 {
-	CS_DEBUG_INFO("BeginFire!!");
-	m_AIPerceptionSourceComponent->MakeNoiseAtLocation(m_MainComponent->GetWorldPosition(), 100.0f);
 	m_bShouldFire = true;
 }
 
@@ -314,9 +312,11 @@ void MyPlayerPawn::OnFire()
 		{
 			rotation = Crystal::Vector4::QuaternionRotationAxis(rotationAxis, angle);
 		}
-
+		
 		spawnParams.Rotation = rotation;
 		level->SpawnActor<Laser>(spawnParams);
+
+		//m_AIPerceptionSourceComponent->MakeNoiseAtLocation(m_MainComponent->GetWorldPosition(), 100.0f);
 	}
 }
 

@@ -1,6 +1,9 @@
 #include "Drone.h"
 
+#include "DroneAIController.h"
 #include "DroneLaser.h"
+#include "MyPlayerPawn.h"
+#include "Crystal/GamePlay/AI/Blackboard.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/GamePlay/Components/TextureComponent.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
@@ -12,7 +15,7 @@ void Drone::Initialize()
 	Crystal::Pawn::Initialize();
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({ 90.0f, 30.0f , 85.0f });
+	boundingOrientedBoxComponent->SetExtents({ 90.0f * 2.0f, 30.0f * 2.0f, 85.0f * 2.0f});
 	boundingOrientedBoxComponent->SetMass(10000.0f);
 	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("ShieldSphere");
@@ -36,7 +39,7 @@ void Drone::Initialize()
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_LightFrigate_GK3.fbx"));
 	staticMeshComponent->AddMaterial(material);
 	staticMeshComponent->AttachTo(m_MainComponent);
-	staticMeshComponent->SetUnitScale(4.0f);
+	staticMeshComponent->SetUnitScale(8.0f);
 
 	m_LeftFireSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftFireSocketComponent");
 	m_LeftFireSocketComponent->SetLocalPosition({ -26.0f, 0.0f, 49.0f });
@@ -108,7 +111,6 @@ void Drone::Update(float deltaTime)
 
 void Drone::OnFire()
 {
-	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
 
 	Crystal::Actor::ActorSpawnParams spawnParams = {};
 	spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
@@ -126,13 +128,36 @@ void Drone::OnFire()
 		bUseLeftSocket = true;
 	}
 
-	spawnParams.Rotation = GetRotationQuat();
-	level->SpawnActor<DroneLaser>(spawnParams);
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	if(level)
+	{
+		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
+		auto playerPosition = playerPawn->GetPosition();
+
+		auto direction = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(playerPosition, spawnParams.Position));
+
+		float angle = Crystal::Vector3::AngleBetweenNormals(Crystal::Vector3::UnitZ, direction);
+		auto rotationAxis = Crystal::Vector3::Normalize(Crystal::Vector3::Cross(Crystal::Vector3::UnitZ, direction));
+
+
+		DirectX::XMFLOAT4 rotation = Crystal::Vector4::Quaternion::Identity;
+		if (!Crystal::Vector3::IsZero(rotationAxis) && !Crystal::Vector3::Equal(Crystal::Vector3::UnitZ, direction, 0.001f) && !Crystal::Equal(
+			fabs(angle), 0.0f))
+		{
+			rotation = Crystal::Vector4::QuaternionRotationAxis(rotationAxis, angle);
+		}
+
+		spawnParams.Rotation = rotation;
+		level->SpawnActor<DroneLaser>(spawnParams);
+	}
+
+	
 }
 
-void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
-	if (damageCauser.lock()->StaticType() != "MyPlayerPawn")
+	auto damageCauser = causer.lock();
+	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}
@@ -143,6 +168,12 @@ void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	if (m_CurrentHealth <= 0.0f)
 	{
 		Destroy();
+	}
+
+	auto droneAIController = Crystal::Cast<DroneAIController>(GetController());
+	if (droneAIController)
+	{
+		droneAIController->GetBlackboardComponent()->SetValueAsFloat3("LastSeenLocation", damageCauser->GetPosition());
 	}
 }
 

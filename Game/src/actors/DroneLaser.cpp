@@ -20,6 +20,7 @@ void DroneLaser::Initialize()
 	boundingOrientedBoxComponent->SetMass(1.0f);
 	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("Drone");
+	boundingOrientedBoxComponent->IgnoreActorClassOf("DroneLaser");
 	boundingOrientedBoxComponent->IgnoreActorClassOf("PolluteSphere");
 	boundingOrientedBoxComponent->BindOnBeginOverlapEvent([this](const Crystal::OverlapResult& overlapResult)
 		{
@@ -38,7 +39,7 @@ void DroneLaser::Initialize()
 	auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	meshComponent->AddMaterial(std::move(material));
 	meshComponent->AttachTo(m_MainComponent);
-	meshComponent->SetUnitScale(3.0f);
+	meshComponent->SetUnitScale(5.0f);
 	meshComponent->SetRenderable(Crystal::ResourceManager::Instance().GetRenderable<Crystal::StaticMesh>("assets/models/SM_Missile_A.fbx"));
 	meshComponent->SetCastShadow(false);
 
@@ -46,11 +47,11 @@ void DroneLaser::Initialize()
 
 	auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 	projectileMovementComponent->SetTargetComponent(m_MainComponent);
-	projectileMovementComponent->SetProjectileMaxAcceleration(100000.0f);
+	projectileMovementComponent->SetProjectileMaxAcceleration(500000.0f);
 
 
 	m_LightComponent->SetLightColor({ 191.0f / 255.0f * 3.0f, 1.0f * 3.0f, 0.0f });
-	m_LightComponent->SetAttenuationRadius(500.0f);
+	m_LightComponent->SetAttenuationRadius(250.0f);
 	m_LightComponent->SetLightIntensity(3.0f);
 	m_LightComponent->AttachTo(m_MainComponent);
 }

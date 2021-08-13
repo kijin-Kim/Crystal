@@ -164,7 +164,6 @@ public:
 			{
 				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
-				//asteroid->SetPosition(Crystal::Vector3::Zero);
 			}
 
 			for (int i = 0; i < 0; i++)
@@ -216,11 +215,6 @@ public:
 			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({""}).lock();
 		}
 
-
-		if (false)
-		{
-			auto playCircle = m_World->SpawnActor<ShieldSphere>({""}).lock();
-		}
 
 		if (false)
 		{
@@ -315,7 +309,16 @@ public:
 			myPlayerPawn->ShieldPostProcess = postProcessActor;
 		}
 
-		
+
+
+		auto spaceWhale = m_World->SpawnActor<SpaceWhale>({}).lock();
+		spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
+		spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
+		spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
+		spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
+
+		auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
+		spaceWhaleController->Possess(spaceWhale);
 	}
 };
 

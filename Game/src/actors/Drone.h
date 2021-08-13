@@ -43,4 +43,6 @@ private:
 	Crystal::Timer m_HealthBarShowTimer = {};
 	const float m_HealthBarShowTime = 3.0f;
 	bool m_bShouldShowHealthBar = false;
+
+
 };

@@ -91,7 +91,11 @@ void SpaceWhale::End()
 	Crystal::Pawn::End();
 
 	auto kraken = Crystal::Cast<Kraken>(GetInstigator());
-	kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() - 10.0f);
+	if(kraken)
+	{
+		kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() - 10.0f);
+	}
+	
 }
 
 
@@ -105,7 +109,11 @@ void SpaceWhale::Update(float deltaTime)
 		m_PolluteGaugeIncrementTimer.Reset();
 
 		auto kraken = Crystal::Cast<Kraken>(GetInstigator());
-		kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() + 1.5f);
+		if(kraken)
+		{
+			kraken->SetPolluteGauge(kraken->GetCurrentPolluteGauge() + 1.5f);
+		}
+		
 	}
 
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
@@ -137,9 +145,10 @@ void SpaceWhale::Update(float deltaTime)
 
 }
 
-void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
-	if(damageCauser.lock()->StaticType() != "MyPlayerPawn")
+	auto damageCauser = causer.lock();
+	if(damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}
@@ -150,6 +159,12 @@ void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	if (m_CurrentHealth <= 0.0f)
 	{
 		Destroy();
+	}
+
+	auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
+	if(spaceWhaleController)
+	{
+		spaceWhaleController->GetBlackboardComponent()->SetValueAsFloat3("PlayerLocation", damageCauser->GetPosition());
 	}
 }
 
