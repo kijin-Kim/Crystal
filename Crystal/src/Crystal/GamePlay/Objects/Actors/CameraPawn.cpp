@@ -33,13 +33,10 @@ namespace Crystal {
 		inputComponent->BindAxis("Turn", CS_AXIS_FN(CameraPawn::RotateYaw));
 
 		inputComponent->BindAxis("RollRight", CS_AXIS_FN(CameraPawn::RollRight));
-
-		inputComponent->BindAction("Fire", EKeyEvent::KE_Pressed, CS_ACTION_FN(CameraPawn::BeginFire));
 	}
 
 	void CameraPawn::RotateYaw(float value)
 	{
-		//ApplicationUtility::GetPlayerController().ProcessYawInput(DirectX::XMConvertToRadians(value));
 		const float valueScale = 0.1f;
 		value *= valueScale;
 		m_MainComponent->RotateYaw(value);
@@ -47,7 +44,6 @@ namespace Crystal {
 
 	void CameraPawn::RotatePitch(float value)
 	{
-		//ApplicationUtility::GetPlayerController().ProcessPitchInput(DirectX::XMConvertToRadians(value));
 		const float valueScale = 0.1f;
 		value *= valueScale;
 		m_MainComponent->RotatePitch(-value);
@@ -57,38 +53,22 @@ namespace Crystal {
 	{
 		value *= 100000.0f;
 		DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), {value, value, value});
-		//m_MovementComponent->AddForce(force);
 	}
 
 	void CameraPawn::MoveRight(float value)
 	{
 		value *= 100000.0f;
 		DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalRightVector(), {value, value, value});
-		//m_MovementComponent->AddForce(force);
 	}
 
 	void CameraPawn::MoveUp(float value)
 	{
 		value *= 100000.0f;
-		DirectX::XMFLOAT3 force =
-			Crystal::Vector3::Multiply(m_MainComponent->GetLocalUpVector(), {value, value, value});
-		//m_MovementComponent->AddForce(force);
+		DirectX::XMFLOAT3 force = Vector3::Multiply(m_MainComponent->GetLocalUpVector(), {value, value, value});
 	}
 
 	void CameraPawn::RollRight(float value)
 	{
 		m_MainComponent->RotateRoll(-value);
-	}
-
-	void CameraPawn::BeginFire()
-	{
-		CS_DEBUG_INFO("BeginFire!!");
-		auto start = m_MainComponent->GetWorldPosition();
-		DirectX::XMFLOAT3 maxDistance = {10000.0f, 10000.0f, 10000.0f};
-		auto end = Vector3::Add(start, Vector3::Multiply(m_MainComponent->GetLocalForwardVector(), maxDistance));
-
-		auto level = Crystal::Cast<Level>(GetOuter());
-		if (level)
-			level->DrawDebugLine(start, end);
 	}
 }

@@ -16,7 +16,7 @@ namespace Crystal {
 
 		auto owner = Cast<Actor>(GetOuter());
 		auto level = Cast<Level>(owner->GetOuter());
-		auto& scene = level->GetScene();
+		auto scene = level->GetScene();
 
 		scene->Textures.push_back(Cast<TextureComponent>(shared_from_this()));
 

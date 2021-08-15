@@ -32,7 +32,7 @@ namespace Crystal {
 		Shared<PlaneQuad3D> PlaneQuad3DMesh = CreateShared<PlaneQuad3D>();
 		Shared<PlaneQuad3DTextured> PlaneQuad3DTexturedMesh = CreateShared<PlaneQuad3DTextured>();
 
-		Shared<Texture> ColorBufferTextures[2] = {};
+		Shared<Texture> ColorBufferTextures[2];
 		Shared<Texture> DepthStencilBufferTexture = nullptr;
 		Shared<Texture> BrightColorBuffer = nullptr;
 		Shared<Texture> FloatingPointBuffer = nullptr;

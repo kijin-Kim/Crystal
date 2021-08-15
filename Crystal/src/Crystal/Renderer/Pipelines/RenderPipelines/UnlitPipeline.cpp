@@ -26,11 +26,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
-		
-
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
 			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1},
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
+			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
 		};
 
 		CD3DX12_ROOT_PARAMETER1 rootParameters[2];
@@ -41,8 +39,6 @@ namespace Crystal {
 		CD3DX12_STATIC_SAMPLER_DESC staticSamplers[] = {
 			CD3DX12_STATIC_SAMPLER_DESC(0)
 		};
-
-
 
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSigDesc = {};
@@ -58,8 +54,6 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
-
-
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 
@@ -68,22 +62,27 @@ namespace Crystal {
 			{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"SUBUV_INDEX", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+
+			{"TOGGLE_ALBEDO_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"TOGGLE_OPACITY_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"USE_ALBEDO_ALPHA", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"ALBEDO_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"OPACITY", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"OPACITY_MULTIPLIER", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 		};
 
-
-	
 
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 		rtvFormat.NumRenderTargets = 1;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 
-		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputLayout, _countof(inputLayout) };
+		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {inputLayout, _countof(inputLayout)};
 		RenderTargetDescription renderTargetDescription(rtvFormat, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 		PipelineStateDescription pipelineStateDescription(
 			inputLayoutDesc,
-			StateHelper::Additive,
+			StateHelper::NonPremultiplied,
 			StateHelper::DepthEnable,
 			StateHelper::CullCounterClock,
 			renderTargetDescription,
@@ -91,7 +90,6 @@ namespace Crystal {
 		);
 
 		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
-
 
 
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
@@ -112,7 +110,6 @@ namespace Crystal {
 
 		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
 
-		auto handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 
 		auto& device = Device::Instance();
@@ -121,6 +118,7 @@ namespace Crystal {
 
 		m_InstanceBatches.clear();
 
+		auto handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 		for (auto& p : scene->Particles)
 		{
@@ -129,60 +127,69 @@ namespace Crystal {
 			{
 				continue;
 			}
-			if(particleComponent->GetHiddenInGame())
+			if (particleComponent->GetHiddenInGame())
 			{
 				continue;
 			}
 
-			auto& particles = particleComponent->GetParticles();
 
-
-			for (auto& particle : particles)
+			auto& emitters = particleComponent->GetParticleSystem()->GetParticleEmitters();
+			for (auto emitter : emitters)
 			{
-				PerInstanceData perInstanceData = {};
+				auto& particles = emitter->GetParticles();
 
 
-				perInstanceData.World = particle.World;
-				perInstanceData.World._11 = perFrameData.View._11;
-				perInstanceData.World._12 = perFrameData.View._12;
-				perInstanceData.World._13 = perFrameData.View._13;
-				perInstanceData.World._21 = perFrameData.View._21;
-				perInstanceData.World._22 = perFrameData.View._22;
-				perInstanceData.World._23 = perFrameData.View._23;
-				perInstanceData.World._31 = perFrameData.View._31;
-				perInstanceData.World._32 = perFrameData.View._32;
-				perInstanceData.World._33 = perFrameData.View._33;
-
-				
-
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Scale(particle.Scale));
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::RotationAxis(mainCamera->GetWorldForwardVector(), 45.0f));
-				perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Translation(particle.Position));
-				
-
-				perInstanceData.SubUVIndex = particle.SubImageIndex;
-
-
-				// 같은 텍스쳐를 쓰면 ㅂ묶을 수 있음
-
-				auto& materials = particleComponent->GetMaterials();
-				for (auto& mat : materials)
+				for (auto& particle : particles)
 				{
+					PerInstanceData perInstanceData = {};
+
+
+					perInstanceData.World = particle.World;
+					perInstanceData.World._11 = perFrameData.View._11;
+					perInstanceData.World._12 = perFrameData.View._12;
+					perInstanceData.World._13 = perFrameData.View._13;
+					perInstanceData.World._21 = perFrameData.View._21;
+					perInstanceData.World._22 = perFrameData.View._22;
+					perInstanceData.World._23 = perFrameData.View._23;
+					perInstanceData.World._31 = perFrameData.View._31;
+					perInstanceData.World._32 = perFrameData.View._32;
+					perInstanceData.World._33 = perFrameData.View._33;
+
+
+					perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Scale(particle.Scale));
+					perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World,
+					                                            Matrix4x4::RotationAxis(mainCamera->GetWorldForwardVector(),
+					                                                                    DirectX::XMConvertToRadians(particle.Rotation)));
+					perInstanceData.World = Matrix4x4::Multiply(perInstanceData.World, Matrix4x4::Translation(particle.Position));
+
+
+					perInstanceData.SubUVIndex = particle.SubImageIndex;
+
+
+					auto& material = emitter->Material;
+
+
+					perInstanceData.AlbedoColor = material->AlbedoColor;
+					perInstanceData.Opacity = material->Opacity;
+					perInstanceData.OpacityMultiplier = material->OpacityMultiplier;
+
+					perInstanceData.bToggleAlbedoTexture = !material->AlbedoTexture.expired() ? true : false;
+					perInstanceData.bToggleOpacityTexture = !material->OpacityTexture.expired() ? true : false;
+					perInstanceData.bUseAlbedoTextureAlpha = material->bUseAlbedoTextureAlpha;
+
+
+					// 같은 텍스쳐를 쓰면 묶을 수 있음
+
+
+
 					PerDrawCallData perDrawCallData = {};
-					perDrawCallData.HorizontalSubImageCount = 6;
-					perDrawCallData.VerticalSubImageCount = 6;
+					perDrawCallData.HorizontalSubImageCount = emitter->HorizontalSubImageCount;
+					perDrawCallData.VerticalSubImageCount = emitter->VerticalSubImageCount;
 
 					m_PerDrawCallConstantBuffer->SetData(&perDrawCallData, 0, sizeof(perDrawCallData));
 
 
-					auto texture = mat->AlbedoTexture.lock();
-					if (!texture)
-					{
-						continue;
-					}
-
-
-					auto it = m_InstanceBatches.find(texture.get()); // 같은 텍스쳐를 쓰고있는 배치가 있으면,
+					auto it = m_InstanceBatches.find(material.get()); // 같은 텍스쳐를 쓰고있는 배치가 있으면,
 					if (it != m_InstanceBatches.end())
 					{
 						++it->second.InstanceCount;
@@ -190,7 +197,7 @@ namespace Crystal {
 						continue;
 					}
 
-					auto result = m_InstanceBatches.insert({texture.get(), InstanceBatch()});
+					auto result = m_InstanceBatches.insert({ material.get(), InstanceBatch()});
 					auto& newInstanceBatch = result.first->second;
 
 					newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
@@ -199,11 +206,21 @@ namespace Crystal {
 					d3dDevice->CopyDescriptorsSimple(1, handle, m_PerDrawCallConstantBuffer->AsConstantBufferView(),
 					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-					// 텍스쳐를 Heap에 Copy
-					d3dDevice->CopyDescriptorsSimple(1, handle, texture->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+					if (perInstanceData.bToggleAlbedoTexture)
+					{
+						d3dDevice->CopyDescriptorsSimple(1, handle, material->AlbedoTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+							D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					}
 					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+					if (perInstanceData.bToggleOpacityTexture)
+					{
+						d3dDevice->CopyDescriptorsSimple(1, handle, material->OpacityTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+							D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					}
+					handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 					newInstanceBatch.PerInstanceDatas.push_back(perInstanceData);
 				}
@@ -247,7 +264,7 @@ namespace Crystal {
 		for (const auto& drawData : m_DrawDatas)
 		{
 			D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-			descriptorHeapHandle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * drawData.DescriptorHeapOffset;
+			descriptorHeapHandle.ptr += drawData.DescriptorHeapOffset;
 			commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapHandle);
 
 

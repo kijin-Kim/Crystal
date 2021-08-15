@@ -349,6 +349,8 @@
     <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\MyPlayerPawn.h" />
+    <ClInclude Include="src\actors\TitleLevel.h" />
+    <ClInclude Include="src\actors\TitleLevelPawn.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="assets\shaders\AdditiveBlending.hlsl">

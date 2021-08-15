@@ -46,9 +46,6 @@ namespace Crystal {
 		void OnCreate() override;
 		void Begin() override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
-	
-	private:
-		std::shared_ptr<StaticMeshComponent> m_StaticMeshComponent;
 	};
 
 

@@ -51,7 +51,7 @@ namespace Crystal {
 		void OnEndOverlap(const OverlapResult& overlapResult);
 		void BindOnEndOverlapEvent(const std::function<void(const struct OverlapResult&)>& event);
 
-		bool IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent);
+		bool IsOverlappedWith(Weak<CollisionComponent> overlappedComponent);
 
 		const std::vector<Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
 
@@ -70,7 +70,7 @@ namespace Crystal {
 			return std::find(m_ActorClassCollisionWhitelist.begin(), m_ActorClassCollisionWhitelist.end(), type);
 		}
 
-		bool SetIsFirstTimeCheckOverlapped(bool firstTimeCheckOverlap)
+		void SetIsFirstTimeCheckOverlapped(bool firstTimeCheckOverlap)
 		{
 			m_bIsFirstTimeCheckOverlap = firstTimeCheckOverlap;
 		}

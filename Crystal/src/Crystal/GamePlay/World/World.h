@@ -4,6 +4,8 @@
 #include "Level.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "PhysicsSystem.h"
+#include "Crystal/Renderer/RenderSystem.h"
+
 
 namespace Crystal {
 
@@ -33,11 +35,17 @@ namespace Crystal {
 
 		void DestroyActor(const std::shared_ptr<Actor>& actor);
 
-		Level* CreateNewLevel(const std::string& name = "");
+		template<class T>
+		const Shared<T>& CreateLevel(const std::string& name = "")
+		{
+			auto level = CreateObject<T>(name, weak_from_this());
+			m_Levels.push_back(level);
+			return Cast<T>(m_Levels.back());
+		}
 
-		Level* GetLevelByName(const std::string& name);
-		Level* GetLevelByIndex(int index);
-		Level* GetCurrentLevel();
+		const Shared<Level>& GetLevelByName(const std::string& name);
+		const Shared<Level>& GetLevelByIndex(int index);
+		const Shared<Level>& GetCurrentLevel() const;
 
 		void SetCurrentLevelByName(const std::string& name);
 		void SetCurrentLevelByIndex(int iIndex);
@@ -49,12 +57,18 @@ namespace Crystal {
 
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+		const Shared<RenderSystem>& GetRenderSystem() const { return m_RenderSystem; }
+		const Shared<PhysicsSystem>& GetPhysicsSystem() const { return m_PhysicsSystem; }
+
 		STATIC_TYPE_IMPLE(World)
 
 	private:
-		Level* m_CurrentLevel = nullptr;
+		Shared<Level> m_CurrentLevel = nullptr;
 		std::vector<std::shared_ptr<Level>> m_Levels;
 		WorldConfig m_WorldConfig = {};
+
+		Shared<RenderSystem> m_RenderSystem = nullptr;
+		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
 	};
 
 	template <class T>

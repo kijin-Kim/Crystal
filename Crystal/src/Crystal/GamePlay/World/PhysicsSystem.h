@@ -2,6 +2,8 @@
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
+	class Level;
+	class World;
 	class Actor;
 	class CollisionComponent;
 	struct Scene;
@@ -19,7 +21,10 @@ namespace Crystal {
 		                     const struct CollisionParams& collisionParams);
 
 
-		const Shared<Scene>& GetScene();
+		Shared<Scene> GetScene();
+		Shared<World> GetWorld();
+		Shared<Level> GetLevel();
+		
 
 
 		STATIC_TYPE_IMPLE(PhysicsSystem)

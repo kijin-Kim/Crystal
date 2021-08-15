@@ -11,14 +11,15 @@ namespace Crystal {
 
 	void BlackboardComponent::SetValueAsBool(const std::string& key, bool value)
 	{
-		
 		if (!m_Blackboard)
 		{
 			return;
 		}
 
+		ClearValue(key);
 
-		auto newValue = new BlackBoardBoolValue();
+
+		auto newValue = new BlackboardBoolValue();
 		newValue->Value = value;
 		
 		m_Blackboard->m_Values[key] = newValue;
@@ -31,7 +32,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardIntValue();
+		ClearValue(key);
+
+		auto newValue = new BlackboardIntValue();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -44,7 +47,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardFloatValue();
+		ClearValue(key);
+
+		auto newValue = new BlackboardFloatValue();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -57,7 +62,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardFloat3Value();
+		ClearValue(key);
+
+		auto newValue = new BlackboardFloat3Value();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -70,7 +77,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardFloat4Value();
+		ClearValue(key);
+
+		auto newValue = new BlackboardFloat4Value();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -83,7 +92,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardStringValue();
+		ClearValue(key);
+
+		auto newValue = new BlackboardStringValue();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -96,7 +107,9 @@ namespace Crystal {
 			return;
 		}
 
-		auto newValue = new BlackBoardObjectValue();
+		ClearValue(key);
+
+		auto newValue = new BlackboardObjectValue();
 		newValue->Value = value;
 
 		m_Blackboard->m_Values[key] = newValue;
@@ -117,6 +130,22 @@ namespace Crystal {
 		return m_Blackboard->m_Values.count(key) != 0;
 	}
 
+	uint64_t BlackboardComponent::GetValueID(const std::string& key) const
+	{
+		if (!m_Blackboard)
+		{
+			return 0;
+		}
+
+		auto it = m_Blackboard->m_Values.find(key);
+		if (it != m_Blackboard->m_Values.end() && it->second)
+		{
+			return (it->second)->BlackboardID;
+		}
+
+		return 0;
+	}
+
 
 	bool BlackboardComponent::GetValueAsBool(const std::string& key) const
 	{
@@ -128,7 +157,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if(it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardBoolValue*>(it->second)->Value;
+			return static_cast<BlackboardBoolValue*>(it->second)->Value;
 		}
 		return false;
 	}
@@ -143,7 +172,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardIntValue*>(it->second)->Value;
+			return static_cast<BlackboardIntValue*>(it->second)->Value;
 		}
 
 		return 0;
@@ -160,7 +189,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardFloatValue*>(it->second)->Value;
+			return static_cast<BlackboardFloatValue*>(it->second)->Value;
 		}
 		
 		return 0.0f;
@@ -176,7 +205,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardFloat3Value*>(it->second)->Value;
+			return static_cast<BlackboardFloat3Value*>(it->second)->Value;
 		}
 		
 		return Crystal::Vector3::Zero;
@@ -192,7 +221,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardFloat4Value*>(it->second)->Value;
+			return static_cast<BlackboardFloat4Value*>(it->second)->Value;
 		}
 		
 		return Crystal::Vector4::Zero;
@@ -208,7 +237,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardStringValue*>(it->second)->Value;
+			return static_cast<BlackboardStringValue*>(it->second)->Value;
 		}
 		
 		return {};
@@ -224,7 +253,7 @@ namespace Crystal {
 		auto it = m_Blackboard->m_Values.find(key);
 		if (it != m_Blackboard->m_Values.end() && it->second)
 		{
-			return static_cast<BlackBoardObjectValue*>(it->second)->Value;
+			return static_cast<BlackboardObjectValue*>(it->second)->Value;
 		}
 		
 		return {};

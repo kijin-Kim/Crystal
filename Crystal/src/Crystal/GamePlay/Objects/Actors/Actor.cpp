@@ -173,6 +173,21 @@ namespace Crystal {
 		return m_MainComponent->GetWorldTransform();
 	}
 
+	const DirectX::XMFLOAT3& Actor::GetVelocity() const
+	{
+		return m_MainComponent->GetVelocity();
+	}
+
+	float Actor::GetMass() const
+	{
+		return m_MainComponent->GetMass();
+	}
+
+	float Actor::GetInverseMass() const
+	{
+		return m_MainComponent->GetInverseMass();
+	}
+
 	void Actor::RotatePitch(float angle)
 	{
 		m_MainComponent->RotatePitch(angle);

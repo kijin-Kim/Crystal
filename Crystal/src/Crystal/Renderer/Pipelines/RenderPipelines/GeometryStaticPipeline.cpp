@@ -28,7 +28,7 @@ namespace Crystal {
 
 		CD3DX12_DESCRIPTOR_RANGE1 perFrameDescriptorRanges[] = {
 			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0},
-			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0}
+			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
 		};
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
@@ -130,9 +130,9 @@ namespace Crystal {
 		m_PerFrameConstantBuffer = BufferManager::Instance().GetConstantBuffer(&perFrameData, sizeof(perFrameData));
 
 
+		
 
-		D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(
-			D3D12_SRV_DIMENSION_TEXTURECUBE); // Per Frame
+		
 
 		D3D12_CPU_DESCRIPTOR_HANDLE destHeapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -140,8 +140,14 @@ namespace Crystal {
 		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle,
-		                              D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		if (scene->IrradianceTexture)
+		{
+			D3D12_CPU_DESCRIPTOR_HANDLE irradianceTextureHandle = scene->IrradianceTexture->GetShaderResourceView(
+				D3D12_SRV_DIMENSION_TEXTURECUBE); // Per Frame
+			device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle,
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		}
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		

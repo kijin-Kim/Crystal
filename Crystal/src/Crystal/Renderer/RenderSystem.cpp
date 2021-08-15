@@ -34,13 +34,12 @@
 namespace Crystal {
 
 
-	void RenderSystem::Begin()
+	void RenderSystem::OnCreate()
 	{
-		CreateRenderTargets();
-		CreateDepthStencilView();
+		Actor::OnCreate();
+		CreateSwapChain();
 
 		auto& resourceManager = ResourceManager::Instance();
-
 		auto geometryShaderStatic = resourceManager.GetShader("assets/shaders/GeometryPass_Static.hlsl").lock();
 		auto forwardShaderStatic = resourceManager.GetShader("assets/shaders/PBRShader_Static.hlsl").lock();
 		auto forwardBlendingShaderStatic = resourceManager.GetShader("assets/shaders/PBRShader_Static_NoInstancing.hlsl").lock();
@@ -112,14 +111,14 @@ namespace Crystal {
 					"TOGGLE_EMISSIVE_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, 120,
 					D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1
 				},
-			});
+				});
 
 
-			RootParameter perFrame = {1, 1, 0};
-			RootParameter perObject = {0, 0, 0};
-			RootParameter perExecute = {0, 5, 0};
+			RootParameter perFrame = { 1, 1, 0 };
+			RootParameter perObject = { 0, 0, 0 };
+			RootParameter perExecute = { 0, 5, 0 };
 
-			geometryShaderStatic->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			geometryShaderStatic->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
 			geometryShaderStatic->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -132,14 +131,14 @@ namespace Crystal {
 				{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"BONEIDS", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			});
+				});
 
 
-			RootParameter perFrame = {1, 1, 0};
-			RootParameter perObject = {1, 0, 0};
-			RootParameter perExecute = {1, 4, 0};
+			RootParameter perFrame = { 1, 1, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perExecute = { 1, 4, 0 };
 
-			pbrSkeletalShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			pbrSkeletalShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
 			pbrSkeletalShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -152,109 +151,109 @@ namespace Crystal {
 				{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 64, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
-			});
+				});
 
-			RootParameter perFrame = {1, 0, 0};
-			RootParameter perObject = {1, 0, 0};
+			RootParameter perFrame = { 1, 0, 0 };
+			RootParameter perObject = { 1, 0, 0 };
 			RootParameter perExecute = {};
 
-			simpleColorShader->SetRootSignature({perFrame, perObject, perExecute});
+			simpleColorShader->SetRootSignature({ perFrame, perObject, perExecute });
 			simpleColorShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 		}
 
 		{
 			skyboxShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			});
+				});
 
-			RootParameter perFrame = {1, 4, 0};
+			RootParameter perFrame = { 1, 4, 0 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
-			skyboxShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			skyboxShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
 			skyboxShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
 		{
-			RootParameter perFrame = {0, 1, 1};
+			RootParameter perFrame = { 0, 1, 1 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
-			panoToCubemapShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
-			panoToCubemapShader->SetDispatchThreadGroupCounts({2048 / 32, 2048 / 32, 6});
+			panoToCubemapShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			panoToCubemapShader->SetDispatchThreadGroupCounts({ 2048 / 32, 2048 / 32, 6 });
 		}
 
 		{
-			RootParameter perFrame = {0, 1, 1};
+			RootParameter perFrame = { 0, 1, 1 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
-			diffIrradianceShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
-			diffIrradianceShader->SetDispatchThreadGroupCounts({32 / 32, 32 / 32, 6});
+			diffIrradianceShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			diffIrradianceShader->SetDispatchThreadGroupCounts({ 32 / 32, 32 / 32, 6 });
 		}
 
 		{
-			RootParameter perFrame = {0, 0, 1};
+			RootParameter perFrame = { 0, 0, 1 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
 
-			gaussianBlurShader->SetRootSignature({perFrame, perObject, perExecute});
-			gaussianBlurShader->SetDispatchThreadGroupCounts({1920 / 8, 1080 / 8, 6});
+			gaussianBlurShader->SetRootSignature({ perFrame, perObject, perExecute });
+			gaussianBlurShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 6 });
 		}
 
 		{
-			RootParameter perFrame = {0, 1, 1};
+			RootParameter perFrame = { 0, 1, 1 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
 
-			additiveBlendingHdrShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
-			additiveBlendingHdrShader->SetDispatchThreadGroupCounts({1920 / 8, 1080 / 8, 1});
+			additiveBlendingHdrShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			additiveBlendingHdrShader->SetDispatchThreadGroupCounts({ 1920 / 8, 1080 / 8, 1 });
 		}
 
 		{
 			toneMappingShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			});
+				});
 
-			RootParameter perFrame = {0, 1, 0};
+			RootParameter perFrame = { 0, 1, 0 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
 
-			toneMappingShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
+			toneMappingShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
 			toneMappingShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
 		{
-			RootParameter perFrame = {0, 1, 1};
+			RootParameter perFrame = { 0, 1, 1 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
 
-			brightColorExtractingShader->SetRootSignature({perFrame, perObject, perExecute});
-			brightColorExtractingShader->SetDispatchThreadGroupCounts({1920 / 8.0f, 1080 / 8.0f, 1});
+			brightColorExtractingShader->SetRootSignature({ perFrame, perObject, perExecute });
+			brightColorExtractingShader->SetDispatchThreadGroupCounts({ 1920 / 8.0f, 1080 / 8.0f, 1 });
 		}
 
 		{
-			RootParameter perFrame = {0, 0, 1};
+			RootParameter perFrame = { 0, 0, 1 };
 			RootParameter perObject = {};
-			RootParameter perExecute = {1, 3, 0};
+			RootParameter perExecute = { 1, 3, 0 };
 
 
-			postProcessShader->SetRootSignature({perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)}});
-			postProcessShader->SetDispatchThreadGroupCounts({1920 / 8.0f, 1080 / 8.0f, 1});
+			postProcessShader->SetRootSignature({ perFrame, perObject, perExecute, {CD3DX12_STATIC_SAMPLER_DESC(0)} });
+			postProcessShader->SetDispatchThreadGroupCounts({ 1920 / 8.0f, 1080 / 8.0f, 1 });
 		}
 
 
 		{
 			lightingPassShader->SetInputLayout({
 				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			});
+				});
 
 
-			RootParameter perFrame = {1, 7, 0};
+			RootParameter perFrame = { 1, 7, 0 };
 			RootParameter perObject = {};
 			RootParameter perExecute = {};
 
@@ -262,10 +261,10 @@ namespace Crystal {
 			lightingPassShader->SetRootSignature({
 				perFrame, perObject, perExecute, {
 					CD3DX12_STATIC_SAMPLER_DESC(0), CD3DX12_STATIC_SAMPLER_DESC(1, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-					                                                            D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-					                                                            D3D12_TEXTURE_ADDRESS_MODE_BORDER)
+																				D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+																				D3D12_TEXTURE_ADDRESS_MODE_BORDER)
 				}
-			});
+				});
 			lightingPassShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -278,17 +277,17 @@ namespace Crystal {
 				{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 				{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 64, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
-			});
+				});
 
-			RootParameter perFrame = {1, 0, 0};
-			RootParameter perObject = {1, 0, 0};
-			RootParameter perExecute = {0, 10, 0};
+			RootParameter perFrame = { 1, 0, 0 };
+			RootParameter perObject = { 1, 0, 0 };
+			RootParameter perExecute = { 0, 10, 0 };
 
 			unlitShader->SetRootSignature({
 				perFrame, perObject, perExecute, {
 					CD3DX12_STATIC_SAMPLER_DESC(0)
 				}
-			});
+				});
 			unlitShader->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		}
 
@@ -315,35 +314,15 @@ namespace Crystal {
 		m_Pipelines.push_back(CreatePipeline<PostProcessPipeline>(postProcessShader, "PostProcessPipeline"));
 
 
-		auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
+	}
 
-		scene->PanoramaCubeColorTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_HybridNoise.hdr").lock();
-		scene->CubemapColorTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                   D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                   D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-		scene->PanoramaCubeAlphaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_Alpha.hdr").lock();
-		scene->CubemapAlphaTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                   D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                   D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-		scene->PanoramaStarFarTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Far_Green.hdr").lock();
-		scene->CubemapStarFarTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                     D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                     D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                     D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	void RenderSystem::Begin()
+	{
+		CreateRenderTargets();
+		CreateDepthStencilView();
 
 
-		scene->PanoramaStarNearTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Near_Large.hdr").lock();
-		scene->CubemapStarNearTexture = CreateShared<Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                      D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                      D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                      D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-
+		auto& scene = GetScene();
 		scene->IrradianceTexture = CreateShared<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
 		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
 		                                                 D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
@@ -352,12 +331,19 @@ namespace Crystal {
 
 		/// COMPUTE
 
+		if (!scene->CubemapColorTexture)
+		{
+			return;
+		}
+
+
 		auto commandQueue = Device::Instance().GetCommandQueue();
 		auto commandList = commandQueue->GetCommandList();
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
 
 		resourceBarrier.Transition.pResource = scene->CubemapColorTexture->GetResource();
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
@@ -407,16 +393,7 @@ namespace Crystal {
 		auto commandList = commandQueue->GetCommandList();
 
 
-		const auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
-
-
-		if (!level)
-		{
-			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
-			return;
-		}
-
+		auto& scene = GetScene();
 
 		if (scene->Cameras.empty())
 		{
@@ -551,8 +528,17 @@ namespace Crystal {
 		m_Pipelines[11]->Record(commandList);
 
 
-		m_Pipelines[1]->Begin();
-		m_Pipelines[1]->Record(commandList);
+		if(scene->CubemapColorTexture)
+		{
+			m_Pipelines[1]->Begin();
+			m_Pipelines[1]->Record(commandList);
+		}
+		
+
+
+
+		m_Pipelines[7]->Begin();
+		m_Pipelines[7]->Record(commandList);
 
 		m_Pipelines[12]->Begin();
 		m_Pipelines[12]->Record(commandList);
@@ -561,9 +547,6 @@ namespace Crystal {
 		m_Pipelines[13]->Begin();
 		m_Pipelines[13]->Record(commandList);
 
-
-		m_Pipelines[7]->Begin();
-		m_Pipelines[7]->Record(commandList);
 
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();
@@ -720,8 +703,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
-		auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -753,6 +735,7 @@ namespace Crystal {
 		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 
+		auto level = GetLevel();
 		if (!level)
 		{
 			// Level이 존재 하지 않으면, 그릴 것이 없습니다.
@@ -802,8 +785,7 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
-		auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -868,48 +850,8 @@ namespace Crystal {
 
 	void RenderSystem::CreateRenderTargets()
 	{
-		//============ SwapChain RenderTargets ==================
 
-		// #DirectX Swap Chain Description
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		swapChainDesc.Width = m_ResWidth;
-		swapChainDesc.Height = m_ResHeight;
-		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainDesc.Stereo = false;
-		swapChainDesc.SampleDesc.Count = 1;
-		swapChainDesc.SampleDesc.Quality = 0;
-		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = 2;
-		swapChainDesc.Scaling = DXGI_SCALING_NONE;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-		// #DirectX Swap Chain FullScreen Description
-		DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullscreenDesc;
-		swapChainFullscreenDesc.RefreshRate.Numerator = 60;
-		swapChainFullscreenDesc.RefreshRate.Denominator = 1;
-		swapChainFullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		swapChainFullscreenDesc.Windowed = true;
-
-		// #DirectX Create Swap Chain https://gamedev.stackexchange.com/questions/149822/direct3d-12-cant-create-a-swap-chain
-
-		auto& device = Device::Instance();
-		auto factory = device.GetFactory();
-
-		auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
-
-
-		HWND currentHandle = GetActiveWindow();
-
-
-		HRESULT hr = factory->CreateSwapChainForHwnd(device.GetCommandQueue()->GetRaw(), currentHandle, &swapChainDesc,
-		                                             &swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
-		CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
-		factory->MakeWindowAssociation(currentHandle, DXGI_MWA_NO_ALT_ENTER);
-
+		auto scene = GetScene();
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -972,11 +914,53 @@ namespace Crystal {
 		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
+	void RenderSystem::CreateSwapChain()
+	{
+		//============ SwapChain RenderTargets ==================
+
+// #DirectX Swap Chain Description
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.Width = m_ResWidth;
+		swapChainDesc.Height = m_ResHeight;
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.Stereo = false;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = 2;
+		swapChainDesc.Scaling = DXGI_SCALING_NONE;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+		// #DirectX Swap Chain FullScreen Description
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullscreenDesc;
+		swapChainFullscreenDesc.RefreshRate.Numerator = 60;
+		swapChainFullscreenDesc.RefreshRate.Denominator = 1;
+		swapChainFullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainFullscreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainFullscreenDesc.Windowed = true;
+
+		// #DirectX Create Swap Chain https://gamedev.stackexchange.com/questions/149822/direct3d-12-cant-create-a-swap-chain
+
+		auto& device = Device::Instance();
+		auto factory = device.GetFactory();
+
+
+
+		HWND currentHandle = GetActiveWindow();
+
+
+		HRESULT hr = factory->CreateSwapChainForHwnd(device.GetCommandQueue()->GetRaw(), currentHandle, &swapChainDesc,
+			&swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
+		CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
+		factory->MakeWindowAssociation(currentHandle, DXGI_MWA_NO_ALT_ENTER);
+	}
+
 
 	void RenderSystem::CreateDepthStencilView()
 	{
-		auto level = Cast<Level>(GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 0,
 		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
@@ -996,7 +980,24 @@ namespace Crystal {
 
 	const WorldConfig& RenderSystem::GetWorldConfig() const
 	{
-		return Cast<Level>(GetOuter())->GetWorldConfig();
+		return GetWorld()->GetWorldConfig();
+	}
+
+	Shared<World> RenderSystem::GetWorld() const
+	{
+		return Cast<World>(GetOuter());
+	}
+
+	Shared<Scene> RenderSystem::GetScene()
+	{
+		auto level = GetLevel();
+		return level->GetScene();
+	}
+
+	Shared<Level> RenderSystem::GetLevel()
+	{
+		auto world = GetWorld();
+		return world->GetCurrentLevel();
 	}
 
 }

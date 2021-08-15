@@ -23,6 +23,7 @@ namespace Crystal {
 		RenderSystem() = default;
 		~RenderSystem() override = default;
 
+		void OnCreate() override;
 		void Begin() override;
 
 		
@@ -35,10 +36,17 @@ namespace Crystal {
 		void ChangeDisplayMode();
 
 		void CreateRenderTargets();
+		void CreateSwapChain();
 		void CreateDepthStencilView();
+		
 		
 
 		const WorldConfig& GetWorldConfig() const;
+
+		Shared<World> GetWorld() const;
+
+		Shared<Scene> GetScene();
+		Shared<Level> GetLevel();
 	
 
 		template <class T>

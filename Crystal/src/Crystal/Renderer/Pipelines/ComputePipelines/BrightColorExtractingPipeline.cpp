@@ -2,8 +2,6 @@
 #include "BrightColorExtractingPipeline.h"
 
 #include "Crystal/Core/Device.h"
-#include "Crystal/GamePlay/World/Level.h"
-#include "Crystal/Renderer/RenderSystem.h"
 #include "Crystal/Renderer/Scene.h"
 
 namespace Crystal {
@@ -12,9 +10,7 @@ namespace Crystal {
 	{
 		ComputePipeline::Begin();
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		auto device = Device::Instance().GetD3DDevice();
 

@@ -9,6 +9,11 @@
 
 namespace Crystal {
 
+	inline float Lerp(float a, float b, float t)
+	{
+		return a + t * (b - a);
+	}
+
 	inline bool Equal(float num1, float num2)
 	{
 		return fabs(num1 - num2) < MACHINE_EPSILON;

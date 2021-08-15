@@ -16,6 +16,7 @@ namespace Crystal {
 	void BTCompositeNode::AddAbortDecorator(Weak<Decorator> decWeak)
 	{
 		m_AbortDecorators.push_back(decWeak);
+		decWeak.lock()->SetOwnerNode(Cast<BTCompositeNode>(weak_from_this()));
 	}
 
 	void BTCompositeNode::AddAbortDecoratorToChilds(Weak<Decorator> decWeak)
@@ -28,7 +29,7 @@ namespace Crystal {
 
 	void BTCompositeNode::PrepareAbortDecorators()
 	{
-		for(auto& child : m_ChildNodes)
+		for (auto& child : m_ChildNodes)
 		{
 			child->PrepareAbortDecorators();
 		}
@@ -43,35 +44,37 @@ namespace Crystal {
 				{
 				case EDecoratorAbortType::DAT_None: break;
 				case EDecoratorAbortType::DAT_Self:
-				{
-					AddAbortDecorator(decorator);
-				}
-				break;
+					{
+						AddAbortDecorator(decorator);
+					}
+					break;
 				case EDecoratorAbortType::DAT_LowerPriority:
-				{
-					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
-
-					auto& siblings = parentNode->GetChildNodes();
-					auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
-					++it;
-					for (it; it != siblings.end(); ++it)
 					{
-						(*it)->AddAbortDecoratorToChilds(decorator);
+						auto parentNode = Cast<BTCompositeNode>(GetParentNode());
+
+						auto& siblings = parentNode->GetChildNodes();
+						auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
+						++it;
+						for (it; it != siblings.end(); ++it)
+						{
+							(*it)->AddAbortDecorator(decorator);
+							(*it)->AddAbortDecoratorToChilds(decorator);
+						}
 					}
-				}
-				break;
+					break;
 				case EDecoratorAbortType::DAT_Both:
-				{
-					auto parentNode = Cast<BTCompositeNode>(GetParentNode());
-
-					auto& siblings = parentNode->GetChildNodes();
-					auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
-					for (it; it != siblings.end(); ++it)
 					{
-						(*it)->AddAbortDecoratorToChilds(decorator);
+						auto parentNode = Cast<BTCompositeNode>(GetParentNode());
+
+						auto& siblings = parentNode->GetChildNodes();
+						auto it = std::find(siblings.begin(), siblings.end(), Cast<BTCompositeNode>(shared_from_this()));
+						for (it; it != siblings.end(); ++it)
+						{
+							(*it)->AddAbortDecorator(decorator);
+							(*it)->AddAbortDecoratorToChilds(decorator);
+						}
 					}
-				}
-				break;
+					break;
 				default:
 					CS_FATAL(false, "");
 				}
@@ -177,15 +180,37 @@ namespace Crystal {
 		for (auto& dec : m_AbortDecorators)
 		{
 			auto abortDec = dec.lock();
-			if(!abortDec)
+			if (!abortDec)
 			{
 				continue;
 			}
 
 			bool result = abortDec->Execute();
-			if(result != abortDec->GetLastResult())
+			switch (abortDec->GetAbortCondition())
 			{
-				return false;
+			case EAbortCondition::AC_OnResultChange:
+				{
+					bool bResultIsChanaged = result != abortDec->GetLastResult();
+					if(bResultIsChanaged)
+					{
+						return false;
+					}
+				}
+				break;
+			case EAbortCondition::AC_OnValueChange:
+				{
+					bool bValueIsDifferent = abortDec->GetCurrentValueID() != abortDec->GetLastValueID();
+
+					if(bValueIsDifferent)
+					{
+						abortDec->SetLastValueID(abortDec->GetCurrentValueID());
+						return false;
+					}
+					else
+					{
+					}
+				}
+				break;
 			}
 		}
 
@@ -198,56 +223,7 @@ namespace Crystal {
 		m_BehaviorTree = behaviorTree;
 		m_BehaviorTree->SetOuter(weak_from_this());
 
-		
+
 		m_BehaviorTree->GetRootNode()->PrepareAbortDecorators();
-
-		//auto& childNodes = m_BehaviorTree->GetRootNode()->GetChildNodes();
-		/*for (auto& childNode : childNodes)
-		{
-			if (childNode->GetHasDecorators())
-			{
-				auto& decorators = childNode->GetDecorators();
-				for (auto& decorator : decorators)
-				{
-					auto abortType = decorator->GetDecoratorAbortType();
-					switch (abortType)
-					{
-					case EDecoratorAbortType::DAT_None: break;
-					case EDecoratorAbortType::DAT_Self:
-						{
-							childNode->AddAbortDecorator(decorator);
-						}
-						break;
-					case EDecoratorAbortType::DAT_LowerPriority:
-					{
-						auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
-
-						auto& siblings = parentNode->GetChildNodes();
-						auto it = std::find(siblings.begin(), siblings.end(), childNode);
-						++it;
-						for (it; it != siblings.end(); ++it)
-						{
-							(*it)->AddAbortDecoratorToChilds(decorator);
-						}
-					}
-						break;
-					case EDecoratorAbortType::DAT_Both:
-						{
-							auto parentNode = Cast<BTCompositeNode>(childNode->GetParentNode());
-
-							auto& siblings = parentNode->GetChildNodes();
-							auto it = std::find(siblings.begin(), siblings.end(), childNode);
-							for (it; it != siblings.end(); ++it)
-							{
-								(*it)->AddAbortDecoratorToChilds(decorator);
-							}
-						}
-						break;
-					default:
-						CS_FATAL(false, "");
-					}
-				}
-			}
-		}*/
 	}
 }

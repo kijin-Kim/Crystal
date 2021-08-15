@@ -22,8 +22,6 @@ namespace Crystal {
 		m_World = std::make_shared<World>();
 		m_World->OnCreate();
 		m_World->SetObjectName("DefaultWorld");
-		m_World->CreateNewLevel("DefaultLevel");
-		m_World->SetCurrentLevelByName("DefaultLevel");	
 	}
 
 	Application::~Application()
@@ -65,6 +63,16 @@ namespace Crystal {
 
 		switch (uMsg)
 		{
+		case WM_SETFOCUS:
+			{
+				RECT rect = {};
+				rect.left = 0;
+				rect.top = 0;
+				rect.right = m_Window->GetWidth();
+				rect.bottom = m_Window->GetHeight();
+				ClipCursor(&rect);
+			}
+			break;
 		case WM_CLOSE:
 			m_bShouldRun = false;
 			return true;
@@ -109,7 +117,8 @@ namespace Crystal {
 	{
 		if (auto currentLevel = m_World->GetCurrentLevel())
 		{
-			auto renderSystem = Cast<RenderSystem>(currentLevel->GetActorByClass("RenderSystem"));
+			
+			auto renderSystem = m_World->GetRenderSystem();
 			renderSystem->ChangeResolution(width, height);
 		}
 
@@ -121,7 +130,7 @@ namespace Crystal {
 	{
 		if (auto currentLevel = m_World->GetCurrentLevel())
 		{
-			auto renderSystem = Cast<RenderSystem>(currentLevel->GetActorByClass("RenderSystem"));
+			auto renderSystem = m_World->GetRenderSystem();
 			renderSystem->ChangeDisplayMode();
 		}
 	}

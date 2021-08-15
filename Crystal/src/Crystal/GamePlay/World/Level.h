@@ -21,7 +21,7 @@ namespace Crystal {
 		Level() = default;
 		~Level() override = default;
 
-		void OnCreate() override;
+		void Initialize() override;
 
 
 		void Update(const float deltaTime) override;
@@ -43,7 +43,6 @@ namespace Crystal {
 		void DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
 		                   const DirectX::XMFLOAT3& color = {0.0f, 1.0f, 0.0f});
 
-		void OnClientConnect();
 
 		const Shared<Scene>& GetScene() const;
 
@@ -77,12 +76,8 @@ namespace Crystal {
 			const std::function<bool(const std::shared_ptr<Actor>&)>& delegate);
 
 
-	private:
-		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
+	protected:
 		Shared<Scene> m_Scene = nullptr;
-		Shared<RenderSystem> m_RenderSystem = nullptr;
-
-
 		Shared<Pawn> m_Player = nullptr;
 		Shared<Actor> m_HUD = nullptr;
 

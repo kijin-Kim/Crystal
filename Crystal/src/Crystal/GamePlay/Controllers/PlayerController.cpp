@@ -81,7 +81,14 @@ namespace Crystal {
 		toggleShowDebugAIActionMapping.bAltDown = false;
 		toggleShowDebugAIActionMapping.bCtrlDown = false;
 		toggleShowDebugAIActionMapping.bShiftDown = false;
-		AddActionMapping("ShowDebugAI", toggleShowDebugAIActionMapping);		
+		AddActionMapping("ShowDebugAI", toggleShowDebugAIActionMapping);
+
+		Crystal::ActionMapping openGameLevelActionMapping = {};
+		openGameLevelActionMapping.CrystalCode = Crystal::Keyboard::Enter;
+		openGameLevelActionMapping.bAltDown = false;
+		openGameLevelActionMapping.bCtrlDown = false;
+		openGameLevelActionMapping.bShiftDown = false;
+		AddActionMapping("OpenGameLevel", openGameLevelActionMapping);
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

@@ -28,7 +28,6 @@ namespace Crystal {
 		void MoveRight(float value);
 		void MoveUp(float value);
 		void RollRight(float value);
-		void BeginFire();
 
 
 		STATIC_TYPE_IMPLE(CameraPawn)

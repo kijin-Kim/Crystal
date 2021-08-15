@@ -9,6 +9,18 @@ namespace Crystal {
 	void World::OnCreate()
 	{
 		Object::OnCreate();
+
+		m_RenderSystem = CreateShared<RenderSystem>();
+		m_RenderSystem->Initialize();
+		m_RenderSystem->SetOuter(weak_from_this());
+		m_RenderSystem->SetObjectName("LevelRenderSystem");
+		m_RenderSystem->OnCreate();
+
+		m_PhysicsSystem = CreateShared<PhysicsSystem>();
+		m_PhysicsSystem->Initialize();
+		m_PhysicsSystem->SetOuter(weak_from_this());
+		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
+		m_PhysicsSystem->OnCreate();
 	}
 
 	void World::DestroyActor(const std::shared_ptr<Actor>& actor)
@@ -18,20 +30,9 @@ namespace Crystal {
 		level->RemoveActor(actor);
 	}
 
-	Level* World::CreateNewLevel(const std::string& name /*= ""*/)
-	{
-		auto level = std::make_shared<Level>();
-		level->OnCreate();
-		if (!name.empty())
-			level->SetObjectName(name);
-		level->SetOuter(weak_from_this());
+	
 
-		m_Levels.push_back(std::move(level));
-
-		return m_Levels.back().get();
-	}
-
-	Level* World::GetLevelByName(const std::string& name)
+	const Shared<Level>& World::GetLevelByName(const std::string& name)
 	{
 		auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [&name](const std::shared_ptr<Level>& level)->bool
 			{
@@ -45,20 +46,20 @@ namespace Crystal {
 			return nullptr;
 		}
 
-		return (*it).get();
+		return (*it);
 	}
 
 
 
-	Level* World::GetLevelByIndex(int index)
+	const Shared<Level>& World::GetLevelByIndex(int index)
 	{
 		if (index >= m_Levels.size() || !m_Levels[index])
 			return nullptr;
 
-		return m_Levels[index].get();
+		return m_Levels[index];
 	}
 
-	Level* World::GetCurrentLevel()
+	const Shared<Level>& World::GetCurrentLevel() const
 	{
 		return m_CurrentLevel;
 	}
@@ -66,11 +67,8 @@ namespace Crystal {
 	void World::SetCurrentLevelByName(const std::string& name)
 	{
 		m_CurrentLevel = GetLevelByName(name);
-	}
+		m_RenderSystem->Begin();
 
-	void World::SetCurrentLevelByIndex(int index)
-	{
-		m_CurrentLevel = GetLevelByIndex(index);
 	}
 
 

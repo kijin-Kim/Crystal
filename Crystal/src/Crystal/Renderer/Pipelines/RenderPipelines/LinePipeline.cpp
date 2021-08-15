@@ -82,9 +82,7 @@ namespace Crystal {
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 
 		if(worldConfig.bShowDebugCollision)

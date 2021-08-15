@@ -39,6 +39,7 @@ namespace Crystal {
 		std::unique_ptr<WindowsWindow> m_Window;
 		std::shared_ptr<World> m_World;
 
+
 		Timer m_Timer = {};
 
 

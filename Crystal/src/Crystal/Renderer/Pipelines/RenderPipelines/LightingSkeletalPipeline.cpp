@@ -18,9 +18,7 @@ namespace Crystal {
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		auto camera = scene->Cameras[0].lock();
 

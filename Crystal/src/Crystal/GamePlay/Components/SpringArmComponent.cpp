@@ -7,6 +7,8 @@ namespace Crystal {
 
 	void SpringArmComponent::Update(const float deltaTime)
 	{
+		TransformComponent::Update(deltaTime);
+
 		if (m_ParentComponent.expired())
 		{
 			CS_WARN("Spring Arm Component에 부모가 존재하지 않습니다");
@@ -24,7 +26,7 @@ namespace Crystal {
 		DirectX::XMFLOAT3 worldTargetPosition = { m_WorldTransform._41, m_WorldTransform._42, m_WorldTransform._43 };
 
 		//=================================================================================================
-		// 후크의 법칙 (Position) TODO : 회전
+		// 후크의 법칙 (Position)
 		auto force = Vector3::Subtract(m_WorldLastPosition, worldTargetPosition);
 
 		float magnitude = Vector3::Length(force);
@@ -46,9 +48,7 @@ namespace Crystal {
 		//=================================================================================================
 		SetWorldPosition(newPosition);
 		m_WorldLastPosition = newPosition;
-
-
-		TransformComponent::Update(deltaTime);
+		
 	}
 
 	void SpringArmComponent::SetSpringConstant(const float springConstant)

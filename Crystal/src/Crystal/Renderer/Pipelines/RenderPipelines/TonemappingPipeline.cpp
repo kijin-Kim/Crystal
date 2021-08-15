@@ -48,13 +48,6 @@ namespace Crystal {
 
 		pipelineStateDescription.CreatePipelineState(m_Shader->GetRootSignature().GetData(), m_Shader, m_PipelineState);
 
-
-		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
-
-		auto& scene = GetScene();
-		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
-
-		m_Components.push_back(m_StaticMeshComponent);
 	}
 
 	void TonemappingPipeline::Begin()
@@ -66,13 +59,35 @@ namespace Crystal {
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+
+		auto& scene = GetScene();
 
 
 		device->CopyDescriptorsSimple(1, heapHandle,
 		                              scene->FloatingPointBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	void TonemappingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
+	{
+		auto device = Device::Instance().GetD3DDevice();
+		auto rootSignature = m_Shader->GetRootSignature();
+
+
+		commandList->SetPipelineState(m_PipelineState.Get());
+		commandList->SetGraphicsRootSignature(rootSignature.GetData());
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
+
+
+		auto renderable = GetScene()->PlaneQuad2DMesh;
+
+		for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
+		{
+			renderable->Render(commandList, j);
+		}
 	}
 
 

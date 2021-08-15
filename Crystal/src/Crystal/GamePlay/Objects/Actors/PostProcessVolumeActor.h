@@ -94,7 +94,14 @@ namespace Crystal {
 		bool GetIsOverlapped() const;
 
 
-		void SetIsEnabled(bool bEnabled) { m_PostProcessComponent->SetIsEnabled(bEnabled); }
+		void SetIsEnabled(bool bEnabled)
+		{
+			m_PostProcessComponent->SetIsEnabled(bEnabled);
+			if(bEnabled)
+			{
+				m_bIsFirstTimeCheckOverlap = true;
+			}
+		}
 		bool GetIsEnabled() const { return m_PostProcessComponent->GetIsEnabled(); }
 
 

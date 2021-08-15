@@ -27,19 +27,15 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
-
-
-
 		auto inputLayout = m_Shader->GetInputLayout();
-	
-		
+
+
 		D3D12_RT_FORMAT_ARRAY rtvFormat = {};
 		rtvFormat.NumRenderTargets = 1;
 		rtvFormat.RTFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		
 
-		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = { inputLayout.GetData(), inputLayout.GetCount() };
+		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {inputLayout.GetData(), inputLayout.GetCount()};
 		RenderTargetDescription renderTargetDescription(rtvFormat, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 		PipelineStateDescription pipelineStateDescription(
@@ -52,16 +48,7 @@ namespace Crystal {
 		);
 
 		pipelineStateDescription.CreatePipelineState(m_Shader->GetRootSignature().GetData(), m_Shader, m_PipelineState);
-
-
-		m_StaticMeshComponent = std::make_shared<StaticMeshComponent>();
-
-
-		auto& scene = GetScene();
-
-		m_StaticMeshComponent->SetRenderable(scene->PlaneQuad2DMesh);
-
-		m_Components.push_back(m_StaticMeshComponent);
+		
 	}
 
 	void LightingPipeline::Begin()
@@ -81,26 +68,19 @@ namespace Crystal {
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
 
-
-
-
 		PerFrameData perFrameData = {};
 
 		auto camera = scene->Cameras[0].lock();
 		perFrameData.ViewProjection = Matrix4x4::Transpose(camera->GetViewProjection());
-		
+
 		auto shadowLightSource = scene->Lights[0].lock();
-		if(!shadowLightSource)
+		if (!shadowLightSource)
 		{
 			return;
 		}
 
 		perFrameData.LightViewProjection = Matrix4x4::Transpose(shadowLightSource->GetLightViewProjection());
-		
 		perFrameData.CameraPositionInWorld = camera->GetWorldPosition();
-
-
-		
 
 
 		const int maxLightCount = 100;
@@ -194,73 +174,31 @@ namespace Crystal {
 
 	void LightingPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
-
-		auto device = Device::Instance().GetD3DDevice();
-		auto rootSignature = m_Shader->GetRootSignature();
-
 		auto& scene = GetScene();
-		if(scene->Lights.empty())
+		if (scene->Lights.empty())
 		{
 			return;
 		}
 
 
+		auto device = Device::Instance().GetD3DDevice();
+		auto rootSignature = m_Shader->GetRootSignature();
+
+
 		commandList->SetPipelineState(m_PipelineState.Get());
 		commandList->SetGraphicsRootSignature(rootSignature.GetData());
-		ID3D12DescriptorHeap* staticDescriptorHeaps[] = { m_DescriptorHeap.Get() };
+		ID3D12DescriptorHeap* staticDescriptorHeaps[] = {m_DescriptorHeap.Get()};
 		commandList->SetDescriptorHeaps(_countof(staticDescriptorHeaps), staticDescriptorHeaps);
 
 		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapHandle);
 
-		int rootParameterIndex = 0;
 
-		if (rootSignature.HasPerFrameParameter())
+		auto renderable = GetScene()->PlaneQuad2DMesh;
+
+		for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
 		{
-			commandList->
-				SetGraphicsRootDescriptorTable(rootSignature.GetPerFrameParameterIndex(), descriptorHeapHandle);
-			descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-				* rootSignature.GetPerFrameDescriptorCount();
-		}
-
-		for (const auto& component : m_Components)
-		{
-			auto meshComponent = component.lock();
-			if (!meshComponent)
-				continue;
-
-			if (rootSignature.HasPerObjectParameter())
-			{
-				commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerObjectParameterIndex(),
-					descriptorHeapHandle); // PerObject
-				descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
-					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-					* rootSignature.GetPerObjectDescriptorCount();
-			}
-
-
-			auto renderable = meshComponent->GetRenderable().lock();
-			auto& materials = meshComponent->GetMaterials();
-
-			if (!renderable)
-			{
-				continue;
-			}
-
-			for (int j = 0; j < renderable->GetVertexbufferCount(); j++)
-			{
-				if (j < materials.size() && materials[j])
-				{
-					if (rootSignature.GetPerExecuteDescriptorCount())
-					{
-						commandList->SetGraphicsRootDescriptorTable(rootSignature.GetPerExecuteParameterIndex(),
-							descriptorHeapHandle); // PerMaterial
-						descriptorHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(
-							D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-							* rootSignature.GetPerExecuteDescriptorCount();
-					}
-				}
-				renderable->Render(commandList, j);
-			}
+			renderable->Render(commandList, j);
 		}
 	}
 

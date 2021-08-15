@@ -14,27 +14,12 @@
 #include "../../../../../Game/src/actors/MyHUD.h"
 
 namespace Crystal {
-	void Level::OnCreate()
+
+
+	void Level::Initialize()
 	{
-		Object::OnCreate();
-
+		Object::Initialize();
 		m_Scene = CreateShared<Scene>();
-
-#if defined(CS_NM_STANDALONE) || defined(CS_NM_CLIENT)
-	
-		m_RenderSystem = CreateShared<RenderSystem>();
-		m_RenderSystem->Initialize();
-		m_RenderSystem->SetOuter(weak_from_this());
-		m_RenderSystem->SetObjectName("LevelRenderSystem");
-		m_RenderSystem->OnCreate();
-		m_RenderSystem->Begin();
-#endif
-
-		m_PhysicsSystem = CreateShared<PhysicsSystem>();
-		m_PhysicsSystem->Initialize();
-		m_PhysicsSystem->SetOuter(weak_from_this());
-		m_PhysicsSystem->SetObjectName("LevelPhysicsSystem");
-		m_PhysicsSystem->OnCreate();
 	}
 
 	void Level::Update(const float deltaTime)
@@ -46,7 +31,7 @@ namespace Crystal {
 		m_bIsUpdating = true;
 
 		AddPendingSpawnedActors();
-		
+
 		for (const auto& actor : m_Actors)
 		{
 			actor->Update(deltaTime);
@@ -57,20 +42,21 @@ namespace Crystal {
 				actor->End();
 			}
 		}
-		m_PhysicsSystem->Update(deltaTime);
+		auto world = Cast<World>(GetWorld());
+		auto physicsSystem = world->GetPhysicsSystem();
+		physicsSystem->Update(deltaTime);
 		RemovePendingActors();
 
 		// TODO : 렌더링 준비과정
 
 
-
-		if (m_RenderSystem)
+		auto renderSystem = world->GetRenderSystem();
+		if (renderSystem)
 		{
-			m_RenderSystem->Update(deltaTime);
+			renderSystem->Update(deltaTime);
 		}
 
 		m_bIsUpdating = false;
-
 	}
 
 	void Level::DrawDebugLine(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float maxDistance,
@@ -86,7 +72,7 @@ namespace Crystal {
 
 	void Level::AddActor(const std::shared_ptr<Actor>& actor)
 	{
-		if(m_bIsUpdating)
+		if (m_bIsUpdating)
 		{
 			m_PendingSpawnedActors.push_back(actor);
 			return;
@@ -154,111 +140,6 @@ namespace Crystal {
 	}
 
 
-	void Level::OnClientConnect()
-	{
-		AddPendingSpawnedActors();
-#ifdef CS_NM_CLIENT
-		/* 멀티플레이어 클라이언트면,
-		* 서버가 알아서 생성
-		* return;
-		*
-		* 
-		*
-		*/
-		return;
-#endif
-
-#ifdef CS_NM_STANDALONE
-		/* 스탠드얼론이 면,
-		* 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
-		* 1. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
-		* 2. 새로운 PlayerController를 Spawn합니다.
-		*/
-		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
-		if (playerStartActors.empty())
-		{
-			CS_FATAL(false, "더 이상 클라이언트를 받을 수 없습니다");
-			return;
-		}
-
-		auto playerStartActor = playerStartActors[0].lock();
-
-		m_HUD = SpawnActor<MyHUD>({ "" }).lock();
-		
-
-		auto newActor = SpawnActor<MyPlayerPawn>({"MyPlayerPawn"}).lock();
-		newActor->SetPosition({0.0f, 0.0f, -2000.0f});
-		m_Player = newActor;
-		
-
-		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
-			newActor->GetComponentByClass("StaticMeshComponent"));
-
-		//auto& resourceManager = ResourceManager::Instance();
-		//
-		//newActorMesh->SetRenderable(resourceManager.GetRenderable<StaticMesh>("assets/models/SM_Frigate_BE2.fbx"));
-		//auto newActorMat = newActorMesh->GetMaterial(0);
-		//newActorMat->AlbedoTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_M_SM_Frigate_BE2_MI_Frigate_BE2_White_BaseColor.tga");
-		//newActorMat->MetallicTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Metallic.tga");
-		//newActorMat->RoughnessTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Roughness.tga");
-		//newActorMat->NormalTexture = resourceManager.GetTexture("assets/textures/T_Frigate_BE2/T_Frigate_BE2_Norm.tga");
-
-		newActor->SetUnitScale(playerStartActor->GetScale().x);
-		newActor->SetRotationQuat(playerStartActor->GetRotationQuat());
-		newActor->SetPosition(playerStartActor->GetPosition());
-
-		playerStartActor->Destroy();
-
-		auto playerController = SpawnActor<PlayerController>({}).lock();
-		playerController->Possess(newActor);
-
-#endif
-
-
-#ifdef CS_NM_DEDICATED
-		/* 멀티플레이어 서버 이면,
-		* 0. PlayerStartActor를 검색하고, 없으면 접속을 거부. Return.
-		* 1. 새로운 PlayerController를 Spawn하고, Id를 지정합니다.
-		* 2. PlayerStartActor를 Destroy하고, PlayerStartActor로부터 새로운 DefaultPawn을 Spawn하고, Possess 합니다.
-		*/
-
-		auto& playerStartActors = GetAllActorByClass("PlayerStartActor");
-		if (playerStartActors.empty())
-		{
-			CS_FATAL(false, "더 이상 클라이언트를 받을 수 없습니다");
-			return;
-		}
-
-		auto& resourceManager = ResourceManager::Instance();
-
-		auto playerStartActor = playerStartActors[0].lock();
-
-
-		auto newActor = SpawnActor<MyPlayerPawn>({ "MyPlayerPawn" }).lock();
-
-		auto newActorMesh = Crystal::Cast<Crystal::StaticMeshComponent>(
-			newActor->GetComponentByClass("StaticMeshComponent"));
-
-		newActorMesh->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("Frigate"));
-		auto newActorMat = newActorMesh->GetMaterial(0);
-		newActorMat->AlbedoTexture = resourceManager.GetTexture("Frigate_Albedo");
-		newActorMat->MetallicTexture = resourceManager.GetTexture("Frigate_Metallic");
-		newActorMat->RoughnessTexture = resourceManager.GetTexture("Frigate_Roughness");
-		newActorMat->NormalTexture = resourceManager.GetTexture("Frigate_Normal");
-
-		newActor->SetUnitScale(playerStartActor->GetScale());
-		newActor->SetRotationQuat(playerStartActor->GetRotationQuat());
-		newActor->SetPosition(playerStartActor->GetPosition());
-
-		playerStartActor->Destroy();
-
-		/*auto playerController = SpawnActor<PlayerController>().lock();
-		playerController->SetNetworkId();
-		playerController->Possess(newActor);*/
-
-
-#endif
-	}
 
 	const Shared<Scene>& Level::GetScene() const
 	{
@@ -340,18 +221,15 @@ namespace Crystal {
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 #ifdef CS_NM_STANDALONE
-		
-			
+
+
 		bool bHandled = false;
 		for (const auto& playerController : m_PlayerControllers)
 		{
 			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
 
-		
 
-
-		
 		return bHandled;
 #endif
 
@@ -363,10 +241,11 @@ namespace Crystal {
 		return false;
 	}
 
-	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist, const CollisionParams& collisionParams)
+	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+	                            const CollisionParams& collisionParams)
 	{
 		DrawDebugLine(origin, direction, dist, Crystal::Vector3::Green);
-		return m_PhysicsSystem->LineTraceSingle(outHitResult, origin, direction, dist, collisionParams);
+		return Crystal::Cast<World>(GetWorld())->GetPhysicsSystem()->LineTraceSingle(outHitResult, origin, direction, dist, collisionParams);
 	}
 
 	const WorldConfig& Level::GetWorldConfig() const

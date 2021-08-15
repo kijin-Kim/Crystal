@@ -49,6 +49,8 @@ namespace Crystal {
 	void CollisionComponent::OnBeginOverlap(const OverlapResult& overlapResult)
 	{
 		m_bIsFirstTimeCheckOverlap = false;
+		overlapResult.OverlappedComponent.lock()->SetIsFirstTimeCheckOverlapped(false);
+
 		m_OverlappedComponents.push_back(overlapResult.OverlappedComponent);
 
 		if(m_OnBeginOverlapEvent)
@@ -65,7 +67,7 @@ namespace Crystal {
 	void CollisionComponent::OnEndOverlap(const OverlapResult& overlapResult)
 	{
 		m_bIsFirstTimeCheckOverlap = false;
-		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlapResult](const Weak<CollisionComponent>& other)
+		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlapResult](Weak<CollisionComponent> other)->bool
 		{
 			auto overlapped = overlapResult.OverlappedComponent.lock();
 			if (!overlapped)
@@ -100,7 +102,7 @@ namespace Crystal {
 		m_OnEndOverlapEvent = event;
 	}
 
-	bool CollisionComponent::IsOverlappedWith(const Weak<CollisionComponent>& overlappedComponent)
+	bool CollisionComponent::IsOverlappedWith(Weak<CollisionComponent> overlappedComponent)
 	{
 		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlappedComponent](const Weak<CollisionComponent>& other)
 		{

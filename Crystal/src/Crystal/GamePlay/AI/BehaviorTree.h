@@ -39,25 +39,34 @@ namespace Crystal {
 			for(auto& childNode : m_ChildNodes)
 			{
 				childNode->ClearExecutionFlags();
+				childNode->ClearChildNodeExecutionFlags();
 			}
 		}
 
 		void Abort()
 		{
 			auto parentNode = Cast<BTCompositeNode>(GetParentNode());
-			if(parentNode == Cast<BTCompositeNode>(GetRootNode()))
+			if(parentNode)
 			{
-				FinishExecute(false);
-				return;
-			}
+				parentNode->Abort();
+				if (parentNode == Cast<BTCompositeNode>(GetRootNode()))
+				{
+					FinishExecute(false);
+					return;
+				}
 
-			if(parentNode->StaticType() == "BTSelectorNode")
-			{
-				FinishExecute(true);
+				if (parentNode->StaticType() == "BTSelectorNode")
+				{
+					FinishExecute(true);
+				}
+				else // BTSequenceNode
+				{
+					FinishExecute(false);
+				}
 			}
-			else // BTSequenceNode
+			else
 			{
-				FinishExecute(false);
+				ClearChildNodeExecutionFlags();
 			}
 		}
 
@@ -130,7 +139,7 @@ namespace Crystal {
 
 		void Execute(float deltaTime) override
 		{
-			bool abortResult = CheckAbortDecorators();
+			auto abortResult = CheckAbortDecorators();
 			if (!abortResult)
 			{
 				Abort();
@@ -387,6 +396,7 @@ namespace Crystal {
 			auto blackBoard = GetBlackboardComponent().lock();
 			auto targetLocation = blackBoard->GetValueAsFloat3(TargetLocationKey);
 
+
 			auto newFacing = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(targetLocation, mainComponent->GetWorldPosition()));
 
 			auto normalizedForward = Crystal::Vector3::Normalize(mainComponent->GetWorldForwardVector());
@@ -411,8 +421,6 @@ namespace Crystal {
 			auto rotation = mainComponent->GetRotationQuat();
 			auto newQuat = Vector4::QuaternionMultiply(rotation, quat);
 			mainComponent->SetRotationQuat(newQuat);
-
-
 		}
 
 		STATIC_TYPE_IMPLE(BTTaskNodeFaceLocation)

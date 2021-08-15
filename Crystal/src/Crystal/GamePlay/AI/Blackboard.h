@@ -1,44 +1,60 @@
 #pragma once
+#include <unordered_map>
 #include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/Objects/Object.h"
+#include "Crystal/Types.h"
 
 namespace Crystal {
 
-	struct IBlackboardValue
+	enum class BlackboardValueType
 	{
+		BVT_None,
+		BVT_Bool,
+		BVT_Int,
+		BVT_Float,
+		BVT_Float3,
+		BVT_Float4,
+		BVT_String,
+		BVT_Object,
 	};
 
-	struct BlackBoardBoolValue : public IBlackboardValue
+	struct IBlackboardValue
+	{
+		uint64_t BlackboardID = IDCounter<IBlackboardValue>::Instance().GetNewID();
+	};
+
+	struct BlackboardBoolValue : public IBlackboardValue
 	{
 		bool Value = false;
 	};
 
-	struct BlackBoardIntValue : public IBlackboardValue
+	struct BlackboardIntValue : public IBlackboardValue
 	{
 		int Value = 0;
 	};
 
-	struct BlackBoardFloatValue : public IBlackboardValue
+	struct BlackboardFloatValue : public IBlackboardValue
 	{
 		float Value = 0.0f;
 	};
 
-	struct BlackBoardFloat3Value : public IBlackboardValue
+	struct BlackboardFloat3Value : public IBlackboardValue
 	{
+
 		DirectX::XMFLOAT3 Value = Vector3::Zero;
 	};
 
-	struct BlackBoardFloat4Value : public IBlackboardValue
+	struct BlackboardFloat4Value : public IBlackboardValue
 	{
 		DirectX::XMFLOAT4 Value = Vector4::Zero;
 	};
 
-	struct BlackBoardStringValue : public IBlackboardValue
+	struct BlackboardStringValue : public IBlackboardValue
 	{
 		std::string Value = {};
 	};
 
-	struct BlackBoardObjectValue : public IBlackboardValue
+	struct BlackboardObjectValue : public IBlackboardValue
 	{
 		Weak<Object> Value = {};
 	};
@@ -81,7 +97,7 @@ namespace Crystal {
 		bool HasValue(const std::string& key);
 		
 
-
+		uint64_t GetValueID(const std::string& key) const;
 		bool GetValueAsBool(const std::string& key) const;
 		int GetValueAsInt(const std::string& key) const;
 		float GetValueAsFloat(const std::string& key) const;

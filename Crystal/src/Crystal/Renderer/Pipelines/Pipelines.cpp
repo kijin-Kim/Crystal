@@ -56,10 +56,16 @@ namespace Crystal {
 		}
 	}
 
-	const Shared<Scene>& Pipeline::GetScene()
+	Shared<RenderSystem> Pipeline::GetRenderSystem()
 	{
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
+		return Cast<RenderSystem>(GetOuter());
+	}
+
+	Shared<Scene> Pipeline::GetScene()
+	{
+		auto renderSystem = GetRenderSystem();
+		auto world = renderSystem->GetWorld();
+		auto level = world->GetCurrentLevel();
 		return level->GetScene();
 	}
 

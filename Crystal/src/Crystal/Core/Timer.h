@@ -18,6 +18,8 @@ namespace Crystal {
 		float GetDeltaSeconds() const { return (float)m_DeltaTime; }
 		float GetElapsedTime() const { return (float)m_ElapsedTime; }
 
+		void SetElapsedTime(float elapsedTime) { m_ElapsedTime = (double)elapsedTime; }
+
 
 		void Pause();
 		void Resume();

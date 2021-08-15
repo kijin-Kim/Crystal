@@ -52,6 +52,7 @@ namespace Crystal {
 		static const D3D12_BLEND_DESC NonPremultiplied;
 
 		static const D3D12_DEPTH_STENCIL_DESC DepthEnable;
+		static const D3D12_DEPTH_STENCIL_DESC DepthEnableNoWrite;
 		static const D3D12_DEPTH_STENCIL_DESC DepthDisable;
 		
 		

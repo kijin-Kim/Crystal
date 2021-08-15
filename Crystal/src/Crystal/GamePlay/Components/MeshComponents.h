@@ -85,8 +85,8 @@ namespace Crystal {
 
 
 		const std::vector <DirectX::XMFLOAT4X4>& GetBoneTransforms() const { return m_BoneTransforms; }
-		
-		
+
+
 		STATIC_TYPE_IMPLE(SkeletalMeshComponent)
 
 	private:
@@ -115,5 +115,7 @@ namespace Crystal {
 		float m_AnimationEventInterval = 0.0f;
 
 		Timer m_AnimationEventTimer = {};
+
+		bool m_bIsPlayingAnimation = false;
 	};
 }

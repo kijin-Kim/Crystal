@@ -18,9 +18,7 @@ namespace Crystal {
 		auto device = Device::Instance().GetD3DDevice();
 		
 
-		auto renderSystem = Cast<RenderSystem>(GetOuter());
-		auto level = Cast<Level>(renderSystem->GetOuter());
-		auto& scene = level->GetScene();
+		auto& scene = GetScene();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		device->CopyDescriptorsSimple(1, handle, scene->BrightColorBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),

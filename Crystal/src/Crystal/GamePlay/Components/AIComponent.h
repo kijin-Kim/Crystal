@@ -72,7 +72,6 @@ namespace Crystal {
 
 		const std::vector<std::string>& GetActorClassVisibilityWhitelist() const { return m_ActorClassVisibilityWhitelist; }
 		void IgnoreVisibilityActorClassOf(const std::string& type) { m_ActorClassVisibilityWhitelist.push_back(type); }
-		void RemoveIgnoreVisibilityActorClassOf(const std::string& type);
 		bool HasActorClassVisibilityWhitelist() const { return !m_ActorClassVisibilityWhitelist.empty(); }
 
 		bool IsVisibilityWhitelistActorClass(const std::string& type)
@@ -143,8 +142,7 @@ namespace Crystal {
 		
 
 		const SightStimulus& GetSightStimulus() const { return m_SightStimulus; }
-		const std::vector<NoiseStimulus>& GetNoiseStimuli() const { return m_NoiseStimuli; }
-		void ClearNoiseStimuli() { m_NoiseStimuli.clear(); }
+		const NoiseStimulus& GetNoiseStimulus() const { return m_NoiseStimuli; }
 
 
 		
@@ -157,6 +155,6 @@ namespace Crystal {
 
 
 		SightStimulus m_SightStimulus = SightStimulus::Create();
-		std::vector<NoiseStimulus> m_NoiseStimuli;
+		NoiseStimulus m_NoiseStimuli = NoiseStimulus::Create();
 	};
 }

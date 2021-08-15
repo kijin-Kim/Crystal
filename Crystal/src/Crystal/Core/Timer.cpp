@@ -38,7 +38,8 @@ namespace Crystal {
 
 	void Timer::Reset()
 	{
-		m_ElapsedTime = 0.0f;
+		m_ElapsedTime = 0.0;
+		m_LastTime = 0.0;
 	}
 
 	

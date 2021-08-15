@@ -10,6 +10,7 @@
 #include "Crystal/Resources/Buffer.h"
 
 namespace Crystal {
+	class RenderSystem;
 	struct WorldConfig;
 	struct Scene;
 
@@ -34,7 +35,8 @@ namespace Crystal {
 
 		void SetShader(const Shared<Shader>& shader) { m_Shader = shader; }
 
-		const Shared<Scene>& GetScene();
+		Shared<RenderSystem> GetRenderSystem();
+		Shared<Scene> GetScene();
 		const WorldConfig& GetWorldConfig() const;
 
 		STATIC_TYPE_IMPLE(Pipeline)

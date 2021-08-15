@@ -110,7 +110,20 @@ namespace Crystal {
 
 	void AIPerceptionComponent::ReceiveNoiseStimulus(const NoiseStimulus& stimulus)
 	{
-		m_PerceptedNoiseStimuli.push_back(stimulus);
+		auto it = std::find_if(m_PerceptedNoiseStimuli.begin(), m_PerceptedNoiseStimuli.end(), [&stimulus](const NoiseStimulus& other)-> bool
+			{
+				if(stimulus.Instigator.expired() || other.Instigator.expired())
+				{
+					return false;
+				}
+
+				return stimulus.Instigator.lock() == other.Instigator.lock();
+			});
+
+		if(it == m_PerceptedNoiseStimuli.end())
+		{
+			m_PerceptedNoiseStimuli.push_back(stimulus);
+		}
 	}
 
 	void AIPerceptionComponent::ForgetNoiseStimulus(const NoiseStimulus& stimulus)
@@ -226,6 +239,7 @@ namespace Crystal {
 	}
 
 
+
 	void AIPerceptionComponent::ReCalculateBoundingFrustum()
 	{
 		m_SightFrustum.LeftSlope = -m_SightWidth * 0.5f / m_SightRange;
@@ -265,12 +279,10 @@ namespace Crystal {
 
 	void AIPerceptionSourceComponent::MakeNoiseAtLocation(const DirectX::XMFLOAT3& position, float maxRange)
 	{
-		NoiseStimulus noiseStimulus = NoiseStimulus::Create();
-		noiseStimulus.Instigator = Cast<Actor>(GetOuter());
-		noiseStimulus.Position = position;
-		noiseStimulus.MaxRange = maxRange;
-
-		m_NoiseStimuli.push_back(noiseStimulus);
+		m_NoiseStimuli = NoiseStimulus::Create();
+		m_NoiseStimuli.Instigator = Cast<Actor>(GetOuter());
+		m_NoiseStimuli.Position = position;
+		m_NoiseStimuli.MaxRange = maxRange;
 	}
 
 	void AIPerceptionSourceComponent::Update(float deltaTime)

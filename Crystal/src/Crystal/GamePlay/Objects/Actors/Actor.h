@@ -76,6 +76,11 @@ namespace Crystal {
 
 		const DirectX::XMFLOAT4X4& GetWorldTransform() const;
 
+		const DirectX::XMFLOAT3& GetVelocity() const;
+
+		float GetMass() const;
+		float GetInverseMass() const;
+
 
 		void RotatePitch(float angle);
 		void RotateYaw(float angle);

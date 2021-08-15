@@ -24,7 +24,7 @@ namespace Crystal {
 
 		uint64_t GetNewID()
 		{
-			static uint64_t Count = -1;
+			static uint64_t Count = 0;
 			return Count++;
 		}
 
