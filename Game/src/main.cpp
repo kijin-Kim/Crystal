@@ -45,7 +45,6 @@ public:
 
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
-
 		{
 			resourceManager.GetTexture("assets/textures/Whale Diffuse.jpg");
 			resourceManager.GetTexture("assets/textures/Whale Roughness.jpg");
@@ -69,22 +68,23 @@ public:
 
 			resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx");
 			resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx");
+			resourceManager.GetAnimation("assets/models/KRAKEN_death.fbx");
 		}
 
 
 		{
 			auto playerStart = m_World->SpawnActor<Crystal::PlayerStartActor>({"1"}).lock();
-			playerStart->SetPosition({7000.0f, 7000.0f, 0.0f});
+			playerStart->SetPosition({0.0f, 3000.0f, 0.0f});
 		}
 
 		m_World->GetCurrentLevel()->OnClientConnect();
 
-		if (false)
+		if (true)
 		{
 			for (int i = 0; i < 5; i++)
 			{
 				auto drone = m_World->SpawnActor<Drone>({"Drone"}).lock();
-				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 3000.0f));
+				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 20000.0f));
 
 				auto droneController = m_World->SpawnActor<DroneAIController>({}).lock();
 				droneController->Possess(drone);
@@ -94,7 +94,7 @@ public:
 
 		{
 			auto sun = m_World->SpawnActor<Sun>({"Sun"}).lock();
-			sun->SetPosition({+10000.0f, 20000.0f, 0.0f});
+			sun->SetPosition({+30000.0f, 50000.0f, 0.0f});
 
 			auto lightComponent = Crystal::Cast<Crystal::LightComponent>(sun->GetComponentByClass("DirectionalLightComponent"));
 			lightComponent->SetLightColor({1.0f, 1.0f, 1.0f});
@@ -121,7 +121,7 @@ public:
 		}
 
 		{
-			const float distFromCenter = 15000.0f;
+			const float distFromCenter = 30000.0f;
 			const float boundingOrientedBoxWidth = 500.0f;
 
 			auto boundingOrientedBoxActor1 = m_World->SpawnActor<Crystal::BoundingOrientedBoxActor>({"BoundingOrientedBoxActor1"}).lock();
@@ -207,6 +207,48 @@ public:
 			}
 		}*/
 
+		if (true)
+		{
+			for (int i = 0; i < 30; i++)
+			{
+				auto asteroid = m_World->SpawnActor<Asteroid>({}).lock();
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
+			}
+
+			for (int i = 0; i < 100; i++)
+			{
+				auto asteroid = m_World->SpawnActor<FakeAsteroid>({}).lock();
+				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
+			}
+
+
+			for (int i = 0; i < 40; i++)
+			{
+				int randomNumber = rand() % 3;
+				switch (randomNumber)
+				{
+				case 0:
+				{
+					auto asteroid = m_World->SpawnActor<HealAsteroid>({}).lock();
+					asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
+					break;
+				}
+				case 1:
+				{
+					auto asteroid = m_World->SpawnActor<PowerAsteroid>({}).lock();
+					asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
+					break;
+				}
+				case 2:
+				{
+					auto asteroid = m_World->SpawnActor<ShieldAsteroid>({}).lock();
+					asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
+					break;
+				}
+				}
+			}
+		}
+
 
 		if (true)
 		{
@@ -217,10 +259,10 @@ public:
 		}
 
 
-		if (true)
+		if (false)
 		{
 			auto particleActor = m_World->SpawnActor<Crystal::ParticleActor>({""}).lock();
-			particleActor->SetPosition({ 0.0f, 0.0f, -3000.0f });
+			particleActor->SetPosition({7000.0f, 7000.0f, 0.0f});
 		}
 
 
@@ -230,7 +272,7 @@ public:
 			postProcessActor->SetPostProcessOrder(0);
 			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
 			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
-			postProcessActor->SetSphereRadius(2300.0f);
+			postProcessActor->SetSphereRadius(2300.0f * 3.0f);
 			postProcessActor->SetPosition(Crystal::Vector3::Zero);
 			postProcessActor->SetIsEnabled(false);
 
@@ -252,7 +294,7 @@ public:
 			postProcessActor->SetPostProcessOrder(2);
 			postProcessActor->SetVolumeBehavior(Crystal::EVolumeBehavior::VB_EnableWhenNotOverlap);
 			postProcessActor->SetVolumeType(Crystal::EVolumeType::VT_Sphere);
-			postProcessActor->SetSphereRadius(2300.0f);
+			postProcessActor->SetSphereRadius(2300.0f * 3.0f);
 			postProcessActor->SetIsEnabled(false);
 
 			auto postProcessComponent = postProcessActor->GetPostProcessComponent();
@@ -344,9 +386,6 @@ public:
 		//	auto spaceWhaleController = m_World->SpawnActor<SpaceWhaleAIController>({}).lock();
 		//	spaceWhaleController->Possess(spaceWhale);
 		//}
-
-
-		
 	}
 };
 

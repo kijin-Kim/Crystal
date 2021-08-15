@@ -19,13 +19,28 @@ struct VS_INPUT
     float4 MatRow1 : MATROW1;
     float4 MatRow2 : MATROW2;
     float4 MatRow3 : MATROW3;
+
     uint SubUVIndex : SUBUV_INDEX;
+    bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
+    bool bToggleOpacityTexture : TOGGLE_OPACITY_TEXTURE;
+    bool bUseAlbedoTextureAlpha : USE_ALBEDO_ALPHA;
+    float3 AlbedoColor : ALBEDO_COLOR;
+    float Opacity : OPACITY;
+    float OpacityMultiplier : OPACITY_MULTIPLIER;
 };
+
 
 struct PS_INPUT
 {
     float4 Position : SV_Position;
     float2 TexCoord : TEXCOORD;
+
+    nointerpolation bool bToggleAlbedoTexture : TOGGLE_ALBEDO_TEXTURE;
+    nointerpolation bool bToggleOpacityTexture : TOGGLE_OPACITY_TEXTURE;
+    nointerpolation bool bUseAlbedoTextureAlpha : USE_ALBEDO_ALPHA;
+    nointerpolation float3 AlbedoColor : ALBEDO_COLOR;
+    nointerpolation float Opacity : OPACITY;
+    nointerpolation float OpacityMultiplier : OPACITY_MULTIPLIER;
 };
 
 
@@ -50,17 +65,39 @@ PS_INPUT vsMain(VS_INPUT input)
     output.TexCoord.x += (1.0f / (float)HorizontalSubImageCount) * xFactor;
     output.TexCoord.y -= (1.0f / (float)VerticalSubImageCount) * ((VerticalSubImageCount - 1)- yFactor);
 
+    output.bToggleAlbedoTexture = input.bToggleAlbedoTexture;
+    output.bToggleOpacityTexture = input.bToggleOpacityTexture;
+    output.bUseAlbedoTextureAlpha = input.bUseAlbedoTextureAlpha;
+    output.AlbedoColor = input.AlbedoColor;
+    output.Opacity = input.Opacity;
+    output.OpacityMultiplier = input.OpacityMultiplier;
     
 
     return output;
 }
 
 
-SamplerState DefualtSampler : register(s0);
-Texture2D Texture : register(t0);
+SamplerState DefaultSampler : register(s0);
+Texture2D AlbedoTexture : register(t0);
+Texture2D OpacityTexture  : register(t1);
 
 float4 psMain(PS_INPUT input) : SV_Target
 {
-    return Texture.Sample(DefualtSampler, input.TexCoord);
+    float4 albedoColor = input.bToggleAlbedoTexture ? AlbedoTexture.Sample(DefaultSampler, input.TexCoord) : float4(input.AlbedoColor, 1.0f);
+    float opacity = 0.0f;
+    if(!input.bUseAlbedoTextureAlpha)
+    {
+        opacity = input.bToggleOpacityTexture ? OpacityTexture.Sample(DefaultSampler,  input.TexCoord).r : input.Opacity;
+    }
+    else
+    {
+        opacity = albedoColor.a;
+    }
+
+    opacity *= input.OpacityMultiplier;
+
+    //float4 finalColor = float4(albedoColor.rgb, opacity);
+    float4 finalColor = float4(albedoColor.rgb, opacity);
+    return finalColor;
 }
 

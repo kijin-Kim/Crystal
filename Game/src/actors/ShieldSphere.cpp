@@ -24,7 +24,7 @@ void ShieldSphere::Initialize()
 	material->bTwoSided = false;
 		
 	auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-	boundingSphereComponent->SetRadius(2300.0f);
+	boundingSphereComponent->SetRadius(2300.0f * 3.0f);
 	boundingSphereComponent->IgnoreActorClassOf("Kraken");
 	boundingSphereComponent->IgnoreActorClassOf("SpaceWhale");
 	boundingSphereComponent->IgnoreActorClassOf("Drone");
@@ -35,7 +35,7 @@ void ShieldSphere::Initialize()
 	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 
 	staticMeshComponent->AddMaterial(std::move(material));
-	staticMeshComponent->SetUnitScale(2300.0f);
+	staticMeshComponent->SetUnitScale(2300.0f * 3.0f);
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/1M_Sphere.fbx"));
 	staticMeshComponent->AttachTo(m_MainComponent);
 		

@@ -335,6 +335,7 @@
     <ClInclude Include="src\actors\Drone.h" />
     <ClInclude Include="src\actors\DroneAIController.h" />
     <ClInclude Include="src\actors\DroneLaser.h" />
+    <ClInclude Include="src\actors\GameLevel.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Laser.h" />
     <ClInclude Include="src\actors\Missile.h" />

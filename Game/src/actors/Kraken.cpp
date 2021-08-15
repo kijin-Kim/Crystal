@@ -37,19 +37,21 @@ void Kraken::Initialize()
 
 
 	auto sphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-	sphereComponent->SetRadius(804 / 2.0f);
+	sphereComponent->SetRadius(804 / 2.0f * 3.0f);
 	sphereComponent->SetInverseMass(0.0f);
 
-	m_ImpulseBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("ImpulseBoxComponent");
-	m_ImpulseBoxComponent->SetExtents({ 500.0f, 500.0f, 1800.0f });
-	m_ImpulseBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	m_SmashAttackBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("SmashAttackBoxComponent");
+	m_SmashAttackBoxComponent->SetExtents({500.0f * 3.0f, 500.0f * 3.0f, 1800.0f * 3.0f});
+	m_SmashAttackBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	m_SmashAttackBoxComponent->IgnoreActorClassOf("Kraken");
 
 
 	m_SkeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
+	m_SkeletalMeshComponent->SetUnitScale(3.0f);
 	m_SkeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/KRAKEN.fbx"));
-	m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnAttack),
+	m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnSmashAttack),
 	                                                3.0f);
-	
+
 	m_SkeletalMeshComponent->AddMaterial(std::move(bodyMaterial));
 	m_SkeletalMeshComponent->AddMaterial(std::move(tentacleMaterial));
 	m_SkeletalMeshComponent->RotatePitch(-90.0f);
@@ -58,8 +60,7 @@ void Kraken::Initialize()
 	m_MainComponent = sphereComponent;
 
 	m_SkeletalMeshComponent->AttachTo(m_MainComponent);
-	m_ImpulseBoxComponent->AttachTo(m_MainComponent);
-	
+	m_SmashAttackBoxComponent->AttachTo(m_MainComponent);
 
 
 	auto barBgMat = Crystal::CreateShared<Crystal::Material>();
@@ -112,9 +113,9 @@ void Kraken::Update(float deltaTime)
 
 			if (playerPawn)
 			{
-				if(m_CurrentPhase == 3)
+				if (m_CurrentPhase == 3)
 				{
-					if(playerPawn->GetIsNotInPolluteSphere())
+					if (playerPawn->GetIsNotInPolluteSphere())
 					{
 						m_PolluteDamageTimer.Tick();
 						if (m_PolluteDamageTimer.GetElapsedTime() >= m_PolluteDamageInterval)
@@ -123,7 +124,10 @@ void Kraken::Update(float deltaTime)
 							playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
 						}
 					}
-
+					else
+					{
+						m_PolluteDamageTimer.Reset();
+					}
 				}
 				else
 				{
@@ -134,8 +138,6 @@ void Kraken::Update(float deltaTime)
 						playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
 					}
 				}
-
-				
 			}
 		}
 	}
@@ -173,7 +175,7 @@ void Kraken::Update(float deltaTime)
 	}
 
 
-	if(m_bShouldShowHealthBar)
+	if (m_bShouldShowHealthBar)
 	{
 		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
 		if (level)
@@ -186,16 +188,14 @@ void Kraken::Update(float deltaTime)
 			{
 				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
 				position2D.y += 100.0f;
-				m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
 				m_HealthBarFillComponent->SetWorldPosition({
 					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
-					});
+				});
 			}
-
 		}
-
 	}
-	
+
 
 	if (m_bShouldShowHealthBar)
 	{
@@ -204,6 +204,17 @@ void Kraken::Update(float deltaTime)
 		{
 			m_HealthBarShowTimer.Reset();
 			SetShowHealthBar(false);
+		}
+	}
+
+	if (m_bIsOnSmashAttack)
+	{
+		m_SmashAttackTimer.Tick();
+		if (m_SmashAttackTimer.GetElapsedTime() >= m_SmashAttackTime)
+		{
+			m_SmashAttackTimer.Reset();
+			m_bIsOnSmashAttack = false;
+			AddImpulseOnSmash();
 		}
 	}
 }
@@ -225,27 +236,59 @@ void Kraken::UpdateHealth()
 	}
 }
 
-void Kraken::OnAttack()
+void Kraken::OnSmashAttack()
 {
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 	m_SkeletalMeshComponent->PlayAnimationWithEndEvent(resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx"), false,
 	                                                   CS_ANIMATION_FN(Kraken::OnIdle));
 
+	m_bIsOnSmashAttack = true;
+	m_SmashAttackTimer.Reset();
 }
 
 void Kraken::OnIdle()
 {
 	auto& resourceManager = Crystal::ResourceManager::Instance();
-	m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnAttack),
+	m_SkeletalMeshComponent->PlayAnimationWithEvent(resourceManager.GetAnimation("assets/models/KRAKEN_idle.fbx"), true, CS_ANIMATION_FN(Kraken::OnSmashAttack),
 	                                                3.0f);
 }
 
-void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void Kraken::AddImpulseOnSmash()
 {
-	if (damageCauser.lock()->StaticType() != "MyPlayerPawn")
+	auto& overalppeds = m_SmashAttackBoxComponent->GetOverlappedComponents();
+	for (auto& weak : overalppeds)
+	{
+		auto& overlapped = weak.lock();
+		if (overlapped)
+		{
+			auto overlappedActor = Crystal::Cast<Actor>(overlapped->GetOuter());
+			if (overlappedActor)
+			{
+				if (overlappedActor->StaticType() == "MyPlayerPawn")
+				{
+					auto overlappedPosition = overlapped->GetWorldPosition();
+					auto direction = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(overlappedPosition, GetPosition()));
+					overlapped->AddImpulse(Crystal::Vector3::Multiply(direction, 3500.0f * 2.0f));
+					overlappedActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
+				}
+			}
+		}
+	}
+}
+
+void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
+{
+	auto damageCauser = causer.lock();
+	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}
+	if(m_CurrentPhase == 3 && Crystal::Cast<MyPlayerPawn>(damageCauser)->GetIsNotInPolluteSphere())
+	{
+		return;
+	}
+
+
 
 	m_CurrentHealth -= damage;
 	UpdateHealth();
@@ -258,6 +301,18 @@ void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 			SetPhase(3);
 		}
 	}
+
+	static bool bDeathAnimationPlaying = false;
+	if(!bDeathAnimationPlaying)
+	{
+		if (m_CurrentHealth <= 0.0f)
+		{
+			bDeathAnimationPlaying = true;
+			m_SkeletalMeshComponent->PlayAnimationWithEndEvent(Crystal::ResourceManager::Instance().GetAnimation("assets/models/KRAKEN_death.fbx"), false,
+				CS_ANIMATION_FN(Kraken::Destroy));
+		}
+	}
+	
 }
 
 void Kraken::SetPhase(uint32_t phase)
@@ -281,6 +336,7 @@ void Kraken::SetPhase(uint32_t phase)
 		break;
 	case 3:
 		{
+			m_PolluteDamageTimer.Reset();
 			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
 			if (level)
 			{
@@ -316,17 +372,30 @@ void Kraken::SetPolluteGauge(float polluteGauge)
 
 	if (m_CurrentPolluteGauge >= m_MaxPolluteGauge)
 	{
-		GreenTintVolumeActor->SetIsEnabled(true);
-		GreenTintVolumeActor->SetHiddenInGame(false);
-		VignetteVolumeActor->SetIsEnabled(true);
-		VignetteVolumeActor->SetHiddenInGame(false);
+		if (GreenTintVolumeActor)
+		{
+			GreenTintVolumeActor->SetIsEnabled(true);
+			GreenTintVolumeActor->SetHiddenInGame(false);
+		}
+
+		if (VignetteVolumeActor)
+		{
+			VignetteVolumeActor->SetIsEnabled(true);
+			VignetteVolumeActor->SetHiddenInGame(false);
+		}
 	}
 	else
 	{
-		GreenTintVolumeActor->SetIsEnabled(false);
-		GreenTintVolumeActor->SetHiddenInGame(true);
-		VignetteVolumeActor->SetIsEnabled(false);
-		VignetteVolumeActor->SetHiddenInGame(true);
+		if (GreenTintVolumeActor)
+		{
+			GreenTintVolumeActor->SetIsEnabled(false);
+			GreenTintVolumeActor->SetHiddenInGame(true);
+		}
+		if (VignetteVolumeActor)
+		{
+			VignetteVolumeActor->SetIsEnabled(false);
+			VignetteVolumeActor->SetHiddenInGame(true);
+		}
 	}
 }
 

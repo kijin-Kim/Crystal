@@ -23,8 +23,10 @@ public:
 
 	void UpdateHealth();
 
-	void OnAttack();
+	void OnSmashAttack();
 	void OnIdle();
+
+	void AddImpulseOnSmash();
 
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
@@ -42,7 +44,7 @@ public:
 
 private:
 	Crystal::Shared<Crystal::SkeletalMeshComponent> m_SkeletalMeshComponent = nullptr;
-	Crystal::Shared<Crystal::BoundingOrientedBoxComponent> m_ImpulseBoxComponent = nullptr;
+	Crystal::Shared<Crystal::BoundingOrientedBoxComponent> m_SmashAttackBoxComponent = nullptr;
 	Crystal::Timer m_SpaceWhaleSpawnTimer = {};
 	float m_SpaceWhaleSpawnInterval = 5.0f;
 	float m_CurrentHealth;
@@ -51,7 +53,7 @@ private:
 	uint32_t m_CurrentPhase = 1;
 
 	uint32_t m_CurrentWhaleSpawnCount = 0;
-	uint32_t m_MaxWhaleSpawnCount = 10;
+	uint32_t m_MaxWhaleSpawnCount = 0;
 
 
 	float m_CurrentPolluteGauge = 0.0f;
@@ -70,6 +72,13 @@ private:
 	Crystal::Timer m_HealthBarShowTimer = {};
 	const float m_HealthBarShowTime = 3.0f;
 	bool m_bShouldShowHealthBar = false;
+
+	bool m_bIsOnSmashAttack = false;
+	Crystal::Timer m_SmashAttackTimer = {};
+	const float m_SmashAttackTime = 0.8f;
+
+	float m_Power = 10.0f;
+
 
 public:
 	Crystal::Shared<Crystal::PostProcessVolumeActor> GreenTintVolumeActor;

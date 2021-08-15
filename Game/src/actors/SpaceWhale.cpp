@@ -22,7 +22,7 @@ void SpaceWhale::Initialize()
 	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({4.9f / 2.0f * 100.0f, 2.8f / 2.0f * 100.0f, 11.0f / 2.0f * 100.0f});
+	boundingOrientedBoxComponent->SetExtents({4.9f / 2.0f * 100.0f * 3.0f, 2.8f / 2.0f * 100.0f * 3.0f, 11.0f / 2.0f * 100.0f * 3.0f});
 	boundingOrientedBoxComponent->SetMass(80000.0f);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("SpaceWhale");
 	boundingOrientedBoxComponent->IgnoreActorClassOf("Kraken");
@@ -58,7 +58,7 @@ void SpaceWhale::Initialize()
 	skeletalMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::SkeletalMesh>("assets/models/Biomechanical Whale Animated.fbx"));
 	skeletalMeshComponent->PlayAnimation(resourceManager.GetAnimation("assets/models/Biomechanical Whale Animated.fbx"), true);
 	skeletalMeshComponent->AddMaterial(material);
-	skeletalMeshComponent->SetUnitScale(100.0f);
+	skeletalMeshComponent->SetUnitScale(100.0f * 3.0f);
 	skeletalMeshComponent->RotateYaw(180.0f);
 
 	m_MainComponent = boundingOrientedBoxComponent;

@@ -74,7 +74,7 @@ float4 psMain(PS_INPUT input) : SV_Target
     float opacity = 0.0f;
     if(!input.bUseAlbedoTextureAlpha)
     {
-        float opacity = input.bToggleOpacityTexture ? OpacityTexture.Sample(DefaultSampler,  input.TexCoord).r : input.Opacity;
+        opacity = input.bToggleOpacityTexture ? OpacityTexture.Sample(DefaultSampler,  input.TexCoord).r : input.Opacity;
     }
     else
     {

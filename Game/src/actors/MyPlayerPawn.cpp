@@ -19,7 +19,7 @@ void MyPlayerPawn::Initialize()
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
-	boundingOrientedBoxComponent->SetMass(7000.0f);
+	boundingOrientedBoxComponent->SetMass(3000.0f);
 
 	m_MainComponent = boundingOrientedBoxComponent;
 
@@ -61,7 +61,10 @@ void MyPlayerPawn::Initialize()
 
 	auto springArmComponent = CreateComponent<Crystal::SpringArmComponent>("SpringArmComponent");
 	springArmComponent->SetOffsetPosition({0, 45.0f, -100.0f});
+	springArmComponent->SetSpringConstant(100.0f);
 	springArmComponent->AttachTo(m_MainComponent);
+	springArmComponent->SetDamping(0.6f);
+	
 
 
 	m_CameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
@@ -258,7 +261,7 @@ void MyPlayerPawn::OnFire()
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
-	const float maxDistance = 7000.0f;
+	const float maxDistance = 10000.0f;
 
 	static bool bUseLeftSocket = true;
 	

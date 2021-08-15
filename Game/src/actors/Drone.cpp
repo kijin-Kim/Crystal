@@ -15,7 +15,7 @@ void Drone::Initialize()
 	Crystal::Pawn::Initialize();
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({90.0f * 2.0f, 30.0f * 2.0f, 85.0f * 2.0f});
+	boundingOrientedBoxComponent->SetExtents({90.0f, 30.0f, 85.0f});
 	boundingOrientedBoxComponent->SetMass(10000.0f);
 	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("ShieldSphere");
@@ -50,7 +50,7 @@ void Drone::Initialize()
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_LightFrigate_GK3.fbx"));
 	staticMeshComponent->AddMaterial(material);
 	staticMeshComponent->AttachTo(m_MainComponent);
-	staticMeshComponent->SetUnitScale(8.0f);
+	staticMeshComponent->SetUnitScale(4.0f);
 
 	m_LeftFireSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftFireSocketComponent");
 	m_LeftFireSocketComponent->SetLocalPosition({-26.0f, 0.0f, 49.0f});
@@ -122,6 +122,7 @@ void Drone::Update(float deltaTime)
 			SetShowHealthBar(false);
 		}
 	}
+
 }
 
 void Drone::OnFire()

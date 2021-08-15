@@ -18,7 +18,7 @@ void PolluteSphere::Initialize()
 
 	auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
 	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
-	boundingSphereComponent->SetRadius(2300.0f);
+	boundingSphereComponent->SetRadius(2300.0f * 3.0f);
 	boundingSphereComponent->IgnoreActorClassOf("Kraken");
 	boundingSphereComponent->IgnoreActorClassOf("DroneLaser");
 	boundingSphereComponent->SetInverseMass(0.0f);
@@ -52,7 +52,7 @@ void PolluteSphere::Initialize()
 
 	m_StaticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	m_StaticMeshComponent->AddMaterial(material);
-	m_StaticMeshComponent->SetUnitScale(2300.0f);
+	m_StaticMeshComponent->SetUnitScale(2300.0f * 3.0f);
 	m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/1M_Sphere.fbx"));
 	m_StaticMeshComponent->AttachTo(m_MainComponent);
 

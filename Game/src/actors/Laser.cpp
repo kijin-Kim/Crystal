@@ -17,7 +17,7 @@ void Laser::Initialize()
 
 
 	auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
-	boundingSphereComponent->SetRadius(15.0f);
+	boundingSphereComponent->SetRadius(7.0f);
 	boundingSphereComponent->SetMass(1.0f);
 	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
 	boundingSphereComponent->IgnoreActorClassOf("MyPlayerPawn");
@@ -35,7 +35,7 @@ void Laser::Initialize()
 	auto meshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
 	meshComponent->AddMaterial(std::move(material));
 	meshComponent->AttachTo(m_MainComponent);
-	meshComponent->SetUnitScale(5.0f);
+	meshComponent->SetUnitScale(2.5f);
 	meshComponent->SetRenderable(Crystal::ResourceManager::Instance().GetRenderable<Crystal::StaticMesh>("assets/models/SM_Missile_A.fbx"));
 	meshComponent->SetCastShadow(false);
 
