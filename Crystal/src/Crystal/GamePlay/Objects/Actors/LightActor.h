@@ -18,8 +18,10 @@ namespace Crystal {
 
 		void Initialize() override
 		{
+			
 			m_LightComponent = CreateComponent<DirectionalLightComponent>("DirectionalLightComponent");
 			m_LightComponent->SetLocalPosition(Vector3::Zero);
+			m_MainComponent = m_LightComponent;
 		}
 
 
@@ -44,6 +46,7 @@ namespace Crystal {
 		{
 			m_LightComponent = CreateComponent<PointLightComponent>("PointLightComponent");
 			m_LightComponent->SetLocalPosition(Vector3::Zero);
+			m_MainComponent = m_LightComponent;
 		}
 
 

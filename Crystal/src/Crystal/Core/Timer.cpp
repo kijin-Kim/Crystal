@@ -38,6 +38,12 @@ namespace Crystal {
 
 	void Timer::Reset()
 	{
+		UINT64 countsPerSec = 0;
+		QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
+
+		m_SecondsPerCount = 1.0 / (double)countsPerSec;
+
+		m_CurrentTime = 0.0;
 		m_ElapsedTime = 0.0;
 		m_LastTime = 0.0;
 	}

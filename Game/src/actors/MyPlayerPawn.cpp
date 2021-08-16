@@ -91,6 +91,8 @@ void MyPlayerPawn::Begin()
 	UpdateHealth();
 }
 
+
+
 void MyPlayerPawn::Update(const float deltaTime)
 {
 	Pawn::Update(deltaTime);
@@ -168,8 +170,13 @@ void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
 	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseShieldItem));
 
-	inputComponent->BindAction("ShowDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleShowDebugCollision));
-	inputComponent->BindAction("ShowDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleShowDebugAI));
+	inputComponent->BindAction("ShowDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ShowDebugCollision));
+	inputComponent->BindAction("HideDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::HideDebugCollision));
+	inputComponent->BindAction("ShowDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ShowDebugAI));
+	inputComponent->BindAction("HideDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::HideDebugAI));
+
+
+	inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::OpenTitleLevel));
 }
 
 void MyPlayerPawn::RotateYaw(float value)
@@ -232,6 +239,12 @@ void MyPlayerPawn::FireMissile()
 	}
 }
 
+void MyPlayerPawn::OpenTitleLevel()
+{
+	auto world = Crystal::Cast<Crystal::World>(GetWorld());
+	world->OpenLevel("TitleLevel");
+}
+
 void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
 	auto actorCausedDamage = damageCauser.lock();
@@ -263,7 +276,7 @@ void MyPlayerPawn::OnFire()
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
 	const float maxDistance = 10000.0f;
 
-	static bool bUseLeftSocket = true;
+	
 	
 	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
 	if (level)
@@ -278,15 +291,15 @@ void MyPlayerPawn::OnFire()
 
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
-		if(bUseLeftSocket)
+		if(m_bUseLeftSocekt)
 		{
 			spawnParams.Position = m_LeftFireSocketComponent->GetWorldPosition();
-			bUseLeftSocket = false;
+			m_bUseLeftSocekt = false;
 		}
 		else
 		{
 			spawnParams.Position = m_RightFireSocketComponent->GetWorldPosition();
-			bUseLeftSocket = true;
+			m_bUseLeftSocekt = true;
 		}
 
 		DirectX::XMFLOAT3 endDirection = m_CameraComponent->GetWorldForwardVector();
@@ -295,7 +308,10 @@ void MyPlayerPawn::OnFire()
 		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();
-			if (hitActor)
+			auto hitComponent = hitResult.HitComponent.lock();
+			
+			
+			if (hitActor && hitComponent)
 			{
 				hitActor->OnTakeDamage(m_Power, Crystal::Cast<Actor>(weak_from_this()));
 			}
@@ -319,8 +335,6 @@ void MyPlayerPawn::OnFire()
 		
 		spawnParams.Rotation = rotation;
 		level->SpawnActor<Laser>(spawnParams);
-
-		//m_AIPerceptionSourceComponent->MakeNoiseAtLocation(m_MainComponent->GetWorldPosition(), 100.0f);
 	}
 }
 
@@ -359,6 +373,12 @@ void MyPlayerPawn::UpdateHealth()
 			hud->OnPlayerHealthUpdated(m_Health, m_MaxHealth);
 		}
 	}
+
+	if(m_Health <= 0.0f)
+	{
+		auto world = Crystal::Cast<Crystal::World>(GetWorld());
+		world->OpenLevel("GameOverLevel");
+	}
 }
 
 void MyPlayerPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
@@ -395,7 +415,7 @@ void MyPlayerPawn::UsePowerItem()
 
 	m_bHasItem[ItemType_Power] = false;
 	UpdateItemStatus(ItemType_Power, false);
-	m_Power += 2.0f;
+	m_Power *= 1.2f;
 }
 
 void MyPlayerPawn::UseHealItem()
@@ -439,7 +459,7 @@ void MyPlayerPawn::UseShieldItem()
 
 }
 
-void MyPlayerPawn::ToggleShowDebugCollision()
+void MyPlayerPawn::ShowDebugCollision()
 {
 	auto world = GetWorld().lock();
 	if (!world)
@@ -447,11 +467,21 @@ void MyPlayerPawn::ToggleShowDebugCollision()
 		return;
 	}
 
-	auto& worldConfig = world->GetWorldConfig();
-	world->SetShowDebugCollision(!worldConfig.bShowDebugCollision);
+	world->SetShowDebugCollision(true);
 }
 
-void MyPlayerPawn::ToggleShowDebugAI()
+void MyPlayerPawn::HideDebugCollision()
+{
+	auto world = GetWorld().lock();
+	if (!world)
+	{
+		return;
+	}
+
+	world->SetShowDebugCollision(false);
+}
+
+void MyPlayerPawn::ShowDebugAI()
 {
 	auto world = GetWorld().lock();
 	if (!world)
@@ -460,7 +490,19 @@ void MyPlayerPawn::ToggleShowDebugAI()
 	}
 
 	auto& worldConfig = world->GetWorldConfig();
-	world->SetShowDebugAI(!worldConfig.bShowDebugAI);
+	world->SetShowDebugAI(true);
+}
+
+void MyPlayerPawn::HideDebugAI()
+{
+	auto world = GetWorld().lock();
+	if (!world)
+	{
+		return;
+	}
+
+	auto& worldConfig = world->GetWorldConfig();
+	world->SetShowDebugAI(false);
 }
 
 void MyPlayerPawn::OnItemDestroyed(ItemType itemType)

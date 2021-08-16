@@ -18,6 +18,7 @@
 #include "actors/CustomBTTask.h"
 #include "actors/Drone.h"
 #include "actors/DroneAIController.h"
+#include "actors/EndLevels.h"
 #include "actors/GameLevel.h"
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
@@ -46,11 +47,11 @@ public:
 		Crystal::Application::Start();
 
 		m_World->CreateLevel<GameLevel>("GameLevel");
-		m_World->SetCurrentLevelByName("GameLevel");
-
-
+		m_World->CreateLevel<GameOverLevel>("GameOverLevel");
+		m_World->CreateLevel<GameClearLevel>("GameClearLevel");
+		
 		m_World->CreateLevel<TitleLevel>("TitleLevel");
-		m_World->SetCurrentLevelByName("TitleLevel");
+		m_World->OpenLevel("TitleLevel");
 
 
 	}

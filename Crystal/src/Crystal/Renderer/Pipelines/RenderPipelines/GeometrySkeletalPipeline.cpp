@@ -94,12 +94,11 @@ namespace Crystal {
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
 	}
 
-	void GeometrySkeletalPipeline::Begin()
+	void GeometrySkeletalPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
-		auto& scene = GetScene();
 
 		auto camera = scene->Cameras[0].lock();
 

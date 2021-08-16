@@ -13,13 +13,13 @@ void SpaceWhaleAIController::Initialize()
 {
 	Crystal::AIController::Initialize();
 
-	m_AIPerceptionComponent->SetIsHearingEnabled(true);
+	m_AIPerceptionComponent->SetIsHearingEnabled(false);
 	m_AIPerceptionComponent->SetHearingRange(4000.0f);
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
 	m_AIPerceptionComponent->SetSightRange(5000.0f);
-	m_AIPerceptionComponent->SetSightWidth(3000.0f);
-	m_AIPerceptionComponent->SetSightHeight(3000.0f);
+	m_AIPerceptionComponent->SetSightWidth(4000.0f);
+	m_AIPerceptionComponent->SetSightHeight(4000.0f);
 }
 
 void SpaceWhaleAIController::Begin()

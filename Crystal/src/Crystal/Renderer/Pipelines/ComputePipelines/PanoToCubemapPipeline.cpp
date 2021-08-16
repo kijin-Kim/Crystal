@@ -10,15 +10,11 @@
 namespace Crystal {
 
 
-	void PanoToCubemapPipeline::Begin()
+	void PanoToCubemapPipeline::Begin(const Shared<Scene>& scene)
 	{
-		ComputePipeline::Begin();
-
+		ComputePipeline::Begin(scene);
 
 		auto device = Device::Instance().GetD3DDevice();
-		auto& resourceManager = ResourceManager::Instance();
-
-		auto& scene = GetScene();
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

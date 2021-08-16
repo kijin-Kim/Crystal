@@ -19,6 +19,10 @@ namespace Crystal {
 		Object::Update(deltaTime);
 #if 1
 		auto scene = GetScene();
+		if(!scene)
+		{
+			return;
+		}
 
 		// -------------------------------------------------------------------------
 		// Sphere vs. Sphere
@@ -26,7 +30,7 @@ namespace Crystal {
 
 		if (!scene->BoundingSphereComponents.empty())
 		{
-			for (int i = 0; i < scene->BoundingSphereComponents.size() - 1; i++)
+			for (int i = 0; i < (int)scene->BoundingSphereComponents.size() - 1; i++)
 			{
 				auto collisionCompLhs = Cast<BoundingSphereComponent>(scene->BoundingSphereComponents[i]);
 
@@ -262,7 +266,7 @@ namespace Crystal {
 
 		if (!scene->BoundingOrientedBoxComponents.empty())
 		{
-			for (int i = 0; i < scene->BoundingOrientedBoxComponents.size() - 1; i++)
+			for (int i = 0; i < (int)scene->BoundingOrientedBoxComponents.size() - 1; i++)
 			{
 				auto collisionCompLhs = Cast<BoundingOrientedBoxComponent>(scene->BoundingOrientedBoxComponents[i]);
 
@@ -690,6 +694,9 @@ namespace Crystal {
 			if (!collisionCompLhs)
 				continue;
 
+			if (!collisionCompLhs->GetIsLineTracable())
+				continue;
+
 			auto ownerActor = Cast<Actor>(collisionCompLhs->GetOuter());
 			if (collisionParams.ShouldBeIgnored(ownerActor))
 			{
@@ -707,6 +714,7 @@ namespace Crystal {
 			{
 				nearest = dist;
 				outHitResult.HitActor = ownerActor;
+				outHitResult.HitComponent = collisionCompLhs;
 				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
 			}
 
@@ -716,17 +724,20 @@ namespace Crystal {
 
 		for (const auto& lhsWeak : scene->BoundingOrientedBoxComponents)
 		{
-			auto collisionComplhs = Cast<BoundingOrientedBoxComponent>(lhsWeak);
-			if (!collisionComplhs)
+			auto collisionCompLhs = Cast<BoundingOrientedBoxComponent>(lhsWeak);
+			if (!collisionCompLhs)
 				continue;
 
-			auto ownerActor = Cast<Actor>(collisionComplhs->GetOuter());
+			if (!collisionCompLhs->GetIsLineTracable())
+				continue;
+
+			auto ownerActor = Cast<Actor>(collisionCompLhs->GetOuter());
 			if (collisionParams.ShouldBeIgnored(ownerActor))
 			{
 				continue;
 			}
 
-			auto collisionLhs = collisionComplhs->GetWorldBoundingOrientedBox();
+			auto collisionLhs = collisionCompLhs->GetWorldBoundingOrientedBox();
 
 			DirectX::XMVECTOR originVector = DirectX::XMLoadFloat3(&origin);
 			DirectX::XMVECTOR directionVector = DirectX::XMLoadFloat3(&direction);
@@ -736,6 +747,7 @@ namespace Crystal {
 			{
 				nearest = dist;
 				outHitResult.HitActor = ownerActor;
+				outHitResult.HitComponent = collisionCompLhs;
 				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
 			}
 

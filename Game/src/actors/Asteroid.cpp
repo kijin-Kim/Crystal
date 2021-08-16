@@ -79,7 +79,7 @@ void Asteroid::Initialize()
 	}
 
 
-	auto randomScale = Crystal::RandomFloatInRange(5.0f, 10.0f);
+	auto randomScale = Crystal::RandomFloatInRange(6.0f, 10.0f);
 	m_MainComponent->RotateRoll(rand() % 360);
 	m_MainComponent->RotatePitch(rand() % 360);
 	m_MainComponent->RotateYaw(rand() % 360);
@@ -236,9 +236,16 @@ void DestructibleAsteroid::UpdateHealth()
 	m_HealthBarFillComponent->SetScaleX(m_HealthBarBgComponent->GetScale().x * healthPercent);
 }
 
-void DestructibleAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void DestructibleAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
-	if (damageCauser.lock()->StaticType() != "MyPlayerPawn")
+	auto damageCauser = causer.lock();
+	if (!damageCauser)
+	{
+		return;
+	}
+
+	
+	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}
@@ -271,7 +278,7 @@ void HealAsteroid::Initialize()
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_5.fbx"));
 
 
-	auto randomScale = rand() % 3 + 8;
+	auto randomScale = rand() % 6 + 5;
 
 	m_MainComponent->RotateRoll(rand() % 360);
 	m_MainComponent->RotatePitch(rand() % 360);
@@ -283,6 +290,7 @@ void HealAsteroid::Initialize()
 void HealAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 {
 	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
+
 
 	if (damageCauser.lock()->StaticType() == "MyPlayerPawn")
 	{
@@ -328,7 +336,7 @@ void PowerAsteroid::Initialize()
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_2.fbx"));
 
 
-	auto randomScale = rand() % 3 + 8;
+	auto randomScale = rand() % 6 + 5;
 
 	m_MainComponent->RotateRoll(rand() % 360);
 	m_MainComponent->RotatePitch(rand() % 360);
@@ -383,7 +391,7 @@ void ShieldAsteroid::Initialize()
 	staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/Asteroid_3.fbx"));
 
 
-	auto randomScale = rand() % 3 + 8;
+	auto randomScale = rand() % 6 + 5;
 
 	m_MainComponent->RotateRoll(rand() % 360);
 	m_MainComponent->RotatePitch(rand() % 360);

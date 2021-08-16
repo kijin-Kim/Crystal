@@ -6,11 +6,9 @@
 
 namespace Crystal {
 
-	void BrightColorExtractingPipeline::Begin()
+	void BrightColorExtractingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		ComputePipeline::Begin();
-
-		auto& scene = GetScene();
+		ComputePipeline::Begin(scene);
 
 		auto device = Device::Instance().GetD3DDevice();
 

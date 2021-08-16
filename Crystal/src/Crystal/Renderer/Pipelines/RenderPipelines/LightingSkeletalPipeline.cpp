@@ -11,14 +11,13 @@
 
 namespace Crystal {
 
-	void LightingSkeletalPipeline::Begin()
+	void LightingSkeletalPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData), sizeof(PerDrawData), 5);
 
-		auto& scene = GetScene();
 
 		auto camera = scene->Cameras[0].lock();
 

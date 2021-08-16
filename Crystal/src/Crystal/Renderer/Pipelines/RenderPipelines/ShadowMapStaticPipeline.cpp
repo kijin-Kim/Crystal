@@ -67,16 +67,15 @@ namespace Crystal {
 		
 	}
 
-	void ShadowMapStaticPipeline::Begin()
+	void ShadowMapStaticPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto& scene = GetScene();
 
 
 		for (int i = 0; i < scene->StaticMeshes.size(); i++) // PerObject

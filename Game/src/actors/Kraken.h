@@ -38,6 +38,8 @@ public:
 	float GetCurrentPolluteGauge() const { return m_CurrentPolluteGauge; }
 
 	void SetShowHealthBar(bool bShow);
+
+	void OpenGameClearLevel();
 	
 
 	STATIC_TYPE_IMPLE(Kraken)
@@ -46,14 +48,14 @@ private:
 	Crystal::Shared<Crystal::SkeletalMeshComponent> m_SkeletalMeshComponent = nullptr;
 	Crystal::Shared<Crystal::BoundingOrientedBoxComponent> m_SmashAttackBoxComponent = nullptr;
 	Crystal::Timer m_SpaceWhaleSpawnTimer = {};
-	float m_SpaceWhaleSpawnInterval = 5.0f;
+	float m_SpaceWhaleSpawnInterval = 10.0f;
 	float m_CurrentHealth;
 	float m_MaxHealth = 600.0f;
 
 	uint32_t m_CurrentPhase = 1;
 
 	uint32_t m_CurrentWhaleSpawnCount = 0;
-	uint32_t m_MaxWhaleSpawnCount = 0;
+	uint32_t m_MaxWhaleSpawnCount = 10;
 
 
 	float m_CurrentPolluteGauge = 0.0f;
@@ -80,6 +82,7 @@ private:
 	float m_Power = 10.0f;
 
 
+	bool m_bDeathAnimationIsPlaying = false;
 public:
 	Crystal::Shared<Crystal::PostProcessVolumeActor> GreenTintVolumeActor;
 	Crystal::Shared<Crystal::PostProcessVolumeActor> VignetteVolumeActor;

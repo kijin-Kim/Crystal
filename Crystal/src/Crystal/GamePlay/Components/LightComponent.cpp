@@ -53,7 +53,15 @@ namespace Crystal {
 			}
 			
 			auto controller = level->GetPlayerController(0).lock();
+			if(!controller)
+			{
+				return;
+			}
 			auto player = controller->GetPossessedPawn().lock();
+			if(!player)
+			{
+				return;
+			}
 			
 			
 			auto shadowCameraPosition = Vector3::Add(player->GetPosition(), Vector3::Multiply(GetLocalForwardVector(), -10000.0f));
@@ -63,7 +71,7 @@ namespace Crystal {
 			float nearPlane = 1000.0f;
 			float farPlane = 100000.0f;
 
-			auto proj = Matrix4x4::OrthoGraphic(2048.0f * 5.0f, 2048.0f * 5.0f, nearPlane, farPlane);
+			auto proj = Matrix4x4::OrthoGraphic(2048.0f * 1.0f, 2048.0f * 1.0f, nearPlane, farPlane);
 
 			m_LightViewProjection = Matrix4x4::Multiply(view, proj);
 		}

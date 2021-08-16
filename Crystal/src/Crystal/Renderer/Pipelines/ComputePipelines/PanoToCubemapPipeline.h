@@ -10,7 +10,7 @@ namespace Crystal {
 		PanoToCubemapPipeline() = default;
 		~PanoToCubemapPipeline() override {}
 
-		void Begin() override;
+		void Begin(const Shared<Scene>& scene) override;
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;
 
 		STATIC_TYPE_IMPLE(PanoToCubemapPipeline)

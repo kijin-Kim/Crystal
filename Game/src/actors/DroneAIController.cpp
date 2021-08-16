@@ -9,11 +9,11 @@ void DroneAIController::Initialize()
 {
 	Crystal::AIController::Initialize();
 
-	m_AIPerceptionComponent->SetIsHearingEnabled(true);
+	m_AIPerceptionComponent->SetIsHearingEnabled(false);
 	m_AIPerceptionComponent->SetHearingRange(4000.0f);
 
 	m_AIPerceptionComponent->SetIsSightEnabled(true);
-	m_AIPerceptionComponent->SetSightRange(2500.0f);
+	m_AIPerceptionComponent->SetSightRange(3000.0f);
 	m_AIPerceptionComponent->SetSightWidth(1500.0f* 2.0f);
 	m_AIPerceptionComponent->SetSightHeight(900.0f * 2.5f);
 	m_AIPerceptionComponent->IgnoreVisibilityActorClassOf("DroneLaser");
@@ -74,7 +74,7 @@ void DroneAIController::Begin()
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "LastSeenLocation";
-		moveToLocationNode->AcceptableRadius = 60.0f;
+		moveToLocationNode->AcceptableRadius = 60.0f * 4.0f;
 		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
@@ -102,7 +102,7 @@ void DroneAIController::Begin()
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "RandomPositionFromCenter";
-		moveToLocationNode->AcceptableRadius = 60.0f;
+		moveToLocationNode->AcceptableRadius = 60.0f * 4.0f;
 		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 
@@ -130,7 +130,7 @@ void DroneAIController::Begin()
 
 		auto moveToLocationNode = Crystal::CreateObject<Crystal::BTTaskNodeMoveToLocation>("TaskMoveToLocation");
 		moveToLocationNode->TargetLocationKey = "RandomPositionInSphere";
-		moveToLocationNode->AcceptableRadius = 60.0f;
+		moveToLocationNode->AcceptableRadius = 60.0f * 4.0f;
 		moveToLocationNode->MaxAcceleration = maxAcceleration;
 		sequenceNode->AddChildNode(moveToLocationNode);
 

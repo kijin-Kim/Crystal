@@ -10,13 +10,21 @@ public:
 
 	void Initialize() override
 	{
-		Pawn::Initialize();
-
 		auto cameraComponent = CreateComponent<Crystal::CameraComponent>("CameraComponent");
-		cameraComponent->SetProjectionMode(Crystal::ECameraProjectionMode::CPM_Orthographic);
+		cameraComponent->SetFieldOfView(85.0f);
 		cameraComponent->SetNearPlane(20.0f);
 		cameraComponent->SetViewport({ 0.0f, 0.0f, 1920.0f, 1080.0f, 0.0f, 1.0f });
 		cameraComponent->SetFarPlane(100000.0f);
+
+
+		auto titleImage = Crystal::CreateShared<Crystal::Material>();
+		titleImage->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/titleImage.png");
+		titleImage->bUseAlbedoTextureAlpha = true;
+
+		auto titleImageComponent = CreateComponent<Crystal::TextureComponent>("TitleImageComponent");
+		titleImageComponent->SetUnitScale(0.5f);
+		titleImageComponent->AddMaterial(titleImage);
+		titleImageComponent->SetHiddenInGame(false);
 
 		m_MainComponent = cameraComponent;
 	}
@@ -27,14 +35,16 @@ public:
 	{
 		Pawn::SetupInputComponent(inputComponent);
 
-		inputComponent->BindAction("OpenGameLevel", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TitleLevelPawn::OpenGameLevel));
+		inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TitleLevelPawn::OpenGameLevel));
 	}
 	
 	void OpenGameLevel()
 	{
 		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->SetCurrentLevelByName("GameLevel");
+		world->OpenLevel("GameLevel");
 	}
+
+	STATIC_TYPE_IMPLE(TitleLevelPawn)
 	
 
 };

@@ -10,15 +10,12 @@
 
 namespace Crystal {
 
-	void AdditiveBlendingPipeline::Begin()
+	void AdditiveBlendingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		ComputePipeline::Begin();
+		ComputePipeline::Begin(scene);
 
 
 		auto device = Device::Instance().GetD3DDevice();
-		
-
-		auto& scene = GetScene();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		device->CopyDescriptorsSimple(1, handle, scene->BrightColorBuffer->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),

@@ -93,7 +93,7 @@ namespace Crystal {
 		/*유저 인터페이스 인풋*/
 		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
 		/*게임모드 인풋*/
-		std::unique_ptr<InputComponent> m_GameInputComponent;
+		std::unique_ptr<InputComponent> m_GameInputComponent = nullptr;
 		/* KeyCode, AxisName, Scale */
 		std::map<int64_t, std::pair<std::string, float>> m_AxisMap;
 		/* KeyCode, ActionName */

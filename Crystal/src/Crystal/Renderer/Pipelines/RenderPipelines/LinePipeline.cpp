@@ -69,20 +69,18 @@ namespace Crystal {
 		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
 	}
 
-	void LinePipeline::Begin()
+	void LinePipeline::Begin(const Shared<Scene>& scene)
 	{
 		auto& worldConfig = GetWorldConfig();
-		if(!worldConfig.bShowDebugAI || !worldConfig.bShowDebugCollision)
+		if(!worldConfig.bShowDebugAI && !worldConfig.bShowDebugCollision)
 		{
 			return;
 		}
 		
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerInstanceData));
 
-
-		auto& scene = GetScene();
 
 
 		if(worldConfig.bShowDebugCollision)

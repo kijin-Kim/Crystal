@@ -16,10 +16,34 @@
 namespace Crystal {
 
 
+	void Level::OnLevelClosed()
+	{
+		m_Scene->Reset();
+		for (const auto& actor : m_Actors)
+		{
+			actor->Destroy();
+		}
+
+		m_bHasDeadActors = true;
+		RemovePendingActors();
+
+		m_PlayerControllers.clear();
+		m_Player = nullptr;
+		m_HUD = nullptr;
+	}
+
 	void Level::Initialize()
 	{
 		Object::Initialize();
 		m_Scene = CreateShared<Scene>();
+	}
+
+	void Level::Begin()
+	{
+		Object::Begin();
+
+		auto world = Crystal::Cast<Crystal::World>(GetWorld());
+		world->GetRenderSystem()->LoadCubemapTextures(m_Scene);
 	}
 
 	void Level::Update(const float deltaTime)
@@ -220,9 +244,6 @@ namespace Crystal {
 
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-#ifdef CS_NM_STANDALONE
-
-
 		bool bHandled = false;
 		for (const auto& playerController : m_PlayerControllers)
 		{
@@ -231,14 +252,6 @@ namespace Crystal {
 
 
 		return bHandled;
-#endif
-
-#ifdef CS_NM_CLIENT // 멀티 플레이어 클라이언트
-		return false;
-
-#endif
-
-		return false;
 	}
 
 	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,

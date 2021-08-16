@@ -170,6 +170,11 @@ void Drone::OnFire()
 void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
 	auto damageCauser = causer.lock();
+	if (!damageCauser)
+	{
+		return;
+	}
+
 	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;

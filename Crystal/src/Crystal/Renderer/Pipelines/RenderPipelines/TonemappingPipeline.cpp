@@ -50,17 +50,14 @@ namespace Crystal {
 
 	}
 
-	void TonemappingPipeline::Begin()
+	void TonemappingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		auto device = Device::Instance().GetD3DDevice();
 
 		auto heapHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-
-		auto& scene = GetScene();
 
 
 		device->CopyDescriptorsSimple(1, heapHandle,

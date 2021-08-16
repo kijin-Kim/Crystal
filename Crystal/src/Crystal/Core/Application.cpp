@@ -87,12 +87,9 @@ namespace Crystal {
 			{
 				m_bShouldRun = false;
 				DestroyWindow(hWnd);
+				return true;
 			}
-			if (wParam == VK_F11)
-			{
-				//Renderer::Instance().ActiveFullScreenMode(!Renderer::Instance().GetIsFullScreenMode());
-			}
-			return true;
+			
 		}
 
 		/*IMGUI가 처리하지 않는 일부 데이터만 Application이 처리합니다.*/

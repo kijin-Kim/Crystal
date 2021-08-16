@@ -25,7 +25,6 @@ namespace Crystal {
 
 	void PostProcessVolumeActor::OnBeginOverlap(const OverlapResult& overlapResult)
 	{
-		CS_DEBUG_INFO("Begin Overlap");
 
 		m_bIsFirstTimeCheckOverlap = false;
 		m_bIsOverlapped = true;
@@ -49,8 +48,6 @@ namespace Crystal {
 	
 	void PostProcessVolumeActor::OnEndOverlap(const OverlapResult& overlapResult)
 	{
-		CS_DEBUG_INFO("End Overlap");
-
 		m_bIsFirstTimeCheckOverlap = false;
 		m_bIsOverlapped = false;
 

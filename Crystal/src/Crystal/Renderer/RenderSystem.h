@@ -26,7 +26,7 @@ namespace Crystal {
 		void OnCreate() override;
 		void Begin() override;
 
-		
+		void LoadCubemapTextures(const Shared<Scene>& scene);
 
 		
 		void Update(const float deltaTime) override;
@@ -39,7 +39,6 @@ namespace Crystal {
 		void CreateSwapChain();
 		void CreateDepthStencilView();
 		
-		
 
 		const WorldConfig& GetWorldConfig() const;
 
@@ -47,6 +46,8 @@ namespace Crystal {
 
 		Shared<Scene> GetScene();
 		Shared<Level> GetLevel();
+
+		void ToggleDisplayMode() { m_bIsFullScreen = !m_bIsFullScreen; }
 	
 
 		template <class T>
@@ -67,7 +68,8 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(RenderSystem)
 	private:
-		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
+		Microsoft::WRL::ComPtr<IDXGISwapChain1>
+		m_SwapChain = nullptr;
 
 
 		std::vector<Unique<Pipeline>> m_Pipelines;

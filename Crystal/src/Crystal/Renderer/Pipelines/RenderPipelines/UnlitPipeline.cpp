@@ -97,10 +97,8 @@ namespace Crystal {
 		m_PerDrawCallConstantBuffer->CreateConstantBufferView();
 	}
 
-	void UnlitPipeline::Begin()
+	void UnlitPipeline::Begin(const Shared<Scene>& scene)
 	{
-		auto& scene = GetScene();
-
 		PerFrameData perFrameData = {};
 
 		auto& mainCamera = scene->Cameras[0].lock();

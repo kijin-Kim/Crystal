@@ -83,12 +83,26 @@ namespace Crystal {
 		toggleShowDebugAIActionMapping.bShiftDown = false;
 		AddActionMapping("ShowDebugAI", toggleShowDebugAIActionMapping);
 
-		Crystal::ActionMapping openGameLevelActionMapping = {};
-		openGameLevelActionMapping.CrystalCode = Crystal::Keyboard::Enter;
-		openGameLevelActionMapping.bAltDown = false;
-		openGameLevelActionMapping.bCtrlDown = false;
-		openGameLevelActionMapping.bShiftDown = false;
-		AddActionMapping("OpenGameLevel", openGameLevelActionMapping);
+		Crystal::ActionMapping toggleHideDebugCollisionActionMapping = {};
+		toggleHideDebugCollisionActionMapping.CrystalCode = Crystal::Keyboard::O;
+		toggleHideDebugCollisionActionMapping.bAltDown = false;
+		toggleHideDebugCollisionActionMapping.bCtrlDown = false;
+		toggleHideDebugCollisionActionMapping.bShiftDown = false;
+		AddActionMapping("HideDebugCollision", toggleHideDebugCollisionActionMapping);
+
+		Crystal::ActionMapping toggleHideDebugAIActionMapping = {};
+		toggleHideDebugAIActionMapping.CrystalCode = Crystal::Keyboard::P;
+		toggleHideDebugAIActionMapping.bAltDown = false;
+		toggleHideDebugAIActionMapping.bCtrlDown = false;
+		toggleHideDebugAIActionMapping.bShiftDown = false;
+		AddActionMapping("HideDebugAI", toggleHideDebugAIActionMapping);
+
+		Crystal::ActionMapping openNewLevelActionMapping = {};
+		openNewLevelActionMapping.CrystalCode = Crystal::Keyboard::Enter;
+		openNewLevelActionMapping.bAltDown = false;
+		openNewLevelActionMapping.bCtrlDown = false;
+		openNewLevelActionMapping.bShiftDown = false;
+		AddActionMapping("OpenNewLevel", openNewLevelActionMapping);
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)

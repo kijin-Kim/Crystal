@@ -39,6 +39,7 @@ namespace Crystal {
 		const Shared<T>& CreateLevel(const std::string& name = "")
 		{
 			auto level = CreateObject<T>(name, weak_from_this());
+			level->Begin();
 			m_Levels.push_back(level);
 			return Cast<T>(m_Levels.back());
 		}
@@ -47,8 +48,8 @@ namespace Crystal {
 		const Shared<Level>& GetLevelByIndex(int index);
 		const Shared<Level>& GetCurrentLevel() const;
 
-		void SetCurrentLevelByName(const std::string& name);
-		void SetCurrentLevelByIndex(int iIndex);
+		void OpenLevel(const std::string& name);
+		void CloseLevel(const std::string& name);
 
 		const WorldConfig& GetWorldConfig() const { return m_WorldConfig; }
 		void SetShowDebugCollision(bool show) { m_WorldConfig.bShowDebugCollision = show; }
@@ -59,6 +60,7 @@ namespace Crystal {
 
 		const Shared<RenderSystem>& GetRenderSystem() const { return m_RenderSystem; }
 		const Shared<PhysicsSystem>& GetPhysicsSystem() const { return m_PhysicsSystem; }
+		const std::vector<std::shared_ptr<Level>>& GetLevels() const { return m_Levels; }
 
 		STATIC_TYPE_IMPLE(World)
 
@@ -69,6 +71,12 @@ namespace Crystal {
 
 		Shared<RenderSystem> m_RenderSystem = nullptr;
 		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
+
+		struct OpenLevelCommand
+		{
+			std::string LevelName;
+		};
+		std::vector<OpenLevelCommand> m_OpenLevelCommands;
 	};
 
 	template <class T>

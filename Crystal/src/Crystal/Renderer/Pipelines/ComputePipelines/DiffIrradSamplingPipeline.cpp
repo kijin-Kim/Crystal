@@ -9,9 +9,9 @@
 
 namespace Crystal {
 
-	void DiffIrradSamplingPipeline::Begin()
+	void DiffIrradSamplingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		ComputePipeline::Begin();
+		ComputePipeline::Begin(scene);
 
 
 		auto device = Device::Instance().GetD3DDevice();
@@ -43,8 +43,6 @@ namespace Crystal {
 		//	}
 		//}
 
-
-		auto& scene = GetScene();
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

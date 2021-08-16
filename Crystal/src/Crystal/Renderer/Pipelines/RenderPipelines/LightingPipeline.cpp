@@ -51,14 +51,13 @@ namespace Crystal {
 		
 	}
 
-	void LightingPipeline::Begin()
+	void LightingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto& scene = GetScene();
 		if (scene->Lights.empty())
 		{
 			return;

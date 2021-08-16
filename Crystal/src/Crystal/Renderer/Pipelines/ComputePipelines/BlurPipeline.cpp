@@ -10,15 +10,13 @@
 namespace Crystal {
 
 
-	void BlurPipeline::Begin()
+	void BlurPipeline::Begin(const Shared<Scene>& scene)
 	{
-		ComputePipeline::Begin();
+		ComputePipeline::Begin(scene);
 
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
-
-		auto& scene = GetScene();
 
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();

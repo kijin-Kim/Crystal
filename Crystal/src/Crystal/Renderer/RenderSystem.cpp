@@ -320,15 +320,14 @@ namespace Crystal {
 	{
 		CreateRenderTargets();
 		CreateDepthStencilView();
+	}
 
-
-		auto& scene = GetScene();
+	void RenderSystem::LoadCubemapTextures(const Shared<Scene>& scene)
+	{
 		scene->IrradianceTexture = CreateShared<Texture>(32, 32, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                 D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 		/// COMPUTE
 
 		if (!scene->CubemapColorTexture)
@@ -352,7 +351,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		m_Pipelines[2]->Begin();
+		m_Pipelines[2]->Begin(scene);
 		m_Pipelines[2]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -368,7 +367,7 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 
-		m_Pipelines[3]->Begin();
+		m_Pipelines[3]->Begin(scene);
 		m_Pipelines[3]->Record(commandList);
 
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
@@ -482,10 +481,10 @@ namespace Crystal {
 			clearStencilValue, 0, nullptr);
 
 
-		m_LightPipelines[0]->Begin();
+		m_LightPipelines[0]->Begin(scene);
 		m_LightPipelines[0]->Record(commandList);
 
-		m_LightPipelines[1]->Begin();
+		m_LightPipelines[1]->Begin(scene);
 		m_LightPipelines[1]->Record(commandList);
 
 		// TODO : CPU 복사로 인한 퍼포먼스 이슈
@@ -502,10 +501,10 @@ namespace Crystal {
 		commandList->RSSetScissorRects(1, &rect);
 
 
-		m_Pipelines[8]->Begin();
+		m_Pipelines[8]->Begin(scene);
 		m_Pipelines[8]->Record(commandList);
 
-		m_Pipelines[9]->Begin();
+		m_Pipelines[9]->Begin(scene);
 		m_Pipelines[9]->Record(commandList);
 
 		commandList->RSSetViewports(1, &mainCamera->GetViewport());
@@ -520,31 +519,31 @@ namespace Crystal {
 			                                D3D12_DSV_DIMENSION_TEXTURE2D));
 
 
-		m_LightPipelines[2]->Begin();
+		m_LightPipelines[2]->Begin(scene);
 		m_LightPipelines[2]->Record(commandList);
 
 
-		m_Pipelines[11]->Begin();
+		m_Pipelines[11]->Begin(scene);
 		m_Pipelines[11]->Record(commandList);
 
 
 		if(scene->CubemapColorTexture)
 		{
-			m_Pipelines[1]->Begin();
+			m_Pipelines[1]->Begin(scene);
 			m_Pipelines[1]->Record(commandList);
 		}
 		
 
 
 
-		m_Pipelines[7]->Begin();
+		m_Pipelines[7]->Begin(scene);
 		m_Pipelines[7]->Record(commandList);
 
-		m_Pipelines[12]->Begin();
+		m_Pipelines[12]->Begin(scene);
 		m_Pipelines[12]->Record(commandList);
 
 
-		m_Pipelines[13]->Begin();
+		m_Pipelines[13]->Begin(scene);
 		m_Pipelines[13]->Record(commandList);
 
 
@@ -555,7 +554,7 @@ namespace Crystal {
 		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
-		m_Pipelines[4]->Begin();
+		m_Pipelines[4]->Begin(scene);
 		m_Pipelines[4]->Record(commandList);
 
 		resourceBarrier.Transition.pResource = scene->BrightColorBuffer->GetResource();
@@ -572,11 +571,11 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 
-		m_Pipelines[5]->Begin();
+		m_Pipelines[5]->Begin(scene);
 		m_Pipelines[5]->Record(commandList);
 
 
-		m_Pipelines[14]->Begin();
+		m_Pipelines[14]->Begin(scene);
 		m_Pipelines[14]->Record(commandList);
 
 		resourceBarrier.Transition.pResource = scene->FloatingPointBuffer->GetResource();
@@ -599,15 +598,15 @@ namespace Crystal {
 			1, &scene->ColorBufferTextures[m_RtvIndex]->GetRenderTargetView(D3D12_RTV_DIMENSION_TEXTURE2D), false,
 			&scene->DepthStencilBufferTexture->GetDepthStencilView(D3D12_DSV_DIMENSION_TEXTURE2D));
 
-		m_Pipelines[6]->Begin();
+		m_Pipelines[6]->Begin(scene);
 		m_Pipelines[6]->Record(commandList);
 
-		m_Pipelines[10]->Begin();
+		m_Pipelines[10]->Begin(scene);
 		m_Pipelines[10]->Record(commandList);
 
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
-		m_Pipelines[0]->Begin();
+		m_Pipelines[0]->Begin(scene);
 		m_Pipelines[0]->Record(commandList);
 
 
@@ -767,6 +766,8 @@ namespace Crystal {
 
 	void RenderSystem::ChangeDisplayMode()
 	{
+		
+
 		BOOL bIsFullScreen = false;
 		m_SwapChain->GetFullscreenState(&bIsFullScreen, nullptr);
 		if (m_bIsFullScreen == static_cast<bool>(bIsFullScreen))
@@ -775,6 +776,19 @@ namespace Crystal {
 
 		CS_INFO("디스플레이 모드를 변환중...");
 
+		auto world = GetWorld();
+		auto& levels = world->GetLevels();
+
+		for(auto& level : levels)
+		{
+			auto& scene = level->GetScene();
+			for (int i = 0; i < 2; i++)
+			{
+				scene->ColorBufferTextures[i].reset();
+			}
+		}
+
+		
 
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
 		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
@@ -785,46 +799,23 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
-		auto& scene = GetScene();
+		
 
-		for (int i = 0; i < 2; i++)
+		
+
+		for (auto& level : levels)
 		{
-			Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
-			m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
-
-
-			scene->ColorBufferTextures[i] = CreateShared<Texture>(rtvBuffer.Get(),
-			                                                      D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			auto& scene = level->GetScene();
+			for (int i = 0; i < 2; i++)
+			{
+				Microsoft::WRL::ComPtr<ID3D12Resource> rtvBuffer = nullptr;
+				m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&rtvBuffer));
+				scene->ColorBufferTextures[i] = CreateShared<Texture>(rtvBuffer.Get(),
+					D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+			}
 		}
 
-		scene->FloatingPointBuffer = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                   DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                   D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                   D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                   D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-
-		scene->BrightColorBuffer = CreateShared<Texture>(m_ResWidth / 3.0f, m_ResHeight / 3.0f, 1, 1,
-		                                                 DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                 D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET |
-		                                                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-
-		scene->DepthStencilBufferTexture = CreateShared<Texture>(m_ResWidth, m_ResHeight, 1, 1,
-		                                                         DXGI_FORMAT_D24_UNORM_S8_UINT,
-		                                                         D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                         D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-		scene->ShadowMapTexture = CreateShared<Texture>(2048, 2048, 1, 1,
-		                                                DXGI_FORMAT_R32_TYPELESS,
-		                                                D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
-		                                                D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-		scene->ShadowMapDummyColorBuffer = CreateShared<Texture>(2048, 2048, 1, 1,
-		                                                         DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-		                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 
 		DXGI_MODE_DESC targetParam = {};

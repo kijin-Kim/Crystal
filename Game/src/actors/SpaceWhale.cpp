@@ -164,6 +164,11 @@ void SpaceWhale::Update(float deltaTime)
 void SpaceWhale::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
 	auto damageCauser = causer.lock();
+	if (!damageCauser)
+	{
+		return;
+	}
+
 	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;

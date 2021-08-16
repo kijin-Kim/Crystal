@@ -10,7 +10,7 @@ namespace Crystal {
 		BlurPipeline() = default;
 		~BlurPipeline() override {}
 
-		void Begin() override;
+		void Begin(const Shared<Scene>& scene) override;
 
 
 		STATIC_TYPE_IMPLE(BlurPipeline)

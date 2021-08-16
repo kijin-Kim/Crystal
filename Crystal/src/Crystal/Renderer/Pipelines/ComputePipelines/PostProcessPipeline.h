@@ -25,7 +25,7 @@ namespace Crystal {
 		PostProcessPipeline() = default;
 		~PostProcessPipeline() override {}
 
-		void Begin() override;
+		void Begin(const Shared<Scene>& scene) override;
 		void End() override;
 
 		void Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList) override;

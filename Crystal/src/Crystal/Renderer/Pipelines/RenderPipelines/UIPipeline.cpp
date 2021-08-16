@@ -89,10 +89,8 @@ namespace Crystal {
 		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
 	}
 
-	void UIPipeline::Begin()
+	void UIPipeline::Begin(const Shared<Scene>& scene)
 	{
-		auto& scene = GetScene();
-
 		PerFrameData perFrameData = {};
 
 		auto& mainCamera = scene->Cameras[0].lock();

@@ -64,11 +64,14 @@ namespace Crystal {
 		return m_CurrentLevel;
 	}
 
-	void World::SetCurrentLevelByName(const std::string& name)
+	void World::OpenLevel(const std::string& name)
 	{
-		m_CurrentLevel = GetLevelByName(name);
-		m_RenderSystem->Begin();
+		m_OpenLevelCommands.push_back({ name });
+	}
 
+	void World::CloseLevel(const std::string& name)
+	{
+		m_CurrentLevel->OnLevelClosed();
 	}
 
 
@@ -76,6 +79,12 @@ namespace Crystal {
 	{
 		if(m_CurrentLevel)
 		{
+			if(uMsg == WM_KEYDOWN && wParam == VK_F11)
+			{
+				GetRenderSystem()->ToggleDisplayMode();
+				return true;
+			}
+
 			return m_CurrentLevel->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
 		
@@ -89,6 +98,26 @@ namespace Crystal {
 		{
 			m_CurrentLevel->Update(deltaTime);
 		}
+
+		if(!m_OpenLevelCommands.empty())
+		{
+			for (auto& command : m_OpenLevelCommands)
+			{
+				if (m_CurrentLevel)
+				{
+					CloseLevel(m_CurrentLevel->GetObjectName());
+				}
+				m_CurrentLevel = GetLevelByName(command.LevelName);
+				m_CurrentLevel->OnLevelOpened();
+				m_RenderSystem->Begin();
+			}
+
+			m_OpenLevelCommands.clear();
+		}
+
+		
+
+
 	}
 
 }

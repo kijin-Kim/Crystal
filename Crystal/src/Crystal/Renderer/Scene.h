@@ -64,9 +64,6 @@ namespace Crystal {
 		Shared<Texture> ShadowMapDummyColorBuffer = nullptr;
 		//===================================================================================
 
-		
-		
-
 		//=====================Not Scene Owned Objects ======================================
 		std::vector<Weak<StaticMeshComponent>> StaticMeshes;
 		std::vector<Weak<SkeletalMeshComponent>> SkeletalMeshes;
@@ -96,6 +93,8 @@ namespace Crystal {
 
 
 		void RemoveGarbage();
+
+		void Reset();
 	};
 
 }

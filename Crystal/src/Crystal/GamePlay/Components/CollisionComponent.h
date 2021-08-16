@@ -42,6 +42,7 @@ namespace Crystal {
 		void SetCollisionType(ECollisionType type) { m_CollisionType = type; }
 		ECollisionType GetCollisionType() const { return m_CollisionType; }
 
+
 		void OnHit(const struct HitResult& hitResult);
 		void BindOnHitEvent(const std::function<void(const struct HitResult&)>& event);
 
@@ -52,6 +53,9 @@ namespace Crystal {
 		void BindOnEndOverlapEvent(const std::function<void(const struct OverlapResult&)>& event);
 
 		bool IsOverlappedWith(Weak<CollisionComponent> overlappedComponent);
+
+		void SetIsLineTracable(bool bLineTracable) { m_bIsLineTracable = bLineTracable; }
+		bool GetIsLineTracable() const { return m_bIsLineTracable; }
 
 		const std::vector<Weak<CollisionComponent>>& GetOverlappedComponents() const { return m_OverlappedComponents; }
 
@@ -100,6 +104,8 @@ namespace Crystal {
 		std::vector<std::string> m_ActorClassCollisionWhitelist;
 
 		bool m_bIsFirstTimeCheckOverlap = true;
+
+		bool m_bIsLineTracable = true;
 	};
 
 	class RayComponent : public CollisionComponent

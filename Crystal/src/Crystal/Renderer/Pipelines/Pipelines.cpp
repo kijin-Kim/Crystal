@@ -16,7 +16,7 @@ namespace Crystal {
 		m_Components.push_back(component);
 	}
 
-	void Pipeline::Begin()
+	void Pipeline::Begin(const Shared<Scene>& scene)
 	{
 	}
 
@@ -190,9 +190,9 @@ namespace Crystal {
 		CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object를 생성하는데 실패하였습니다");
 	}
 
-	void RenderPipeline::Begin()
+	void RenderPipeline::Begin(const Shared<Scene>& scene)
 	{
-		Pipeline::Begin();
+		Pipeline::Begin(scene);
 	}
 
 	void RenderPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)

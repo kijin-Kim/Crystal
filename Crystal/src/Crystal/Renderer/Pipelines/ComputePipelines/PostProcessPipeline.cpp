@@ -3,13 +3,12 @@
 #include "Crystal/Core/Device.h"
 #include "Crystal/Renderer/Scene.h"
 
-void Crystal::PostProcessPipeline::Begin()
+void Crystal::PostProcessPipeline::Begin(const Shared<Scene>& scene)
 {
-	ComputePipeline::Begin();
+	ComputePipeline::Begin(scene);
 	auto& device = Device::Instance();
 	auto d3dDevice = device.GetD3DDevice();
 
-	auto& scene = GetScene();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dDevice->CopyDescriptorsSimple(1, handle, scene->FloatingPointBuffer->GetUnorderedAccessView(D3D12_UAV_DIMENSION_TEXTURE2D),

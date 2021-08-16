@@ -40,7 +40,13 @@ void KrakenAIController::Update(float deltaTime)
 	AIController::Update(deltaTime);
 
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-	auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
-
-	GetBlackboardComponent()->SetValueAsFloat3("PlayerLocation", playerPawn->GetPosition());
+	if(level)
+	{
+		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
+		if(playerPawn)
+		{
+			GetBlackboardComponent()->SetValueAsFloat3("PlayerLocation", playerPawn->GetPosition());
+		}
+	}
+	
 }

@@ -130,6 +130,10 @@ namespace Crystal {
 			{
 				SetHiddenInGame(false);
 			}
+			else
+			{
+				m_bIsFirstTimeCheckOverlap = true;
+			}
 		}
 		bool GetUnbound() const { return m_bUnbound; }
 

@@ -110,14 +110,13 @@ namespace Crystal {
 		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
 	}
 
-	void GeometryStaticPipeline::Begin()
+	void GeometryStaticPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto& scene = GetScene();
 
 
 		PerFrameData perFrameData = {};

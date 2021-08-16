@@ -118,16 +118,15 @@ namespace Crystal {
 		opaqueCounterClockCull.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineStates[{EBlendMode::BM_Opaque, false}]);
 	}
 
-	void ForwardStaticPipeline::Begin()
+	void ForwardStaticPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 
 		PrepareConstantBuffers(sizeof(PerFrameData), sizeof(PerObjectData));
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto& scene = GetScene();
 
 		if(scene->Lights.empty())
 		{

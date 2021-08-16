@@ -44,47 +44,53 @@ public:
 			resourceManager.GetAnimation("assets/models/KRAKEN_death.fbx");
 		}
 
-
-
 		auto& scene = GetScene();
+
 
 		scene->PanoramaCubeColorTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_HybridNoise.hdr").lock();
 		scene->CubemapColorTexture = Crystal::CreateShared<Crystal::Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                            D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 		scene->PanoramaCubeAlphaTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Skybox_13_Alpha.hdr").lock();
 		scene->CubemapAlphaTexture = Crystal::CreateShared<Crystal::Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                            D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                            D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 		scene->PanoramaStarFarTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Far_Green.hdr").lock();
 		scene->CubemapStarFarTexture = Crystal::CreateShared<Crystal::Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                              D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                              D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                              D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 
 		scene->PanoramaStarNearTexture = resourceManager.GetTexture("assets/textures/cubemaps/T_Stars_Near_Large.hdr").lock();
 		scene->CubemapStarNearTexture = Crystal::CreateShared<Crystal::Texture>(1024, 1024, 6, 1, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		                                                                        D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-		                                                                        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-		                                                                        D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	}
+
+	void OnLevelOpened() override
+	{
+		Level::OnLevelOpened();
+
+		auto& resourceManager = Crystal::ResourceManager::Instance();
 
 
 
 		m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		m_Player = SpawnActor<MyPlayerPawn>({ "MyPlayerPawn" }).lock();
-		m_Player->SetPosition({ 0.0f, 3000.0f, 0.0f });
+		m_Player->SetPosition({ 0.0f, 7000.0f, 7000.0f });
 		auto playerController = SpawnActor<Crystal::PlayerController>({}).lock();
 		playerController->Possess(m_Player);
-		
+
 
 		if (true)
 		{
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 30; i++)
 			{
 				auto drone = SpawnActor<Drone>({ "Drone" }).lock();
 				drone->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 20000.0f));
@@ -168,57 +174,17 @@ public:
 		}
 
 
-		/*if (true)
-		{
-			for (int i = 0; i < 300; i++)
-			{
-				auto asteroid = SpawnActor<Asteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 15000.0f));
-			}
 
-			for (int i = 0; i < 1000; i++)
-			{
-				auto asteroid = SpawnActor<FakeAsteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 10000.0f));
-			}
-
-
-			for (int i = 0; i < 40; i++)
-			{
-				int randomNumber = rand() % 3;
-				switch (randomNumber)
-				{
-				case 0:
-					{
-						auto asteroid = SpawnActor<HealAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
-						break;
-					}
-				case 1:
-					{
-						auto asteroid = SpawnActor<PowerAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
-						break;
-					}
-				case 2:
-					{
-						auto asteroid = SpawnActor<ShieldAsteroid>({}).lock();
-						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 5000.0f));
-						break;
-					}
-				}
-			}
-		}*/
 
 		if (true)
 		{
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 150; i++)
 			{
 				auto asteroid = SpawnActor<Asteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
 			}
 
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 600; i++)
 			{
 				auto asteroid = SpawnActor<FakeAsteroid>({}).lock();
 				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
@@ -262,12 +228,6 @@ public:
 		}
 
 
-		if (false)
-		{
-			auto particleActor = SpawnActor<Crystal::ParticleActor>({ "" }).lock();
-			particleActor->SetPosition({ 7000.0f, 7000.0f, 0.0f });
-		}
-
 
 		if (true)
 		{
@@ -285,10 +245,8 @@ public:
 			mat->TintColor = { 0.2f, 0.2f, 0.05f };
 
 			auto kraken = Crystal::Cast<Kraken>(GetActorByClass("Kraken"));
-			if (kraken)
-			{
-				kraken->GreenTintVolumeActor = postProcessActor;
-			}
+			kraken->GreenTintVolumeActor = postProcessActor;
+
 		}
 
 		if (true)
@@ -306,10 +264,8 @@ public:
 			mat->SceneColorMaskTexture = resourceManager.GetTexture("assets/textures/radial_gradient.png");
 
 			auto kraken = Crystal::Cast<Kraken>(GetActorByClass("Kraken"));
-			if (kraken)
-			{
-				kraken->VignetteVolumeActor = postProcessActor;
-			}
+			kraken->VignetteVolumeActor = postProcessActor;
+
 		}
 
 		if (true)
@@ -327,10 +283,8 @@ public:
 			mat->OpacityMultiplier = 0.0f;
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(GetActorByClass("MyPlayerPawn"));
-			if (myPlayerPawn)
-			{
-				myPlayerPawn->DamagedPostProcessActor = postProcessActor;
-			}
+			myPlayerPawn->DamagedPostProcessActor = postProcessActor;
+
 		}
 
 		if (true)
@@ -348,10 +302,7 @@ public:
 			mat->OpacityMultiplier = 0.0f;
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(GetActorByClass("MyPlayerPawn"));
-			if (myPlayerPawn)
-			{
-				myPlayerPawn->HealPostProcessActor = postProcessActor;
-			}
+			myPlayerPawn->HealPostProcessActor = postProcessActor;
 		}
 
 		if (true)
@@ -371,25 +322,10 @@ public:
 
 
 			auto myPlayerPawn = Crystal::Cast<MyPlayerPawn>(GetActorByClass("MyPlayerPawn"));
-			if (myPlayerPawn)
-			{
-				myPlayerPawn->ShieldPostProcess = postProcessActor;
-			}
+			myPlayerPawn->ShieldPostProcess = postProcessActor;
 		}
-
-
-		//for (int i = 0; i < 10; i++)
-		//{
-		//	auto spaceWhale = SpawnActor<SpaceWhale>({}).lock();
-		//	spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
-		//	spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
-		//	spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
-		//	spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
-
-		//	auto spaceWhaleController = SpawnActor<SpaceWhaleAIController>({}).lock();
-		//	spaceWhaleController->Possess(spaceWhale);
-		//}
 	}
+
 
 
 

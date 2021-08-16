@@ -14,6 +14,7 @@ void MyHUD::Initialize()
 	auto crossHairTexture = CreateComponent<Crystal::TextureComponent>("CrosshairTextureComponent");
 	crossHairTexture->AddMaterial(crossHairMat);
 	crossHairTexture->SetUnitScale(0.8f);
+	crossHairTexture->SetHiddenInGame(false);
 
 
 	auto hitMarkerMat = Crystal::CreateShared<Crystal::Material>();
@@ -24,6 +25,7 @@ void MyHUD::Initialize()
 	m_HitmarkerTextureComponent = CreateComponent<Crystal::TextureComponent>("HitmarkerTextureComponent");
 	m_HitmarkerTextureComponent->AddMaterial(hitMarkerMat);
 	m_HitmarkerTextureComponent->SetUnitScale(0.035f);
+	m_HitmarkerTextureComponent->SetHiddenInGame(false);
 	
 	
 
@@ -37,6 +39,7 @@ void MyHUD::Initialize()
 	hpBarBg->SetUnitScale(0.35f);
 	hpBarBg->SetScaleY(0.13f);
 	hpBarBg->SetWorldPosition({-1920.0f / 2.0f + 280.0f, -430.0f, 1.0f});
+	hpBarBg->SetHiddenInGame(false);
 
 
 	auto hpBarFillMat = Crystal::CreateShared<Crystal::Material>();
@@ -52,6 +55,7 @@ void MyHUD::Initialize()
 	m_HealthFillComponent->SetUnitScale(0.35f);
 	m_HealthFillComponent->SetScaleX(0.35f * 0.5f);
 	m_HealthFillComponent->SetScaleY(0.13f);
+	m_HealthFillComponent->SetHiddenInGame(false);
 
 
 
@@ -60,6 +64,7 @@ void MyHUD::Initialize()
 	enemyHpBarBg->SetUnitScale(0.7f);
 	enemyHpBarBg->SetScaleY(0.20f);
 	enemyHpBarBg->SetWorldPosition({ 0.0f, 430.0f, 1.0f });
+	enemyHpBarBg->SetHiddenInGame(false);
 
 	auto enemyHpBarFillMat = Crystal::CreateShared<Crystal::Material>();
 	enemyHpBarFillMat->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/HpBarFill.png");
@@ -71,6 +76,7 @@ void MyHUD::Initialize()
 	m_EnemyHpBarFillComponent->SetUnitScale(0.7f);
 	m_EnemyHpBarFillComponent->SetScaleX(0.7f * 0.5f);
 	m_EnemyHpBarFillComponent->SetScaleY(0.20f);
+	m_EnemyHpBarFillComponent->SetHiddenInGame(false);
 
 		
 	auto pollutionHpBarBg = CreateComponent<Crystal::TextureComponent>("PollutionBackgroundTextureComponent");
@@ -78,6 +84,7 @@ void MyHUD::Initialize()
 	pollutionHpBarBg->SetUnitScale(0.7f);
 	pollutionHpBarBg->SetScaleY(0.10f);
 	pollutionHpBarBg->SetWorldPosition({ 0.0f, 430.0f - m_HealthBarHeight / 2.0f, 1.0f });
+	pollutionHpBarBg->SetHiddenInGame(false);
 
 	auto pollutionBarFillMat = Crystal::CreateShared<Crystal::Material>();
 	pollutionBarFillMat->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/PollutionBarFill.png");
@@ -89,6 +96,7 @@ void MyHUD::Initialize()
 	m_PollutionBarFillComponent->SetUnitScale(0.7f);
 	m_PollutionBarFillComponent->SetScaleX(0.7f * 0.0f);
 	m_PollutionBarFillComponent->SetScaleY(0.10f);
+	m_PollutionBarFillComponent->SetHiddenInGame(false);
 		
 
 
@@ -98,25 +106,24 @@ void MyHUD::Initialize()
 	itemBg->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/ItemBg.png");
 	itemBg->bUseAlbedoTextureAlpha = true;
 
-	//auto itemBg1 = CreateComponent<Crystal::TextureComponent>("itemBg1Component");
-	//itemBg1->SetWorldPosition({566.0f, -430.0f, 0.0f});
-	//itemBg1->AddMaterial(itemBg);
-	//itemBg1->SetUnitScale(0.08f);
 
 	auto itemBg1 = CreateComponent<Crystal::TextureComponent>("itemBg1Component");
 	itemBg1->SetWorldPosition({566.0f + (511.0f * 2.0f * 0.08f * 1) + (15.0f * 1), -430.0f, 0.0f});
 	itemBg1->AddMaterial(itemBg);
 	itemBg1->SetUnitScale(0.08f);
+	itemBg1->SetHiddenInGame(false);
 
 	auto itemBg2 = CreateComponent<Crystal::TextureComponent>("itemBg2Component");
 	itemBg2->SetWorldPosition({566.0f + (511.0f * 2.0f * 0.08f * 2) + (15.0f * 2), -430.0f, 0.0f});
 	itemBg2->AddMaterial(itemBg);
 	itemBg2->SetUnitScale(0.08f);
+	itemBg2->SetHiddenInGame(false);
 
 	auto itemBg3 = CreateComponent<Crystal::TextureComponent>("itemBg3Component");
 	itemBg3->SetWorldPosition({566.0f + (511.0f * 2.0f * 0.08f * 3) + (15.0f * 3), -430.0f, 0.0f});
 	itemBg3->AddMaterial(itemBg);
 	itemBg3->SetUnitScale(0.08f);
+	itemBg3->SetHiddenInGame(false);
 
 
 	auto powerPotionMat = Crystal::CreateShared<Crystal::Material>();

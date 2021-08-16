@@ -68,9 +68,15 @@ void ShieldSphere::Initialize()
 	UpdateHealth();
 }
 
-void ShieldSphere::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
+void ShieldSphere::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
-	if (damageCauser.lock()->StaticType() != "MyPlayerPawn")
+	auto damageCauser = causer.lock();
+	if (!damageCauser)
+	{
+		return;
+	}
+
+	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
 	}

@@ -192,6 +192,30 @@ namespace Crystal {
 		}
 	}
 
+	void Scene::Reset()
+	{
+		StaticMeshes.clear();
+		SkeletalMeshes.clear();
+		Particles.clear();
+
+		BoundingOrientedBoxComponents.clear();
+		BoundingSphereComponents.clear();
+		RayComponents.clear();
+		BoundingFrustumComponents.clear();
+
+
+		Textures.clear();
+
+		PostProcesses.clear();
+
+		Lights.clear();
+		Cameras.clear();
+
+		AIPerceptionSources.clear();
+		AIPerceptions.clear();
+
+	}
+
 
 }
 ;

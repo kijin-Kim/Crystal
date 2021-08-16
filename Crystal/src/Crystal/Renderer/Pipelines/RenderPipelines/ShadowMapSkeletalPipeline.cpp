@@ -62,12 +62,10 @@ namespace Crystal {
 		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
 	}
 
-	void ShadowMapSkeletalPipeline::Begin()
+	void ShadowMapSkeletalPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
-
-		auto& scene = GetScene();
 
 
 		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)

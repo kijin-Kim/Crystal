@@ -44,6 +44,8 @@ void Kraken::Initialize()
 	m_SmashAttackBoxComponent->SetExtents({500.0f * 3.0f, 500.0f * 3.0f, 1800.0f * 3.0f});
 	m_SmashAttackBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
 	m_SmashAttackBoxComponent->IgnoreActorClassOf("Kraken");
+	m_SmashAttackBoxComponent->IgnoreActorClassOf("Laser");
+	m_SmashAttackBoxComponent->SetIsLineTracable(false);
 
 
 	m_SkeletalMeshComponent = CreateComponent<Crystal::SkeletalMeshComponent>("MeshComponent");
@@ -142,37 +144,41 @@ void Kraken::Update(float deltaTime)
 		}
 	}
 
-
-	m_SpaceWhaleSpawnTimer.Tick();
-	if (m_SpaceWhaleSpawnTimer.GetElapsedTime() >= m_SpaceWhaleSpawnInterval)
+	if(m_CurrentPhase >= 2)
 	{
-		m_SpaceWhaleSpawnTimer.Reset();
-
-		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-		if (level)
+		m_SpaceWhaleSpawnTimer.Tick();
+		if (m_SpaceWhaleSpawnTimer.GetElapsedTime() >= m_SpaceWhaleSpawnInterval)
 		{
-			for (int i = 0; i < 3; i++)
+			m_SpaceWhaleSpawnTimer.Reset();
+
+			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+			if (level)
 			{
-				if (m_CurrentWhaleSpawnCount >= m_MaxWhaleSpawnCount)
+				for (int i = 0; i < 3; i++)
 				{
-					break;
+					if (m_CurrentWhaleSpawnCount >= m_MaxWhaleSpawnCount)
+					{
+						break;
+					}
+
+					ActorSpawnParams spawnParams = {};
+					spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
+
+					auto spaceWhale = level->SpawnActor<SpaceWhale>(spawnParams).lock();
+					spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
+					spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
+					spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
+					spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
+
+					auto spaceWhaleController = level->SpawnActor<SpaceWhaleAIController>({}).lock();
+					spaceWhaleController->Possess(spaceWhale);
+					++m_CurrentWhaleSpawnCount;
 				}
-
-				ActorSpawnParams spawnParams = {};
-				spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
-
-				auto spaceWhale = level->SpawnActor<SpaceWhale>(spawnParams).lock();
-				spaceWhale->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 6000.0f));
-				spaceWhale->RotatePitch(Crystal::RandomFloatInRange(0.0f, 359.0f));
-				spaceWhale->RotateYaw(Crystal::RandomFloatInRange(0.0f, 359.0f));
-				spaceWhale->RotateRoll(Crystal::RandomFloatInRange(0.0f, 359.0f));
-
-				auto spaceWhaleController = level->SpawnActor<SpaceWhaleAIController>({}).lock();
-				spaceWhaleController->Possess(spaceWhale);
-				++m_CurrentWhaleSpawnCount;
 			}
 		}
 	}
+
+	
 
 
 	if (m_bShouldShowHealthBar)
@@ -234,10 +240,12 @@ void Kraken::UpdateHealth()
 		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 		m_HealthBarFillComponent->SetScaleX(m_HealthBarBgComponent->GetScale().x * healthPercent);
 	}
+
 }
 
 void Kraken::OnSmashAttack()
 {
+	CS_INFO("Smash");
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 	m_SkeletalMeshComponent->PlayAnimationWithEndEvent(resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx"), false,
 	                                                   CS_ANIMATION_FN(Kraken::OnIdle));
@@ -255,6 +263,7 @@ void Kraken::OnIdle()
 
 void Kraken::AddImpulseOnSmash()
 {
+	CS_INFO("Impulse");
 	auto& overalppeds = m_SmashAttackBoxComponent->GetOverlappedComponents();
 	for (auto& weak : overalppeds)
 	{
@@ -279,6 +288,12 @@ void Kraken::AddImpulseOnSmash()
 void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 {
 	auto damageCauser = causer.lock();
+	if(!damageCauser)
+	{
+		return;
+	}
+
+
 	if (damageCauser->StaticType() != "MyPlayerPawn")
 	{
 		return;
@@ -302,14 +317,14 @@ void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 		}
 	}
 
-	static bool bDeathAnimationPlaying = false;
-	if(!bDeathAnimationPlaying)
+	
+	if(!m_bDeathAnimationIsPlaying)
 	{
 		if (m_CurrentHealth <= 0.0f)
 		{
-			bDeathAnimationPlaying = true;
+			m_bDeathAnimationIsPlaying = true;
 			m_SkeletalMeshComponent->PlayAnimationWithEndEvent(Crystal::ResourceManager::Instance().GetAnimation("assets/models/KRAKEN_death.fbx"), false,
-				CS_ANIMATION_FN(Kraken::Destroy));
+				CS_ANIMATION_FN(Kraken::OpenGameClearLevel));
 		}
 	}
 	
@@ -374,25 +389,70 @@ void Kraken::SetPolluteGauge(float polluteGauge)
 	{
 		if (GreenTintVolumeActor)
 		{
+
+			if (m_CurrentPhase == 3)
+			{
+				GreenTintVolumeActor->SetUnBound(false);
+			}
+			else
+			{
+				GreenTintVolumeActor->SetUnBound(true);
+			}
 			GreenTintVolumeActor->SetIsEnabled(true);
 			GreenTintVolumeActor->SetHiddenInGame(false);
+
+		
 		}
 
 		if (VignetteVolumeActor)
 		{
+			if (m_CurrentPhase == 3)
+			{
+				VignetteVolumeActor->SetUnBound(false);
+			}
+			else
+			{
+				VignetteVolumeActor->SetUnBound(true);
+			}
+
 			VignetteVolumeActor->SetIsEnabled(true);
 			VignetteVolumeActor->SetHiddenInGame(false);
+
+		
 		}
+
 	}
 	else
 	{
 		if (GreenTintVolumeActor)
 		{
+
+			if (m_CurrentPhase == 3)
+			{
+				GreenTintVolumeActor->SetUnBound(false);
+			}
+			else
+			{
+				GreenTintVolumeActor->SetUnBound(true);
+			}
+
 			GreenTintVolumeActor->SetIsEnabled(false);
 			GreenTintVolumeActor->SetHiddenInGame(true);
+
+
+			
 		}
 		if (VignetteVolumeActor)
 		{
+			if (m_CurrentPhase == 3)
+			{
+				VignetteVolumeActor->SetUnBound(false);
+			}
+			else
+			{
+				VignetteVolumeActor->SetUnBound(true);
+			}
+
 			VignetteVolumeActor->SetIsEnabled(false);
 			VignetteVolumeActor->SetHiddenInGame(true);
 		}
@@ -409,4 +469,10 @@ void Kraken::SetShowHealthBar(bool bShow)
 
 	m_HealthBarBgComponent->SetHiddenInGame(!bShow);
 	m_HealthBarFillComponent->SetHiddenInGame(!bShow);
+}
+
+void Kraken::OpenGameClearLevel()
+{
+	auto world = Crystal::Cast<Crystal::World>(GetWorld());
+	world->OpenLevel("GameClearLevel");
 }

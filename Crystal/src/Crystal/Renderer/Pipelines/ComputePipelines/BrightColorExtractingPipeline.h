@@ -9,7 +9,7 @@ namespace Crystal {
 		BrightColorExtractingPipeline() = default;
 		~BrightColorExtractingPipeline() override = default;
 
-		void Begin() override;
+		void Begin(const Shared<Scene>& scene) override;
 
 		STATIC_TYPE_IMPLE(BrightColorExtractingPipeline)
 		

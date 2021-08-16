@@ -13,9 +13,9 @@
 namespace Crystal {
 
 
-	void CubemapPipeline::Begin()
+	void CubemapPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 		PrepareConstantBuffers(sizeof(PerFrameData));
 
@@ -24,7 +24,6 @@ namespace Crystal {
 		PerFrameData perFrameData = {};
 
 
-		auto& scene = GetScene();
 		auto camera = scene->Cameras[0].lock();
 
 

@@ -335,6 +335,8 @@
     <ClInclude Include="src\actors\Drone.h" />
     <ClInclude Include="src\actors\DroneAIController.h" />
     <ClInclude Include="src\actors\DroneLaser.h" />
+    <ClInclude Include="src\actors\EndLevelPawns.h" />
+    <ClInclude Include="src\actors\EndLevels.h" />
     <ClInclude Include="src\actors\GameLevel.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Laser.h" />
@@ -349,6 +351,7 @@
     <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\MyPlayerPawn.h" />
+    <ClInclude Include="src\actors\TitleInterceptorActor.h" />
     <ClInclude Include="src\actors\TitleLevel.h" />
     <ClInclude Include="src\actors\TitleLevelPawn.h" />
   </ItemGroup>

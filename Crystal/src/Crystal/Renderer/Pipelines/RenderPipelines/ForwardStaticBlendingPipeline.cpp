@@ -102,15 +102,14 @@ namespace Crystal {
 
 	}
 
-	void ForwardStaticBlendingPipeline::Begin()
+	void ForwardStaticBlendingPipeline::Begin(const Shared<Scene>& scene)
 	{
-		RenderPipeline::Begin();
+		RenderPipeline::Begin(scene);
 
 		
 
 		auto device = Device::Instance().GetD3DDevice();
 
-		auto& scene = GetScene();
 		if (scene->Lights.empty())
 		{
 			return;

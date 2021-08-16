@@ -20,10 +20,6 @@ namespace Crystal {
 		void Initialize() override
 		{
 			auto meshComponent = CreateComponent<StaticMeshComponent>("StaticMeshComponent");
-
-			auto material = std::make_unique<Material>();
-			meshComponent->AddMaterial(std::move(material));
-
 			m_MainComponent = meshComponent;
 		}
 

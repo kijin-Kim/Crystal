@@ -54,6 +54,8 @@ public:
 	void EndFire();
 
 	void FireMissile();
+
+	void OpenTitleLevel();
 	
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
@@ -64,8 +66,10 @@ public:
 	void UseHealItem();
 	void UseShieldItem();
 
-	void ToggleShowDebugCollision();
-	void ToggleShowDebugAI();
+	void ShowDebugCollision();
+	void HideDebugCollision();
+	void ShowDebugAI();
+	void HideDebugAI();
 
 	void OnItemDestroyed(ItemType itemType);
 
@@ -105,7 +109,7 @@ private:
 	const float m_MaxHealth = 100.0f;
 	float m_Health = m_MaxHealth;
 	
-	float m_Power = 5.0f;
+	float m_Power = 1.0f;
 
 	bool m_bHasItem[ItemTypeCount];
 
@@ -118,6 +122,8 @@ private:
 	const float m_HealInterval = 1.0f;
 	const float m_HealAmount = 2.0f;
 	bool m_bShouldHeal = false;
+
+	bool m_bUseLeftSocekt = true;
 
 public:
 	Crystal::Weak<Crystal::PostProcessVolumeActor> DamagedPostProcessActor;

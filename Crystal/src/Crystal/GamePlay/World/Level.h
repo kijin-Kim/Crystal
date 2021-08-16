@@ -21,7 +21,11 @@ namespace Crystal {
 		Level() = default;
 		~Level() override = default;
 
+		virtual void OnLevelOpened() {}
+		virtual void OnLevelClosed();
+
 		void Initialize() override;
+		void Begin() override;
 
 
 		void Update(const float deltaTime) override;
