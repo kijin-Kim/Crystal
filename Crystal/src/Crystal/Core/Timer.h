@@ -1,4 +1,6 @@
 #pragma once
+#include <chrono>
+
 
 namespace Crystal {
 
@@ -20,23 +22,15 @@ namespace Crystal {
 
 		void SetElapsedTime(float elapsedTime) { m_ElapsedTime = (double)elapsedTime; }
 
-
-		void Pause();
-		void Resume();
-
-			
+	private:
+		double getCurrent();
 
 	private:
-		double m_SecondsPerCount = 0.0;
-
-		double m_CurrentTime = 0.0;
-		double m_DeltaTime = 0.0;
 		double m_ElapsedTime = 0.0;
+		double m_DeltaTime = 0.0;
 		double m_LastTime = 0.0;
+		double m_InvFreq = 0.0;
 
-		bool m_bIsStopped = false;
-
-		double m_Rate = 0.0;
-		bool m_bShouldLoop = false;	
+		bool m_bShouldReset = true;
 	};
 }

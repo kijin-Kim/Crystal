@@ -1,4 +1,5 @@
 #pragma once
+#include "AllyDrone.h"
 #include "Drone.h"
 #include "Crystal/GamePlay/AI/BehaviorTree.h"
 
@@ -41,11 +42,11 @@ public:
 };
 
 
-class BTTaskNodeSetRandomPositionInSphere : public Crystal::BTTaskNode
+class BTTaskNodeSetRandomPositionInSphereFromPosition : public Crystal::BTTaskNode
 {
 public:
-	BTTaskNodeSetRandomPositionInSphere() = default;
-	~BTTaskNodeSetRandomPositionInSphere() override = default;
+	BTTaskNodeSetRandomPositionInSphereFromPosition() = default;
+	~BTTaskNodeSetRandomPositionInSphereFromPosition() override = default;
 
 
 	void Execute(float deltaTime) override
@@ -81,6 +82,50 @@ public:
 
 public:
 	std::string RandomPositionKey;
+	float Radius;
+};
+
+class BTTaskNodeSetRandomPositionInSphere : public Crystal::BTTaskNode
+{
+public:
+	BTTaskNodeSetRandomPositionInSphere() = default;
+	~BTTaskNodeSetRandomPositionInSphere() override = default;
+
+
+	void Execute(float deltaTime) override
+	{
+
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+		bool result = ExecuteDecorators();
+		if (!result)
+		{
+			FinishExecute(false);
+			return;
+		}
+
+		auto possessedPawn = GetPossessedPawn().lock();
+		if (!possessedPawn)
+		{
+			FinishExecute(false);
+			return;
+		}
+
+		auto blackBoard = GetBlackboardComponent().lock();
+		blackBoard->SetValueAsFloat3(RandomPositionKey, Crystal::Vector3::RandomPositionInSphere(Center, Radius));
+
+		FinishExecute(true);
+	}
+
+	STATIC_TYPE_IMPLE(BTTaskNodeSetRandomPositionInSphere)
+
+public:
+	std::string RandomPositionKey;
+	DirectX::XMFLOAT3 Center;
 	float Radius;
 };
 
@@ -241,6 +286,56 @@ public:
 	}
 
 	STATIC_TYPE_IMPLE(BTTaskNodeDroneFire)
+
+public:
+	std::string RandomPositionKey;
+	DirectX::XMFLOAT3 Center;
+	float Radius;
+};
+
+class BTTaskNodeAllyDroneFire : public Crystal::BTTaskNode
+{
+public:
+	BTTaskNodeAllyDroneFire() = default;
+	~BTTaskNodeAllyDroneFire() override = default;
+
+
+	void Execute(float deltaTime) override
+	{
+		bool abortResult = CheckAbortDecorators();
+		if (!abortResult)
+		{
+			Abort();
+			return;
+		}
+
+		bool result = ExecuteDecorators();
+		if (!result)
+		{
+			FinishExecute(false);
+			return;
+		}
+
+		auto possessedPawn = GetPossessedPawn().lock();
+		if (!possessedPawn)
+		{
+			FinishExecute(false);
+			return;
+		}
+
+		if (possessedPawn->StaticType() != "AllyDrone")
+		{
+			FinishExecute(false);
+			return;
+		}
+
+		auto drone = Crystal::Cast<AllyDrone>(possessedPawn);
+		drone->OnFire();
+
+		FinishExecute(true);
+	}
+
+	STATIC_TYPE_IMPLE(BTTaskNodeAllyDroneFire)
 
 public:
 	std::string RandomPositionKey;

@@ -17,6 +17,7 @@ void DroneAIController::Initialize()
 	m_AIPerceptionComponent->SetSightWidth(1500.0f* 2.0f);
 	m_AIPerceptionComponent->SetSightHeight(900.0f * 2.5f);
 	m_AIPerceptionComponent->IgnoreVisibilityActorClassOf("DroneLaser");
+	m_AIPerceptionComponent->IgnoreVisibilityActorClassOf("Laser");
 }
 
 void DroneAIController::Begin()
@@ -118,7 +119,7 @@ void DroneAIController::Begin()
 	{
 		auto sequenceNode = Crystal::CreateObject<Crystal::BTSequenceNode>("SequenceMoveToRandomPositionInSphere");
 
-		auto setRandomPositionNode = Crystal::CreateObject<BTTaskNodeSetRandomPositionInSphere>("TaskSetRandomPositionInSphere");
+		auto setRandomPositionNode = Crystal::CreateObject<BTTaskNodeSetRandomPositionInSphereFromPosition>("TaskSetRandomPositionInSphere");
 		setRandomPositionNode->Radius = 10000.0f;
 		setRandomPositionNode->RandomPositionKey = "RandomPositionInSphere";
 		sequenceNode->AddChildNode(setRandomPositionNode);

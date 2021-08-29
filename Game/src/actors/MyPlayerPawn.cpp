@@ -147,6 +147,7 @@ void MyPlayerPawn::Update(const float deltaTime)
 		}
 	}
 
+
 }
 
 void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)

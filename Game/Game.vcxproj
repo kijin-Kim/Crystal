@@ -311,35 +311,52 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\actors\AllyDrone.cpp" />
+    <ClCompile Include="src\actors\AllyDroneAIController.cpp" />
+    <ClCompile Include="src\actors\AllyDroneLaser.cpp" />
     <ClCompile Include="src\actors\Asteroid.cpp" />
+    <ClCompile Include="src\actors\Cruiser.cpp" />
     <ClCompile Include="src\actors\Drone.cpp" />
     <ClCompile Include="src\actors\DroneAIController.cpp" />
     <ClCompile Include="src\actors\DroneLaser.cpp" />
     <ClCompile Include="src\actors\Kraken.cpp" />
     <ClCompile Include="src\actors\KrakenAIController.cpp" />
     <ClCompile Include="src\actors\Laser.cpp" />
+    <ClCompile Include="src\actors\LevelLandscapeActor.cpp" />
+    <ClCompile Include="src\actors\MineCave.cpp" />
     <ClCompile Include="src\actors\Missile.cpp" />
     <ClCompile Include="src\actors\MyHUD.cpp" />
     <ClCompile Include="src\actors\PlayerShield.cpp" />
     <ClCompile Include="src\actors\PolluteSphere.cpp" />
     <ClCompile Include="src\actors\ShieldSphere.cpp" />
+    <ClCompile Include="src\actors\SpaceStation.cpp" />
+    <ClCompile Include="src\actors\SpaceStationCoreActor.cpp" />
     <ClCompile Include="src\actors\SpaceWhale.cpp" />
     <ClCompile Include="src\actors\SpaceWhaleAIController.cpp" />
+    <ClCompile Include="src\actors\Stargate.cpp" />
     <ClCompile Include="src\actors\Sun.cpp" />
     <ClCompile Include="src\actors\MyPlayerPawn.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\actors\AllyDrone.h" />
+    <ClInclude Include="src\actors\AllyDroneAIController.h" />
+    <ClInclude Include="src\actors\AllyDroneLaser.h" />
     <ClInclude Include="src\actors\Asteroid.h" />
+    <ClInclude Include="src\actors\Cruiser.h" />
     <ClInclude Include="src\actors\CustomBTTask.h" />
     <ClInclude Include="src\actors\Drone.h" />
     <ClInclude Include="src\actors\DroneAIController.h" />
     <ClInclude Include="src\actors\DroneLaser.h" />
     <ClInclude Include="src\actors\EndLevelPawns.h" />
     <ClInclude Include="src\actors\EndLevels.h" />
+    <ClInclude Include="src\actors\MainLevel.h" />
     <ClInclude Include="src\actors\GameLevel.h" />
     <ClInclude Include="src\actors\Kraken.h" />
     <ClInclude Include="src\actors\Laser.h" />
+    <ClInclude Include="src\actors\LevelLandscapeActor.h" />
+    <ClInclude Include="src\actors\MineCave.h" />
+    <ClInclude Include="src\actors\MiningLevel.h" />
     <ClInclude Include="src\actors\Missile.h" />
     <ClInclude Include="src\actors\KrakenAIController.h" />
     <ClInclude Include="src\actors\MyHUD.h" />
@@ -347,8 +364,11 @@
     <ClInclude Include="src\actors\PolluteSphere.h" />
     <ClInclude Include="src\actors\ShieldSphere.h" />
     <ClInclude Include="src\actors\SpaceCombatTypes.h" />
+    <ClInclude Include="src\actors\SpaceStation.h" />
+    <ClInclude Include="src\actors\SpaceStationCoreActor.h" />
     <ClInclude Include="src\actors\SpaceWhale.h" />
     <ClInclude Include="src\actors\SpaceWhaleAIController.h" />
+    <ClInclude Include="src\actors\Stargate.h" />
     <ClInclude Include="src\actors\Sun.h" />
     <ClInclude Include="src\actors\MyPlayerPawn.h" />
     <ClInclude Include="src\actors\TitleInterceptorActor.h" />

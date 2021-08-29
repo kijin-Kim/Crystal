@@ -1,5 +1,7 @@
 #pragma once
 #include "Crystal/Core/Timer.h"
+#include "Crystal/GamePlay/Components/AIComponent.h"
+#include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 
 namespace Crystal {
@@ -23,6 +25,25 @@ public:
 
 };
 
+class WhiteAsteroid : public Crystal::Actor
+{
+
+
+public:
+	WhiteAsteroid() = default;
+	~WhiteAsteroid() override = default;
+
+	void Initialize() override;
+
+	void SetAsteroidType(int type);
+
+
+	STATIC_TYPE_IMPLE(WhiteAsteroid)
+
+private:
+	Crystal::Shared<Crystal::StaticMeshComponent> m_StaticMeshComponent;
+};
+
 
 
 class FakeAsteroid : public Crystal::Actor
@@ -39,6 +60,19 @@ public:
 	void Initialize() override;
 	STATIC_TYPE_IMPLE(FakeAsteroid)
 };
+
+
+class FakeWhiteAsteroid : public Crystal::Actor
+{
+
+public:
+	FakeWhiteAsteroid() = default;
+	~FakeWhiteAsteroid() override = default;
+
+	void Initialize() override;
+	STATIC_TYPE_IMPLE(FakeWhiteAsteroid)
+};
+
 
 
 class DestructibleAsteroid : public Crystal::Actor
@@ -65,6 +99,7 @@ protected:
 private:
 	Crystal::Shared<Crystal::TextureComponent> m_HealthBarFillComponent = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_HealthBarBgComponent = nullptr;
+	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent = nullptr;
 	int m_HealthBarWidth = 0;
 	int m_HealthBarHeight = 0;
 
@@ -114,5 +149,7 @@ public:
 	void Initialize() override;
 
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
+
+	STATIC_TYPE_IMPLE(ShieldAsteroid)
 
 };

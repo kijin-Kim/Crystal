@@ -15,6 +15,7 @@ namespace Crystal {
 	{
 		PrimitiveComponent::Update(deltaTime);
 
+		std::lock_guard<std::recursive_mutex> locker(m_OverlappedComponentsMutex);
 		for (auto it = m_OverlappedComponents.begin(); it != m_OverlappedComponents.end();)
 		{
 			if (it->expired())
@@ -48,6 +49,7 @@ namespace Crystal {
 
 	void CollisionComponent::OnBeginOverlap(const OverlapResult& overlapResult)
 	{
+		std::lock_guard<std::recursive_mutex> locker(m_OverlappedComponentsMutex);
 		m_bIsFirstTimeCheckOverlap = false;
 		overlapResult.OverlappedComponent.lock()->SetIsFirstTimeCheckOverlapped(false);
 
@@ -66,6 +68,7 @@ namespace Crystal {
 
 	void CollisionComponent::OnEndOverlap(const OverlapResult& overlapResult)
 	{
+		std::lock_guard<std::recursive_mutex> locker(m_OverlappedComponentsMutex);
 		m_bIsFirstTimeCheckOverlap = false;
 		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlapResult](Weak<CollisionComponent> other)->bool
 		{
@@ -104,6 +107,7 @@ namespace Crystal {
 
 	bool CollisionComponent::IsOverlappedWith(Weak<CollisionComponent> overlappedComponent)
 	{
+		std::lock_guard<std::recursive_mutex> locker(m_OverlappedComponentsMutex);
 		auto it = std::find_if(m_OverlappedComponents.begin(), m_OverlappedComponents.end(), [&overlappedComponent](const Weak<CollisionComponent>& other)
 		{
 			auto overlapped = overlappedComponent.lock();

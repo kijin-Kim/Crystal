@@ -78,7 +78,6 @@ namespace Crystal {
 	{
 		MeshComponent::Update(deltaTime);
 
-		
 		auto animation = m_Animation.lock();
 		if (animation)
 		{

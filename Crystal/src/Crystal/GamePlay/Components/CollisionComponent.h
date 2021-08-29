@@ -1,4 +1,6 @@
 #pragma once
+#include <mutex>
+
 #include "Component.h"
 #include "Crystal/Resources/Meshes.h"
 #include "PrimitiveComponent.h"
@@ -91,6 +93,7 @@ namespace Crystal {
 	private:
 		bool m_bCollisionEnabled = true;
 
+		std::recursive_mutex m_OverlappedComponentsMutex;
 		std::vector<Weak<CollisionComponent>> m_OverlappedComponents;
 
 		std::function<void(const struct HitResult&)> m_OnHitEvent;

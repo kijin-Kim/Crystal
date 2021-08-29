@@ -57,6 +57,18 @@ namespace Crystal {
 		Shared<Texture> PanoramaStarNearTexture = nullptr;
 		Shared<Texture> CubemapStarNearTexture = nullptr;
 
+		struct SkyboxConfig
+		{
+			DirectX::XMFLOAT4 AdditiveColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+			float RedLevel = 1.0f;
+			float GreenLevel = 1.0f;
+			float BlueLevel = 1.0f;
+			float Power = 0.8f;
+			float Saturation = 1.1f;
+			float NearStarDesaturation = 0.0f;
+			float FarStarDesaturation = 0.0f;
+		} SkyboxConfiguration;
+
 		
 
 	
@@ -85,7 +97,7 @@ namespace Crystal {
 		std::vector<Weak<AIPerceptionSourceComponent>> AIPerceptionSources;
 		std::vector<Weak<AIPerceptionComponent>> AIPerceptions;
 
-
+		
 		
 		//===================================================================================
 

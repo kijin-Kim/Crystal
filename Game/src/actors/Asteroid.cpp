@@ -38,6 +38,9 @@ void Asteroid::Initialize()
 
 	int randomNumber = Crystal::RandomFloatInRange(0, 5);
 	auto& resourceManager = Crystal::ResourceManager::Instance();
+
+	
+
 	switch (randomNumber)
 	{
 	case 0:
@@ -85,6 +88,153 @@ void Asteroid::Initialize()
 	m_MainComponent->RotateYaw(rand() % 360);
 	m_MainComponent->SetUnitScale(randomScale);
 	m_MainComponent->SetMass(500.0f * randomScale);
+}
+
+void WhiteAsteroid::Initialize()
+{
+	auto material = Crystal::CreateShared<Crystal::Material>();
+	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+	material->ShadingModel = Crystal::EShadingModel::SM_Lit;
+
+	auto boundingSphereComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingSphereComponent");
+	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
+
+
+	m_MainComponent = boundingSphereComponent;
+
+
+	m_StaticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
+	m_StaticMeshComponent->AddMaterial(material);
+	m_StaticMeshComponent->AttachTo(m_MainComponent);
+
+
+	int randomNumber = Crystal::RandomFloatInRange(0, 8);
+	auto& resourceManager = Crystal::ResourceManager::Instance();
+
+
+	switch (randomNumber)
+	{
+	case 0:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_1.fbx"));
+		boundingSphereComponent->SetRadius(215.0f);
+		break;
+	case 1:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_2.fbx"));
+		boundingSphereComponent->SetRadius(617.0f / 2.0f);
+		break;
+	case 2:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_3.fbx"));
+		boundingSphereComponent->SetRadius(663.0f / 2.0f);
+		break;
+	case 3:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_4.fbx"));
+		boundingSphereComponent->SetRadius(3025.0f / 2.0f);
+		break;
+	case 4:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_5.fbx"));
+		boundingSphereComponent->SetRadius(541.0f / 2.0f);
+		break;
+	case 5:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_6.fbx"));
+		boundingSphereComponent->SetRadius(541.0f / 2.0f);
+		break;
+	case 6:
+	case 7:
+	case 8:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_8.fbx"));
+		boundingSphereComponent->SetRadius(330.0f / 2.0f);
+		break;
+	}
+
+
+	auto randomScale = Crystal::RandomFloatInRange(6.0f, 10.0f) * 0.08f;
+	m_MainComponent->RotateRoll(rand() % 360);
+	m_MainComponent->RotatePitch(rand() % 360);
+	m_MainComponent->RotateYaw(rand() % 360);
+	m_MainComponent->SetUnitScale(randomScale);
+	m_MainComponent->SetMass(500.0f * randomScale);
+}
+
+void WhiteAsteroid::SetAsteroidType(int type)
+{
+	auto material = m_StaticMeshComponent->GetMaterial(0);
+	auto& resourceManager = Crystal::ResourceManager::Instance();
+	switch (type)
+	{
+	case 0:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_1.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(215.0f);
+		break;
+	case 1:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_2.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(617.0f / 2.0f);
+		break;
+	case 2:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_3.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(663.0f / 2.0f);
+		break;
+	case 3:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_4.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(3025.0f / 2.0f);
+		break;
+	case 4:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_5_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_5.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(541.0f / 2.0f);
+		break;
+	case 5:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_6.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(541.0f / 2.0f);
+		break;
+	case 6:
+	case 7:
+	case 8:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_N.tga");
+		m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_8.fbx"));
+		Crystal::Cast<Crystal::BoundingSphereComponent>(m_MainComponent)->SetRadius(330.0f / 2.0f);
+		break;
+	}
+
 }
 
 void FakeAsteroid::Initialize()
@@ -151,6 +301,85 @@ void FakeAsteroid::Initialize()
 	m_MainComponent->SetMass(500.0f * randomScale);
 }
 
+void FakeWhiteAsteroid::Initialize()
+{
+	auto material = Crystal::CreateShared<Crystal::Material>();
+	material->BlendMode = Crystal::EBlendMode::BM_Opaque;
+	material->ShadingModel = Crystal::EShadingModel::SM_Lit;
+
+	auto staticMeshComponent = CreateComponent<Crystal::StaticMeshComponent>("StaticMeshComponent");
+	staticMeshComponent->AddMaterial(material);
+	staticMeshComponent->SetCastShadow(false);
+
+	m_MainComponent = staticMeshComponent;
+
+
+	int randomNumber = Crystal::RandomFloatInRange(0, 8);
+	auto& resourceManager = Crystal::ResourceManager::Instance();
+
+
+	switch (randomNumber)
+	{
+	case 0:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_1_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_1.fbx"));
+		break;
+	case 1:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_2_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_2.fbx"));
+		break;
+	case 2:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_3_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_3.fbx"));
+		break;
+	case 3:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_4_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_4.fbx"));
+		break;
+	case 4:
+	case 5:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_6_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_6.fbx"));
+		break;
+	case 6:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_7_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_7_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_7_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_7.fbx"));
+		break;
+	case 7:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_8_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_8.fbx"));
+		break;
+	case 8:
+		material->AlbedoTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_9_D.tga");
+		material->RoughnessTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_9_R.tga");
+		material->NormalTexture = resourceManager.GetTexture("assets/textures/Asteroid2/T_Asteroid_9_N.tga");
+		staticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/S_Asteroid_9.fbx"));
+		break;
+	}
+
+
+	auto randomScale = Crystal::RandomFloatInRange(0.4f, 0.8f) * 0.025f;
+	m_MainComponent->RotateRoll(rand() % 360);
+	m_MainComponent->RotatePitch(rand() % 360);
+	m_MainComponent->RotateYaw(rand() % 360);
+	m_MainComponent->SetUnitScale(randomScale);
+	m_MainComponent->SetMass(500.0f * randomScale);
+}
+
 void DestructibleAsteroid::Initialize()
 {
 	Actor::Initialize();
@@ -175,6 +404,11 @@ void DestructibleAsteroid::Initialize()
 	m_HealthBarFillComponent->AddMaterial(hpBarFillMat);
 	m_HealthBarFillComponent->SetScaleX(0.072f);
 	m_HealthBarFillComponent->SetScaleY(0.048f);
+
+	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
+	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
+	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
+	
 
 	SetShowHealthBar(false);
 }
@@ -244,8 +478,9 @@ void DestructibleAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> cause
 		return;
 	}
 
-	
-	if (damageCauser->StaticType() != "MyPlayerPawn")
+
+	auto staticType = damageCauser->StaticType();
+	if (staticType != "MyPlayerPawn" && staticType != "AllyDrone")
 	{
 		return;
 	}
@@ -292,7 +527,8 @@ void HealAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
 
 
-	if (damageCauser.lock()->StaticType() == "MyPlayerPawn")
+	auto staticType = damageCauser.lock()->StaticType();
+	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
 	{
 		m_CurrentHealth -= damage;
 		UpdateHealth();
@@ -349,7 +585,8 @@ void PowerAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser
 {
 	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
 
-	if (damageCauser.lock()->StaticType() == "MyPlayerPawn")
+	auto staticType = damageCauser.lock()->StaticType();
+	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
 	{
 		m_CurrentHealth -= damage;
 		UpdateHealth();
@@ -404,7 +641,8 @@ void ShieldAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCause
 {
 	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
 
-	if (damageCauser.lock()->StaticType() == "MyPlayerPawn")
+	auto staticType = damageCauser.lock()->StaticType();
+	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
 	{
 		m_CurrentHealth -= damage;
 		UpdateHealth();

@@ -16,6 +16,8 @@ namespace Crystal {
 
 		void Update(const float deltaTime) override;
 
+		
+
 
 		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
 		                     const struct CollisionParams& collisionParams);

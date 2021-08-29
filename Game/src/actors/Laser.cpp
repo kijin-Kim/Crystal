@@ -20,6 +20,8 @@ void Laser::Initialize()
 	boundingSphereComponent->SetRadius(7.0f);
 	boundingSphereComponent->SetMass(1.0f);
 	boundingSphereComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	boundingSphereComponent->IgnoreActorClassOf("AllyDrone");
+	boundingSphereComponent->IgnoreActorClassOf("DroneLaser");
 	boundingSphereComponent->IgnoreActorClassOf("MyPlayerPawn");
 	boundingSphereComponent->IgnoreActorClassOf("PolluteSphere");
 	boundingSphereComponent->IgnoreActorClassOf("Laser");
@@ -42,7 +44,7 @@ void Laser::Initialize()
 
 	auto projectileMovementComponent = CreateComponent<Crystal::ProjectileMovementComponent>("ProjectileMovementComponent");
 	projectileMovementComponent->SetTargetComponent(m_MainComponent);
-	projectileMovementComponent->SetProjectileMaxAcceleration(300000.0f);
+	projectileMovementComponent->SetProjectileMaxAcceleration(100000.0f);
 }
 
 void Laser::Update(float deltaTime)

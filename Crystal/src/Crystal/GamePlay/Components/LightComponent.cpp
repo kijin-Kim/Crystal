@@ -71,7 +71,7 @@ namespace Crystal {
 			float nearPlane = 1000.0f;
 			float farPlane = 100000.0f;
 
-			auto proj = Matrix4x4::OrthoGraphic(2048.0f * 1.0f, 2048.0f * 1.0f, nearPlane, farPlane);
+			auto proj = Matrix4x4::OrthoGraphic(2048.0f * 3.0f, 2048.0f * 3.0f, nearPlane, farPlane);
 
 			m_LightViewProjection = Matrix4x4::Multiply(view, proj);
 		}

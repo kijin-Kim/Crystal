@@ -99,7 +99,7 @@ private:
 	Crystal::Weak<PlayerShield> m_PlayerShield = {};
 
 	bool m_bShouldFire = false;
-	float m_RoundPerMin = 1000.0f;
+	float m_RoundPerMin = 1200.0f;
 	float m_RoundPerSec = m_RoundPerMin / 60.0f;
 	float m_FireInterval = 1.0f / m_RoundPerSec;
 
@@ -109,7 +109,7 @@ private:
 	const float m_MaxHealth = 100.0f;
 	float m_Health = m_MaxHealth;
 	
-	float m_Power = 1.0f;
+	float m_Power = 5.0f;
 
 	bool m_bHasItem[ItemTypeCount];
 

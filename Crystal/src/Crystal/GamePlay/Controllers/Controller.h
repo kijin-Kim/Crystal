@@ -19,7 +19,10 @@ namespace Crystal {
 		{
 			m_PossessedPawn = pawn;
 			pawn->OnPossessed(Cast<Controller>(weak_from_this()));
+			OnPosses(pawn);
 		}
+
+		virtual void OnPosses(Shared<Pawn> pawn) {}
 
 		virtual bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 

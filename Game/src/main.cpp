@@ -19,10 +19,12 @@
 #include "actors/Drone.h"
 #include "actors/DroneAIController.h"
 #include "actors/EndLevels.h"
+#include "actors/MainLevel.h"
 #include "actors/GameLevel.h"
 #include "actors/Kraken.h"
 #include "actors/Missile.h"
 #include "actors/KrakenAIController.h"
+#include "actors/MiningLevel.h"
 #include "actors/MyHUD.h"
 #include "actors/ShieldSphere.h"
 #include "actors/SpaceWhale.h"
@@ -46,12 +48,15 @@ public:
 	{
 		Crystal::Application::Start();
 
+		m_World->CreateLevel<MiningLevel>("MiningLevel");
+		m_World->CreateLevel<MainLevel>("MainLevel");
 		m_World->CreateLevel<GameLevel>("GameLevel");
 		m_World->CreateLevel<GameOverLevel>("GameOverLevel");
 		m_World->CreateLevel<GameClearLevel>("GameClearLevel");
 		
 		m_World->CreateLevel<TitleLevel>("TitleLevel");
-		m_World->OpenLevel("TitleLevel");
+
+		m_World->OpenLevel("MiningLevel");
 
 
 	}

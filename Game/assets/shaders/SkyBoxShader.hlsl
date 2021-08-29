@@ -12,6 +12,14 @@ struct PS_INPUT
 cbuffer Constants : register(b0)
 {
     float4x4 InverseViewProj : packoffset(c0);
+    float4 AdditiveColor : packoffset(c4);
+    float RedLevel : packoffset(c5.x);
+    float GreenLevel : packoffset(c5.y);
+    float BlueLevel : packoffset(c5.z);
+    float Power : packoffset(c5.w);
+    float Saturation : packoffset(c6.x);
+    float NearStarDesaturation : packoffset(c6.y);
+    float FarStarDesaturation : packoffset(c6.z);
 };
 
 
@@ -38,30 +46,32 @@ float4 psMain(PS_INPUT input) : SV_TARGET
     float3 starFarColor = StarFarColorTexture.Sample(DefaultSampler, input.TexCoord).rgb;
     float3 starNearColor = StarNearColorTexture.Sample(DefaultSampler, input.TexCoord).rgb;
 
+    color.r *= RedLevel;
+    color.g *= GreenLevel;
+    color.b *= BlueLevel;
     
 
-    float saturation = 1.1f;
-    float colorfraction = saturation * -1.0f + 1.0f;
+    float colorfraction = Saturation * -1.0f + 1.0f;
     float3 luminaceFactor = float3(0.3f, 0.59f, 0.11f);
 
-    color = pow(color, 0.8f);
+    color = pow(color, Power);
     color = lerp(color, dot(color, luminaceFactor), colorfraction); //desaturation
 
     alpha *= 5.0f;
     alpha = pow(alpha, 2.0f);
 
 
-    //float starFarColorFraction = 0.3f;
     starFarColor *= 2.0f;
-    //starFarColor = lerp(starFarColor, dot(starFarColor, luminaceFactor), starFarColorFraction);
+    starFarColor = lerp(starFarColor, dot(starFarColor, luminaceFactor), FarStarDesaturation);
     starFarColor -= alpha;
     starFarColor = saturate(starFarColor);
 
     starNearColor *= 2.0f;
-    
-    float3 additiveColor = float3(0.008364,0.012143,0.026042);
+    starNearColor = lerp(starNearColor, dot(starNearColor, luminaceFactor), NearStarDesaturation);
 
-    float3 finalColor = color + starFarColor + starNearColor + additiveColor;
+
+    float3 finalColor = color + starFarColor + starNearColor +  AdditiveColor.rgb;
+
 
     return float4(finalColor, 1.0f);
 }

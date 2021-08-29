@@ -4,59 +4,38 @@
 namespace Crystal {
 	Timer::Timer()
 	{
-		UINT64 countsPerSec = 0;
-		QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
-
-		m_SecondsPerCount = 1.0 / (double)countsPerSec;
+		LARGE_INTEGER f;
+		QueryPerformanceFrequency(&f);
+		m_InvFreq = 1000.0 / double(f.QuadPart);
 	}
 
 	void Timer::Tick()
 	{
-		if (m_bIsStopped)
+		double current = getCurrent();
+
+		if(m_bShouldReset)
 		{
-			m_DeltaTime = 0.0;
-			return;
+			m_LastTime = current;
+			m_bShouldReset = false;
 		}
 
-		UINT64 currentTime = 0;
-		QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
-		m_CurrentTime = (double)currentTime;
-
-		// 타이머는 언제나 첫틱에 0.0의 델타타임에서 시작합니다
-		if (m_LastTime != 0.0)
-			m_DeltaTime = (m_CurrentTime - m_LastTime) * m_SecondsPerCount;
-
-		m_LastTime = m_CurrentTime;
-
-		if (m_DeltaTime < 0.0)
-		{
-			m_DeltaTime = 0.0;
-		}
-
+		m_DeltaTime = (current - m_LastTime) * m_InvFreq * (1 / 1000.0);
 		m_ElapsedTime += m_DeltaTime;
+
+		m_LastTime = current;
 	}
 
 	void Timer::Reset()
 	{
-		UINT64 countsPerSec = 0;
-		QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
-
-		m_SecondsPerCount = 1.0 / (double)countsPerSec;
-
-		m_CurrentTime = 0.0;
+		m_bShouldReset = true;
 		m_ElapsedTime = 0.0;
-		m_LastTime = 0.0;
 	}
 
-	
-	void Timer::Pause()
+	double Timer::getCurrent()
 	{
-		m_bIsStopped = true;
-	}
-
-	void Timer::Resume()
-	{
-		m_bIsStopped = false;
+		LARGE_INTEGER c;
+		QueryPerformanceCounter(&c);
+		return c.QuadPart;
 	}
 
 }

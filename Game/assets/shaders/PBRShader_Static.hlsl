@@ -195,7 +195,7 @@ float CalculateShadow(float4 lightSpacePosition)
     ShadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
 
     float2 texelSize = float2(1.0f / float(shadowMapWidth), 1.0f / float(shadowMapHeight));
-    float bias = 0.0001f;
+    float bias =0.0008f;
 
     for(int x = -1; x <= 1; ++x) // PCF
     {

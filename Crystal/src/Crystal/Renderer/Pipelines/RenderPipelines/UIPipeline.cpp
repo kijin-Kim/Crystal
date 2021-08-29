@@ -136,12 +136,7 @@ namespace Crystal {
 			auto& materials = textureComponent->GetMaterials();
 			for (auto& mat : materials)
 			{
-				auto texture = mat->AlbedoTexture.lock();
-				if (!texture)
-				{
-					continue;
-				}
-
+				
 				perInstanceData.AlbedoColor = mat->AlbedoColor;
 				perInstanceData.Opacity = mat->Opacity;
 				perInstanceData.OpacityMultiplier = mat->OpacityMultiplier;
@@ -194,9 +189,8 @@ namespace Crystal {
 			drawData.InstanceCount = batch.second.InstanceCount;
 			drawData.DescriptorHeapOffset = batch.second.DescriptorHeapOffset;
 
-			drawData.InstanceVertexBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size(),
-			                                                     batch.second.PerInstanceDatas.size(), false, true);
-			drawData.InstanceVertexBuffer->SetData(batch.second.PerInstanceDatas.data(), 0, sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size());
+			drawData.InstanceVertexBuffer = BufferManager::Instance().GetBuffer(batch.second.PerInstanceDatas.data(), sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size(),
+				batch.second.PerInstanceDatas.size(), true);
 
 			m_DrawDatas.push_back(std::move(drawData));
 		}

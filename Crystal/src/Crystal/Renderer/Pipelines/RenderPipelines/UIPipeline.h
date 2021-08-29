@@ -60,7 +60,7 @@ namespace Crystal {
 		{
 			uint64_t InstanceCount = 1;
 			uint64_t DescriptorHeapOffset = 0;
-			Unique<Buffer> InstanceVertexBuffer = nullptr;
+			Shared<Buffer> InstanceVertexBuffer = nullptr;
 		};
 
 		std::unordered_map<Material*, InstanceBatch> m_InstanceBatches;

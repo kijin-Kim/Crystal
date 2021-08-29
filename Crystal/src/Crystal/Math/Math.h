@@ -117,9 +117,9 @@ namespace Crystal {
 
 			
 			DirectX::XMFLOAT3 position = {};
-			position.x = r * sin(phi) * cos(theta);
-			position.y = r * sin(phi) * sin(theta);
-			position.z = r * cos(phi);
+			position.x = center.x +  r * sin(phi) * cos(theta);
+			position.y = center.y + r * sin(phi) * sin(theta);
+			position.z = center.z + r * cos(phi);
 			
 			return position;			
 		}
