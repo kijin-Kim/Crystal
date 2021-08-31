@@ -105,6 +105,20 @@ namespace Crystal {
 		}
 
 
+		for (auto it = Texts.begin(); it != Texts.end();)
+		{
+			if (it->expired())
+			{
+				it = Texts.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+
+
 		for (auto it = AIPerceptionSources.begin(); it != AIPerceptionSources.end();)
 		{
 			if (it->expired())

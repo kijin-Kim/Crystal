@@ -61,6 +61,7 @@ namespace Crystal {
 			{"TOGGLE_OPACITY_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"USE_ALBEDO_ALPHA", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"ALBEDO_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"TINT_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"OPACITY", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 			{"OPACITY_MULTIPLIER", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
 		};
@@ -96,7 +97,7 @@ namespace Crystal {
 		auto& mainCamera = scene->Cameras[0].lock();
 
 		perFrameData.View = Matrix4x4::Transpose(Matrix4x4::LookTo({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}));
-		perFrameData.Projection = Matrix4x4::Transpose(Matrix4x4::OrthoGraphic(1920.0f, 1080.0f, 0.1f, 1000.0f));
+		perFrameData.Projection = Matrix4x4::Transpose(Matrix4x4::OrthoGraphicOffCenter(0.0f, 1920.0f, 0.0f, 1080.0f, 0.1f, 1000.0f));
 
 		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
 
@@ -138,6 +139,7 @@ namespace Crystal {
 			{
 				
 				perInstanceData.AlbedoColor = mat->AlbedoColor;
+				perInstanceData.TintColor = mat->TintColor;
 				perInstanceData.Opacity = mat->Opacity;
 				perInstanceData.OpacityMultiplier = mat->OpacityMultiplier;
 

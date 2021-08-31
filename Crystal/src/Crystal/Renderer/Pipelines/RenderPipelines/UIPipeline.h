@@ -43,6 +43,7 @@ namespace Crystal {
 			int bToggleOpacityTexture = false;
 			int bUseAlbedoTextureAlpha = false;
 			DirectX::XMFLOAT3 AlbedoColor = Vector3::Cyan;
+			DirectX::XMFLOAT3 TintColor = Vector3::White;
 			float Opacity = 1.0f;
 			float OpacityMultiplier = 1.0f;
 		};

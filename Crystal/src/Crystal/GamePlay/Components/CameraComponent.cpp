@@ -42,8 +42,8 @@ namespace Crystal {
 			cameraSpacePosition = {cameraSpacePosition.x * invW, cameraSpacePosition.y * invW};
 		}
 
-		cameraSpacePosition.x = cameraSpacePosition.x / 2.0f * m_Viewport.Width;
-		cameraSpacePosition.y = cameraSpacePosition.y / 2.0f * m_Viewport.Height;
+		cameraSpacePosition.x = m_Viewport.Width / 2.0f + cameraSpacePosition.x / 2.0f * m_Viewport.Width;
+		cameraSpacePosition.y = m_Viewport.Height / 2.0f + cameraSpacePosition.y / 2.0f * m_Viewport.Height;
 
 		return cameraSpacePosition;
 	}

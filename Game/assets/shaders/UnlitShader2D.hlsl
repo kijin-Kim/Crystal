@@ -19,6 +19,7 @@ struct VS_INPUT
     bool bToggleOpacityTexture : TOGGLE_OPACITY_TEXTURE;
     bool bUseAlbedoTextureAlpha : USE_ALBEDO_ALPHA;
     float3 AlbedoColor : ALBEDO_COLOR;
+    float3 TintColor : TINT_COLOR;
     float Opacity : OPACITY;
     float OpacityMultiplier : OPACITY_MULTIPLIER;
 };
@@ -34,6 +35,7 @@ struct PS_INPUT
     nointerpolation bool bUseAlbedoTextureAlpha : USE_ALBEDO_ALPHA;
 
     nointerpolation float3 AlbedoColor : ALBEDO_COLOR;
+    nointerpolation float3 TintColor : TINT_COLOR;
     nointerpolation float Opacity : OPACITY;
     nointerpolation float OpacityMultiplier : OPACITY_MULTIPLIER;
 };
@@ -55,6 +57,7 @@ PS_INPUT vsMain(VS_INPUT input)
     output.bToggleOpacityTexture = input.bToggleOpacityTexture;
     output.bUseAlbedoTextureAlpha = input.bUseAlbedoTextureAlpha;
     output.AlbedoColor = input.AlbedoColor;
+    output.TintColor = input.TintColor;
     output.Opacity = input.Opacity;
     output.OpacityMultiplier = input.OpacityMultiplier;
 
@@ -81,6 +84,7 @@ float4 psMain(PS_INPUT input) : SV_Target
         opacity = albedoColor.a;
     }
 
+    albedoColor *= float4(input.TintColor, 1.0f);
     opacity *= input.OpacityMultiplier;
 
     float4 finalColor = float4(albedoColor.rgb, opacity);

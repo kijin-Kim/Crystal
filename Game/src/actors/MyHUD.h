@@ -34,14 +34,23 @@ public:
 	STATIC_TYPE_IMPLE(MyHUD)
 
 private:
-	Crystal::Shared<Crystal::TextureComponent> m_HealthFillComponent = nullptr;
-	Crystal::Shared<Crystal::TextureComponent> m_EnemyHpBarFillComponent = nullptr;
-	Crystal::Shared<Crystal::TextureComponent> m_PollutionBarFillComponent = nullptr;
+	Crystal::Shared<Crystal::TextureComponent> m_PlayerFillComponent = nullptr;
+	Crystal::Shared<Crystal::TextureComponent> m_KrakenFillComponent = nullptr;
+	Crystal::Shared<Crystal::TextureComponent> m_PolluteFillComponent = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_PowerPotionIcon = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_HealPotionIcon = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_ShieldPotionIcon = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_HitmarkerTextureComponent = nullptr;
 	int m_HealthBarWidth = 0;
 	int m_HealthBarHeight = 0;
+
+	float m_BarPadding = 0.0f;
+	float m_BarBackgroundWidth = 0.0f;
+	float m_FillWidth = 0.0f;
+
+	DirectX::XMFLOAT2 m_PlayerBarScale = { 1.0f , 1.0f };
+	DirectX::XMFLOAT2 m_KrakenBarScale = { 1.0f , 1.0f };
+	DirectX::XMFLOAT2 m_PolluteBarScale = { 1.0f , 1.0f };
+
 
 };

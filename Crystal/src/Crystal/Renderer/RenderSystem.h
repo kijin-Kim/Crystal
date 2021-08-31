@@ -6,7 +6,6 @@
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
 #include "Crystal/Resources/Shader.h"
 
-
 namespace Crystal {
 	struct WorldConfig;
 	class LightComponent;
@@ -85,7 +84,7 @@ namespace Crystal {
 
 		Timer m_CleanUpTimer;
 		const float m_CleanUpTime = 5.0f;
-		
+
 	};
 }
 

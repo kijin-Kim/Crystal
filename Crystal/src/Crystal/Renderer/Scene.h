@@ -6,6 +6,7 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
 #include "Crystal/GamePlay/Components/TextureComponent.h""
+#include "Crystal/GamePlay/Components/TextRenderingComponent.h"
 
 namespace Crystal {
 	class PostProcessComponent;
@@ -88,6 +89,7 @@ namespace Crystal {
 		
 		
 		std::vector<Weak<TextureComponent>> Textures;
+		std::vector<Weak<TextRenderingComponent>> Texts;
 
 		std::vector<Weak<PostProcessComponent>> PostProcesses;
 

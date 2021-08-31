@@ -453,6 +453,7 @@
     <ClInclude Include="src\Crystal\GamePlay\Components\PrimitiveComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\SpringArmComponent.h" />
+    <ClInclude Include="src\Crystal\GamePlay\Components\TextRenderingComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TextureComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\TransformComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Controllers\AIController.h" />
@@ -476,6 +477,7 @@
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\BrightColorExtractingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PostProcessPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\PipelineStateHelper.h" />
+    <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\FontPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.h" />
     <ClInclude Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UIPipeline.h" />
@@ -549,6 +551,7 @@
     <ClCompile Include="src\Crystal\GamePlay\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\ProjectileMovementComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\SpringArmComponent.cpp" />
+    <ClCompile Include="src\Crystal\GamePlay\Components\TextRenderingComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TextureComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Crystal\GamePlay\Controllers\AIController.cpp" />
@@ -575,6 +578,7 @@
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\DiffIrradSamplingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PanoToCubemapPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\ComputePipelines\PostProcessPipeline.cpp" />
+    <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\FontPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticBlendingPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\ForwardStaticPipeline.cpp" />
     <ClCompile Include="src\Crystal\Renderer\Pipelines\RenderPipelines\UIPipeline.cpp" />
@@ -615,15 +619,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Crystal\GamePlay\Components\CollisionShapes.inl" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="external\DirectXTex\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
+    </ProjectReference>
+    <ProjectReference Include="external\DirectXTK\DirectXTK_Desktop_2019_Win10.vcxproj">
+      <Project>{3e0e8608-cd9b-4c76-af33-29ca38f2c9f0}</Project>
     </ProjectReference>
     <ProjectReference Include="external\imgui\ImGui.vcxproj">
       <Project>{ffabe88a-f7c7-4134-b287-54119e3d0ef4}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Crystal\GamePlay\Components\CollisionShapes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
