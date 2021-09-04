@@ -319,6 +319,7 @@
     <ClCompile Include="src\actors\Drone.cpp" />
     <ClCompile Include="src\actors\DroneAIController.cpp" />
     <ClCompile Include="src\actors\DroneLaser.cpp" />
+    <ClCompile Include="src\actors\Inventory.cpp" />
     <ClCompile Include="src\actors\Kraken.cpp" />
     <ClCompile Include="src\actors\KrakenAIController.cpp" />
     <ClCompile Include="src\actors\Laser.cpp" />
@@ -350,6 +351,8 @@
     <ClInclude Include="src\actors\DroneLaser.h" />
     <ClInclude Include="src\actors\EndLevelPawns.h" />
     <ClInclude Include="src\actors\EndLevels.h" />
+    <ClInclude Include="src\actors\Inventory.h" />
+    <ClInclude Include="src\actors\InventoryLevel.h" />
     <ClInclude Include="src\actors\MainLevel.h" />
     <ClInclude Include="src\actors\GameLevel.h" />
     <ClInclude Include="src\actors\Kraken.h" />
@@ -362,6 +365,7 @@
     <ClInclude Include="src\actors\MyHUD.h" />
     <ClInclude Include="src\actors\PlayerShield.h" />
     <ClInclude Include="src\actors\PolluteSphere.h" />
+    <ClInclude Include="src\actors\Quest.h" />
     <ClInclude Include="src\actors\ShieldSphere.h" />
     <ClInclude Include="src\actors\SpaceCombatTypes.h" />
     <ClInclude Include="src\actors\SpaceStation.h" />

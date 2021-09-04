@@ -1,4 +1,5 @@
 #pragma once
+#include <stack>
 #include <vector>
 
 #include "Level.h"
@@ -48,8 +49,8 @@ namespace Crystal {
 		const Shared<Level>& GetLevelByIndex(int index);
 		const Shared<Level>& GetCurrentLevel() const;
 
-		void OpenLevel(const std::string& name);
-		void CloseLevel(const std::string& name);
+		void PushLevel(const std::string& name);
+		void PopLevel(const std::string& name);
 
 		const WorldConfig& GetWorldConfig() const { return m_WorldConfig; }
 		void SetShowDebugCollision(bool show) { m_WorldConfig.bShowDebugCollision = show; }
@@ -65,18 +66,13 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(World)
 
 	private:
-		Shared<Level> m_CurrentLevel = nullptr;
 		std::vector<std::shared_ptr<Level>> m_Levels;
+		std::stack<std::shared_ptr<Level>> m_LevelStack;
 		WorldConfig m_WorldConfig = {};
 
 		Shared<RenderSystem> m_RenderSystem = nullptr;
 		Shared<PhysicsSystem> m_PhysicsSystem = nullptr;
 
-		struct OpenLevelCommand
-		{
-			std::string LevelName;
-		};
-		std::vector<OpenLevelCommand> m_OpenLevelCommands;
 	};
 
 	template <class T>
@@ -87,9 +83,9 @@ namespace Crystal {
 			return spawnParams.Level->SpawnActor<T>(spawnParams);
 		}
 
-		if (m_CurrentLevel)
+		if(!m_LevelStack.empty())
 		{
-			return m_CurrentLevel->SpawnActor<T>(spawnParams);
+			return m_LevelStack.top()->SpawnActor<T>(spawnParams);
 		}
 
 		CS_FATAL(false, "먼저 Level을 설정해주세요");

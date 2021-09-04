@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d12.h>
+#include <DirectXMath.h>
 
 #define SERIALIZE_PROPERTIES friend class boost::serialization::access;\
 template <class Archive>\

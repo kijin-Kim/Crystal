@@ -63,16 +63,6 @@ namespace Crystal {
 
 		switch (uMsg)
 		{
-		case WM_SETFOCUS:
-			{
-				RECT rect = {};
-				rect.left = 0;
-				rect.top = 0;
-				rect.right = m_Window->GetWidth();
-				rect.bottom = m_Window->GetHeight();
-				ClipCursor(&rect);
-			}
-			break;
 		case WM_CLOSE:
 			m_bShouldRun = false;
 			return true;

@@ -657,6 +657,7 @@ namespace Crystal {
 		m_Pipelines[0]->End();
 		m_Pipelines[7]->End();
 		m_Pipelines[8]->End();
+		m_Pipelines[10]->End();
 		m_Pipelines[11]->End();
 		m_Pipelines[12]->End();
 		m_Pipelines[14]->End();

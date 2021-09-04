@@ -43,7 +43,7 @@ public:
 	void OpenTitleLevel()
 	{
 		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->OpenLevel("TitleLevel");
+		world->PushLevel("TitleLevel");
 	}
 
 	STATIC_TYPE_IMPLE(GameOverLevelPawn)
@@ -88,7 +88,7 @@ public:
 	void OpenTitleLevel()
 	{
 		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->OpenLevel("TitleLevel");
+		world->PushLevel("TitleLevel");
 	}
 
 	STATIC_TYPE_IMPLE(GameClearLevelPawn)

@@ -9,7 +9,7 @@ namespace Crystal {
 
 	void TextRenderingComponent::RegisterComponent()
 	{
-		TransformComponent::RegisterComponent();
+		PrimitiveComponent::RegisterComponent();
 
 		auto owner = Cast<Actor>(GetOuter());
 		auto level = Cast<Level>(owner->GetOuter());

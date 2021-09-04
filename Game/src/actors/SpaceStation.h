@@ -8,4 +8,6 @@ public:
 	~SpaceStation() override = default;
 
 	void Initialize() override;
+
+	STATIC_TYPE_IMPLE(SpaceStation)
 };

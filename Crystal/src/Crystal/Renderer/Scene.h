@@ -9,6 +9,7 @@
 #include "Crystal/GamePlay/Components/TextRenderingComponent.h"
 
 namespace Crystal {
+	class ButtonComponent;
 	class PostProcessComponent;
 
 	/*
@@ -90,6 +91,7 @@ namespace Crystal {
 		
 		std::vector<Weak<TextureComponent>> Textures;
 		std::vector<Weak<TextRenderingComponent>> Texts;
+		std::vector<Weak<ButtonComponent>> Buttons;
 
 		std::vector<Weak<PostProcessComponent>> PostProcesses;
 

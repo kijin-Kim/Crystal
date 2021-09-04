@@ -110,46 +110,40 @@ private:
 };
 
 
-class HealAsteroid : public DestructibleAsteroid
+class GreenOreAsteroid : public DestructibleAsteroid
 {
 public:
-	HealAsteroid() = default;
-	~HealAsteroid() override = default;
+	GreenOreAsteroid() = default;
+	~GreenOreAsteroid() override = default;
 
 
 	void Initialize() override;
 
-	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
-
-	STATIC_TYPE_IMPLE(HealAsteroid)
+	STATIC_TYPE_IMPLE(GreenOreAsteroid)
 };
 
-class PowerAsteroid : public DestructibleAsteroid
+class BlueOreAsteroid : public DestructibleAsteroid
 {
 public:
-	PowerAsteroid() = default;
-	~PowerAsteroid() override = default;
+	BlueOreAsteroid() = default;
+	~BlueOreAsteroid() override = default;
 
 
 	void Initialize() override;
 
-	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
-
-	STATIC_TYPE_IMPLE(PowerAsteroid)
+	STATIC_TYPE_IMPLE(BlueOreAsteroid)
 };
 
 
-class ShieldAsteroid : public DestructibleAsteroid
+class YellowOreAsteroid : public DestructibleAsteroid
 {
 public:
-	ShieldAsteroid() = default;
-	~ShieldAsteroid() override = default;
+	YellowOreAsteroid() = default;
+	~YellowOreAsteroid() override = default;
 
 	void Initialize() override;
 
-	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
-
-	STATIC_TYPE_IMPLE(ShieldAsteroid)
+	STATIC_TYPE_IMPLE(YellowOreAsteroid)
 
 };

@@ -11,4 +11,5 @@ public:
 	~SpaceStationCoreActor() override = default;
 
 	void Initialize() override;
+	STATIC_TYPE_IMPLE(SpaceStationCoreActor)
 };

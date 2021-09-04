@@ -1,5 +1,6 @@
 ﻿#include "Asteroid.h"
 
+#include "Inventory.h"
 #include "MyPlayerPawn.h"
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
@@ -10,11 +11,11 @@
 
 BOOST_CLASS_EXPORT(Asteroid)
 
-BOOST_CLASS_EXPORT(HealAsteroid)
+BOOST_CLASS_EXPORT(GreenOreAsteroid)
 
-BOOST_CLASS_EXPORT(PowerAsteroid)
+BOOST_CLASS_EXPORT(BlueOreAsteroid)
 
-BOOST_CLASS_EXPORT(ShieldAsteroid)
+BOOST_CLASS_EXPORT(YellowOreAsteroid)
 
 
 void Asteroid::Initialize()
@@ -405,6 +406,8 @@ void DestructibleAsteroid::Initialize()
 	m_HealthBarFillComponent->SetScaleX(0.072f);
 	m_HealthBarFillComponent->SetScaleY(0.048f);
 
+
+
 	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
 	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
 	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
@@ -443,9 +446,9 @@ void DestructibleAsteroid::Update(float deltaTime)
 			{
 				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
 				position2D.y += 100.0f;
-				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 1.0f});
 				m_HealthBarFillComponent->SetWorldPosition({
-					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 2.0f
 				});
 			}
 		}
@@ -485,10 +488,28 @@ void DestructibleAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> cause
 		return;
 	}
 
+
+	m_CurrentHealth -= damage;
+	UpdateHealth();
+	if (m_CurrentHealth <= 0.0f)
+	{
+		Destroy();
+		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+		if (level)
+		{
+			auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
+			if(staticType == "MyPlayerPawn")
+			{
+				playerPawn->GetInventory()->AddGold(GetScale().x * 100.0f);
+			}
+			
+		}
+	}
+
 	SetShowHealthBar(true);
 }
 
-void HealAsteroid::Initialize()
+void GreenOreAsteroid::Initialize()
 {
 	DestructibleAsteroid::Initialize();
 
@@ -522,30 +543,9 @@ void HealAsteroid::Initialize()
 	m_MainComponent->SetMass(5000.0f * randomScale);
 }
 
-void HealAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
-{
-	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
 
 
-	auto staticType = damageCauser.lock()->StaticType();
-	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
-	{
-		m_CurrentHealth -= damage;
-		UpdateHealth();
-		if (m_CurrentHealth <= 0.0f)
-		{
-			Destroy();
-			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-			if (level)
-			{
-				auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
-				playerPawn->OnItemDestroyed(ItemType_Heal);
-			}
-		}
-	}
-}
-
-void PowerAsteroid::Initialize()
+void BlueOreAsteroid::Initialize()
 {
 	DestructibleAsteroid::Initialize();
 
@@ -581,29 +581,9 @@ void PowerAsteroid::Initialize()
 	m_MainComponent->SetMass(5000.0f * randomScale);
 }
 
-void PowerAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
-{
-	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
 
-	auto staticType = damageCauser.lock()->StaticType();
-	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
-	{
-		m_CurrentHealth -= damage;
-		UpdateHealth();
-		if (m_CurrentHealth <= 0.0f)
-		{
-			Destroy();
-			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-			if (level)
-			{
-				auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
-				playerPawn->OnItemDestroyed(ItemType_Power);
-			}
-		}
-	}
-}
 
-void ShieldAsteroid::Initialize()
+void YellowOreAsteroid::Initialize()
 {
 	DestructibleAsteroid::Initialize();
 
@@ -635,26 +615,4 @@ void ShieldAsteroid::Initialize()
 	m_MainComponent->RotateYaw(rand() % 360);
 	m_MainComponent->SetUnitScale(randomScale);
 	m_MainComponent->SetMass(5000.0f * randomScale);
-}
-
-void ShieldAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
-{
-	DestructibleAsteroid::OnTakeDamage(damage, damageCauser);
-
-	auto staticType = damageCauser.lock()->StaticType();
-	if (staticType == "MyPlayerPawn" || staticType == "AllyDrone")
-	{
-		m_CurrentHealth -= damage;
-		UpdateHealth();
-		if (m_CurrentHealth <= 0.0f)
-		{
-			Destroy();
-			auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-			if (level)
-			{
-				auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
-				playerPawn->OnItemDestroyed(ItemType_Shield);
-			}
-		}
-	}
 }

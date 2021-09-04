@@ -9,6 +9,8 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
+#include "Inventory.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 BOOST_CLASS_EXPORT(MyPlayerPawn)
 
@@ -82,6 +84,8 @@ void MyPlayerPawn::Initialize()
 	m_AIPerceptionSourceComponent = CreateComponent<Crystal::AIPerceptionSourceComponent>("AIPerceptionSourceComponent");
 	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
 	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
+
+	m_Inventory = Crystal::CreateObject<Inventory>("PlayerInventory", weak_from_this());
 }
 
 void MyPlayerPawn::Begin()
@@ -148,6 +152,43 @@ void MyPlayerPawn::Update(const float deltaTime)
 	}
 
 
+
+	const auto start = m_CameraComponent->GetWorldPosition();
+	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
+	float maxDistance = 50000.0f;
+
+	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
+	if (level)
+	{
+		Crystal::HitResult hitResult = {};
+		Crystal::CollisionParams collisionParams = {};
+		collisionParams.IgnoreActors.push_back(Crystal::Cast<Actor>(shared_from_this()));
+		collisionParams.IgnoreClasses.push_back("BoundingOrientedBoxActor");
+		collisionParams.IgnoreClasses.push_back("PolluteSphere");
+		collisionParams.IgnoreClasses.push_back("Laser");
+		collisionParams.IgnoreClasses.push_back("DroneLaser");
+		collisionParams.IgnoreClasses.push_back("AllyDroneLaser");
+		collisionParams.IgnoreClasses.push_back("Asteroid");
+		collisionParams.IgnoreClasses.push_back("WhiteAsteroid");
+		collisionParams.IgnoreClasses.push_back("SpaceStationCoreActor");
+		collisionParams.IgnoreClasses.push_back("Sun");
+
+
+		DirectX::XMFLOAT3 endDirection = m_CameraComponent->GetWorldForwardVector();
+
+		bool result = level->LineTraceSingle(hitResult, start, direction, maxDistance, collisionParams);
+		if (result)
+		{
+			auto hitActor = hitResult.HitActor.lock();
+			Crystal::Cast<MyHUD>(level->GetHUD())->OnActorHovered(hitActor, maxDistance);
+		}
+		else
+		{
+			Crystal::Cast<MyHUD>(level->GetHUD())->OnActorNotHovered();
+		}
+	}
+
+
 }
 
 void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
@@ -165,7 +206,7 @@ void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::BeginFire));
 	inputComponent->BindAction("Fire", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::EndFire));
 
-	inputComponent->BindAction("FireMissile", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::FireMissile));
+	inputComponent->BindAction("ToggleMenu", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleMenu));
 
 	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UsePowerItem));
 	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
@@ -223,27 +264,14 @@ void MyPlayerPawn::EndFire()
 	m_bShouldFire = false;
 }
 
-void MyPlayerPawn::FireMissile()
+void MyPlayerPawn::ToggleMenu()
 {
-	CS_DEBUG_INFO("FireMissile !!");
-
-	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
-	if (level)
-	{
-		Crystal::Actor::ActorSpawnParams spawnParams = {};
-
-		auto playerPosition = GetPosition();
-		spawnParams.Position = {playerPosition.x, playerPosition.y, playerPosition.z + 30.0f};
-		spawnParams.Rotation = Crystal::Vector4::QuaternionMultiply(GetRotationQuat(), m_CameraComponent->GetRotationQuat());
-
-		auto missile = level->SpawnActor<Missile>(spawnParams).lock();
-	}
 }
 
 void MyPlayerPawn::OpenTitleLevel()
 {
 	auto world = Crystal::Cast<Crystal::World>(GetWorld());
-	world->OpenLevel("TitleLevel");
+	world->PushLevel("TitleLevel");
 }
 
 void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
@@ -270,12 +298,17 @@ void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	}
 }
 
+const Crystal::Shared<Inventory>& MyPlayerPawn::GetInventory() const
+{
+	return m_Inventory;
+}
+
 void MyPlayerPawn::OnFire()
 {
 	CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
-	const float maxDistance = 10000.0f;
+	float maxDistance = 50000.0f;
 
 	
 	
@@ -289,18 +322,19 @@ void MyPlayerPawn::OnFire()
 		collisionParams.IgnoreClasses.push_back("PolluteSphere");
 		collisionParams.IgnoreClasses.push_back("Laser");
 		collisionParams.IgnoreClasses.push_back("DroneLaser");
+		collisionParams.IgnoreClasses.push_back("AllyDroneLaser");
 
 		Crystal::Actor::ActorSpawnParams spawnParams = {};
 
-		if(m_bUseLeftSocekt)
+		if(m_bUseLeftSocket)
 		{
 			spawnParams.Position = m_LeftFireSocketComponent->GetWorldPosition();
-			m_bUseLeftSocekt = false;
+			m_bUseLeftSocket = false;
 		}
 		else
 		{
 			spawnParams.Position = m_RightFireSocketComponent->GetWorldPosition();
-			m_bUseLeftSocekt = true;
+			m_bUseLeftSocket = true;
 		}
 
 		DirectX::XMFLOAT3 endDirection = m_CameraComponent->GetWorldForwardVector();
@@ -378,7 +412,7 @@ void MyPlayerPawn::UpdateHealth()
 	if(m_Health <= 0.0f)
 	{
 		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->OpenLevel("GameOverLevel");
+		world->PushLevel("GameOverLevel");
 	}
 }
 
@@ -506,8 +540,3 @@ void MyPlayerPawn::HideDebugAI()
 	world->SetShowDebugAI(false);
 }
 
-void MyPlayerPawn::OnItemDestroyed(ItemType itemType)
-{
-	m_bHasItem[itemType] = true;
-	UpdateItemStatus(itemType, true);
-}

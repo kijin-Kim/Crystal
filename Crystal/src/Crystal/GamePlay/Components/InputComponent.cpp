@@ -80,6 +80,7 @@ namespace Crystal {
 		return false;
 	}
 
+
 	bool InputComponent::ProcessAxisMappedInput(int64_t keyCode, float axisValue)
 	{
 		auto ownerActor = Cast<Actor>(GetOuter());
@@ -139,18 +140,24 @@ namespace Crystal {
 
 		/*Process Action*/
 		auto actionIt = actionMap.find(actionKey);
+		int elementCount = actionMap.count(actionKey);
+
 		if (actionIt != actionMap.end())
 		{
-			std::string actionName = (*actionIt).second;
-			auto actionFnIt = m_ActionFunctionMap.find(std::make_pair(actionName, keyStatus));
-			if (actionFnIt != m_ActionFunctionMap.end())
+			for (int i = 0; i < elementCount; i++, actionIt++)
 			{
-				bHandledOnAction = true;
-				auto actionFn = (*actionFnIt).second;
-				/*Call Action Function*/
-				actionFn();
+				std::string actionName = (*actionIt).second;
+				auto actionFnIt = m_ActionFunctionMap.find(std::make_pair(actionName, keyStatus));
+				if (actionFnIt != m_ActionFunctionMap.end())
+				{
+					bHandledOnAction = true;
+					auto actionFn = (*actionFnIt).second;
+					/*Call Action Function*/
+					actionFn();
+				}
 			}
 		}
+		
 
 		return bHandledOnAction;
 	}

@@ -73,6 +73,14 @@ namespace Crystal {
 			return result.x;
 		}
 
+		inline DirectX::XMFLOAT2 Transform(const DirectX::XMFLOAT2& v1, const DirectX::XMFLOAT4X4& m1)
+		{
+			DirectX::XMFLOAT2 result;
+			DirectX::XMVECTOR newVector = DirectX::XMVector2Transform(XMLoadFloat2(&v1), XMLoadFloat4x4(&m1));
+			XMStoreFloat2(&result, newVector);
+			return result;
+		}
+
 	}
 
 

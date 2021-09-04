@@ -61,23 +61,36 @@ namespace Crystal {
 
 	const Shared<Level>& World::GetCurrentLevel() const
 	{
-		return m_CurrentLevel;
+		return m_LevelStack.top();
 	}
 
-	void World::OpenLevel(const std::string& name)
+	void World::PushLevel(const std::string& name)
 	{
-		m_OpenLevelCommands.push_back({ name });
+		auto it = std::find_if(m_Levels.begin(), m_Levels.end(), [&name](const std::shared_ptr<Level>& level)->bool
+			{
+				return level->GetObjectName() == name;
+			}
+		);
+		if(it == m_Levels.end())
+		{
+			CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
+		}
+		
+		m_LevelStack.push(*it);
+		m_LevelStack.top()->OnLevelOpened();
+		m_RenderSystem->Begin();
 	}
 
-	void World::CloseLevel(const std::string& name)
+	void World::PopLevel(const std::string& name)
 	{
-		m_CurrentLevel->OnLevelClosed();
+		m_LevelStack.top()->OnLevelClosed();
+		m_LevelStack.pop();
 	}
 
 
 	bool World::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if(m_CurrentLevel)
+		if(!m_LevelStack.empty())
 		{
 			if(uMsg == WM_KEYDOWN && wParam == VK_F11)
 			{
@@ -85,7 +98,7 @@ namespace Crystal {
 				return true;
 			}
 
-			return m_CurrentLevel->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			return m_LevelStack.top()->OnInputEvent(hWnd, uMsg, wParam, lParam);
 		}
 		
 	}
@@ -94,30 +107,7 @@ namespace Crystal {
 	{
 		Object::Update(deltaTime);
 
-		if (m_CurrentLevel)
-		{
-			m_CurrentLevel->Update(deltaTime);
-		}
-
-		if(!m_OpenLevelCommands.empty())
-		{
-			for (auto& command : m_OpenLevelCommands)
-			{
-				if (m_CurrentLevel)
-				{
-					CloseLevel(m_CurrentLevel->GetObjectName());
-				}
-				m_CurrentLevel = GetLevelByName(command.LevelName);
-				m_CurrentLevel->OnLevelOpened();
-				m_RenderSystem->Begin();
-			}
-
-			m_OpenLevelCommands.clear();
-		}
-
-		
-
-
+		m_LevelStack.top()->Update(deltaTime);
 	}
 
 }

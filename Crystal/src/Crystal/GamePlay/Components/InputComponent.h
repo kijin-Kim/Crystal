@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+
 #include "Component.h"
 #include "Crystal/GamePlay/Controllers/KeyCodes.h"
 
@@ -31,14 +32,17 @@ namespace Crystal {
 		void UnBindAction(const std::string& actionName, EKeyEvent keyEventType);
 
 		bool ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-		
+
 
 		void BindCursor(bool bShouldBindCursor) { m_bShouldBindCursor = bShouldBindCursor; }
 		bool IsCursorBind() const { return m_bShouldBindCursor; }
 		/*커서를 바인딩 하기전 바인딩할 위치를 지정합니다.*/
-		void ReadyCursorBinding() { GetCursorPos(&m_BindPosition); }
-		void ShowCursor(bool bShowCursor) { m_bIsCursorVisible = bShowCursor; }
+		void ReadyCursorBinding()
+		{
+			GetCursorPos(&m_BindPosition);
+		}
 
+		void ShowCursor(bool bShowCursor) { m_bIsCursorVisible = bShowCursor; }
 
 		STATIC_TYPE_IMPLE(InputComponent)
 

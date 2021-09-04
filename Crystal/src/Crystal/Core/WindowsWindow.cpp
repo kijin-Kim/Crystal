@@ -78,13 +78,17 @@ namespace Crystal {
 			| WS_SYSMENU 
 			| WS_THICKFRAME;
 
+		RECT rt = { 0, 0, width, height };
+		AdjustWindowRectEx(&rt, windowStyle, FALSE, TRUE);
+
 		m_Handle = CreateWindowEx(
 			NULL,
 			L"Hello Direct3d 12!",
 			L"Hello Application!",
 			windowStyle,
-			0, 0, width, height,
+			0, 0, rt.right - rt.left, rt.bottom - rt.top,
 			nullptr, nullptr, HINST_THISCOMPONENT, this);
+
 
 		CS_FATAL(m_Handle, "윈도우를 생성하는데 실패하였습니다");
 		ShowWindow(m_Handle, SW_SHOW);

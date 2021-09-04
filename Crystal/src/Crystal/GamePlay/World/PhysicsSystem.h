@@ -2,11 +2,14 @@
 #include "Crystal/GamePlay/Objects/Object.h"
 
 namespace Crystal {
+	struct AABB2D;
 	class Level;
 	class World;
 	class Actor;
 	class CollisionComponent;
 	struct Scene;
+
+	
 
 	class PhysicsSystem : public Object
 	{
@@ -19,8 +22,9 @@ namespace Crystal {
 		
 
 
-		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+		bool LineTraceSingle(struct HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float& outDist,
 		                     const struct CollisionParams& collisionParams);
+
 
 
 		Shared<Scene> GetScene();

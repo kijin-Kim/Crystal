@@ -11,6 +11,8 @@
 #include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 #include "Crystal/Renderer/Scene.h"
 #include "Crystal/GamePlay/Components/CameraComponent.h"
+#include "Crystal/GamePlay/Components/ButtonComponent.h"
+#include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 
 namespace Crystal {
@@ -662,6 +664,115 @@ namespace Crystal {
 			}
 		}
 
+		// Cursor vs Button
+		POINT winCursorPos = {};
+		GetCursorPos(&winCursorPos);
+		ScreenToClient(GetActiveWindow(), &winCursorPos);
+
+		DirectX::XMFLOAT2 cursorPos = {(float)winCursorPos.x, (float)(1080.0f - winCursorPos.y)};
+		auto pc = Crystal::Cast<PlayerController>(GetLevel()->GetPlayerController(0));
+
+		Shared<ButtonComponent> hoveredButton = nullptr;
+		float max = -10.0f;
+		for (auto& weak : scene->Buttons)
+		{
+			auto button = weak.lock();
+			if (!button)
+			{
+				continue;
+			}
+
+			if (button->GetHiddenInGame())
+			{
+				continue;
+			}
+
+			const auto& aabb = button->GetAABB();
+
+			float hoveredZ = button->GetWorldPosition().z;
+			if (hoveredZ >= max && (aabb.Min.x < cursorPos.x && cursorPos.x < aabb.Max.x
+				&& aabb.Min.y < cursorPos.y && cursorPos.y < aabb.Max.y))
+			{
+				max = hoveredZ;
+				hoveredButton = button;
+			}
+		}
+
+
+		if (hoveredButton)
+		{
+			pc->SetCurrentButtonIsHovered(true);
+			pc->SetCurrentButton(hoveredButton);
+			hoveredButton->OnButtonHovered();
+		}
+
+
+		for (auto& weak : scene->Buttons)
+		{
+			auto button = weak.lock();
+			if (!button)
+			{
+				continue;
+			}
+
+			if(button == hoveredButton)
+			{
+				continue;
+			}
+
+			if (button->GetHiddenInGame())
+			{
+				continue;
+			}
+
+			if (button->GetIsHovered())
+			{
+				auto currentButton = pc->GetCurrentButton().lock();
+				if (currentButton && currentButton == button)
+				{
+					pc->SetCurrentButtonIsHovered(false);
+				}
+				button->OnButtonUnhovered();
+			}
+		}
+
+
+		/*POINT winCursorPos = {};
+		GetCursorPos(&winCursorPos);
+		ScreenToClient(GetActiveWindow(), &winCursorPos);
+
+		DirectX::XMFLOAT2 cursorPos = { (float)winCursorPos.x, (float)(1080.0f - winCursorPos.y) };
+		auto pc = Crystal::Cast<PlayerController>(GetLevel()->GetPlayerController(0));
+		for (auto& weak : scene->Buttons)
+		{
+			auto button = weak.lock();
+			if (!button)
+			{
+				continue;
+			}
+
+			if (button->GetHiddenInGame())
+			{
+				continue;
+			}
+
+			const auto& aabb = button->GetAABB();
+
+			if (aabb.Min.x < cursorPos.x && cursorPos.x < aabb.Max.x
+				&& aabb.Min.y < cursorPos.y && cursorPos.y < aabb.Max.y)
+			{
+				pc->SetCurrentButtonIsHovered(true);
+				pc->SetCurrentButton(button);
+				button->OnButtonHovered();
+			}
+			else if(button->GetIsHovered())
+			{
+				pc->SetCurrentButtonIsHovered(false);
+				button->OnButtonUnhovered();
+			}
+		}*/
+
+
 		for (auto& thread : threads)
 		{
 			thread.join();
@@ -784,12 +895,13 @@ namespace Crystal {
 		return hitActor == targetActor;
 	}
 
-	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+	bool PhysicsSystem::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float& outDist,
 	                                    const CollisionParams& collisionParams)
 	{
 		// Bounding Sphere
 
-		float nearest = dist;
+		float nearest = outDist;
+		float dist = outDist;
 		bool result = false;
 
 		auto scene = GetScene();
@@ -820,6 +932,7 @@ namespace Crystal {
 			if (currentResult && dist < nearest)
 			{
 				nearest = dist;
+				outDist = nearest;
 				outHitResult.HitActor = ownerActor;
 				outHitResult.HitComponent = collisionCompLhs;
 				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
@@ -853,6 +966,7 @@ namespace Crystal {
 			if (currentResult && dist < nearest)
 			{
 				nearest = dist;
+				outDist = nearest;
 				outHitResult.HitActor = ownerActor;
 				outHitResult.HitComponent = collisionCompLhs;
 				outHitResult.HitPosition = Vector3::Multiply(direction, dist);
@@ -864,6 +978,7 @@ namespace Crystal {
 
 		return result;
 	}
+
 
 	Shared<Scene> PhysicsSystem::GetScene()
 	{

@@ -9,6 +9,7 @@
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
+class Inventory;
 class PlayerShield;
 
 namespace Crystal {
@@ -53,7 +54,7 @@ public:
 	void BeginFire();
 	void EndFire();
 
-	void FireMissile();
+	void ToggleMenu();
 
 	void OpenTitleLevel();
 	
@@ -71,13 +72,15 @@ public:
 	void ShowDebugAI();
 	void HideDebugAI();
 
-	void OnItemDestroyed(ItemType itemType);
 
 	void SetIsNotInPolluteSphere(bool bIsNotInSphere)
 	{
 		m_bIsNotInPolluteSphere = bIsNotInSphere;
 	}
 	bool GetIsNotInPolluteSphere() const { return m_bIsNotInPolluteSphere; }
+
+	const Crystal::Shared<Inventory>& GetInventory() const;
+
 
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
 
@@ -95,6 +98,9 @@ private:
 	Crystal::Shared<Crystal::PawnMovementComponent> m_MovementComponent = nullptr;
 	Crystal::Shared<Crystal::CameraComponent> m_CameraComponent = nullptr;
 	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent;
+
+	Crystal::Shared<Inventory> m_Inventory;
+	
 
 	Crystal::Weak<PlayerShield> m_PlayerShield = {};
 
@@ -123,11 +129,11 @@ private:
 	const float m_HealAmount = 2.0f;
 	bool m_bShouldHeal = false;
 
-	bool m_bUseLeftSocekt = true;
+	bool m_bUseLeftSocket = true;
 
 public:
 	Crystal::Weak<Crystal::PostProcessVolumeActor> DamagedPostProcessActor;
 	Crystal::Weak<Crystal::PostProcessVolumeActor> HealPostProcessActor;
 	Crystal::Weak<Crystal::PostProcessVolumeActor> ShieldPostProcess;
-
+	
 };

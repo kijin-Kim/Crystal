@@ -61,12 +61,18 @@ namespace Crystal {
 				continue;
 			}
 
+			if(text->GetHiddenInGame())
+			{
+				continue;
+			}
+
 
 			auto output = text->GetText();
 			if(output.empty())
 			{
 				continue;
 			}
+
 
 			auto horizontalAlignment = text->GetHorizontalTextAlignment();
 			DirectX::XMFLOAT2 origin = { 0.0f, 0.0f };

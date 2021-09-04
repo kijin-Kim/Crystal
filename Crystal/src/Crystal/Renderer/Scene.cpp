@@ -117,6 +117,18 @@ namespace Crystal {
 			}
 		}
 
+		for (auto it = Buttons.begin(); it != Buttons.end();)
+		{
+			if (it->expired())
+			{
+				it = Buttons.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
 
 
 		for (auto it = AIPerceptionSources.begin(); it != AIPerceptionSources.end();)

@@ -53,10 +53,9 @@ public:
 		m_World->CreateLevel<GameLevel>("GameLevel");
 		m_World->CreateLevel<GameOverLevel>("GameOverLevel");
 		m_World->CreateLevel<GameClearLevel>("GameClearLevel");
-		
 		m_World->CreateLevel<TitleLevel>("TitleLevel");
 
-		m_World->OpenLevel("MiningLevel");
+		m_World->PushLevel("MainLevel");
 
 
 	}

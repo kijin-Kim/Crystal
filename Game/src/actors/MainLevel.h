@@ -24,10 +24,6 @@ public:
 		Level::Initialize();
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
-		{
-
-		}
-
 		auto& scene = GetScene();
 
 
@@ -79,9 +75,8 @@ public:
 		m_Player->SetPosition(Crystal::Vector3::Zero);
 		auto playerController = SpawnActor<Crystal::PlayerController>({}).lock();
 		playerController->Possess(m_Player);
-
+		playerController->EnableModeSwitching(true, Crystal::Keyboard::M);
 		
-
 
 
 		//auto cruiser = SpawnActor<Cruiser>({ "" }).lock();
@@ -167,22 +162,6 @@ public:
 			boundingOrientedBoxActor6->RotateYaw(90.0f);
 		}
 
-
-		/*if (true)
-		{
-			for (int i = 0; i < 150; i++)
-			{
-				auto asteroid = SpawnActor<WhiteAsteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
-			}
-
-			for (int i = 0; i < 600; i++)
-			{
-				auto asteroid = SpawnActor<FakeWhiteAsteroid>({}).lock();
-				asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
-			}
-
-		}*/
 
 
 		if (true)

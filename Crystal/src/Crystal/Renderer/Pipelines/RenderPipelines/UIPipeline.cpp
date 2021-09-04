@@ -2,6 +2,7 @@
 #include "UIPipeline.h"
 
 #include "Crystal/Core/Device.h"
+#include "Crystal/GamePlay/Components/ButtonComponent.h"
 #include "Crystal/Renderer/Scene.h"
 #include "Crystal/Renderer/Pipelines/PipelineStateHelper.h"
 
@@ -13,7 +14,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descriptorHeapDesc.NumDescriptors = 20000;
+		descriptorHeapDesc.NumDescriptors = 1000;
 		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		descriptorHeapDesc.NodeMask = 0;
 
@@ -22,6 +23,7 @@ namespace Crystal {
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perExecuteDescriptorRanges[] = {
+			{D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE},
 			{D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE}
 		};
 
@@ -50,20 +52,7 @@ namespace Crystal {
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-
-			{"MATROW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"MATROW", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"MATROW", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"MATROW", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-
-			{"TOGGLE_ALBEDO_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"TOGGLE_OPACITY_TEXTURE", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"USE_ALBEDO_ALPHA", 0, DXGI_FORMAT_R32_UINT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"ALBEDO_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"TINT_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"OPACITY", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
-			{"OPACITY_MULTIPLIER", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1},
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
 
@@ -78,37 +67,23 @@ namespace Crystal {
 		PipelineStateDescription pipelineStateDescription(
 			inputLayoutDesc,
 			StateHelper::NonPremultiplied,
-			StateHelper::DepthEnable,
+			StateHelper::DepthDisable,
 			StateHelper::CullCounterClock,
 			renderTargetDescription,
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
 		);
-		
+
 		pipelineStateDescription.CreatePipelineState(m_RootSignature, m_Shader, m_PipelineState);
-
-
-		m_PerFrameConstantBuffer = CreateUnique<Buffer>(nullptr, sizeof(PerFrameData), 0, true, true);
 	}
 
 	void UIPipeline::Begin(const Shared<Scene>& scene)
 	{
-		PerFrameData perFrameData = {};
-
-		auto& mainCamera = scene->Cameras[0].lock();
-
-		perFrameData.View = Matrix4x4::Transpose(Matrix4x4::LookTo({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}));
-		perFrameData.Projection = Matrix4x4::Transpose(Matrix4x4::OrthoGraphicOffCenter(0.0f, 1920.0f, 0.0f, 1080.0f, 0.1f, 1000.0f));
-
-		m_PerFrameConstantBuffer->SetData(&perFrameData, 0, sizeof(perFrameData));
-
+		auto descriptorHeapStartPtr = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 		auto handle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
-
-
-		m_InstanceBatches.clear();
 
 
 		for (auto& texture : scene->Textures)
@@ -124,85 +99,133 @@ namespace Crystal {
 			}
 
 
-			PerInstanceData perInstanceData = {};
+			m_SortedMeshes.insert({textureComponent->GetWorldPosition().z, {handle.ptr - descriptorHeapStartPtr}});
 
-
-			perInstanceData.World = textureComponent->GetWorldTransform();
-
-
-
-
-			// 같은 텍스쳐를 쓰면 ㅂ묶을 수 있음
+			PerObjectData perObjectData = {};
+			perObjectData.World = Matrix4x4::Transpose(textureComponent->GetWorldTransform());
 
 			auto& materials = textureComponent->GetMaterials();
 			for (auto& mat : materials)
 			{
-				
-				perInstanceData.AlbedoColor = mat->AlbedoColor;
-				perInstanceData.TintColor = mat->TintColor;
-				perInstanceData.Opacity = mat->Opacity;
-				perInstanceData.OpacityMultiplier = mat->OpacityMultiplier;
-
-				perInstanceData.bToggleAlbedoTexture = !mat->AlbedoTexture.expired() ? true : false;
-				perInstanceData.bToggleOpacityTexture = !mat->OpacityTexture.expired() ? true : false;
-				perInstanceData.bUseAlbedoTextureAlpha = mat->bUseAlbedoTextureAlpha;
+				perObjectData.AlbedoColor = mat->AlbedoColor;
+				perObjectData.TintColor = mat->TintColor;
+				perObjectData.Opacity = mat->Opacity;
+				perObjectData.OpacityMultiplier = mat->OpacityMultiplier;
+				perObjectData.bToggleAlbedoTexture = !mat->AlbedoTexture.expired() ? true : false;
+				perObjectData.bToggleOpacityTexture = !mat->OpacityTexture.expired() ? true : false;
+				perObjectData.bUseAlbedoTextureAlpha = mat->bUseAlbedoTextureAlpha;
 
 
-				auto it = m_InstanceBatches.find(mat.get()); // 같은 텍스쳐를 쓰고있는 배치가 있으면,
-				if (it != m_InstanceBatches.end())
-				{
-					++it->second.InstanceCount;
-					it->second.PerInstanceDatas.push_back(perInstanceData);
-					continue;
-				}
-
-				auto result = m_InstanceBatches.insert({ mat.get(), InstanceBatch()});
-				auto& newInstanceBatch = result.first->second;
-
-				newInstanceBatch.DescriptorHeapOffset = handle.ptr - m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+				auto perObjectBuffer = BufferManager::Instance().GetConstantBuffer(&perObjectData, sizeof(PerObjectData));
+				d3dDevice->CopyDescriptorsSimple(1, handle, perObjectBuffer->AsConstantBufferView(),
+				                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 				// 텍스쳐를 Heap에 Copy
 
-				if(perInstanceData.bToggleAlbedoTexture)
+
+				if (perObjectData.bToggleAlbedoTexture)
 				{
 					d3dDevice->CopyDescriptorsSimple(1, handle, mat->AlbedoTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-				if (perInstanceData.bToggleOpacityTexture)
+				if (perObjectData.bToggleOpacityTexture)
 				{
 					d3dDevice->CopyDescriptorsSimple(1, handle, mat->OpacityTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
-						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				}
 				handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-
-				newInstanceBatch.PerInstanceDatas.push_back(perInstanceData);
 			}
 		}
 
-		m_DrawDatas.clear();
 
-		for (auto& batch : m_InstanceBatches)
+		for (auto& button : scene->Buttons)
 		{
-			DrawData drawData = {};
+			auto buttonComponent = button.lock();
+			if (!buttonComponent)
+			{
+				continue;
+			}
+			if (buttonComponent->GetHiddenInGame())
+			{
+				continue;
+			}
 
-			drawData.InstanceCount = batch.second.InstanceCount;
-			drawData.DescriptorHeapOffset = batch.second.DescriptorHeapOffset;
 
-			drawData.InstanceVertexBuffer = BufferManager::Instance().GetBuffer(batch.second.PerInstanceDatas.data(), sizeof(PerInstanceData) * batch.second.PerInstanceDatas.size(),
-				batch.second.PerInstanceDatas.size(), true);
+			m_SortedMeshes.insert({buttonComponent->GetWorldPosition().z, {handle.ptr - descriptorHeapStartPtr}});
 
-			m_DrawDatas.push_back(std::move(drawData));
+			PerObjectData perObjectData = {};
+			perObjectData.World = Matrix4x4::Transpose(buttonComponent->GetWorldTransform());
+
+
+			auto material = buttonComponent->GetNormalMaterial();
+
+			EButtonState buttonState = buttonComponent->GetButtonRenderState();
+			switch (buttonState)
+			{
+			case EButtonState::BS_Pressed:
+				{
+					auto mat = buttonComponent->GetPressedMaterial();
+					if (mat)
+					{
+						material = mat;
+					}
+				}
+				break;
+			case EButtonState::BS_Hovered:
+				{
+					auto mat = buttonComponent->GetHoveredMaterial();
+					if (mat)
+					{
+						material = mat;
+					}
+				}
+				break;
+			}
+
+			if (!material)
+			{
+				continue;
+			}
+
+			perObjectData.AlbedoColor = material->AlbedoColor;
+			perObjectData.TintColor = material->TintColor;
+			perObjectData.Opacity = material->Opacity;
+			perObjectData.OpacityMultiplier = material->OpacityMultiplier;
+			perObjectData.bToggleAlbedoTexture = !material->AlbedoTexture.expired() ? true : false;
+			perObjectData.bToggleOpacityTexture = !material->OpacityTexture.expired() ? true : false;
+			perObjectData.bUseAlbedoTextureAlpha = material->bUseAlbedoTextureAlpha;
+
+
+			auto perObjectBuffer = BufferManager::Instance().GetConstantBuffer(&perObjectData, sizeof(PerObjectData));
+			d3dDevice->CopyDescriptorsSimple(1, handle, perObjectBuffer->AsConstantBufferView(),
+			                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			// 텍스쳐를 Heap에 Copy
+
+
+			if (perObjectData.bToggleAlbedoTexture)
+			{
+				d3dDevice->CopyDescriptorsSimple(1, handle, material->AlbedoTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+				                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			}
+			handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			if (perObjectData.bToggleOpacityTexture)
+			{
+				d3dDevice->CopyDescriptorsSimple(1, handle, material->OpacityTexture.lock()->GetShaderResourceView(D3D12_SRV_DIMENSION_TEXTURE2D),
+				                                 D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			}
+			handle.ptr += device.GetIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 	}
 
 	void UIPipeline::Record(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList)
 	{
 		Pipeline::Record(commandList);
-
-		auto& device = Device::Instance();
 
 
 		commandList->SetPipelineState(m_PipelineState.Get());
@@ -213,13 +236,22 @@ namespace Crystal {
 
 		auto& scene = GetScene();
 
-		commandList->SetGraphicsRootConstantBufferView(0, m_PerFrameConstantBuffer->GetGPUVirtualAddress());
 
-		for (const auto& drawData : m_DrawDatas)
+		PerFrameData perFrameData = {};
+		perFrameData.View = Matrix4x4::Transpose(Matrix4x4::LookTo({0.0f, 0.0f, -10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}));
+		perFrameData.Projection = Matrix4x4::Transpose(Matrix4x4::OrthoGraphicOffCenter(0.0f, 1920.0f, 0.0f, 1080.0f, 0.1f, 1000.0f));
+
+		auto perFrameBuffer = BufferManager::Instance().GetConstantBuffer(&perFrameData, sizeof(PerFrameData));
+
+		commandList->SetGraphicsRootConstantBufferView(0, perFrameBuffer->GetGPUVirtualAddress());
+
+		D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapStart = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+		for (auto& sortedData : m_SortedMeshes)
 		{
-			D3D12_GPU_DESCRIPTOR_HANDLE descriptorHeapHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-			descriptorHeapHandle.ptr += drawData.DescriptorHeapOffset;
-			commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapHandle);
+			auto handle = descriptorHeapStart;
+			handle.ptr += sortedData.second.DescriptorHeapOffsets;
+			commandList->SetGraphicsRootDescriptorTable(1, handle);
 
 
 			std::vector<D3D12_VERTEX_BUFFER_VIEW> vertexBufferViews;
@@ -230,11 +262,14 @@ namespace Crystal {
 				vertexBufferViews.push_back(vertexbuffer->AsVertexBufferView(vertexbuffer->GetSize() / vertexbuffer->GetElementCount()));
 			}
 
-
 			commandList->IASetVertexBuffers(0, vertexBufferViews.size(), vertexBufferViews.data());
-			commandList->IASetVertexBuffers(1, 1, &drawData.InstanceVertexBuffer->AsVertexBufferView(sizeof(PerInstanceData)));
 			commandList->IASetIndexBuffer(&scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->AsIndexBufferView());
-			commandList->DrawIndexedInstanced(scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->GetElementCount(), drawData.InstanceCount, 0, 0, 0);
+			commandList->DrawIndexedInstanced(scene->PlaneQuad2DMesh->GetIndexBuffers()[0]->GetElementCount(), 1, 0, 0, 0);
 		}
+	}
+
+	void UIPipeline::End()
+	{
+		m_SortedMeshes.clear();
 	}
 }

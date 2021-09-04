@@ -40,14 +40,6 @@ namespace Crystal {
 		fireActionMapping.bShiftDown = false;
 		AddActionMapping("Fire", fireActionMapping);
 
-		Crystal::ActionMapping fireMissileActionMapping = {};
-		fireMissileActionMapping.CrystalCode = Crystal::Mouse::Button::Right;
-		fireMissileActionMapping.bAltDown = false;
-		fireMissileActionMapping.bCtrlDown = false;
-		fireMissileActionMapping.bShiftDown = false;
-		AddActionMapping("FireMissile", fireMissileActionMapping);
-
-
 		Crystal::ActionMapping usePowerItemActionMapping = {};
 		usePowerItemActionMapping.CrystalCode = Crystal::Keyboard::Num1;
 		usePowerItemActionMapping.bAltDown = false;
@@ -108,13 +100,11 @@ namespace Crystal {
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
 	{
 		auto result = m_AxisMap.insert(std::make_pair(key, std::make_pair(axisName, scale)));
-		CS_FATAL(result.second, "AxisMapping에 실패하였습니다.");
 	}
 
 	void PlayerController::AddActionMapping(const std::string& actionName, const ActionMapping& key)
 	{
 		auto result = m_ActionMap.insert(std::make_pair(key, actionName));
-		CS_FATAL(result.second, "ActionMapping에 실패하였습니다.");
 	}
 
 	void PlayerController::Possess(std::shared_ptr<Pawn> pawn)
@@ -129,34 +119,71 @@ namespace Crystal {
 
 		auto level = Cast<Level>(GetOuter());
 		auto& scene = level->GetScene();
-		
+
 		scene->SetMainCamera(camera);
-			
+
 		m_GameInputComponent = std::make_unique<InputComponent>();
 		m_GameInputComponent->BindCursor(true); // 커서를 화면 상에 고정시킵니다.
 		m_GameInputComponent->ShowCursor(false);
 		m_GameInputComponent->SetOuter(pawn);
 		m_GameInputComponent->ReadyCursorBinding();
-		
+
 		m_UserInterfaceInputComponent->SetOuter(pawn);
+
+
+		ActionMapping actionKey = {};
+		actionKey.CrystalCode = Mouse::Button::Left;
+		actionKey.bAltDown = false;
+		actionKey.bCtrlDown = false;
+		actionKey.bShiftDown = false;
+		AddActionMapping("MouseClickAction", actionKey);
+
+
+		m_UserInterfaceInputComponent->BindAction("MouseClickAction", EKeyEvent::KE_Pressed, [this]()
+		{
+			auto button = m_CurrentButton.lock();
+			if (button)
+			{
+				m_PressedButton = button;
+				button->OnButtonPressed();
+			}
+		});
+
+		m_UserInterfaceInputComponent->BindAction("MouseClickAction", EKeyEvent::KE_Released, [this]()
+		{
+			auto pressedButton = m_PressedButton.lock();
+			auto currentButton = m_CurrentButton.lock();
+			if (pressedButton && currentButton)
+			{
+				if(m_bCurrentButtonIsHovered && pressedButton == currentButton)
+				{
+					pressedButton->OnButtonClicked();
+				}
+				else
+				{
+					m_CurrentButton = {};
+				}
+
+				pressedButton->OnButtonReleased();
+			}
+		});
+
+
 		pawn->SetupInputComponent(m_GameInputComponent.get());
-
-
-		
 	}
 
 	bool PlayerController::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{		
+	{
 		switch (m_InputMode)
 		{
 		case Crystal::EInputMode::IM_Game:
-		{
-			if (m_GameInputComponent)
 			{
-				return m_GameInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
+				if (m_GameInputComponent)
+				{
+					return m_GameInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
+				}
+				return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 			}
-			return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
-		}
 		case Crystal::EInputMode::IM_UI:
 			return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 		default:
@@ -172,6 +199,19 @@ namespace Crystal {
 
 	void PlayerController::ProcessYawInput(float value)
 	{
+	}
+
+	void PlayerController::SetInputMode(EInputMode inputMode)
+	{
+		switch (inputMode)
+		{
+		case EInputMode::IM_Game:
+			m_GameInputComponent->ReadyCursorBinding();
+			break;
+		case EInputMode::IM_UI: break;
+		default: ;
+		}
+		m_InputMode = inputMode;
 	}
 
 	void PlayerController::EnableModeSwitching(bool bEnable, int64_t keyCode /*= Crystal::Mouse::Right*/)
@@ -201,35 +241,45 @@ namespace Crystal {
 			if (!m_GameInputComponent)
 				CS_FATAL(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
 
-			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); m_GameInputComponent->ReadyCursorBinding(); });
-			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Released, [this]() { SetInputMode(EInputMode::IM_UI); });
+			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); });
+			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_UI); });
 		}
-		/*만약 원래 Switchable Mode였고, 이번에 Switchable 모드가 된다면,*/
+			/*만약 원래 Switchable Mode였고, 이번에 Switchable 모드가 된다면,*/
 		else if (bWasSwitchableMode && !bIsSwitchableMode)
 		{
 			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Pressed);
-			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Released);
+			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Pressed);
 		}
+	}
+
+	void PlayerController::SetCurrentButton(Crystal::Weak<ButtonComponent> button)
+	{
+		m_CurrentButton = button;
+	}
+
+	Weak<ButtonComponent> PlayerController::GetCurrentButton() const
+	{
+		return m_CurrentButton;
 	}
 
 	DirectX::XMFLOAT2 PlayerController::ProjectWorldToCameraSpace(const DirectX::XMFLOAT3& worldPosition)
 	{
 		auto level = Cast<Level>(GetLevel());
-		if(!level)
+		if (!level)
 		{
-			return { 0.0f, 0.0f };
+			return {0.0f, 0.0f};
 		}
 
 		auto playerPawn = Cast<Pawn>(level->GetPlayerPawn());
-		if(!playerPawn)
+		if (!playerPawn)
 		{
-			return { 0.0f, 0.0f };
+			return {0.0f, 0.0f};
 		}
 
 		auto cameraComponent = Cast<CameraComponent>(playerPawn->GetComponentByClass("CameraComponent"));
-		if(!cameraComponent)
+		if (!cameraComponent)
 		{
-			return { 0.0f, 0.0f };
+			return {0.0f, 0.0f};
 		}
 
 		return cameraComponent->ProjectWorldToCameraSpace(worldPosition);

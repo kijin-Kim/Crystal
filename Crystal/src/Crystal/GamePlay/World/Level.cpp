@@ -254,10 +254,9 @@ namespace Crystal {
 		return bHandled;
 	}
 
-	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float dist,
+	bool Level::LineTraceSingle(HitResult& outHitResult, const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, float& dist,
 	                            const CollisionParams& collisionParams)
 	{
-		DrawDebugLine(origin, direction, dist, Crystal::Vector3::Green);
 		return Crystal::Cast<World>(GetWorld())->GetPhysicsSystem()->LineTraceSingle(outHitResult, origin, direction, dist, collisionParams);
 	}
 

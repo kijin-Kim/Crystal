@@ -56,13 +56,13 @@ void AllyDrone::Initialize()
 
 
 	auto indicatorMat = Crystal::CreateShared<Crystal::Material>();
-	indicatorMat->AlbedoTexture= Crystal::ResourceManager::Instance().GetTexture("assets/textures/AllyDroneIndicator.png");
+	indicatorMat->TintColor = { 0.0f, 1.0f, 0.0f };
+	indicatorMat->AlbedoTexture= Crystal::ResourceManager::Instance().GetTexture("assets/textures/helm.tga");
 	indicatorMat->bUseAlbedoTextureAlpha = true;
 
-	m_IndicatorTextueComponent = CreateComponent<Crystal::TextureComponent>("HpBackgroundTextureComponent");
+	m_IndicatorTextueComponent = CreateComponent<Crystal::TextureComponent>("AllyIndicatorComponent");
 	m_IndicatorTextueComponent->AddMaterial(indicatorMat);
-	m_IndicatorTextueComponent->SetScaleX(0.01f);
-	m_IndicatorTextueComponent->SetScaleY(0.01f);
+	m_IndicatorTextueComponent->SetUnitScale(1.0f / 512.0f * 10.0f);
 
 }
 

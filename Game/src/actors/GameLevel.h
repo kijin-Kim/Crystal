@@ -198,19 +198,19 @@ public:
 				{
 				case 0:
 					{
-						auto asteroid = SpawnActor<HealAsteroid>({}).lock();
+						auto asteroid = SpawnActor<GreenOreAsteroid>({}).lock();
 						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
 						break;
 					}
 				case 1:
 					{
-						auto asteroid = SpawnActor<PowerAsteroid>({}).lock();
+						auto asteroid = SpawnActor<BlueOreAsteroid>({}).lock();
 						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
 						break;
 					}
 				case 2:
 					{
-						auto asteroid = SpawnActor<ShieldAsteroid>({}).lock();
+						auto asteroid = SpawnActor<YellowOreAsteroid>({}).lock();
 						asteroid->SetPosition(Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 30000.0f));
 						break;
 					}

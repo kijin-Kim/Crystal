@@ -1,5 +1,5 @@
 #pragma once
-#include "TransformComponent.h"
+#include "PrimitiveComponent.h"
 
 namespace Crystal {
 
@@ -9,9 +9,8 @@ namespace Crystal {
 		TA_Center
 	};
 
-	class TextRenderingComponent : public TransformComponent
+	class TextRenderingComponent : public PrimitiveComponent
 	{
-	
 
 	public:
 		TextRenderingComponent() = default;

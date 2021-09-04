@@ -10,7 +10,7 @@ public:
 
 	void Initialize() override;
 
-
+	STATIC_TYPE_IMPLE(Stargate)
 private:
 	Crystal::Shared<Crystal::StaticMeshComponent> m_CircleMeshComponent;
 };
