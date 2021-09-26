@@ -33,7 +33,7 @@ public:
 private:
 	float m_Power = 10.0f;
 	Crystal::Timer m_PolluteGaugeIncrementTimer = {};
-	float m_PolluteGaugeIncrementInterval = 3.0f;
+	float m_PolluteGaugeIncrementInterval = 0.5f;
 
 
 	const float m_MaxHealth = 150.0f;

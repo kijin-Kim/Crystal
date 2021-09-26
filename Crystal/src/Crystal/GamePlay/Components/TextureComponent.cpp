@@ -33,7 +33,7 @@ namespace Crystal {
 		float scaleZ = 1.0f;
 
 
-		if(!m_Materials.empty())
+		if(!m_Materials.empty() && m_Materials[0])
 		{
 			auto albedoTexture = m_Materials[0]->AlbedoTexture.lock();
 			auto opacityTexture = m_Materials[0]->OpacityTexture.lock();

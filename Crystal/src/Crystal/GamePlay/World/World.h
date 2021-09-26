@@ -47,10 +47,10 @@ namespace Crystal {
 
 		const Shared<Level>& GetLevelByName(const std::string& name);
 		const Shared<Level>& GetLevelByIndex(int index);
-		const Shared<Level>& GetCurrentLevel() const;
+		Shared<Level> GetCurrentLevel() const;
 
 		void PushLevel(const std::string& name);
-		void PopLevel(const std::string& name);
+		void PopLevel();
 
 		const WorldConfig& GetWorldConfig() const { return m_WorldConfig; }
 		void SetShowDebugCollision(bool show) { m_WorldConfig.bShowDebugCollision = show; }

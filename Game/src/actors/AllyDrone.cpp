@@ -60,9 +60,9 @@ void AllyDrone::Initialize()
 	indicatorMat->AlbedoTexture= Crystal::ResourceManager::Instance().GetTexture("assets/textures/helm.tga");
 	indicatorMat->bUseAlbedoTextureAlpha = true;
 
-	m_IndicatorTextueComponent = CreateComponent<Crystal::TextureComponent>("AllyIndicatorComponent");
-	m_IndicatorTextueComponent->AddMaterial(indicatorMat);
-	m_IndicatorTextueComponent->SetUnitScale(1.0f / 512.0f * 10.0f);
+	m_IndicatorTextureComponent = CreateComponent<Crystal::TextureComponent>("AllyIndicatorComponent");
+	m_IndicatorTextureComponent->AddMaterial(indicatorMat);
+	m_IndicatorTextureComponent->SetUnitScale(1.0f / 512.0f * 10.0f);
 
 }
 
@@ -77,7 +77,7 @@ void AllyDrone::Update(float deltaTime)
 		if (playerController)
 		{
 			auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-			m_IndicatorTextueComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+			m_IndicatorTextureComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
 		}
 	}
 

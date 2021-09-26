@@ -34,6 +34,15 @@ namespace Crystal {
 		return static_cast<float>(dis(gen));
 	}
 
+	inline int RandomIntInRange(float min, float max)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<int> dis(min, max);
+
+		return static_cast<int>(dis(gen));
+	}
+
 	inline uint32_t Align(uint32_t num, uint32_t alignByte)
 	{
 		return (num + (alignByte - 1)) & ~(alignByte - 1);

@@ -29,6 +29,7 @@ public:
 private:
 	Crystal::Shared<Crystal::TransformComponent> m_LeftFireSocketComponent = nullptr;
 	Crystal::Shared<Crystal::TransformComponent> m_RightFireSocketComponent = nullptr;
+	Crystal::Shared<Crystal::TextureComponent> m_IndicatorTextureComponent = nullptr;
 
 
 	const float m_MaxHealth = 15.0f;

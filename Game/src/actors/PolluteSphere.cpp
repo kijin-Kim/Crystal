@@ -29,7 +29,6 @@ void PolluteSphere::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
-				Crystal::Cast<MyPlayerPawn>(actor)->SetIsNotInPolluteSphere(false);
 				auto& mat = m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = true;
 			}
@@ -40,7 +39,6 @@ void PolluteSphere::Initialize()
 			auto staticType = actor->StaticType();
 			if (staticType == "MyPlayerPawn")
 			{
-				Crystal::Cast<MyPlayerPawn>(actor)->SetIsNotInPolluteSphere(true);
 				auto& mat= m_StaticMeshComponent->GetMaterials();
 				mat[0]->bTwoSided = false;
 			}

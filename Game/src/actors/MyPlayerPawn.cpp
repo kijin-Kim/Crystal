@@ -9,7 +9,6 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/GamePlay/Components/MovementComponent.h"
 #include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
-#include "Inventory.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
 BOOST_CLASS_EXPORT(MyPlayerPawn)
@@ -17,7 +16,6 @@ BOOST_CLASS_EXPORT(MyPlayerPawn)
 void MyPlayerPawn::Initialize()
 {
 	Pawn::Initialize();
-
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetExtents({90.0f / 2.0f, 30.0f / 2.0f, 85.0f / 2.0f});
@@ -85,12 +83,39 @@ void MyPlayerPawn::Initialize()
 	m_AIPerceptionSourceComponent->SetIsHearingEnabled(true);
 	m_AIPerceptionSourceComponent->SetIsSightEnabled(true);
 
-	m_Inventory = Crystal::CreateObject<Inventory>("PlayerInventory", weak_from_this());
 }
 
 void MyPlayerPawn::Begin()
 {
 	Pawn::Begin();
+
+	auto level = GetLevel().lock();
+	if(level)
+	{
+		ActorSpawnParams spawnParams;
+		spawnParams.Instigator = Crystal::Cast<Actor>(weak_from_this());
+
+		m_Inventory = level->SpawnActor<Inventory>(spawnParams);
+		m_Inventory.lock()->AddItem(EItemType::IT_HealPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_HealPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_HealPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_PowerPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_PowerPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_PowerPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_PowerPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_PowerPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_ShieldPotion);
+		m_Inventory.lock()->AddItem(EItemType::IT_Ore);
+		m_Inventory.lock()->AddItem(EItemType::IT_Ore);
+		m_Inventory.lock()->AddItem(EItemType::IT_Ore);
+	}
 	
 	UpdateHealth();
 }
@@ -171,6 +196,8 @@ void MyPlayerPawn::Update(const float deltaTime)
 		collisionParams.IgnoreClasses.push_back("Asteroid");
 		collisionParams.IgnoreClasses.push_back("WhiteAsteroid");
 		collisionParams.IgnoreClasses.push_back("SpaceStationCoreActor");
+		collisionParams.IgnoreClasses.push_back("DummySpaceStation");
+		collisionParams.IgnoreClasses.push_back("DummyStargate");
 		collisionParams.IgnoreClasses.push_back("Sun");
 
 
@@ -180,10 +207,14 @@ void MyPlayerPawn::Update(const float deltaTime)
 		if (result)
 		{
 			auto hitActor = hitResult.HitActor.lock();
+			m_HoveredActor = hitActor;
+			m_HoveredDistance = maxDistance;
 			Crystal::Cast<MyHUD>(level->GetHUD())->OnActorHovered(hitActor, maxDistance);
 		}
 		else
 		{
+			m_HoveredActor = {};
+			m_HoveredDistance = 0.0f;
 			Crystal::Cast<MyHUD>(level->GetHUD())->OnActorNotHovered();
 		}
 	}
@@ -208,17 +239,17 @@ void MyPlayerPawn::SetupInputComponent(Crystal::InputComponent* inputComponent)
 
 	inputComponent->BindAction("ToggleMenu", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ToggleMenu));
 
-	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UsePowerItem));
-	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
-	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::UseShieldItem));
+	inputComponent->BindAction("UsePowerItem", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::UsePowerItem));
+	inputComponent->BindAction("UseHealItem", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::UseHealItem));
+	inputComponent->BindAction("UseShieldItem", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::UseShieldItem));
 
 	inputComponent->BindAction("ShowDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ShowDebugCollision));
 	inputComponent->BindAction("HideDebugCollision", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::HideDebugCollision));
 	inputComponent->BindAction("ShowDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::ShowDebugAI));
 	inputComponent->BindAction("HideDebugAI", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::HideDebugAI));
 
-
-	inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::OpenTitleLevel));
+	inputComponent->BindAction("Interact", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(MyPlayerPawn::OnInteractWithHovered));
+	inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(MyPlayerPawn::OpenTitleLevel));
 }
 
 void MyPlayerPawn::RotateYaw(float value)
@@ -270,8 +301,9 @@ void MyPlayerPawn::ToggleMenu()
 
 void MyPlayerPawn::OpenTitleLevel()
 {
+	CS_DEBUG_INFO("Released");
 	auto world = Crystal::Cast<Crystal::World>(GetWorld());
-	world->PushLevel("TitleLevel");
+	world->PopLevel();
 }
 
 void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
@@ -298,9 +330,41 @@ void MyPlayerPawn::OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser)
 	}
 }
 
-const Crystal::Shared<Inventory>& MyPlayerPawn::GetInventory() const
+Crystal::Weak<Inventory> MyPlayerPawn::GetInventory() const
 {
 	return m_Inventory;
+}
+
+void MyPlayerPawn::OnInteractWithHovered()
+{
+	auto hovered = m_HoveredActor.lock();
+	if(hovered)
+	{
+		auto type = hovered->StaticType();
+		if (type == "SpaceStation")
+		{
+			auto world = GetWorld().lock();
+			if (world)
+			{
+				if (world->GetCurrentLevel()->GetObjectName() == "MainLevel")
+				{
+					world->PushLevel("ShopLevel");
+				}
+			}
+
+		} else if(type == "Stargate")
+		{
+			auto world = GetWorld().lock();
+			if(world)
+			{
+				if(world->GetCurrentLevel()->GetObjectName() == "MainLevel")
+				{
+					world->PushLevel("StargateLevel");
+				}
+			}
+		}
+	}
+	
 }
 
 void MyPlayerPawn::OnFire()
@@ -408,60 +472,45 @@ void MyPlayerPawn::UpdateHealth()
 			hud->OnPlayerHealthUpdated(m_Health, m_MaxHealth);
 		}
 	}
-
-	if(m_Health <= 0.0f)
-	{
-		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->PushLevel("GameOverLevel");
-	}
 }
 
-void MyPlayerPawn::UpdateItemStatus(ItemType itemType, bool bAcquired)
-{
-	auto level = Crystal::Cast<Crystal::Level>(GetOuter());
-	if (!level)
-	{
-		return;
-	}
-
-	auto hud = Crystal::Cast<MyHUD>(level->GetHUD());
-	if (!hud)
-	{
-		return;
-	}
-
-
-	if (bAcquired)
-	{
-		hud->OnItemAcquired(itemType);
-	}
-	else
-	{
-		hud->OnItemUsed(itemType);
-	}
-}
 
 void MyPlayerPawn::UsePowerItem()
 {
-	if (!m_bHasItem[ItemType_Power])
+	auto inventory = m_Inventory.lock();
+	if(!inventory)
 	{
 		return;
 	}
 
-	m_bHasItem[ItemType_Power] = false;
-	UpdateItemStatus(ItemType_Power, false);
+	uint32_t count = inventory->GetItemCount(EItemType::IT_PowerPotion);
+	if(count <= 0)
+	{
+		return;
+	}
+
+	inventory->RemoveItem(EItemType::IT_PowerPotion);
+
 	m_Power *= 1.2f;
 }
 
 void MyPlayerPawn::UseHealItem()
 {
-	if (!m_bHasItem[ItemType_Heal])
+	auto inventory = m_Inventory.lock();
+	if (!inventory)
 	{
 		return;
 	}
 
-	m_bHasItem[ItemType_Heal] = false;
-	UpdateItemStatus(ItemType_Heal, false);
+	uint32_t count = inventory->GetItemCount(EItemType::IT_HealPotion);
+	if (count <= 0)
+	{
+		return;
+	}
+
+	inventory->RemoveItem(EItemType::IT_HealPotion);
+
+
 	m_bShouldHeal = true;
 	m_HealTimer.Reset();
 	m_HealIntervalTimer.Reset();
@@ -469,13 +518,19 @@ void MyPlayerPawn::UseHealItem()
 
 void MyPlayerPawn::UseShieldItem()
 {
-	if (!m_bHasItem[ItemType_Shield])
+	auto inventory = m_Inventory.lock();
+	if (!inventory)
 	{
 		return;
 	}
 
-	m_bHasItem[ItemType_Shield] = false;
-	UpdateItemStatus(ItemType_Shield, false);
+	uint32_t count = inventory->GetItemCount(EItemType::IT_ShieldPotion);
+	if (count <= 0)
+	{
+		return;
+	}
+
+	inventory->RemoveItem(EItemType::IT_ShieldPotion);
 
 
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());

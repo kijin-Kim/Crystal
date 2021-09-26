@@ -500,7 +500,13 @@ void DestructibleAsteroid::OnTakeDamage(float damage, Crystal::Weak<Actor> cause
 			auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
 			if(staticType == "MyPlayerPawn")
 			{
-				playerPawn->GetInventory()->AddGold(GetScale().x * 100.0f);
+				auto inventory = Crystal::Cast<Inventory>(playerPawn->GetInventory());
+				if(inventory)
+				{
+					inventory->AddGold(GetScale().x * 100.0f);
+					inventory->AddItem(EItemType::IT_Ore);
+				}
+				
 			}
 			
 		}

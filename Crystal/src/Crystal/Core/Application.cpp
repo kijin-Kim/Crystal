@@ -42,7 +42,7 @@ namespace Crystal {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 
-				const int maxMessageCount = 5;
+				const int maxMessageCount = 3;
 				++msgCount;
 				if (msgCount >= maxMessageCount)
 					break;
@@ -55,11 +55,13 @@ namespace Crystal {
 	{
 		m_Timer.Tick();
 		m_World->Update(m_Timer.GetDeltaSeconds());
-	}
+ 	}
 
 	bool Application::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		/*Process Global Window Events*/
+
+		
 
 		switch (uMsg)
 		{

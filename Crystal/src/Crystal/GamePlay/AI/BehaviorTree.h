@@ -238,6 +238,77 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BTTaskNode)
 	};
 
+	class BTTaskNodeMoveToActor : public BTTaskNode
+	{
+	public:
+		BTTaskNodeMoveToActor() = default;
+		~BTTaskNodeMoveToActor() override = default;
+
+
+		void Execute(float deltaTime) override
+		{
+			bool abortResult = CheckAbortDecorators();
+			if (!abortResult)
+			{
+				Abort();
+				return;
+			}
+
+			bool result = ExecuteDecorators();
+			if (!result)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+
+			if (TargetActorKey.empty())
+			{
+				FinishExecute(false);
+				return;
+			}
+
+			auto possessedPawn = GetPossessedPawn().lock();
+			if (!possessedPawn)
+			{
+				FinishExecute(false);
+				return;
+			}
+
+
+			auto blackBoard = GetBlackboardComponent().lock();
+			auto targetActor = Cast<Actor>(blackBoard->GetValueAsObject(TargetActorKey));
+			if(!targetActor)
+			{
+				return;
+			}
+			auto targetLocation = targetActor->GetPosition();
+
+
+			auto distance = Vector3::Subtract(targetLocation, possessedPawn->GetPosition());
+			float lengthSq = Vector3::LengthSquared(distance);
+			float acceptableRadiusSq = AcceptableRadius * AcceptableRadius;
+
+
+			if (lengthSq <= acceptableRadiusSq)
+			{
+				FinishExecute(true);
+				return;
+			}
+
+			auto direction = Vector3::Normalize(distance);
+
+			possessedPawn->AddForce(Vector3::Multiply(direction, MaxAcceleration));
+		}
+
+		STATIC_TYPE_IMPLE(BTTaskNodeMoveToActor)
+
+	public:
+		float AcceptableRadius = 0.0f;
+		float MaxAcceleration = 0.0f;
+		std::string TargetActorKey;
+	};
+
 	class BTTaskNodeMoveToLocation : public BTTaskNode
 	{
 	public:

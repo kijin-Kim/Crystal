@@ -61,29 +61,23 @@ public:
 		scene->SkyboxConfiguration.FarStarDesaturation = 0.3f;
 		scene->SkyboxConfiguration.AdditiveColor = { 0.008364, 0.012143, 0.026042, 1.000000 };
 
-	}
 
-	void OnLevelOpened() override
-	{
-		Level::OnLevelOpened();
+		auto playerStartActor = SpawnActor<Crystal::PlayerStartActor>({ "" }).lock();
+		playerStartActor->SetPosition({ -10000.0f, 10000.0f, 0.0f });
 
-		auto& resourceManager = Crystal::ResourceManager::Instance();
-
+		SpawnActor<Crystal::PlayerStartActor>({});
 
 		m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		m_Player = SpawnActor<MyPlayerPawn>({ "MyPlayerPawn" }).lock();
-		m_Player->SetPosition(Crystal::Vector3::Zero);
+		m_Player->SetPosition({-10000.0f, 10000.0f, 0.0f});
 		auto playerController = SpawnActor<Crystal::PlayerController>({}).lock();
 		playerController->Possess(m_Player);
 		playerController->EnableModeSwitching(true, Crystal::Keyboard::M);
+
+
 		
-
-
-		//auto cruiser = SpawnActor<Cruiser>({ "" }).lock();
-		//cruiser->SetPosition(Crystal::Vector3::Zero);
-
-		//auto stargate = SpawnActor<Stargate>({ "" }).lock();
-		//stargate->SetPosition({0.0f, 0.0f, 20000.0f});
+		auto stargate = SpawnActor<Stargate>({""}).lock();
+		stargate->SetPosition({ 0.0f, 0.0f, 40000.0f });
 
 
 		auto spaceStation = SpawnActor<SpaceStation>({ "" }).lock();
@@ -117,51 +111,6 @@ public:
 			lightComponent->RotatePitch(30.0f);
 			lightComponent->SetCastShadow(false);
 		}
-
-		{
-			const float distFromCenter = 30000.0f;
-			const float boundingOrientedBoxWidth = 500.0f;
-
-			auto boundingOrientedBoxActor1 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor1" }).lock();
-			boundingOrientedBoxActor1->SetPosition({ +distFromCenter + boundingOrientedBoxWidth, 0.0f, 0.0f });
-			boundingOrientedBoxActor1->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-
-			auto boundingOrientedBoxActor2 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor2" }).lock();
-			boundingOrientedBoxActor2->SetPosition({ -distFromCenter - boundingOrientedBoxWidth, 0.0f, 0.0f });
-			boundingOrientedBoxActor2->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-
-			auto boundingOrientedBoxActor3 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor3" }).lock();
-			boundingOrientedBoxActor3->SetPosition({ 0.0f, +distFromCenter + boundingOrientedBoxWidth, 0.0f });
-			boundingOrientedBoxActor3->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-			boundingOrientedBoxActor3->RotateRoll(90.0f);
-			auto boundingOrientedBoxActor4 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor4" }).lock();
-			boundingOrientedBoxActor4->SetPosition({ 0.0f, -distFromCenter - boundingOrientedBoxWidth, 0.0f });
-			boundingOrientedBoxActor4->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-			boundingOrientedBoxActor4->RotateRoll(90.0f);
-
-			auto boundingOrientedBoxActor5 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor5" }).lock();
-			boundingOrientedBoxActor5->SetPosition({ 0.0f, 0.0f, +distFromCenter + boundingOrientedBoxWidth });
-			boundingOrientedBoxActor5->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-			boundingOrientedBoxActor5->RotateYaw(90.0f);
-
-			auto boundingOrientedBoxActor6 = SpawnActor<Crystal::BoundingOrientedBoxActor>({ "BoundingOrientedBoxActor6" }).lock();
-			boundingOrientedBoxActor6->SetPosition({ 0.0f, 0.0f, -distFromCenter - boundingOrientedBoxWidth });
-			boundingOrientedBoxActor6->SetExtents({
-				boundingOrientedBoxWidth, +distFromCenter + boundingOrientedBoxWidth * 2.0f, +distFromCenter + boundingOrientedBoxWidth * 2.0f
-				});
-			boundingOrientedBoxActor6->RotateYaw(90.0f);
-		}
-
 
 
 		if (true)
@@ -221,5 +170,42 @@ public:
 		}
 
 	}
+
+	void OnLevelOpened(Crystal::Shared<Level> lastLevel) override
+	{
+		Level::OnLevelOpened(lastLevel);
+	}
+
+	void OnLevelClosed(std::shared_ptr<Level> nextLevel) override
+	{
+		Level::OnLevelClosed(nextLevel);
+		if(nextLevel->GetObjectName() == "ShopLevel" || nextLevel->GetObjectName() == "LevelClearedLevel")
+		{
+			auto inventory = GetActorByClass("Inventory");
+			MoveActorToLevel(inventory.lock(), nextLevel);
+		}
+		else if(nextLevel->GetObjectName() == "StargateLevel")
+		{
+		}
+		else
+		{
+			auto playerStartActor = Crystal::Cast<Crystal::PlayerStartActor>(nextLevel->GetActorByClass("PlayerStartActor"));
+			m_Player->SetPosition(playerStartActor->GetPosition());
+			
+
+			nextLevel->SetPlayer(m_Player);
+			nextLevel->SetPlayerController(m_PlayerControllers[0]);
+			nextLevel->SetHUD(m_HUD);
+
+			MoveActorToLevel(m_Player, nextLevel);
+			MoveActorToLevel(m_PlayerControllers[0], nextLevel);
+			MoveActorToLevel(m_HUD, nextLevel);
+			auto inventory = GetActorByClass("Inventory");
+			MoveActorToLevel(inventory.lock(), nextLevel);
+			
+		}
+
+	}
+
 };
 

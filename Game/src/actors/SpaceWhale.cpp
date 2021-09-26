@@ -28,12 +28,24 @@ void SpaceWhale::Initialize()
 	boundingOrientedBoxComponent->IgnoreActorClassOf("Kraken");
 	boundingOrientedBoxComponent->BindOnHitEvent([this](const Crystal::HitResult& hitResult)
 	{
-		auto staticType = hitResult.HitActor.lock()->StaticType();
+		auto hitActor = hitResult.HitActor.lock();
+		if(!hitActor)
+		{
+			return;
+		}
+
+		auto staticType = hitActor->StaticType();
 		if (staticType == "BoundingOrientedBoxActor")
 		{
 			auto spaceWhaleController = Crystal::Cast<SpaceWhaleAIController>(GetController());
-			auto blackboardComponent = spaceWhaleController->GetBlackboardComponent();
-			blackboardComponent->SetValueAsFloat3("RandomPositionInSphere", Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 300.0f));
+			if(spaceWhaleController)
+			{
+				auto blackboardComponent = spaceWhaleController->GetBlackboardComponent();
+				if(blackboardComponent)
+				{
+					blackboardComponent->SetValueAsFloat3("RandomPositionInSphere", Crystal::Vector3::RandomPositionInSphere(Crystal::Vector3::Zero, 300.0f));
+				}
+			}
 		}
 
 		if (staticType == "MyPlayerPawn")
@@ -48,7 +60,10 @@ void SpaceWhale::Initialize()
 			if (spaceWhaleController)
 			{
 				auto blackboardComponent = spaceWhaleController->GetBlackboardComponent();
-				blackboardComponent->SetValueAsBool("bDamagedPlayer", true);
+				if(blackboardComponent)
+				{
+					blackboardComponent->SetValueAsBool("bDamagedPlayer", true);
+				}
 			}
 		}
 	});
@@ -139,9 +154,9 @@ void SpaceWhale::Update(float deltaTime)
 			{
 				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
 				position2D.y += 100.0f;
-				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 2.0f});
+				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 1.0f});
 				m_HealthBarFillComponent->SetWorldPosition({
-					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 2.0f
 				});
 			}
 		}

@@ -56,9 +56,9 @@ void PlayerShield::Update(float deltaTime)
 		{
 			auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
 			position2D.y += 100.0f;
-			m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+			m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 1.0f });
 			m_HealthBarFillComponent->SetWorldPosition({
-				position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 1.0f
+				position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 2.0f
 				});
 		}
 		

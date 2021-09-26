@@ -99,7 +99,7 @@ namespace Crystal {
 		GetClientRect(m_Handle, &windowRect);
 		POINT windowPos = { windowRect.left, windowRect.top };
 		ScreenToClient(m_Handle, &windowPos);
-		SetWindowPos(m_Handle, nullptr, windowPos.x, 0, width, height, SWP_SHOWWINDOW);
+		SetWindowPos(m_Handle, nullptr, windowPos.x, 0, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
 
 		ImGui_ImplWin32_Init(m_Handle);
 	}

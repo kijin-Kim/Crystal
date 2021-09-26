@@ -9,11 +9,16 @@
 #include "Crystal/Renderer/RenderSystem.h"
 
 
+struct QuestReward;
+class Quest;
+class Inventory;
+
 namespace Crystal {
 	class LightComponent;
 
 	class PlayerController;
 	class RenderSystem;
+
 
 	class Level : public Object
 	{
@@ -21,8 +26,13 @@ namespace Crystal {
 		Level() = default;
 		~Level() override = default;
 
-		virtual void OnLevelOpened() {}
-		virtual void OnLevelClosed();
+		virtual void OnLevelOpened(Shared<Level> lastLevel);
+		virtual void OnLevelClosed(Shared<Level> nextLevel);
+
+		void MoveActorToLevel(Shared<Actor> actor, Shared<Level> level);
+		void OnActorMoved(Shared<Actor> actor);
+
+		void ClearActors();
 
 		void Initialize() override;
 		void Begin() override;
@@ -73,6 +83,18 @@ namespace Crystal {
 
 		float GetDeltaTime() const { return m_DeltaTime; }
 
+		void SetHUD(Shared<Actor> hud) { m_HUD = hud; }
+		void SetPlayer(Shared<Pawn> player) { m_Player = player; }
+		void SetPlayerController(Shared<PlayerController> pc) { m_PlayerControllers.push_back(pc); }
+
+
+		void CreateQuest(const std::string& displayText, const DirectX::XMFLOAT3& targetLocation, Weak<Actor> targetActor, const QuestReward& reward);
+		void CreateQuest(const std::string& displayText, const std::initializer_list<std::string>& types, uint32_t count, const QuestReward& reward);
+
+
+		const std::vector<Shared<Quest>>& GetQuests() const;
+		
+
 		STATIC_TYPE_IMPLE(Level)
 
 	protected:
@@ -84,6 +106,8 @@ namespace Crystal {
 		Shared<Scene> m_Scene = nullptr;
 		Shared<Pawn> m_Player = nullptr;
 		Shared<Actor> m_HUD = nullptr;
+		std::vector<Shared<Quest>> m_Quests;
+		
 
 		std::vector<std::shared_ptr<Actor>> m_Actors;
 		std::vector<std::shared_ptr<Actor>> m_PendingSpawnedActors;

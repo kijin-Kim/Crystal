@@ -87,6 +87,16 @@ void Kraken::Initialize()
 	m_HealthBarFillComponent->SetScaleX(0.072f * 0.5f);
 	m_HealthBarFillComponent->SetScaleY(0.048f);
 
+
+	auto indicatorMat = Crystal::CreateShared<Crystal::Material>();
+	indicatorMat->TintColor = { 1.0f, 0.0f, 0.0f };
+	indicatorMat->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/boss_icon.tga");
+	indicatorMat->bUseAlbedoTextureAlpha = true;
+
+	m_IndicatorTextureComponent = CreateComponent<Crystal::TextureComponent>("AllyIndicatorComponent");
+	m_IndicatorTextureComponent->AddMaterial(indicatorMat);
+	m_IndicatorTextureComponent->SetUnitScale(1.0f / 512.0f * 10.0f);
+
 	SetShowHealthBar(false);
 }
 
@@ -99,11 +109,32 @@ void Kraken::Begin()
 	m_CurrentHealth = m_MaxHealth;
 
 	UpdateHealth();
+
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	if (level)
+	{
+		auto hud = Crystal::Cast<MyHUD>(level->GetHUD());
+		if (hud)
+		{
+			hud->OnPolluteGaugeUpdated(0.0f, 1.0f);
+		}
+	}
+	
 }
 
 void Kraken::Update(float deltaTime)
 {
 	Crystal::Pawn::Update(deltaTime);
+
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+	if (playerController)
+	{
+		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+		m_IndicatorTextureComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+	}
+
+	
 
 
 	if (m_CurrentPolluteGauge >= m_MaxPolluteGauge)
@@ -125,10 +156,6 @@ void Kraken::Update(float deltaTime)
 							m_PolluteDamageTimer.Reset();
 							playerPawn->OnTakeDamage(2.0f, Crystal::Cast<Crystal::Actor>(weak_from_this()));
 						}
-					}
-					else
-					{
-						m_PolluteDamageTimer.Reset();
 					}
 				}
 				else
@@ -324,7 +351,7 @@ void Kraken::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 		{
 			m_bDeathAnimationIsPlaying = true;
 			m_SkeletalMeshComponent->PlayAnimationWithEndEvent(Crystal::ResourceManager::Instance().GetAnimation("assets/models/KRAKEN_death.fbx"), false,
-				CS_ANIMATION_FN(Kraken::OpenGameClearLevel));
+				CS_ANIMATION_FN(Kraken::Destroy));
 		}
 	}
 	
@@ -420,7 +447,7 @@ void Kraken::SetPolluteGauge(float polluteGauge)
 
 		
 		}
-
+		
 	}
 	else
 	{
@@ -469,10 +496,4 @@ void Kraken::SetShowHealthBar(bool bShow)
 
 	m_HealthBarBgComponent->SetHiddenInGame(!bShow);
 	m_HealthBarFillComponent->SetHiddenInGame(!bShow);
-}
-
-void Kraken::OpenGameClearLevel()
-{
-	auto world = Crystal::Cast<Crystal::World>(GetWorld());
-	world->PushLevel("GameClearLevel");
 }

@@ -10,9 +10,9 @@ public:
 	GameOverLevel() = default;
 	~GameOverLevel() override = default;
 
-	void OnLevelOpened() override
+	void OnLevelOpened(Crystal::Shared<Level> lastLevel) override
 	{
-		Crystal::Level::OnLevelOpened();
+		Crystal::Level::OnLevelOpened(lastLevel);
 
 		//m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		m_Player = SpawnActor<GameOverLevelPawn>({ "GameOverLevelPawn" }).lock();
@@ -31,9 +31,9 @@ public:
 	GameClearLevel() = default;
 	~GameClearLevel() override = default;
 
-	void OnLevelOpened() override
+	void OnLevelOpened(Crystal::Shared<Level> lastLevel) override
 	{
-		Crystal::Level::OnLevelOpened();
+		Crystal::Level::OnLevelOpened(lastLevel);
 
 		//m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		m_Player = SpawnActor<GameClearLevelPawn>({ "GameClearLevelPawn" }).lock();

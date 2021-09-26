@@ -433,3 +433,4 @@ void SpaceStation::Initialize()
 		hangarMeshBox4Component->AttachTo(hangarMeshComponent4);
 	}
 }
+

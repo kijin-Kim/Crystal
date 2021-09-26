@@ -39,8 +39,6 @@ public:
 
 	void SetShowHealthBar(bool bShow);
 
-	void OpenGameClearLevel();
-	
 
 	STATIC_TYPE_IMPLE(Kraken)
 
@@ -67,6 +65,7 @@ private:
 
 	Crystal::Shared<Crystal::TextureComponent> m_HealthBarFillComponent = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_HealthBarBgComponent = nullptr;
+	Crystal::Shared<Crystal::TextureComponent> m_IndicatorTextureComponent = nullptr;
 	int m_HealthBarWidth = 0;
 	int m_HealthBarHeight = 0;
 
@@ -87,5 +86,3 @@ public:
 	Crystal::Shared<Crystal::PostProcessVolumeActor> GreenTintVolumeActor;
 	Crystal::Shared<Crystal::PostProcessVolumeActor> VignetteVolumeActor;
 };
-
-

@@ -14,8 +14,8 @@ void Drone::Initialize()
 {
 	Crystal::Pawn::Initialize();
 
-	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
-	boundingOrientedBoxComponent->SetExtents({90.0f, 30.0f, 85.0f});
+	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingSphereComponent>("BoundingOrientedBoxComponent");
+	boundingOrientedBoxComponent->SetRadius(90.0f);
 	boundingOrientedBoxComponent->SetMass(10000.0f);
 	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Block);
 	boundingOrientedBoxComponent->IgnoreActorClassOf("ShieldSphere");
@@ -83,6 +83,15 @@ void Drone::Initialize()
 	m_HealthBarFillComponent->SetScaleX(0.072f * 0.5f);
 	m_HealthBarFillComponent->SetScaleY(0.048f);
 
+	auto indicatorMat = Crystal::CreateShared<Crystal::Material>();
+	indicatorMat->TintColor = { 1.0f, 0.0f, 0.0f };
+	indicatorMat->AlbedoTexture = Crystal::ResourceManager::Instance().GetTexture("assets/textures/helm.tga");
+	indicatorMat->bUseAlbedoTextureAlpha = true;
+
+	m_IndicatorTextureComponent = CreateComponent<Crystal::TextureComponent>("AllyIndicatorComponent");
+	m_IndicatorTextureComponent->AddMaterial(indicatorMat);
+	m_IndicatorTextureComponent->SetUnitScale(1.0f / 512.0f * 10.0f);
+
 	UpdateHealth();
 	SetShowHealthBar(false);
 }
@@ -91,26 +100,23 @@ void Drone::Update(float deltaTime)
 {
 	Actor::Update(deltaTime);
 
+	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
+	auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
+	auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+	m_IndicatorTextureComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+
 	if (m_bShouldShowHealthBar)
 	{
-		auto level = Crystal::Cast<Crystal::Level>(GetLevel());
-		if (level)
-		{
-			float healthPercent = m_CurrentHealth / m_MaxHealth;
-			healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
+		float healthPercent = m_CurrentHealth / m_MaxHealth;
+		healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 
-
-			auto playerController = Crystal::Cast<Crystal::PlayerController>(level->GetPlayerController(0));
-			if (playerController)
-			{
-				auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
-				position2D.y += 100.0f;
-				m_HealthBarBgComponent->SetWorldPosition({position2D.x, position2D.y, 1.0f});
-				m_HealthBarFillComponent->SetWorldPosition({
-					position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 2.0f
-				});
-			}
-		}
+		auto position2D = playerController->ProjectWorldToCameraSpace(GetPosition());
+		m_IndicatorTextureComponent->SetWorldPosition({ position2D.x, position2D.y, 2.0f });
+		position2D.y += 100.0f;
+		m_HealthBarBgComponent->SetWorldPosition({ position2D.x, position2D.y, 1.0f });
+		m_HealthBarFillComponent->SetWorldPosition({
+			position2D.x - m_HealthBarWidth * m_HealthBarBgComponent->GetScale().x * (1.0f - healthPercent), position2D.y, 2.0f
+			});
 	}
 
 	if (m_bShouldShowHealthBar)
@@ -123,6 +129,7 @@ void Drone::Update(float deltaTime)
 		}
 	}
 
+	
 }
 
 void Drone::OnFire()
@@ -146,7 +153,15 @@ void Drone::OnFire()
 	auto level = Crystal::Cast<Crystal::Level>(GetLevel());
 	if (level)
 	{
-		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
+
+		auto controller = Crystal::Cast<DroneAIController>(GetController());
+		auto playerPawn = Crystal::Cast<Actor>(controller->GetBlackboardComponent()->GetValueAsObject("PlayerPawnObject"));
+		if(!playerPawn)
+		{
+			playerPawn = Crystal::Cast<Actor>(controller->GetBlackboardComponent()->GetValueAsObject("AttackTarget"));
+		}
+
+
 		auto playerPosition = playerPawn->GetPosition();
 
 		auto direction = Crystal::Vector3::Normalize(Crystal::Vector3::Subtract(playerPosition, spawnParams.Position));

@@ -10,6 +10,10 @@ void Stargate::Initialize()
 
 	auto boundingOrientedBoxComponent = CreateComponent<Crystal::BoundingOrientedBoxComponent>("BoundingOrientedBoxComponent");
 	boundingOrientedBoxComponent->SetUnitScale(100.0f * 10.0f);
+	boundingOrientedBoxComponent->SetInverseMass(0.0f);
+	boundingOrientedBoxComponent->SetCollisionType(Crystal::ECollisionType::CT_Overlap);
+	boundingOrientedBoxComponent->IgnoreActorClassOf("Laser");
+	boundingOrientedBoxComponent->IgnoreActorClassOf("DroneLaser");
 
 	m_MainComponent = boundingOrientedBoxComponent;
 

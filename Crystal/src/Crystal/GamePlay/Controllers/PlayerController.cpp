@@ -95,6 +95,14 @@ namespace Crystal {
 		openNewLevelActionMapping.bCtrlDown = false;
 		openNewLevelActionMapping.bShiftDown = false;
 		AddActionMapping("OpenNewLevel", openNewLevelActionMapping);
+
+		Crystal::ActionMapping interactMapping = {};
+		interactMapping.CrystalCode = Crystal::Keyboard::V;
+		interactMapping.bAltDown = false;
+		interactMapping.bCtrlDown = false;
+		interactMapping.bShiftDown = false;
+		AddActionMapping("Interact", interactMapping);
+
 	}
 
 	void PlayerController::AddAxisMapping(const std::string& axisName, int key, float scale)
@@ -159,10 +167,8 @@ namespace Crystal {
 				{
 					pressedButton->OnButtonClicked();
 				}
-				else
-				{
-					m_CurrentButton = {};
-				}
+
+				m_CurrentButton = {};
 
 				pressedButton->OnButtonReleased();
 			}

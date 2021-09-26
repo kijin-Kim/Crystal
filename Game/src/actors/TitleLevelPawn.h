@@ -22,6 +22,7 @@ public:
 		titleImage->bUseAlbedoTextureAlpha = true;
 
 		auto titleImageComponent = CreateComponent<Crystal::TextureComponent>("TitleImageComponent");
+		titleImageComponent->SetWorldPosition({ 1920.0f / 2.0f, 1080.0f / 2.0f, 0.0f });
 		titleImageComponent->SetUnitScale(0.5f);
 		titleImageComponent->AddMaterial(titleImage);
 		titleImageComponent->SetHiddenInGame(false);
@@ -35,13 +36,16 @@ public:
 	{
 		Pawn::SetupInputComponent(inputComponent);
 
-		inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Pressed, CS_ACTION_FN(TitleLevelPawn::OpenGameLevel));
+		inputComponent->BindAction("OpenNewLevel", Crystal::EKeyEvent::KE_Released, CS_ACTION_FN(TitleLevelPawn::OpenGameLevel));
 	}
 	
 	void OpenGameLevel()
 	{
 		auto world = Crystal::Cast<Crystal::World>(GetWorld());
-		world->PushLevel("GameLevel");
+		world->PopLevel();
+		world->PushLevel("MainLevel");
+		world->PushLevel("AttackLevel");
+		
 	}
 
 	STATIC_TYPE_IMPLE(TitleLevelPawn)

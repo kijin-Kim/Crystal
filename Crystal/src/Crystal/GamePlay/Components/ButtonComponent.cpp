@@ -166,19 +166,22 @@ namespace Crystal {
 
 		DirectX::XMFLOAT2 extent = {0.0f, 0.0f};
 
-
-		auto albedoTexture = m_Materials[0]->AlbedoTexture.lock();
-		auto opacityTexture = m_Materials[0]->OpacityTexture.lock();
-		if (albedoTexture)
+		if(!m_Materials.empty() && m_Materials[0])
 		{
-			extent.x = albedoTexture->GetWidth() * m_Scale.x;
-			extent.y = albedoTexture->GetHeight() * m_Scale.y;
+			auto albedoTexture = m_Materials[0]->AlbedoTexture.lock();
+			auto opacityTexture = m_Materials[0]->OpacityTexture.lock();
+			if (albedoTexture)
+			{
+				extent.x = albedoTexture->GetWidth() * m_Scale.x;
+				extent.y = albedoTexture->GetHeight() * m_Scale.y;
+			}
+			else if (opacityTexture)
+			{
+				extent.x = opacityTexture->GetWidth() * m_Scale.x;
+				extent.y = opacityTexture->GetHeight() * m_Scale.y;
+			}
 		}
-		else if (opacityTexture)
-		{
-			extent.x = opacityTexture->GetWidth() * m_Scale.x;
-			extent.y = opacityTexture->GetHeight() * m_Scale.y;
-		}
+		
 
 		m_AABB.Min = Vector2::Subtract({position.x, position.y}, {extent.x, extent.y});
 		m_AABB.Max = Vector2::Add({position.x, position.y}, {extent.x, extent.y});

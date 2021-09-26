@@ -71,8 +71,8 @@ namespace Crystal {
 	
 		STATIC_TYPE_IMPLE(Blackboard)
 
-	private:
-		std::unordered_map<std::string, IBlackboardValue*> m_Values;
+	public:
+		std::unordered_map<std::string, std::unique_ptr<IBlackboardValue>> m_Values;
 	};
 
 	class BlackboardComponent : public Component

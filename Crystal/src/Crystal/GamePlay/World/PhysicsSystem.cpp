@@ -705,6 +705,11 @@ namespace Crystal {
 			pc->SetCurrentButton(hoveredButton);
 			hoveredButton->OnButtonHovered();
 		}
+		else
+		{
+			pc->SetCurrentButtonIsHovered(false);
+			pc->SetCurrentButton({});
+		}
 
 
 		for (auto& weak : scene->Buttons)
@@ -905,9 +910,14 @@ namespace Crystal {
 		bool result = false;
 
 		auto scene = GetScene();
+		if(!scene)
+		{
+			return false;
+		}
 
 
-		for (const auto& lhsWeak : scene->BoundingSphereComponents)
+
+		for (auto lhsWeak : scene->BoundingSphereComponents)
 		{
 			auto collisionCompLhs = Cast<BoundingSphereComponent>(lhsWeak);
 			if (!collisionCompLhs)
@@ -942,7 +952,7 @@ namespace Crystal {
 		}
 
 
-		for (const auto& lhsWeak : scene->BoundingOrientedBoxComponents)
+		for (auto lhsWeak : scene->BoundingOrientedBoxComponents)
 		{
 			auto collisionCompLhs = Cast<BoundingOrientedBoxComponent>(lhsWeak);
 			if (!collisionCompLhs)

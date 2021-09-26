@@ -1,6 +1,9 @@
 #include "cspch.h"
 #include "PostProcessVolumeActor.h"
 
+#include "../../../../../../Game/src/actors/MyPlayerPawn.h"
+#include "Crystal/GamePlay/World/Level.h"
+
 namespace Crystal {
 
 	void PostProcessVolumeActor::SetPostProcessOrder(uint32_t order)
@@ -28,7 +31,12 @@ namespace Crystal {
 
 		m_bIsFirstTimeCheckOverlap = false;
 		m_bIsOverlapped = true;
+
+
+		auto level = GetLevel().lock();
+		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
 		
+
 		if(m_bIsEnabled)
 		{
 			switch (m_VolumeBehavior)
@@ -38,6 +46,7 @@ namespace Crystal {
 				break;
 			case EVolumeBehavior::VB_EnableWhenNotOverlap:
 				SetHiddenInGame(true);
+				playerPawn->SetIsNotInPolluteSphere(false);
 				break;
 			}
 		}
@@ -51,6 +60,11 @@ namespace Crystal {
 		m_bIsFirstTimeCheckOverlap = false;
 		m_bIsOverlapped = false;
 
+
+		auto level = GetLevel().lock();
+		auto playerPawn = Crystal::Cast<MyPlayerPawn>(level->GetPlayerPawn());
+
+
 		if(m_bIsEnabled)
 		{
 			switch (m_VolumeBehavior)
@@ -60,6 +74,7 @@ namespace Crystal {
 				break;
 			case EVolumeBehavior::VB_EnableWhenNotOverlap:
 				SetHiddenInGame(false);
+				playerPawn->SetIsNotInPolluteSphere(true);
 				break;
 			}
 		}

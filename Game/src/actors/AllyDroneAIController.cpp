@@ -27,7 +27,7 @@ void AllyDroneAIController::Begin()
 	AIController::Begin();
 
 
-	const float maxAcceleration = 5000000.0f;
+	const float maxAcceleration = 8000000.0f;
 
 	auto behaviorTree = Crystal::CreateObject<Crystal::BehaviorTree>();
 	auto rootNode = behaviorTree->GetRootNode();
@@ -133,7 +133,7 @@ void AllyDroneAIController::Begin()
 			if (sightStimulus.bIsSensed)
 			{
 				auto staticType = instigator->StaticType();
-				if (staticType == "PowerAsteroid" || staticType == "ShieldAsteroid" || staticType == "HealAsteroid")
+				if (staticType == "GreenOreAsteroid" || staticType == "YellowOreAsteroid" || staticType == "BlueOreAsteroid")
 				{
 					if(!m_BlackboardComponent->HasValue("TargetAsteroid"))
 					{
@@ -144,7 +144,7 @@ void AllyDroneAIController::Begin()
 			else
 			{
 				auto staticType = instigator->StaticType();
-				if (staticType == "PowerAsteroid" || staticType == "ShieldAsteroid" || staticType == "HealAsteroid")
+				if (staticType == "GreenOreAsteroid" || staticType == "YellowOreAsteroid" || staticType == "BlueOreAsteroid")
 				{
 					m_BlackboardComponent->ClearValue("TargetAsteroid");
 				}

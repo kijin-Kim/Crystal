@@ -9,7 +9,7 @@ public:
 
 	void Initialize() override;
 	void Begin() override;
-
+	void Update(float deltaTime) override;
 
 	STATIC_TYPE_IMPLE(DroneAIController)
 

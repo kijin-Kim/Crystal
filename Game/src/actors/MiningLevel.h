@@ -58,25 +58,30 @@ public:
 		scene->SkyboxConfiguration.NearStarDesaturation = 0.0f;
 		scene->SkyboxConfiguration.FarStarDesaturation = 0.0f;
 		scene->SkyboxConfiguration.AdditiveColor = Crystal::Vector4::Zero;
+
+		SpawnActor<Crystal::PlayerStartActor>({});
 	}
 
-	void OnLevelOpened() override
+	void OnLevelOpened(Crystal::Shared<Level> lastLevel) override
 	{
-		Level::OnLevelOpened();
+		Level::OnLevelOpened(lastLevel);
 
 		auto& resourceManager = Crystal::ResourceManager::Instance();
 
-		m_HUD = SpawnActor<MyHUD>({""}).lock();
-		m_Player = SpawnActor<MyPlayerPawn>({"MyPlayerPawn"}).lock();
-		m_Player->SetPosition(Crystal::Vector3::Zero);
-		auto playerController = SpawnActor<Crystal::PlayerController>({}).lock();
-		playerController->Possess(m_Player);
+		QuestReward reward;
+		reward.Gold = 500;
+		reward.ItemType.push_back(EItemType::IT_HealPotion);
+		reward.ItemType.push_back(EItemType::IT_PowerPotion);
+		reward.ItemCount.push_back(1);
+		reward.ItemCount.push_back(3);
 
-		auto stargate = SpawnActor<Stargate>({""}).lock();
-		stargate->SetPosition({0.0f, 20000.0f, 20000.0f});
+		Crystal::Cast<MyHUD>(m_HUD)->SetQuestMainText(L"Gather Resources");
+		CreateQuest("Destroy Ore Asteroids", { "GreenOreAsteroid","BlueOreAsteroid", "YellowOreAsteroid" }, 20, reward);
 
 
-		for (int i = 0; i < 3; i++)
+
+
+		for (int i = 0; i < 5; i++)
 		{
 			auto allyDrone = SpawnActor<AllyDrone>({""}).lock();
 			allyDrone->SetPosition({250.0f + 250.0f * i, 0.0f, 0.0f});
@@ -84,7 +89,7 @@ public:
 			allyDroneController->Possess(allyDrone);
 		}
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			auto allyDrone = SpawnActor<AllyDrone>({""}).lock();
 			allyDrone->SetPosition({-250.0f - 250.0f * i, 0.0f, 0.0f});
@@ -93,7 +98,6 @@ public:
 		}
 
 
-		//		auto mineCave = SpawnActor<MineCave>({ "" }).lock();
 
 		{
 			auto sun = SpawnActor<Sun>({"Sun"}).lock();
@@ -167,5 +171,26 @@ public:
 				}
 			}
 		}
+	}
+
+	void OnLevelClosed(Crystal::Shared<Level> nextLevel) override
+	{
+		Level::OnLevelClosed(nextLevel);
+
+		auto playerStartActor = Crystal::Cast<Crystal::PlayerStartActor>(nextLevel->GetActorByClass("PlayerStartActor"));
+		m_Player->SetPosition(playerStartActor->GetPosition());
+
+
+		nextLevel->SetPlayer(m_Player);
+		nextLevel->SetPlayerController(m_PlayerControllers[0]);
+		nextLevel->SetHUD(m_HUD);
+
+		MoveActorToLevel(m_Player, nextLevel);
+		MoveActorToLevel(m_PlayerControllers[0], nextLevel);
+		MoveActorToLevel(m_HUD, nextLevel);
+		auto inventory = GetActorByClass("Inventory");
+		MoveActorToLevel(inventory.lock(), nextLevel);
+
+		ClearActors();
 	}
 };

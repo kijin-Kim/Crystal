@@ -61,7 +61,7 @@ float4 psMain(PS_INPUT input) : SV_Target
         opacity = albedoColor.a;
     }
 
-    albedoColor *= float4(TintColor, 1.0f);
+    albedoColor.rgb *= TintColor;
     opacity *= OpacityMultiplier;
 
     float4 finalColor = float4(albedoColor.rgb, opacity);

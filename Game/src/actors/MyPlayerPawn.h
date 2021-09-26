@@ -4,12 +4,13 @@
 #include "Crystal/GamePlay/Components/MeshComponents.h"
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Core/Logger.h"
+#include "Inventory.h"
 #include "Crystal/Core/Timer.h"
 #include "Crystal/GamePlay/Components/SpringArmComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/GeometryStaticPipeline.h"
 
-class Inventory;
+class Quest;
 class PlayerShield;
 
 namespace Crystal {
@@ -32,7 +33,6 @@ class MyPlayerPawn final : public Crystal::Pawn
 		ar& m_FireInterval;
 //		ar& m_FireTimer;
 		ar& m_Health;
-		ar& m_bHasItem;
 	}
 
 public:
@@ -61,7 +61,7 @@ public:
 	void OnTakeDamage(float damage, Crystal::Weak<Actor> damageCauser) override;
 
 	void UpdateHealth();
-	void UpdateItemStatus(ItemType itemType, bool bAcquired);
+	
 
 	void UsePowerItem();
 	void UseHealItem();
@@ -79,7 +79,13 @@ public:
 	}
 	bool GetIsNotInPolluteSphere() const { return m_bIsNotInPolluteSphere; }
 
-	const Crystal::Shared<Inventory>& GetInventory() const;
+	Crystal::Weak<Inventory> GetInventory() const;
+
+	void OnInteractWithHovered();
+
+	void SetHealth(float health) { m_Health = health; }
+	float GetHealth() const { return m_Health; }
+	float GetMaxHealth() const { return m_MaxHealth; }
 
 
 	STATIC_TYPE_IMPLE(MyPlayerPawn)
@@ -99,7 +105,7 @@ private:
 	Crystal::Shared<Crystal::CameraComponent> m_CameraComponent = nullptr;
 	Crystal::Shared<Crystal::AIPerceptionSourceComponent> m_AIPerceptionSourceComponent;
 
-	Crystal::Shared<Inventory> m_Inventory;
+	Crystal::Weak<Inventory> m_Inventory;
 	
 
 	Crystal::Weak<PlayerShield> m_PlayerShield = {};
@@ -117,7 +123,6 @@ private:
 	
 	float m_Power = 5.0f;
 
-	bool m_bHasItem[ItemTypeCount];
 
 
 	bool m_bIsNotInPolluteSphere = false;
@@ -130,6 +135,10 @@ private:
 	bool m_bShouldHeal = false;
 
 	bool m_bUseLeftSocket = true;
+
+
+	Crystal::Weak<Crystal::Actor> m_HoveredActor;
+	float m_HoveredDistance;
 
 public:
 	Crystal::Weak<Crystal::PostProcessVolumeActor> DamagedPostProcessActor;

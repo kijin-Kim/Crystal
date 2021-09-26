@@ -22,7 +22,11 @@ namespace Crystal {
 		Actor::Destroy();
 
 		auto controller = Cast<Controller>(m_Controller);
-		controller->Destroy();
+		if(controller)
+		{
+			controller->Destroy();
+		}
+		
 		
 	}
 

@@ -107,6 +107,10 @@ namespace Crystal {
 			auto& materials = textureComponent->GetMaterials();
 			for (auto& mat : materials)
 			{
+				if(!mat)
+				{
+					continue;
+				}
 				perObjectData.AlbedoColor = mat->AlbedoColor;
 				perObjectData.TintColor = mat->TintColor;
 				perObjectData.Opacity = mat->Opacity;

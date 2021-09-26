@@ -12,16 +12,49 @@
 #include "Crystal/Resources/ResourceManager.h"
 
 #include "../../../../../Game/src/actors/MyHUD.h"
+#include "../../../../../Game/src/actors/Quest.h"
+#include "Crystal/GamePlay/Objects/Actors/PlayerStartActor.h"
 
 namespace Crystal {
 
 
-	void Level::OnLevelClosed()
+	void Level::OnLevelOpened(Shared<Level> lastLevel)
+	{
+		m_Scene->Reset();
+		for(auto& actor : m_Actors)
+		{
+			actor->RegisterComponents();
+		}
+	}
+
+	void Level::OnLevelClosed(Shared<Level> nextLevel)
+	{
+		m_Quests.clear();
+		m_Scene->Reset();
+	}
+
+	void Level::MoveActorToLevel(Shared<Actor> actor, Shared<Level> level)
+	{
+		level->OnActorMoved(actor);
+		m_Actors.erase(std::find(m_Actors.begin(), m_Actors.end(), actor));
+	}
+
+	void Level::OnActorMoved(Shared<Actor> actor)
+	{
+		AddActor(actor);
+		actor->SetOuter(weak_from_this());
+	}
+
+
+	void Level::ClearActors()
 	{
 		m_Scene->Reset();
 		for (const auto& actor : m_Actors)
 		{
-			actor->Destroy();
+			if (actor->StaticType() != "PlayerStartActor")
+			{
+				actor->Destroy();
+			}
 		}
 
 		m_bHasDeadActors = true;
@@ -31,6 +64,7 @@ namespace Crystal {
 		m_Player = nullptr;
 		m_HUD = nullptr;
 	}
+
 
 	void Level::Initialize()
 	{
@@ -66,6 +100,27 @@ namespace Crystal {
 				actor->End();
 			}
 		}
+
+		for(const auto& quest : m_Quests)
+		{
+			quest->Update(deltaTime);
+		}
+
+		if (!m_Quests.empty())
+		{
+			bool m_bAllCompleted = true;
+			for (int i = 0; i < m_Quests.size(); i++)
+			{
+				m_bAllCompleted &= m_Quests[i]->GetIsCompleted();
+			}
+			if (m_bAllCompleted)
+			{
+				auto world = GetWorld().lock();
+				world->PopLevel();
+				world->PushLevel("LevelClearedLevel");
+			}
+		}
+
 		auto world = Cast<World>(GetWorld());
 		auto physicsSystem = world->GetPhysicsSystem();
 		physicsSystem->Update(deltaTime);
@@ -124,6 +179,7 @@ namespace Crystal {
 	void Level::RemoveActor(const std::shared_ptr<Actor>& actor)
 	{
 		actor->SetIsDead(true);
+		
 	}
 
 	void Level::RemovePendingActors()
@@ -141,6 +197,10 @@ namespace Crystal {
 			}
 			else
 			{
+				for (auto& quest : m_Quests)
+				{
+					quest->OnActorDestroyed((*it)->StaticType());
+				}
 				it = m_Actors.erase(it);
 			}
 		}
@@ -236,6 +296,40 @@ namespace Crystal {
 		return *it;
 	}
 
+
+	void Level::CreateQuest(const std::string& displayText, const DirectX::XMFLOAT3& targetLocation, Weak<Actor> targetActor, const QuestReward& reward)
+	{
+		auto newQuest = CreateObject<Quest>(displayText, weak_from_this());
+		newQuest->SetQuestType(Quest::EQuestType::QT_Location);
+		newQuest->SetQuestText(displayText);
+		newQuest->SetQuestTargetActor(targetActor);
+		newQuest->SetQuestTargetLocation(targetLocation);
+		newQuest->SetQuestReward(reward);
+
+		m_Quests.push_back(newQuest);
+	}
+
+	void Level::CreateQuest(const std::string& displayText, const std::initializer_list<std::string>& types, uint32_t count, const QuestReward& reward)
+	{
+		auto newQuest = CreateObject<Quest>(displayText, weak_from_this());
+		newQuest->SetQuestType(Quest::EQuestType::QT_Destroy);
+		newQuest->SetQuestText(displayText);
+
+		for(auto type : types)
+		{
+			newQuest->SetQuestTargetType(type);
+		}
+		newQuest->SetQuestTargetTypeCount(count);
+		newQuest->SetQuestReward(reward);
+
+		m_Quests.push_back(newQuest);
+	}
+
+	const std::vector<Shared<Quest>>& Level::GetQuests() const
+	{
+		return m_Quests;
+	}
+
 	std::vector<std::shared_ptr<Actor>>::iterator Level::FindActorItByDelegate(
 		const std::function<bool(const std::shared_ptr<Actor>&)>& delegate)
 	{
@@ -245,12 +339,15 @@ namespace Crystal {
 	bool Level::OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		bool bHandled = false;
-		for (const auto& playerController : m_PlayerControllers)
+
+		if(!m_PlayerControllers.empty())
 		{
-			bHandled |= playerController->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			bHandled |= m_PlayerControllers[0]->OnInputEvent(hWnd, uMsg, wParam, lParam);
+			if(bHandled)
+			{
+				return true;
+			}
 		}
-
-
 		return bHandled;
 	}
 

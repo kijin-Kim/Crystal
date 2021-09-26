@@ -59,9 +59,14 @@ namespace Crystal {
 		return m_Levels[index];
 	}
 
-	const Shared<Level>& World::GetCurrentLevel() const
+	Shared<Level> World::GetCurrentLevel() const
 	{
-		return m_LevelStack.top();
+		if(!m_LevelStack.empty())
+		{
+			return m_LevelStack.top();
+		}
+		return nullptr;
+		
 	}
 
 	void World::PushLevel(const std::string& name)
@@ -75,16 +80,37 @@ namespace Crystal {
 		{
 			CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
 		}
-		
+
+		Shared<Level> lastLevel = nullptr;
+		if(!m_LevelStack.empty())
+		{
+			m_LevelStack.top()->OnLevelClosed(*it);
+			lastLevel = m_LevelStack.top();
+		}
+
 		m_LevelStack.push(*it);
-		m_LevelStack.top()->OnLevelOpened();
+		m_LevelStack.top()->OnLevelOpened(lastLevel);
 		m_RenderSystem->Begin();
 	}
 
-	void World::PopLevel(const std::string& name)
+	void World::PopLevel()
 	{
-		m_LevelStack.top()->OnLevelClosed();
-		m_LevelStack.pop();
+		if (!m_LevelStack.empty())
+		{
+			auto topLevel = m_LevelStack.top();
+			m_LevelStack.pop();
+
+			if (!m_LevelStack.empty())
+			{
+				topLevel->OnLevelClosed(m_LevelStack.top());
+				m_LevelStack.top()->OnLevelOpened(topLevel);
+			}
+			else
+			{
+				topLevel->OnLevelClosed(nullptr);
+
+			}
+		}
 	}
 
 

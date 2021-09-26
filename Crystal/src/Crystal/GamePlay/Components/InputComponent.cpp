@@ -48,7 +48,20 @@ namespace Crystal {
 		
 		auto [keyCode, keyStatus] = GetCrystalKeyCode(uMsg, wParam, lParam);
 
-
+	/*	switch (keyStatus)
+		{
+		case EKeyEvent::KE_None: break;
+		case EKeyEvent::KE_Pressed:
+			CS_DEBUG_INFO("Pressed : %d", keyCode);
+			break;
+		case EKeyEvent::KE_Released:
+			CS_DEBUG_INFO("Released : %d", keyCode);
+			break;
+		case EKeyEvent::KE_Repeat:
+			CS_DEBUG_INFO("Repeat : %d", keyCode);
+			break;
+		default: ;
+		}*/
 
 		
 		ProcessActionMappedInput(uMsg, keyCode, lParam, keyStatus);
@@ -164,7 +177,7 @@ namespace Crystal {
 
 	std::pair<int64_t, EKeyEvent> InputComponent::GetCrystalKeyCode(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		std::pair<int64_t, EKeyEvent> crystalKey = std::make_pair(Keyboard::Unknown, EKeyEvent::KE_Pressed);
+		std::pair<int64_t, EKeyEvent> crystalKey = std::make_pair(Keyboard::Unknown, EKeyEvent::KE_None);
 		crystalKey.second = (HIWORD(lParam) & KF_REPEAT) ? EKeyEvent::KE_Repeat : EKeyEvent::KE_Pressed;
 		crystalKey.second = uMsg == WM_KEYUP ? EKeyEvent::KE_Released : crystalKey.second;
 		switch (wParam)
@@ -418,7 +431,11 @@ namespace Crystal {
 			break;
 		}
 
-		return  crystalKey;
+		if(crystalKey.first == Keyboard::Unknown)
+		{
+			crystalKey.second = EKeyEvent::KE_None;
+		}
+		return crystalKey;
 	}
 
 	MouseCodeWithDelta InputComponent::GetCrystalMouseCodeWithDelta(UINT uMsg, LPARAM lParam)

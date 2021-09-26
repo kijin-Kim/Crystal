@@ -10,9 +10,15 @@ public:
 	TitleLevel() = default;
 	~TitleLevel() override = default;
 
-	void OnLevelOpened() override
+	void Initialize() override
 	{
-		Crystal::Level::OnLevelOpened();
+		Level::Initialize();
+		SpawnActor<Crystal::PlayerStartActor>({});
+	}
+
+	void OnLevelOpened(Crystal::Shared<Level> lastLevel) override
+	{
+		Crystal::Level::OnLevelOpened(lastLevel);
 
 		//m_HUD = SpawnActor<MyHUD>({ "" }).lock();
 		m_Player = SpawnActor<TitleLevelPawn>({ "TitleLevelPawn" }).lock();
@@ -20,8 +26,7 @@ public:
 		auto playerController = SpawnActor<Crystal::PlayerController>({}).lock();
 		playerController->Possess(m_Player);
 
-
-
+		
 	}
 
 	STATIC_TYPE_IMPLE(TitleLevel)
