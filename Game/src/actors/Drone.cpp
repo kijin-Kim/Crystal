@@ -8,6 +8,7 @@
 #include "Crystal/GamePlay/Components/TextureComponent.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
+#include "Crystal/GamePlay/Objects/Actors/ParticleActor.h"
 
 
 void Drone::Initialize()
@@ -201,6 +202,13 @@ void Drone::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 	if (m_CurrentHealth <= 0.0f)
 	{
 		Destroy();
+		auto level = GetLevel().lock();
+		if (level)
+		{
+			Actor::ActorSpawnParams spawnParams;
+			spawnParams.Position = GetPosition();
+			level->SpawnActor<Crystal::ParticleActor>(spawnParams);
+		}
 	}
 
 	auto droneAIController = Crystal::Cast<DroneAIController>(GetController());

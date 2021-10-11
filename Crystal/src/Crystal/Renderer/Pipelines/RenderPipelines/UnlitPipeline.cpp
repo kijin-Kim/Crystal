@@ -82,8 +82,8 @@ namespace Crystal {
 
 		PipelineStateDescription pipelineStateDescription(
 			inputLayoutDesc,
-			StateHelper::NonPremultiplied,
-			StateHelper::DepthEnable,
+			StateHelper::Additive,
+			StateHelper::DepthDisable,
 			StateHelper::CullCounterClock,
 			renderTargetDescription,
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE

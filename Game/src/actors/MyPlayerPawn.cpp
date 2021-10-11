@@ -48,6 +48,7 @@ void MyPlayerPawn::Initialize()
 	m_StaticMeshComponent->AddMaterial(partsMat);
 	m_StaticMeshComponent->AttachTo(m_MainComponent);
 	m_StaticMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/SM_MK3InterceptorMainLite.fbx"));
+	m_StaticMeshComponent->SetHiddenInGame(false);
 
 
 	m_LeftFireSocketComponent = CreateComponent<Crystal::TransformComponent>("LeftFireSocketComponent");

@@ -16,8 +16,12 @@ namespace Crystal {
 		~ParticleActor() override = default;
 
 		void Initialize() override;
+		void Update(const float deltaTime) override;
 
 
 		STATIC_TYPE_IMPLE(ParticleActor)
+
+	private:
+		Timer m_Timer;
 	};
 }

@@ -217,6 +217,11 @@ namespace Crystal {
 			if (!meshComponent)
 				continue;
 
+			if (meshComponent->GetHiddenInGame())
+			{
+				continue;
+			}
+
 
 			auto materials = meshComponent->GetMaterials();
 

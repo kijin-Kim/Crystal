@@ -20,20 +20,20 @@ namespace Crystal {
 
 		auto particleSystem = CreateShared<ParticleSystem>();
 
-	/*	auto fireBallEmitter = CreateShared<ParticleEmitter>();
+		auto fireBallEmitter = CreateShared<ParticleEmitter>();
 
 		fireBallEmitter->MinRadius = 20.0f;
 		fireBallEmitter->MaxRadius = 100.0f;
 
-		fireBallEmitter->MinStartScale = 400.0f;
-		fireBallEmitter->MaxStartScale = 600.0f;
+		fireBallEmitter->MinStartScale = 300.0f;
+		fireBallEmitter->MaxStartScale = 400.0f;
 
 		fireBallEmitter->MinEndScale = 800.0f;
 		fireBallEmitter->MaxEndScale = 1000.0f;
 
 
-		fireBallEmitter->MinVelocity = {0.0f, 700.0f, 0.0f};
-		fireBallEmitter->MaxVelocity = {0.0f, 1000.0f, 0.0f};
+		fireBallEmitter->MinVelocity = { 0.0f, 700.0f, 0.0f };
+		fireBallEmitter->MaxVelocity = { 0.0f, 1000.0f, 0.0f };
 
 		fireBallEmitter->MinRotationAngle = 0.0f;
 		fireBallEmitter->MaxRotationAngle = 52.0f;
@@ -50,12 +50,12 @@ namespace Crystal {
 		fireBallEmitter->VerticalSubImageCount = 6;
 
 
-		particleSystem->AddParticleEmitter(fireBallEmitter);*/
+		particleSystem->AddParticleEmitter(fireBallEmitter);
 
 
-		auto smokeMaterial = CreateShared<Crystal::Material>();
+		/*auto smokeMaterial = CreateShared<Crystal::Material>();
 		smokeMaterial->AlbedoTexture = ResourceManager::Instance().GetTexture("assets/textures/T_Smoke_SubUV.tga");
-		
+
 		smokeMaterial->bUseAlbedoTextureAlpha = true;
 		smokeMaterial->BlendMode = EBlendMode::BM_Translucent;
 
@@ -88,10 +88,24 @@ namespace Crystal {
 		smokeEmitter->HorizontalSubImageCount = 8;
 		smokeEmitter->VerticalSubImageCount = 8;
 
-		particleSystem->AddParticleEmitter(smokeEmitter);
+		particleSystem->AddParticleEmitter(smokeEmitter);*/
 
 		particleComponent->SetParticleSystem(particleSystem);
 
 		m_MainComponent = particleComponent;
 	}
+
+	void ParticleActor::Update(const float deltaTime)
+	{
+		Actor::Update(deltaTime);
+
+
+		m_Timer.Tick();
+
+		if (m_Timer.GetElapsedTime() >= 0.7f)
+		{
+			Destroy();
+		}
+	}
+
 }
