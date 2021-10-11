@@ -86,7 +86,7 @@ HDR 밝기 영역으로 표현된 Scene을 모니터가 표현할 수 있는 영
 # Shadow Mapping
 ## 사진
 
-<img src="ReadMeResource/Shadow.png" width="80%" height="80%" style="margin-left: auto; margin-right: auto; display: block;"></img>
+<img src="ReadMeResource/shadow.png" width="80%" height="80%" style="margin-left: auto; margin-right: auto; display: block;"></img>
 ###### <center>< Shadow Map ></center>
 
 ## 세부 설명
