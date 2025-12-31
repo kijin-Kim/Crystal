@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <mutex>
 
 #include "Component.h"
@@ -6,18 +7,16 @@
 #include "PrimitiveComponent.h"
 #include "Crystal/Resources/ResourceManager.h"
 #include "Crystal/Renderer/Pipelines/RenderPipelines/LinePipeline.h"
-#include "CollisionShapes.h"
 
+
+namespace DirectX
+{
+	struct BoundingOrientedBox;
+}
 
 namespace Crystal {
 	class CollisionComponent : public PrimitiveComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<PrimitiveComponent>(*this);
-			ar & m_PostScaledTransform;
-			ar & m_bCollisionEnabled;
-		}
 
 	public:
 		CollisionComponent()
@@ -186,14 +185,14 @@ namespace Crystal {
 		void SetExtents(const DirectX::XMFLOAT3& extent) { m_BoundingOrientedBox.Extents = extent; }
 		void SetOrientation(const DirectX::XMFLOAT4& orientation) { m_BoundingOrientedBox.Orientation = orientation; }
 
-		Collision::BoundingOrientedBox GetWorldBoundingOrientedBox() const
+		DirectX::BoundingOrientedBox GetWorldBoundingOrientedBox() const
 		{
-			Collision::BoundingOrientedBox worldBoundingOrientedBox = Collision::BoundingOrientedBox();
+			DirectX::BoundingOrientedBox worldBoundingOrientedBox = DirectX::BoundingOrientedBox();
 			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, XMLoadFloat4x4(&m_WorldTransform));			
 			return worldBoundingOrientedBox;
 		}
 
-		const Collision::BoundingOrientedBox& GetBoundingOrientedBox() const
+		const DirectX::BoundingOrientedBox& GetBoundingOrientedBox() const
 		{
 			return m_BoundingOrientedBox;
 		}
@@ -201,7 +200,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BoundingOrientedBoxComponent)
 
 	private:
-		Collision::BoundingOrientedBox m_BoundingOrientedBox = Collision::BoundingOrientedBox();
+		DirectX::BoundingOrientedBox m_BoundingOrientedBox = DirectX::BoundingOrientedBox();
 	};
 
 
@@ -266,14 +265,14 @@ namespace Crystal {
 		float GetFar() const { return m_BoundingFrustum.Far; }
 
 
-		Collision::BoundingFrustum GetWorldBoundingFrustum() const
+		DirectX::BoundingFrustum GetWorldBoundingFrustum() const
 		{
-			Collision::BoundingFrustum worldBoundingFrustum = Collision::BoundingFrustum();
+			DirectX::BoundingFrustum worldBoundingFrustum = DirectX::BoundingFrustum();
 			m_BoundingFrustum.Transform(worldBoundingFrustum, XMLoadFloat4x4(&m_WorldTransform));
 			return worldBoundingFrustum;
 		}
 
-		const Collision::BoundingFrustum& GetBoundingFrustum() const
+		const DirectX::BoundingFrustum& GetBoundingFrustum() const
 		{
 			return m_BoundingFrustum;
 		}
@@ -282,7 +281,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(BoundingFrustumComponent)
 
 	private:
-		Collision::BoundingFrustum m_BoundingFrustum = Collision::BoundingFrustum();
+		DirectX::BoundingFrustum m_BoundingFrustum = DirectX::BoundingFrustum();
 
 		float m_FarWidth = 100.0f;
 		float m_FarHeight = 100.0f;
@@ -324,15 +323,15 @@ namespace Crystal {
 		const DirectX::XMFLOAT3& GetCenter() const { return m_BoundingSphere.Center; }
 		float GetRadius() const { return m_BoundingSphere.Radius; }
 
-		Collision::BoundingSphere GetWorldBoundingSphere() const
+		DirectX::BoundingSphere GetWorldBoundingSphere() const
 		{
-			Collision::BoundingSphere worldBoundingSphere = Collision::BoundingSphere();
+			DirectX::BoundingSphere worldBoundingSphere = DirectX::BoundingSphere();
 			m_BoundingSphere.Transform(worldBoundingSphere, XMLoadFloat4x4(&m_WorldTransform));
 			return worldBoundingSphere;
 		}
 
 		STATIC_TYPE_IMPLE(BoundingSphereComponent)
 	private:
-		Collision::BoundingSphere m_BoundingSphere = Collision::BoundingSphere();
+		DirectX::BoundingSphere m_BoundingSphere = DirectX::BoundingSphere();
 	};
 }

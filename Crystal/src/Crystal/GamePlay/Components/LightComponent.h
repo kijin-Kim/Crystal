@@ -4,15 +4,6 @@
 namespace Crystal {
 	class LightComponent : public TransformComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<TransformComponent>(*this);
-			ar & m_LightColor;
-			ar & m_Intensity;
-			ar & m_bCastShadow;
-			ar & m_LightViewProjection;
-		}
-
 	public:
 		LightComponent() = default;
 		~LightComponent() override = default;
@@ -50,10 +41,6 @@ namespace Crystal {
 
 	class DirectionalLightComponent : public LightComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<LightComponent>(*this);
-		}
 
 	public:
 		DirectionalLightComponent() = default;
@@ -65,10 +52,6 @@ namespace Crystal {
 
 	class PointLightComponent : public LightComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<LightComponent>(*this);
-		}
 
 	public:
 		PointLightComponent() = default;

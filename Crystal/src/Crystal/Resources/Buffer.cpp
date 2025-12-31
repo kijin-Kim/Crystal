@@ -39,7 +39,7 @@ namespace Crystal {
 
 			HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 				D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_Resource));
-			CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
+			// CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
 
 			m_Resource->Map(0, nullptr, (void**)&m_CpuBasePtr);
 
@@ -50,7 +50,7 @@ namespace Crystal {
 		{
 			HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 				D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_Resource));
-			CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
+			// CS_FATAL(SUCCEEDED(hr), "목표 버퍼를 생성하는데 실패하였습니다");
 
 			if (data)
 			{
@@ -58,7 +58,7 @@ namespace Crystal {
 
 				HRESULT hr = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &bufferResourceDesc,
 					D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&intermediateBuffer));
-				CS_FATAL(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
+				// CS_FATAL(SUCCEEDED(hr), "중간 버퍼를 생성하는데 실패하였습니다");
 
 				//auto commandQueue = Renderer::Instance().GetCommandQueue();
 				auto commandQueue = Device::Instance().GetCommandQueue();
@@ -109,7 +109,7 @@ namespace Crystal {
 	{
 		if (!m_ConstantBufferView.IsNull())
 		{
-			CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
+			// CS_WARN("현재 타입의 리소스뷰가 이미 존재합니다");
 			return;
 		}
 
@@ -143,7 +143,7 @@ namespace Crystal {
 
 		if (it == m_AvailableConstantBuffers.end())
 		{
-			CS_DEBUG_INFO("Create New ConstantBuffer");
+			// CS_DEBUG_INFO("Create New ConstantBuffer");
 			auto newBuffer = CreateShared<Buffer>(data, requestedSize, 0, true, true);
 			m_UsedConstantBuffers.push_back(newBuffer);
 			return newBuffer;
@@ -185,7 +185,7 @@ namespace Crystal {
 			++it;
 		}
 
-		CS_DEBUG_INFO("Create New Buffer");
+		// CS_DEBUG_INFO("Create New Buffer");
 		const auto newBuffer = CreateShared<Buffer>(data, requestedSize, count, false, bAsDynamic);
 		m_UsedBuffers.push_back(newBuffer);
 		return newBuffer;

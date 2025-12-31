@@ -10,10 +10,7 @@ namespace Crystal {
 
 class Kraken : public Crystal::Pawn
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Pawn>(*this);
-	}
+
 
 public:
 	void Initialize() override;

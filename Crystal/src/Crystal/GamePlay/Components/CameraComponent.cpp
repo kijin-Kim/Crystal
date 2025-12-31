@@ -5,7 +5,6 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/Scene.h"
 
-BOOST_CLASS_EXPORT(Crystal::CameraComponent)
 
 namespace Crystal {
 	CameraComponent::CameraComponent()
@@ -72,7 +71,7 @@ namespace Crystal {
 			m_ViewProjection = Matrix4x4::Multiply(m_View, m_Projection);
 			break;
 		default:
-			CS_FATAL(false, "예상치 못한 Camera Projection Mode.");
+			// CS_FATAL(false, "예상치 못한 Camera Projection Mode.");
 			break;
 		}
 	}

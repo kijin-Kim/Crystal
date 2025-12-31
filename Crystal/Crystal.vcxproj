@@ -38,37 +38,37 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StandaloneDebug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerDebug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StandaloneRelease|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ServerRelease|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -146,8 +146,8 @@
       <PrecompiledHeaderFile>cspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_DEBUG;CS_NM_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;// CS_DEBUG;CS_NM_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -164,7 +164,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -180,8 +180,8 @@
       <PrecompiledHeaderFile>cspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_NM_STANDALONE;CS_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_NM_STANDALONE;// CS_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -198,7 +198,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -214,8 +214,8 @@
       <PrecompiledHeaderFile>cspch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_DEBUG;CS_NM_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;// CS_DEBUG;CS_NM_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -232,7 +232,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -249,7 +249,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_RELEASE;CS_NM_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -270,7 +270,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -287,7 +287,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_NM_STANDALONE;CS_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -308,7 +308,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -325,7 +325,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>26812;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;CS_RELEASE;CS_NM_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external;%BOOST_ROOT%</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;external\assimp\include;external\DirectXTex\;external\Imgui\;external</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -346,7 +346,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>%BOOST_LIBRARYDIR%;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
@@ -438,14 +438,11 @@
     <ClInclude Include="src\Crystal\Core\Core.h" />
     <ClInclude Include="src\Crystal\Core\Device.h" />
     <ClInclude Include="src\Crystal\Core\SerializeHelper.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\LineActor.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\SkyboxActor.h" />
     <ClInclude Include="src\Crystal\GamePlay\AI\BehaviorTree.h" />
     <ClInclude Include="src\Crystal\GamePlay\AI\Blackboard.h" />
     <ClInclude Include="src\Crystal\GamePlay\AI\Decorator.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\AIComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\ButtonComponent.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Components\CollisionShapes.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\LightComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\MovementComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CollisionComponent.h" />
@@ -516,8 +513,6 @@
     <ClInclude Include="src\Crystal\Core\Logger.h" />
     <ClInclude Include="src\Crystal\Core\Timer.h" />
     <ClInclude Include="src\Crystal\Core\WindowsWindow.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\CameraPawn.h" />
-    <ClInclude Include="src\Crystal\GamePlay\Actors\Pawn.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\CameraComponent.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\Component.h" />
     <ClInclude Include="src\Crystal\GamePlay\Components\InputComponent.h" />
@@ -619,9 +614,6 @@
     <ClCompile Include="src\cspch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Crystal\GamePlay\Components\CollisionShapes.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="external\DirectXTex\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">

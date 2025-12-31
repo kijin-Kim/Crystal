@@ -1,7 +1,6 @@
 #include "cspch.h"
 #include "TransformComponent.h"
 
-BOOST_CLASS_EXPORT(Crystal::TransformComponent)
 
 namespace Crystal {
 	void TransformComponent::Begin()
@@ -70,7 +69,7 @@ namespace Crystal {
 	{
 		SetParentComponent(component);
 		auto actor = Cast<Actor>(GetOuter());
-		CS_FATAL(actor, "Outer가 존재하지 않습니다.");
+		// CS_FATAL(actor, "Outer가 존재하지 않습니다.");
 		actor->MoveToTransformComponentHierarchy(Cast<TransformComponent>(shared_from_this()));
 	}
 
@@ -206,7 +205,7 @@ namespace Crystal {
 
 	float TransformComponent::GetMass() const
 	{
-		CS_FATAL(m_InverseMass != 0, "질량이 무한대 입니다. 먼저 HasFiniteMass()로 검사되어야합니다");
+		// CS_FATAL(m_InverseMass != 0, "질량이 무한대 입니다. 먼저 HasFiniteMass()로 검사되어야합니다");
 		return 1.0f / m_InverseMass;
 	}
 

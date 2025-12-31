@@ -141,11 +141,11 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Root Signature?? ?ø???????? ????????????");
 		auto device = Device::Instance().GetD3DDevice();
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_D3d12RootSignature));
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Root Signature?? ???????? ????????????");
 	}
 
 
@@ -155,7 +155,7 @@ namespace Crystal {
 
 	Shader::Shader(const std::string& fileName)
 	{
-		CS_INFO("%s 셰이더 불러오는 중...", fileName.c_str());
+		// CS_INFO("%s ????? ??????? ??...", fileName.c_str());
 
 		Microsoft::WRL::ComPtr<ID3DBlob> srcBlob = loadSourceFromFile(fileName);
 		const std::string srcString = (char*)srcBlob->GetBufferPointer();
@@ -191,17 +191,17 @@ namespace Crystal {
 			compileShader(srcBlob, ShaderType::Compute);
 			bIsValidShader = true;
 		}
-		CS_FATAL(bIsValidShader, "%s 셰이더의 진입점을 찾을 수 없습니다", fileName.c_str());
-		/* Crystal에서는 각각의 셰이더를 파싱할 때, 다음과 같은 prefix를 사용한 진입점을 요구합니다.
-		* 버텍스 셰이더 : vs
-		* 헐 셰이더 : hs
-		* 도메인 셰이더 : ds
-		* 지오메트리 셰이더 : gs
-		* 픽셀 셰이더 : ps
-		* 컴퓨트 셰이더 : cs
+		// CS_FATAL(bIsValidShader, "%s ??????? ???????? ??? ?? ???????", fileName.c_str());
+		/* Crystal?????? ?????? ??????? ????? ??, ?????? ???? prefix?? ????? ???????? ??????.
+		* ????? ????? : vs
+		* ?? ????? : hs
+		* ?????? ????? : ds
+		* ????????? ????? : gs
+		* ??? ????? : ps
+		* ???? ????? : cs
 		*/
 
-		CS_INFO("%s 셰이더 불러오기 완료", fileName.c_str());
+		// CS_INFO("%s ????? ??????? ???", fileName.c_str());
 	}
 
 	bool Shader::CheckInputValidation(const std::string& inputName, D3D_SHADER_INPUT_TYPE shaderInputType)
@@ -230,7 +230,7 @@ namespace Crystal {
 		std::wstring shaderPath(filePath.begin(), filePath.end());
 		Microsoft::WRL::ComPtr<ID3DBlob> shaderCode = nullptr;
 		HRESULT hr = D3DReadFileToBlob(shaderPath.c_str(), &shaderCode);
-		CS_FATAL(SUCCEEDED(hr), "%s 셰이더가 존재하지 않습니다", filePath.c_str());
+		// CS_FATAL(SUCCEEDED(hr), "%s ??????? ???????? ??????", filePath.c_str());
 		return shaderCode;
 	}
 
@@ -241,7 +241,7 @@ namespace Crystal {
 		std::string staticShaderType;
 
 		UINT compileFlag = 0;
-#ifdef CS_DEBUG
+#ifdef  CS_DEBUG
 		compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_ENABLE_STRICTNESS;
 #endif
 
@@ -266,7 +266,7 @@ namespace Crystal {
 			staticShaderType = "cs";
 			break;
 		default:
-			CS_FATAL(false, "유효하지 않은 Shader Type 입니다.");
+			// CS_FATAL(false, "??????? ???? Shader Type ????.");
 			break;
 		}
 
@@ -279,12 +279,12 @@ namespace Crystal {
 
 		if (errorBlob)
 		{
-			CS_WARN("%s", (char*)errorBlob->GetBufferPointer());
+			// CS_WARN("%s", (char*)errorBlob->GetBufferPointer());
 		}
-		CS_FATAL(SUCCEEDED(hr), "셰이더 컴파일에 실패하였습니다. %s", (char*)errorBlob->GetBufferPointer());
+		// CS_FATAL(SUCCEEDED(hr), "????? ??????? ????????????. %s", (char*)errorBlob->GetBufferPointer());
 
 		hr = D3DReflect(m_ShaderDataBlobs[type]->GetBufferPointer(), m_ShaderDataBlobs[type]->GetBufferSize(), IID_PPV_ARGS(&m_ShaderReflection));
-		CS_FATAL(SUCCEEDED(hr), "셰이더 리플렉션을 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "????? ???÷????? ????????????.");
 	}
 
 	bool Shader::canCompile(ShaderType type, const std::string& src)
@@ -304,7 +304,7 @@ namespace Crystal {
 		case ShaderType::Compute:
 			return src.find("csMain") != std::string::npos;
 		default:
-			CS_FATAL(false, "유효하지 않은 Shader Type입니다.");
+			// CS_FATAL(false, "??????? ???? Shader Type????.");
 			return false;
 		}
 	}

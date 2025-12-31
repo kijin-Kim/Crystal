@@ -11,3 +11,6 @@ Game/assets/textures/
 bin/
 !Crystal/external/assimp/bin
 *.exe
+
+
+.idea/

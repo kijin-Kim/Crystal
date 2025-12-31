@@ -25,7 +25,7 @@ namespace Crystal {
 		uint32_t threadCount = std::thread::hardware_concurrency();
 		threadCount -= 2;
 
-#if 1
+#if 0
 		auto scene = GetScene();
 		if (!scene)
 		{
@@ -107,7 +107,7 @@ namespace Crystal {
 
 							float totalDist = 0.0f;
 							DirectX::XMVECTOR contactNormalVector;
-							if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
+							if (collisionLhs.Intersects(collisionRhs))
 							{
 								if (collisionTypeLhs == ECollisionType::CT_Overlap && (!collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs
 									->
@@ -251,7 +251,7 @@ namespace Crystal {
 							float totalDist = 0.0f;
 							DirectX::XMVECTOR contactNormalVector;
 
-							if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
+							if (collisionLhs.Intersects(collisionRhs))
 							{
 								if (collisionTypeLhs == ECollisionType::CT_Overlap && (!collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs
 									->
@@ -398,7 +398,7 @@ namespace Crystal {
 
 							float totalDist = 0.0f;
 							DirectX::XMVECTOR contactNormalVector;
-							if (collisionLhs.Intersects(collisionRhs, contactNormalVector, totalDist))
+							if (collisionLhs.Intersects(collisionRhs))
 							{
 								if (collisionTypeLhs == ECollisionType::CT_Overlap && (!collisionCompLhs->IsOverlappedWith(collisionCompRhs) || collisionCompLhs
 									->
@@ -540,7 +540,7 @@ namespace Crystal {
 					auto sourceNoise = sourceComp->GetNoiseStimulus();
 
 					auto hearingSphere = perceptionComp->GetWorldHearingSphere();
-					Collision::BoundingSphere noiseSphere;
+					DirectX::BoundingSphere noiseSphere;
 					noiseSphere.Center = sourceNoise.Position;
 					noiseSphere.Radius = sourceNoise.MaxRange;
 

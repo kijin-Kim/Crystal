@@ -10,12 +10,6 @@ namespace Crystal {
 
 	class PrimitiveComponent : public TransformComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<TransformComponent>(*this);
-			ar & m_bHiddenInGame;
-		}
-
 	public:
 		PrimitiveComponent() = default;
 

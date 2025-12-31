@@ -10,11 +10,6 @@ namespace Crystal {
 namespace Crystal {
 	class MovementComponent : public Component
 	{
-		SERIALIZE_PROPERTIES
-		{
-			ar & *m_TargetComponent;
-		}
-
 	public:
 		MovementComponent() = default;
 		~MovementComponent() override = default;

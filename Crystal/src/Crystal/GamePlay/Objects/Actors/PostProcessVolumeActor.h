@@ -1,6 +1,7 @@
 #pragma once
+#include <DirectXCollision.h>
+
 #include "Actor.h"
-#include "Crystal/GamePlay/Components/CollisionShapes.h"
 #include "Crystal/GamePlay/Components/PostProcessComponent.h"
 
 namespace Crystal {
@@ -75,16 +76,16 @@ namespace Crystal {
 		Crystal::Shared<PostProcessComponent> GetPostProcessComponent() const { return m_PostProcessComponent; }
 
 
-		Collision::BoundingOrientedBox GetWorldBoundingOrientedBox() const
+		DirectX::BoundingOrientedBox GetWorldBoundingOrientedBox() const
 		{
-			Collision::BoundingOrientedBox worldBoundingOrientedBox = Collision::BoundingOrientedBox();
+			DirectX::BoundingOrientedBox worldBoundingOrientedBox = DirectX::BoundingOrientedBox();
 			m_BoundingOrientedBox.Transform(worldBoundingOrientedBox, DirectX::XMLoadFloat4x4(&GetWorldTransform()));
 			return worldBoundingOrientedBox;
 		}
 
-		Collision::BoundingSphere GetWorldBoundingSphere() const
+		DirectX::BoundingSphere GetWorldBoundingSphere() const
 		{
-			Collision::BoundingSphere worldBoundingSphere = Collision::BoundingSphere();
+			DirectX::BoundingSphere worldBoundingSphere = DirectX::BoundingSphere();
 			m_BoundingSphere.Transform(worldBoundingSphere, DirectX::XMLoadFloat4x4(&GetWorldTransform()));
 			return worldBoundingSphere;
 		}
@@ -141,8 +142,8 @@ namespace Crystal {
 
 	private:
 		Shared<PostProcessComponent> m_PostProcessComponent = nullptr;
-		Collision::BoundingOrientedBox m_BoundingOrientedBox = {};
-		Collision::BoundingSphere m_BoundingSphere = {};
+		DirectX::BoundingOrientedBox m_BoundingOrientedBox = {};
+		DirectX::BoundingSphere m_BoundingSphere = {};
 		EVolumeType m_VolumeType = EVolumeType::VT_Box;
 		EVolumeBehavior m_VolumeBehavior = EVolumeBehavior::VB_EnableWhenOverlap;
 

@@ -385,9 +385,9 @@ namespace Crystal {
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		commandQueue->Execute(commandList);
-		CS_INFO("HDRI로부터 Cubemap 생성중...");
+		// CS_INFO("HDRI로부터 Cubemap 생성중...");
 		commandQueue->Flush();
-		CS_INFO("HDRI로부터 Cubemap 생성 완료");
+		// CS_INFO("HDRI로부터 Cubemap 생성 완료");
 	}
 
 	void RenderSystem::Update(const float deltaTime)
@@ -673,7 +673,7 @@ namespace Crystal {
 			m_CleanUpTimer.Reset();
 
 			scene->RemoveGarbage();
-			CS_DEBUG_INFO("Garbage Removed");
+			// CS_DEBUG_INFO("Garbage Removed");
 		}
 
 		BufferManager::Instance().Flush();
@@ -689,7 +689,7 @@ namespace Crystal {
 		if (m_ResWidth == width && m_ResHeight == height)
 			return;
 
-		CS_INFO("해상도를 변경하는 중...");
+		// CS_INFO("해상도를 변경하는 중...");
 
 		m_RtvIndex = 0;
 
@@ -706,12 +706,12 @@ namespace Crystal {
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 		HRESULT hr = m_SwapChain->ResizeTarget(&targetParam);
-		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
 
 		hr = m_SwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM,
 		                                DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
 		auto& scene = GetScene();
@@ -772,8 +772,8 @@ namespace Crystal {
 		cameraComponent->SetScissorRect({0, 0, width, height});
 
 
-		CS_INFO("해상도를 변경 완료.");
-		CS_INFO("현재 해상도 : %d X %d", targetParam.Width, targetParam.Height);
+		// CS_INFO("해상도를 변경 완료.");
+		// CS_INFO("현재 해상도 : %d X %d", targetParam.Width, targetParam.Height);
 	}
 
 	void RenderSystem::ChangeDisplayMode()
@@ -784,7 +784,7 @@ namespace Crystal {
 			return;
 
 
-		CS_INFO("디스플레이 모드를 변환중...");
+		// CS_INFO("디스플레이 모드를 변환중...");
 
 		auto world = GetWorld();
 		auto& levels = world->GetLevels();
@@ -800,12 +800,12 @@ namespace Crystal {
 
 
 		HRESULT hr = m_SwapChain->SetFullscreenState(m_bIsFullScreen, nullptr);
-		CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "디스플레이모드를 변환하는데 실패하였습니다.");
 
 
 		hr = m_SwapChain->ResizeBuffers(2, m_ResWidth, m_ResHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
 		                                DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-		CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "버퍼를 Resize하는데 실패하였습니다.");
 
 
 		for (auto& level : levels)
@@ -831,15 +831,15 @@ namespace Crystal {
 		targetParam.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 		hr = m_SwapChain->ResizeTarget(&targetParam);
-		CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "타겟을 Resize하는데 실패하였습니다.");
 
 		m_RtvIndex = 0;
 
-		CS_INFO("디스플레이 모드를 변환 완료.");
-		if (m_bIsFullScreen)
-			CS_INFO("현재 디스플레이 모드 : 전체화면 모드");
-		else
-			CS_INFO("현재 디스플레이 모드 : 창 모드");
+		// CS_INFO("디스플레이 모드를 변환 완료.");
+		// if (m_bIsFullScreen)
+		// 	// CS_INFO("현재 디스플레이 모드 : 전체화면 모드");
+		// else
+		// 	// CS_INFO("현재 디스플레이 모드 : 창 모드");
 	}
 
 	void RenderSystem::CreateRenderTargets()
@@ -945,7 +945,7 @@ namespace Crystal {
 
 		HRESULT hr = factory->CreateSwapChainForHwnd(device.GetCommandQueue()->GetRaw(), currentHandle, &swapChainDesc,
 		                                             &swapChainFullscreenDesc, nullptr, m_SwapChain.GetAddressOf());
-		CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Swap Chain을 생성하는데 실패하였습니다");
 		factory->MakeWindowAssociation(currentHandle, DXGI_MWA_NO_ALT_ENTER);
 	}
 

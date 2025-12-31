@@ -7,10 +7,7 @@ namespace Crystal {
 
 	class DirectionalLightActor : public Actor
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Actor>(*this);
-		}
+
 
 	public:
 		DirectionalLightActor() = default;
@@ -33,10 +30,6 @@ namespace Crystal {
 
 	class PointLightActor : public Actor
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Actor>(*this);
-		}
 
 	public:
 		PointLightActor() = default;

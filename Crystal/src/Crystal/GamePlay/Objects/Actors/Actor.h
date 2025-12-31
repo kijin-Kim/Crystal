@@ -16,21 +16,6 @@ namespace Crystal {
 	// Spawn-able object
 	class Actor : public Object
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Object>(*this);
-			ar & *m_MainComponent;
-			for(auto& c : m_Components)
-			{
-				ar& c;
-			}
-
-			for(auto& c : m_TransformHierarchy)
-			{
-				ar& c;
-			}
-		}
-		
 	public:
 		struct ActorSpawnParams
 		{

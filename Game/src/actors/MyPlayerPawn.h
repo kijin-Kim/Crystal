@@ -22,18 +22,6 @@ namespace Crystal {
 
 class MyPlayerPawn final : public Crystal::Pawn
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Pawn>(*this);
-		ar & *m_MovementComponent;
-		ar & *m_CameraComponent;
-		ar& m_bShouldFire;
-		ar& m_RoundPerMin;
-		ar & m_RoundPerSec;
-		ar& m_FireInterval;
-//		ar& m_FireTimer;
-		ar& m_Health;
-	}
 
 public:
 	MyPlayerPawn() = default;

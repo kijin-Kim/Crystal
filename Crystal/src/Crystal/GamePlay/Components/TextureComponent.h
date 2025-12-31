@@ -5,11 +5,6 @@ namespace Crystal {
 
 	class TextureComponent : public PrimitiveComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<PrimitiveComponent>(*this);
-		}
-
 	public:
 		TextureComponent() = default;
 		~TextureComponent() override = default;

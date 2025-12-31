@@ -7,10 +7,6 @@
 
 class Sun : public Crystal::DirectionalLightActor
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::DirectionalLightActor>(*this);
-	}
 
 public:
 	Sun() = default;

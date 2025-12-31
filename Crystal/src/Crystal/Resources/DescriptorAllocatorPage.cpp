@@ -17,7 +17,7 @@ namespace Crystal {
 		heapDesc.NumDescriptors = m_DescriptorCountInHeap;
 
 		HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_D3d12DescriptorHeap));
-		CS_FATAL(SUCCEEDED(hr), "Descriptor Heap을 생성하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Descriptor Heap을 생성하는데 실패하였습니다");
 
 		m_BaseDescriptor = m_D3d12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		m_DescriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

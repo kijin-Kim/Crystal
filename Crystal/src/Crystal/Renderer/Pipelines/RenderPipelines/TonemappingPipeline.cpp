@@ -22,7 +22,7 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
-		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
 		auto inputLayout = m_Shader->GetInputLayout();

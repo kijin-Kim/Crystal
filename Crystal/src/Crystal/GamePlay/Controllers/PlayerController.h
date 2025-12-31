@@ -8,13 +8,6 @@ namespace Crystal {
 
 	struct ActionMapping
 	{
-		SERIALIZE_PROPERTIES
-		{
-			ar & CrystalCode;
-			ar & bAltDown;
-			ar & bCtrlDown;
-			ar & bShiftDown;
-		}
 
 		int64_t CrystalCode = 0;
 		bool bAltDown = false;
@@ -50,17 +43,7 @@ namespace Crystal {
 
 	class PlayerController : public Controller
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Controller>(*this);
-			ar & *m_UserInterfaceInputComponent;
-			ar & *m_GameInputComponent;
-			ar & m_AxisMap;
-			ar & m_ActionMap;
-			ar & m_InputMode;
-			ar & m_bIsSwitchableMode;
-			ar & m_NetworkId;
-		}
+
 
 	public:
 		PlayerController();

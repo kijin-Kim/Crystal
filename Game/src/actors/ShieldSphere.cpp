@@ -4,7 +4,6 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
 
-BOOST_CLASS_EXPORT(ShieldSphere)
 
 void ShieldSphere::Initialize()
 {

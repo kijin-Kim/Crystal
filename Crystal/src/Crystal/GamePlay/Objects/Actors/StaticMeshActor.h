@@ -8,10 +8,6 @@ namespace Crystal {
 
 	class StaticMeshActor : public Actor
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Crystal::Actor>(*this);
-		}
 
 	public:
 		StaticMeshActor() = default;

@@ -1,7 +1,6 @@
 ﻿#include "cspch.h"
 #include "Object.h"
 
-BOOST_CLASS_EXPORT(Crystal::Object)
 
 namespace Crystal {
 
@@ -12,7 +11,7 @@ namespace Crystal {
 
 	Object::~Object()
 	{
-		CS_DEBUG_INFO("Object : [%s]가 제거되었습니다", m_Name.c_str());
+		// CS_DEBUG_INFO("Object : [%s]가 제거되었습니다", m_Name.c_str());
 	}
 
 	void Object::Initialize()
@@ -21,7 +20,7 @@ namespace Crystal {
 
 	void Object::OnCreate()
 	{
-		CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
+		// CS_DEBUG_INFO("Object : [%s]가 생성되었습니다", m_Name.c_str());
 	}
 
 	void Object::Update(float deltaTime)

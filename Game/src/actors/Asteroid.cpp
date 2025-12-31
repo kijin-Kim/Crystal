@@ -9,13 +9,6 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/Resources/ResourceManager.h"
 
-BOOST_CLASS_EXPORT(Asteroid)
-
-BOOST_CLASS_EXPORT(GreenOreAsteroid)
-
-BOOST_CLASS_EXPORT(BlueOreAsteroid)
-
-BOOST_CLASS_EXPORT(YellowOreAsteroid)
 
 
 void Asteroid::Initialize()

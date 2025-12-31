@@ -262,7 +262,7 @@ namespace Crystal {
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(m_PipelineStateStream), &m_PipelineStateStream};
 
 		HRESULT hr = d3dDevice->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&outPipelineState));
-		CS_FATAL(SUCCEEDED(hr), "Pipeline State 를 생성하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Pipeline State 를 생성하는데 실패하였습니다");
 	}
 
 

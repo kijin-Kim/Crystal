@@ -13,7 +13,7 @@ namespace Crystal {
 
 		m_AnimationScene = m_AnimationFileImporter->ReadFile(filePath, aiProcess_ConvertToLeftHanded);
 
-		CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode), "%s 애니메이션 데이터를 로드하는데 실패하였습니다", filePath.c_str());
+		// CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode), "%s 애니메이션 데이터를 로드하는데 실패하였습니다", filePath.c_str());
 
 		m_AnimationChannelMaps.resize(m_AnimationScene->mNumAnimations);
 		for (unsigned int i = 0; i < m_AnimationScene->mNumAnimations; i++)
@@ -26,7 +26,7 @@ namespace Crystal {
 			}
 		}
 
-		CS_DEBUG_INFO("%s 애니메이션 데이터를 로드하였습니다.", filePath.c_str());
+		// CS_DEBUG_INFO("%s 애니메이션 데이터를 로드하였습니다.", filePath.c_str());
 
 	}
 

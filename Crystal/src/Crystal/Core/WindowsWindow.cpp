@@ -71,7 +71,7 @@ namespace Crystal {
 
 		RegisterClass(&wndClass);
 
-		/*À©µµ¿ì ¸®»çÀÌÂ¡À» Á¦ÇÑÇÕ´Ï´Ù.*/
+		/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		const auto windowStyle 
 			= WS_OVERLAPPED 
 			| WS_CAPTION 
@@ -90,11 +90,11 @@ namespace Crystal {
 			nullptr, nullptr, HINST_THISCOMPONENT, this);
 
 
-		CS_FATAL(m_Handle, "À©µµ¿ì¸¦ »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		// CS_FATAL(m_Handle, "ï¿½ï¿½ï¿½ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
 
-		/*ÀÓ½Ã : ´õ ÁÁÀº ¹æ¹ýÀÌ ÀÖÀ»°Í*/
+		/*ï¿½Ó½ï¿½ : ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 		RECT windowRect = {};
 		GetClientRect(m_Handle, &windowRect);
 		POINT windowPos = { windowRect.left, windowRect.top };

@@ -25,10 +25,10 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 		                                 rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+		// CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
 		

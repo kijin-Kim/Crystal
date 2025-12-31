@@ -10,10 +10,6 @@ namespace Crystal {
 
 class Asteroid : public Crystal::Actor
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Actor>(*this);
-	}
 
 public:
 	Asteroid() = default;
@@ -48,10 +44,7 @@ private:
 
 class FakeAsteroid : public Crystal::Actor
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Actor>(*this);
-	}
+
 
 public:
 	FakeAsteroid() = default;

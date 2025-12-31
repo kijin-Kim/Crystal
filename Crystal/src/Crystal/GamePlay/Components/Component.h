@@ -7,11 +7,6 @@
 namespace Crystal {
 	class Component : public Object
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Object>(*this);
-		}
-
 	public:
 		Component() = default;
 		~Component() override = default;

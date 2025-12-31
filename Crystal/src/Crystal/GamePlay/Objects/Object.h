@@ -4,12 +4,6 @@
 
 #include <set>
 #include <unordered_map>
-#include <boost/serialization/serialization.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/export.hpp>
 
 #include "Crystal/Core/Core.h"
 
@@ -19,11 +13,6 @@ namespace Crystal {
 
 	class Object : public std::enable_shared_from_this<Object>
 	{
-		SERIALIZE_PROPERTIES
-		{
-			ar & m_Name;
-		}
-
 	public:
 		Object();
 		virtual ~Object();

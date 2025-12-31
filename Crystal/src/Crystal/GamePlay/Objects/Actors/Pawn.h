@@ -7,11 +7,7 @@ namespace Crystal {
 	class Controller;
 	class Pawn : public Actor
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Actor>(*this);
-		}
-		
+
 	public:
 		Pawn() = default;
 		~Pawn() override = default;

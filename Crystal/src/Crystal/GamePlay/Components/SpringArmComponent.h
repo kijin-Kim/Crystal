@@ -5,14 +5,6 @@
 namespace Crystal {
 	class SpringArmComponent final : public TransformComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<TransformComponent>(*this);
-			ar & m_SpirngConstant;
-			ar & m_RestLength;
-			ar & m_OffsetPosition;
-			ar & m_WorldLastPosition;
-		}
 
 	public:
 		SpringArmComponent() = default;

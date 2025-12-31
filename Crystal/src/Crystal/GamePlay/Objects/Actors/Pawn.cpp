@@ -3,7 +3,6 @@
 
 #include "Crystal/GamePlay/Controllers/Controller.h"
 
-BOOST_CLASS_EXPORT(Crystal::Pawn)
 
 namespace Crystal {
 

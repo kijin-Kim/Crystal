@@ -3,7 +3,6 @@
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 #include "Crystal/GamePlay/World/Level.h"
 
-BOOST_CLASS_EXPORT(Crystal::InputComponent)
 
 namespace Crystal {
 	void InputComponent::BindAxis(const std::string& axisName, const std::function<void(float value)>& function)
@@ -52,13 +51,13 @@ namespace Crystal {
 		{
 		case EKeyEvent::KE_None: break;
 		case EKeyEvent::KE_Pressed:
-			CS_DEBUG_INFO("Pressed : %d", keyCode);
+			// CS_DEBUG_INFO("Pressed : %d", keyCode);
 			break;
 		case EKeyEvent::KE_Released:
-			CS_DEBUG_INFO("Released : %d", keyCode);
+			// CS_DEBUG_INFO("Released : %d", keyCode);
 			break;
 		case EKeyEvent::KE_Repeat:
-			CS_DEBUG_INFO("Repeat : %d", keyCode);
+			// CS_DEBUG_INFO("Repeat : %d", keyCode);
 			break;
 		default: ;
 		}*/

@@ -1,5 +1,7 @@
 #pragma once
-#include "CollisionShapes.h"
+#include <DirectXCollision.h>
+#include <functional>
+
 #include "Component.h"
 #include "Crystal/Types.h"
 #include "Crystal/Core/Timer.h"
@@ -54,11 +56,11 @@ namespace Crystal {
 		const DirectX::XMFLOAT4X4& GetSightFrustumTransform() const;
 
 
-		const Collision::BoundingSphere& GetHearingSphere() const;
-		const Collision::BoundingFrustum& GetSightFrustum() const;
+		const DirectX::BoundingSphere& GetHearingSphere() const;
+		const DirectX::BoundingFrustum& GetSightFrustum() const;
 
-		const Collision::BoundingSphere& GetWorldHearingSphere() const;
-		const Collision::BoundingFrustum& GetWorldSightFrustum() const;
+		const DirectX::BoundingSphere& GetWorldHearingSphere() const;
+		const DirectX::BoundingFrustum& GetWorldSightFrustum() const;
 
 		
 		
@@ -96,14 +98,14 @@ namespace Crystal {
 
 		bool m_bIsHearingEnabled = false;
 		float m_HearingRange = 0.0f;
-		Collision::BoundingSphere m_HearingSphere = {};
+		DirectX::BoundingSphere m_HearingSphere = {};
 		DirectX::XMFLOAT4X4 m_HearingSphereTransform = Matrix4x4::Identity();
 		
 		bool m_bIsSightEnabled = false;
 		float m_SightRange = 1000.0f;
 		float m_SightWidth = 100.0f;
 		float m_SightHeight = 100.0f;
-		Collision::BoundingFrustum m_SightFrustum = {};
+		DirectX::BoundingFrustum m_SightFrustum = {};
 		DirectX::XMFLOAT4X4 m_SightFrustumTransform = Matrix4x4::Identity();
 
 

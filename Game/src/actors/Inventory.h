@@ -1,5 +1,6 @@
 #pragma once
 #include "Crystal/GamePlay/Objects/Actors/Actor.h"
+#include <map>
 
 namespace Crystal {
 	struct Material;

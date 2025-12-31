@@ -188,26 +188,26 @@ namespace Crystal {
 		return m_SightFrustumTransform;
 	}
 
-	const Collision::BoundingSphere& AIPerceptionComponent::GetHearingSphere() const
+	const DirectX::BoundingSphere& AIPerceptionComponent::GetHearingSphere() const
 	{
 		return m_HearingSphere;
 	}
 
-	const Collision::BoundingFrustum& AIPerceptionComponent::GetSightFrustum() const
+	const DirectX::BoundingFrustum& AIPerceptionComponent::GetSightFrustum() const
 	{
 		return m_SightFrustum;
 	}
 
-	const Collision::BoundingSphere& AIPerceptionComponent::GetWorldHearingSphere() const
+	const DirectX::BoundingSphere& AIPerceptionComponent::GetWorldHearingSphere() const
 	{
-		Collision::BoundingSphere worldBoundingSphere = {};
+		DirectX::BoundingSphere worldBoundingSphere = {};
 		m_HearingSphere.Transform(worldBoundingSphere, XMLoadFloat4x4(&m_HearingSphereTransform));
 		return worldBoundingSphere;
 	}
 
-	const Collision::BoundingFrustum& AIPerceptionComponent::GetWorldSightFrustum() const
+	const DirectX::BoundingFrustum& AIPerceptionComponent::GetWorldSightFrustum() const
 	{
-		Collision::BoundingFrustum worldBoundingFrustum = {};
+		DirectX::BoundingFrustum worldBoundingFrustum = {};
 		m_SightFrustum.Transform(worldBoundingFrustum, XMLoadFloat4x4(&m_SightFrustumTransform));
 		return worldBoundingFrustum;
 	}

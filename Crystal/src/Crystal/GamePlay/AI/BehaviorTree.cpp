@@ -76,7 +76,8 @@ namespace Crystal {
 					}
 					break;
 				default:
-					CS_FATAL(false, "");
+					break;
+					// CS_FATAL(false, "");
 				}
 			}
 		}

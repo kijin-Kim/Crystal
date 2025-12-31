@@ -4,7 +4,6 @@
 #include "Crystal/GamePlay/Components/Component.h"
 #include "Crystal/GamePlay/World/World.h"
 
-BOOST_CLASS_EXPORT(Crystal::Actor)
 
 namespace Crystal {
 
@@ -52,12 +51,12 @@ namespace Crystal {
 			                                       return com == component;
 		                                       }))
 		{
-			CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetObjectName().c_str());
+			// CS_WARN("삽입하려는 Component : %s가 이미 존재합니다", component->GetObjectName().c_str());
 			return;
 		}
 		m_Components.emplace_back(component);
 
-		CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
+		// CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
 	}
 
 	void Actor::RegisterComponents()
@@ -75,7 +74,7 @@ namespace Crystal {
 
 	void Actor::MoveToTransformComponentHierarchy(const std::shared_ptr<TransformComponent>& component)
 	{
-		CS_FATAL(!component->GetParentComponent().expired(), "이동하려는 컴포넌트의 Parent가 존재 하지 않습니다.");
+		// CS_FATAL(!component->GetParentComponent().expired(), "이동하려는 컴포넌트의 Parent가 존재 하지 않습니다.");
 
 
 		/*Hierarchy에 이미 있는지 검사*/
@@ -89,8 +88,7 @@ namespace Crystal {
 
 		if (hierarchyit != m_TransformHierarchy.end())
 		{
-			CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다",
-			        component->GetObjectName().c_str());
+			// CS_WARN("삽입하려는 Component : %s가 이미 Transform Component Hierarchy에 존재합니다", component->GetObjectName().c_str());
 			return;
 		}
 
@@ -103,7 +101,7 @@ namespace Crystal {
 
 		if (componentIt == m_Components.end())
 		{
-			CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
+			// CS_WARN("Move하려는 Component : %s 가 존재하지 않습니다", component->GetObjectName().c_str());
 			return;
 		}
 
@@ -129,7 +127,7 @@ namespace Crystal {
 		{
 			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), component);
 		}
-		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
+		// CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
 	}
 
 	void Actor::SetUnitScale(float scale)

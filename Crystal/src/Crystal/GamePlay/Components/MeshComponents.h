@@ -1,4 +1,6 @@
 #pragma once
+#include <functional>
+
 #include "Component.h"
 #include "PrimitiveComponent.h"
 #include "Crystal/Core/Timer.h"
@@ -15,11 +17,7 @@ namespace Crystal {
 	{
 		using Super = PrimitiveComponent;
 
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<PrimitiveComponent>(*this);
-			ar & m_bCastShadow;
-		}
+
 
 	public:
 		MeshComponent() = default;
@@ -38,11 +36,6 @@ namespace Crystal {
 	{
 		using Super = MeshComponent;
 
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<MeshComponent>(*this);
-		}
-
 	public:
 		StaticMeshComponent() = default;
 		~StaticMeshComponent() override = default;
@@ -58,11 +51,6 @@ namespace Crystal {
 	class SkeletalMeshComponent : public MeshComponent
 	{
 		using Super = MeshComponent;
-
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<MeshComponent>(*this);
-		}
 
 	public:
 		SkeletalMeshComponent() = default;

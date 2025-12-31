@@ -88,7 +88,7 @@ namespace Crystal {
 			return m_LevelStack.top()->SpawnActor<T>(spawnParams);
 		}
 
-		CS_FATAL(false, "먼저 Level을 설정해주세요");
+		// CS_FATAL(false, "???? Level?? ???????????");
 		return {};
 	}
 

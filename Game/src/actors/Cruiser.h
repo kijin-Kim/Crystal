@@ -5,10 +5,6 @@
 
 class Cruiser : public Crystal::Pawn
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Actor>(*this);
-	}
 
 public:
 	Cruiser() = default;

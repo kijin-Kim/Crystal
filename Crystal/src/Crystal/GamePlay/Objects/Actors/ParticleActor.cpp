@@ -3,7 +3,6 @@
 
 #include "Crystal/Resources/ResourceManager.h"
 
-BOOST_CLASS_EXPORT(Crystal::ParticleActor)
 
 namespace Crystal {
 

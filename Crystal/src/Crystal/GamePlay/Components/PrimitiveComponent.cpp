@@ -3,7 +3,6 @@
 
 #include "Crystal/GamePlay/World/Level.h"
 
-BOOST_CLASS_EXPORT(Crystal::PrimitiveComponent)
 
 namespace Crystal {
 

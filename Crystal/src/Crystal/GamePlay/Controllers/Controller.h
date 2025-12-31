@@ -6,10 +6,6 @@
 namespace Crystal {
 	class Controller : public Actor
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Actor>(*this);
-		}
 
 	public:
 		Controller() = default;

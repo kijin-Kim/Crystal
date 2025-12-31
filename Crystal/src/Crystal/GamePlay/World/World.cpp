@@ -26,7 +26,7 @@ namespace Crystal {
 	void World::DestroyActor(const std::shared_ptr<Actor>& actor)
 	{
 		auto level = Cast<Level>(actor->GetOuter());
-		CS_FATAL(level, "Outer가 존재하지 않습니다");
+		// CS_FATAL(level, "Outer가 존재하지 않습니다");
 		level->RemoveActor(actor);
 	}
 
@@ -42,7 +42,7 @@ namespace Crystal {
 
 		if (it == m_Levels.end())
 		{
-			CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
+			// CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
 			return nullptr;
 		}
 
@@ -78,7 +78,7 @@ namespace Crystal {
 		);
 		if(it == m_Levels.end())
 		{
-			CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
+			// CS_WARN("%s 이름의 Level을 찾을 수 없습니다.", name.c_str());
 		}
 
 		Shared<Level> lastLevel = nullptr;

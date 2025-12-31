@@ -4,8 +4,6 @@
 #include "Crystal/GamePlay/World/Level.h"
 #include "Crystal/Renderer/Scene.h"
 
-BOOST_CLASS_EXPORT(Crystal::PlayerController)
-
 namespace Crystal {
 	PlayerController::PlayerController()
 	{
@@ -121,7 +119,7 @@ namespace Crystal {
 		const auto camera = Cast<CameraComponent>(pawn->GetComponentByClass("CameraComponent"));
 		if (!camera)
 		{
-			CS_WARN("Possess하는 Pawn에 카메라가 존재하지 않습니다");
+			// CS_WARN("Possess하는 Pawn에 카메라가 존재하지 않습니다");
 			return;
 		}
 
@@ -193,7 +191,7 @@ namespace Crystal {
 		case Crystal::EInputMode::IM_UI:
 			return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 		default:
-			CS_FATAL(false, "유효하지 않은 게임 모드입니다.");
+			// CS_FATAL(false, "유효하지 않은 게임 모드입니다.");
 			break;
 		}
 		return false;
@@ -245,7 +243,7 @@ namespace Crystal {
 		if (!bWasSwitchableMode && bIsSwitchableMode)
 		{
 			if (!m_GameInputComponent)
-				CS_FATAL(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
+				// CS_FATAL(false, "게임 모드를 위한 인풋이 준비되어 있지 않습니다. 먼저 Pawn을 빙의 해주세요.");
 
 			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); });
 			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_UI); });

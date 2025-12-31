@@ -1,4 +1,8 @@
 #pragma once
+#include <DirectXCollision.h>
+
+#include "DirectXMath.h"
+
 #include "Crystal/GamePlay/Components/CollisionComponent.h"
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
@@ -46,7 +50,7 @@ namespace Crystal {
 		STATIC_TYPE_IMPLE(LinePipeline)
 	
 	private:
-		void CalculateBoundingFrustumTransform(const Collision::BoundingFrustum& frustum, const DirectX::XMFLOAT4X4& world);
+		void CalculateBoundingFrustumTransform(const DirectX::BoundingFrustum& frustum, const DirectX::XMFLOAT4X4& world);
 		
 	private:
 

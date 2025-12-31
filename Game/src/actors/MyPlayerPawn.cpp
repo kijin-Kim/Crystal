@@ -11,7 +11,6 @@
 #include "Crystal/GamePlay/Objects/Actors/PostProcessVolumeActor.h"
 #include "Crystal/GamePlay/Controllers/PlayerController.h"
 
-BOOST_CLASS_EXPORT(MyPlayerPawn)
 
 void MyPlayerPawn::Initialize()
 {
@@ -292,7 +291,7 @@ void MyPlayerPawn::BeginFire()
 
 void MyPlayerPawn::EndFire()
 {
-	CS_DEBUG_INFO("EndFire!!");
+	// CS_DEBUG_INFO("EndFire!!");
 	m_bShouldFire = false;
 }
 
@@ -302,7 +301,7 @@ void MyPlayerPawn::ToggleMenu()
 
 void MyPlayerPawn::OpenTitleLevel()
 {
-	CS_DEBUG_INFO("Released");
+	// CS_DEBUG_INFO("Released");
 	auto world = Crystal::Cast<Crystal::World>(GetWorld());
 	world->PopLevel();
 }
@@ -370,7 +369,7 @@ void MyPlayerPawn::OnInteractWithHovered()
 
 void MyPlayerPawn::OnFire()
 {
-	CS_DEBUG_INFO("Fired");
+	// CS_DEBUG_INFO("Fired");
 	const auto start = m_CameraComponent->GetWorldPosition();
 	const auto direction = Crystal::Vector3::Normalize(m_CameraComponent->GetWorldForwardVector());
 	float maxDistance = 50000.0f;

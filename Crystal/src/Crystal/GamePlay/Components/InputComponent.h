@@ -12,16 +12,6 @@ namespace Crystal {
 
 	class InputComponent : public Component
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<Component>(*this);
-			ar & m_bShouldBindCursor;
-			ar & m_bIsCursorVisible;
-
-			ar & m_LastPosition;
-			ar & m_BindPosition;
-		}
-
 	public:
 		InputComponent() = default;
 		virtual ~InputComponent() = default;

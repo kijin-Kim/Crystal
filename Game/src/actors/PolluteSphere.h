@@ -8,10 +8,6 @@
 
 class PolluteSphere : public Crystal::Actor
 {
-	SERIALIZE_PROPERTIES
-	{
-		boost::serialization::base_object<Crystal::Actor>(*this);
-	}
 
 public:
 	PolluteSphere() = default;

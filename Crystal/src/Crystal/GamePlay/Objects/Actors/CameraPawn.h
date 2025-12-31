@@ -9,11 +9,7 @@
 namespace Crystal {
 	class CameraPawn : public Pawn
 	{
-		SERIALIZE_PROPERTIES
-		{
-			ar & *m_MovementComponent;
-		}
-
+		
 	public:
 		CameraPawn() = default;
 		virtual ~CameraPawn() = default;

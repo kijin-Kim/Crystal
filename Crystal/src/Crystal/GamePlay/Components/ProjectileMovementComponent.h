@@ -5,11 +5,7 @@ namespace Crystal {
 
 	class ProjectileMovementComponent : public MovementComponent
 	{
-		SERIALIZE_PROPERTIES
-		{
-			boost::serialization::base_object<MovementComponent>(*this);
-		}
-		
+
 	public:
 		ProjectileMovementComponent() = default;
 		~ProjectileMovementComponent() override = default;

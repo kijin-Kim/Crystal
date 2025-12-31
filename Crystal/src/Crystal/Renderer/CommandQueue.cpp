@@ -13,13 +13,13 @@ namespace Crystal {
 		d3d12CommandQueueDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateCommandQueue(&d3d12CommandQueueDesc, IID_PPV_ARGS(&m_d3d12CommandQueue));
-		CS_FATAL(SUCCEEDED(hr), "CommandQueue를 생성하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "CommandQueue를 생성하는데 실패하였습니다.");
 
 		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
-		CS_FATAL(SUCCEEDED(hr), "Fence를 생성하는데 실패하였습니다.");
+		// CS_FATAL(SUCCEEDED(hr), "Fence를 생성하는데 실패하였습니다.");
 
 		m_FenceEvent = ::CreateEvent(NULL, false, false, NULL);
-		CS_FATAL(m_FenceEvent, "Fence Event를 생성하는데 실패하였습니다");
+		// CS_FATAL(m_FenceEvent, "Fence Event를 생성하는데 실패하였습니다");
 	}
 
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> CommandQueue::GetCommandList()
@@ -37,7 +37,7 @@ namespace Crystal {
 		{
 			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&d3d12CommandAllcator));
-			CS_FATAL(SUCCEEDED(hr), "CommandAllocator를 생성하는데 실패하였습니다.");
+			// CS_FATAL(SUCCEEDED(hr), "CommandAllocator를 생성하는데 실패하였습니다.");
 		}
 
 		if (!m_CommandListQueue.empty())
@@ -50,7 +50,7 @@ namespace Crystal {
 		{
 			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandList(0, m_d3d12CommandListType, d3d12CommandAllcator.Get(), nullptr, IID_PPV_ARGS(&d3d12CommandList));
-			CS_FATAL(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
+			// CS_FATAL(SUCCEEDED(hr), "CommandList를 생성하는데 실패하였습니다.");
 		}
 
 		d3d12CommandList->SetPrivateDataInterface(__uuidof(ID3D12CommandAllocator), d3d12CommandAllcator.Get());

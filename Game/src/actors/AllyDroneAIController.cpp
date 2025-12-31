@@ -122,7 +122,7 @@ void AllyDroneAIController::Begin()
 
 	m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
 		{
-			CS_DEBUG_INFO("Find Sight");
+			// CS_DEBUG_INFO("Find Sight");
 
 			auto instigator = sightStimulus.Instigator.lock();
 			if (!instigator)
