@@ -54,7 +54,7 @@ namespace Crystal {
 		DirectX::XMFLOAT3 worldForward = {worldTransform._31, worldTransform._32, worldTransform._33};
 		DirectX::XMFLOAT3 worldUp = {worldTransform._21, worldTransform._22, worldTransform._23};
 
-		/// ÇØ°á¹ý Controller°¡ Á÷Á¢ rotationÀ» ¹Þ¾Æ Matrix¸¦ ¸¸µé±â?
+		/// ï¿½Ø°ï¿½ï¿½ Controllerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ rotationï¿½ï¿½ ï¿½Þ¾ï¿½ Matrixï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½?
 
 		switch (m_ProjectionMode)
 		{
@@ -71,8 +71,10 @@ namespace Crystal {
 			m_ViewProjection = Matrix4x4::Multiply(m_View, m_Projection);
 			break;
 		default:
-			// CS_FATAL(false, "¿¹»óÄ¡ ¸øÇÑ Camera Projection Mode.");
+			CS_FATAL(false, "ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ Camera Projection Mode.");
 			break;
 		}
 	}
 }
+
+

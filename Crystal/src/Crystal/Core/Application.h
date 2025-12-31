@@ -53,3 +53,4 @@ namespace Crystal {
 {\
 	return new x(width, height);\
 }
+

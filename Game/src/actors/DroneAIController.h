@@ -19,3 +19,5 @@ private:
 	float m_FireInterval = 1.0f / m_RoundPerSec;
 };
 
+
+

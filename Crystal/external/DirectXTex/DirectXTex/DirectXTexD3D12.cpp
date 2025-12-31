@@ -813,3 +813,5 @@ HRESULT DirectX::CaptureTexture(
 
     return S_OK;
 }
+
+

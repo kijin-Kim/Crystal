@@ -25,10 +25,10 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ ½Ã¸®¾óÈ­ÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(SUCCEEDED(hr), "Root Signatureï¿½ï¿½ ï¿½Ã¸ï¿½ï¿½ï¿½È­ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 		                                 rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(SUCCEEDED(hr), "Root Signatureï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 
 
 		
@@ -93,7 +93,7 @@ namespace Crystal {
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
 			auto boneMatrices = component->GetBoneTransforms();
-			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : ÃÖÀûÈ­ ¸Å¿ì¸Å¿ì¸Å¿ì¸Å¿ì ºñÈ¿À²Àû
+			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : ï¿½ï¿½ï¿½ï¿½È­ ï¿½Å¿ï¿½Å¿ï¿½Å¿ï¿½Å¿ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½
 			m_PerObjectConstantBuffers[i]->SetData(&perObjectData, 0, sizeof(perObjectData));
 		}
 	}
@@ -149,3 +149,5 @@ namespace Crystal {
 		}
 	}
 }
+
+

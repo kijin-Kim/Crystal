@@ -26,7 +26,7 @@ namespace Crystal {
 	void World::DestroyActor(const std::shared_ptr<Actor>& actor)
 	{
 		auto level = Cast<Level>(actor->GetOuter());
-		// CS_FATAL(level, "Outer°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù");
+		CS_FATAL(level, "Outerê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
 		level->RemoveActor(actor);
 	}
 
@@ -42,7 +42,7 @@ namespace Crystal {
 
 		if (it == m_Levels.end())
 		{
-			// CS_WARN("%s ÀÌ¸§ÀÇ LevelÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.", name.c_str());
+			CS_WARN("%s ì´ë¦„ì˜ Levelì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", name.c_str());
 			return nullptr;
 		}
 
@@ -78,7 +78,7 @@ namespace Crystal {
 		);
 		if(it == m_Levels.end())
 		{
-			// CS_WARN("%s ÀÌ¸§ÀÇ LevelÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.", name.c_str());
+			CS_WARN("%s ì´ë¦„ì˜ Levelì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", name.c_str());
 		}
 
 		Shared<Level> lastLevel = nullptr;
@@ -137,4 +137,3 @@ namespace Crystal {
 	}
 
 }
-

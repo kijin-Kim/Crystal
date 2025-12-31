@@ -38,7 +38,7 @@ namespace Crystal {
 		/*Non-Hierarchy Components + Main Component*/
 		for (auto& component : m_Components)
 			component->Update(deltaTime);
-		/*Hierarchy Components °è»êÀÇ È¿À²À» À§ÇØ ÃÖ»óÀ§ ºÎ¸ğ (MainComponent)ºÎÅÍ ÀÚ½Ä ¼øÀ¸·Î transformÀÌ °è»êµË´Ï´Ù.*/
+		/*Hierarchy Components ê³„ì‚°ì˜ íš¨ìœ¨ì„ ìœ„í•´ ìµœìƒìœ„ ë¶€ëª¨ (MainComponent)ë¶€í„° ìì‹ ìˆœìœ¼ë¡œ transformì´ ê³„ì‚°ë©ë‹ˆë‹¤.*/
 		for (auto& transformComponent : m_TransformHierarchy)
 			transformComponent->Update(deltaTime);
 	}
@@ -51,12 +51,12 @@ namespace Crystal {
 			                                       return com == component;
 		                                       }))
 		{
-			// CS_WARN("»ğÀÔÇÏ·Á´Â Component : %s°¡ ÀÌ¹Ì Á¸ÀçÇÕ´Ï´Ù", component->GetObjectName().c_str());
+			CS_WARN("ì‚½ì…í•˜ë ¤ëŠ” Component : %sê°€ ì´ë¯¸ ì¡´ì¬í•©ë‹ˆë‹¤", component->GetObjectName().c_str());
 			return;
 		}
 		m_Components.emplace_back(component);
 
-		// CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
+		CS_DEBUG_INFO("Component : %s Registered", component->GetObjectName().c_str());
 	}
 
 	void Actor::RegisterComponents()
@@ -74,10 +74,10 @@ namespace Crystal {
 
 	void Actor::MoveToTransformComponentHierarchy(const std::shared_ptr<TransformComponent>& component)
 	{
-		// CS_FATAL(!component->GetParentComponent().expired(), "ÀÌµ¿ÇÏ·Á´Â ÄÄÆ÷³ÍÆ®ÀÇ Parent°¡ Á¸Àç ÇÏÁö ¾Ê½À´Ï´Ù.");
+		CS_FATAL(!component->GetParentComponent().expired(), "ì´ë™í•˜ë ¤ëŠ” ì»´í¬ë„ŒíŠ¸ì˜ Parentê°€ ì¡´ì¬ í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 
 
-		/*Hierarchy¿¡ ÀÌ¹Ì ÀÖ´ÂÁö °Ë»ç*/
+		/*Hierarchyì— ì´ë¯¸ ìˆëŠ”ì§€ ê²€ì‚¬*/
 
 		auto hierarchyit = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 		                                [component](
@@ -88,11 +88,11 @@ namespace Crystal {
 
 		if (hierarchyit != m_TransformHierarchy.end())
 		{
-			// CS_WARN("»ğÀÔÇÏ·Á´Â Component : %s°¡ ÀÌ¹Ì Transform Component Hierarchy¿¡ Á¸ÀçÇÕ´Ï´Ù", component->GetObjectName().c_str());
+			CS_WARN("ì‚½ì…í•˜ë ¤ëŠ” Component : %sê°€ ì´ë¯¸ Transform Component Hierarchyì— ì¡´ì¬í•©ë‹ˆë‹¤", component->GetObjectName().c_str());
 			return;
 		}
 
-		/*Component ¹è¿­¿¡¼­ MoveÇÒ ÄÄÆ÷³ÍÆ®¸¦ Ã£À½*/
+		/*Component ë°°ì—´ì—ì„œ Moveí•  ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ìŒ*/
 		auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),
 		                                [component](const std::shared_ptr<Component>& com) -> bool
 		                                {
@@ -101,33 +101,33 @@ namespace Crystal {
 
 		if (componentIt == m_Components.end())
 		{
-			// CS_WARN("MoveÇÏ·Á´Â Component : %s °¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù", component->GetObjectName().c_str());
+			CS_WARN("Moveí•˜ë ¤ëŠ” Component : %s ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤", component->GetObjectName().c_str());
 			return;
 		}
 
-		// ±âÁ¸ÀÇ ¹è¿­¿¡¼­ erase ÇÕ´Ï´Ù.
+		// ê¸°ì¡´ì˜ ë°°ì—´ì—ì„œ erase í•©ë‹ˆë‹¤.
 		m_Components.erase(componentIt);
 
 
-		/*Transform Hierarchy¿¡¼­ÀÇ À§Ä¡¸¦ Ã£¾Æ »ğÀÔÇÕ´Ï´Ù..*/
+		/*Transform Hierarchyì—ì„œì˜ ìœ„ì¹˜ë¥¼ ì°¾ì•„ ì‚½ì…í•©ë‹ˆë‹¤..*/
 		auto it = std::find_if(m_TransformHierarchy.begin(), m_TransformHierarchy.end(),
 		                       [component](const std::shared_ptr<TransformComponent>& com) -> bool
 		                       {
 			                       return com.get() == component->GetParentComponent().lock().get();
 		                       });
 
-		/*ºÎ¸ğ¸¦ Ã£¾ÒÀ» ½Ã*/
+		/*ë¶€ëª¨ë¥¼ ì°¾ì•˜ì„ ì‹œ*/
 		if (it != m_TransformHierarchy.end())
 		{
-			/*ºÎ¸ğ ¹Ù·Î ´ÙÀ½ ÀÚ¸®¿¡ »ğÀÔ*/
+			/*ë¶€ëª¨ ë°”ë¡œ ë‹¤ìŒ ìë¦¬ì— ì‚½ì…*/
 			m_TransformHierarchy.insert(it + 1, component);
 		}
-			/*ºÎ¸ğ¸¦ ¸ø Ã£¾ÒÀ» ½Ã == MainComponentÀÇ ÀÚ½Ä*/
+			/*ë¶€ëª¨ë¥¼ ëª» ì°¾ì•˜ì„ ì‹œ == MainComponentì˜ ìì‹*/
 		else if (m_MainComponent == component->GetParentComponent().lock())
 		{
 			m_TransformHierarchy.insert(m_TransformHierarchy.begin(), component);
 		}
-		// CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
+		CS_DEBUG_INFO("Component : %s Moved", component->GetObjectName().c_str());
 	}
 
 	void Actor::SetUnitScale(float scale)

@@ -441,3 +441,5 @@ static void ImGui_ImplDX9_InvalidateDeviceObjectsForPlatformWindows()
         if (platform_io.Viewports[i]->RendererUserData)
             ImGui_ImplDX9_DestroyWindow(platform_io.Viewports[i]);
 }
+
+

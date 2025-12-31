@@ -43,7 +43,7 @@ namespace Crystal {
 		device->CopyDescriptorsSimple(1, destHeapHandle, irradianceTextureHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		destHeapHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		/*¸ÞÅÍ¸®¾óÀ» Shader Visible Descriptor Heap¿¡ º¹»çÇÕ´Ï´Ù.*/
+		/*ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ Shader Visible Descriptor Heapï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		for (int i = 0; i < scene->SkeletalMeshes.size(); i++)
 		{
 			auto component = scene->SkeletalMeshes[i].lock();
@@ -63,7 +63,7 @@ namespace Crystal {
 
 			perObjectData.World = Matrix4x4::Transpose(component->GetWorldTransform());
 			auto boneMatrices = component->GetBoneTransforms();
-			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : ÃÖÀûÈ­ ¸Å¿ì¸Å¿ì¸Å¿ì¸Å¿ì ºñÈ¿À²Àû
+			std::copy(boneMatrices.begin(), boneMatrices.end(), perObjectData.Bones); // TODO : ï¿½ï¿½ï¿½ï¿½È­ ï¿½Å¿ï¿½Å¿ï¿½Å¿ï¿½Å¿ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½
 			m_PerObjectConstantBuffers[i]->SetData((void*)&perObjectData, 0, sizeof(perObjectData));
 
 			D3D12_CPU_DESCRIPTOR_HANDLE perObjectConstantBufferHandle = m_PerObjectConstantBuffers[i]->AsConstantBufferView();
@@ -156,3 +156,5 @@ namespace Crystal {
 	}
 
 }
+
+

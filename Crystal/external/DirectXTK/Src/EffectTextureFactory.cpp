@@ -329,3 +329,5 @@ void EffectTextureFactory::GetResource(size_t slot, ID3D12Resource** resource, b
         *isCubeMap = textureEntry.mIsCubeMap;
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿#include "Asteroid.h"
+#include "Asteroid.h"
 
 #include "Inventory.h"
 #include "MyPlayerPawn.h"
@@ -615,3 +615,5 @@ void YellowOreAsteroid::Initialize()
 	m_MainComponent->SetUnitScale(randomScale);
 	m_MainComponent->SetMass(5000.0f * randomScale);
 }
+
+

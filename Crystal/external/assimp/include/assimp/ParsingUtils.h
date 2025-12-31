@@ -257,3 +257,5 @@ std::string GetNextToken(const char*& in) {
 } // ! namespace Assimp
 
 #endif // ! AI_PARSING_UTILS_H_INC
+
+

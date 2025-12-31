@@ -164,3 +164,5 @@ typedef basic_formatter< wchar_t > wformat;
 } // ! namespace Assimp
 
 #endif
+
+

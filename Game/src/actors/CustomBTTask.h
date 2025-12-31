@@ -342,3 +342,4 @@ public:
 	DirectX::XMFLOAT3 Center;
 	float Radius;
 };
+

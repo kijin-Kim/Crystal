@@ -18,3 +18,5 @@ namespace Crystal {
 		scene->Texts.push_back(Cast<TextRenderingComponent>(shared_from_this()));
 	}
 }
+
+

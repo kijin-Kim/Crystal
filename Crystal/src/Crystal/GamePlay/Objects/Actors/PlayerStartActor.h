@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Actor.h"
 
 
@@ -18,3 +18,5 @@ namespace Crystal {
 	
 	};
 }
+
+

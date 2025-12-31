@@ -92,7 +92,8 @@ namespace Crystal {
 		                                   aiProcess_SortByPType |
 		                                   aiProcess_OptimizeMeshes |
 		                                   aiProcess_ValidateDataStructure);
-		// CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode), "%s ????? ?��????? ????????????", filePath.c_str());
+		CS_FATAL(!(!m_MeshScene || m_MeshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_MeshScene->mRootNode),
+		         "%s 메쉬를 로드하는데 실패하였습니다", filePath.c_str());
 	}
 
 	Mesh::~Mesh()
@@ -103,7 +104,7 @@ namespace Crystal {
 
 	StaticMesh::StaticMesh(const std::string& filePath) : Mesh(filePath)
 	{
-		// CS_INFO("%s ??? ??????? ?? ...", filePath.c_str());
+		CS_INFO("%s 메쉬 불러오는 중 ...", filePath.c_str());
 		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
 		for (const auto& submesh : m_Submeshes)
 		{
@@ -115,7 +116,7 @@ namespace Crystal {
 			                                              (UINT)(sizeof(UINT) * submesh->Indices.size()), (UINT)submesh->Indices.size(), false, false));
 		}
 
-		// CS_INFO("%s ??? ??????? ???", filePath.c_str());
+		CS_INFO("%s 메쉬 불러오기 완료", filePath.c_str());
 	}
 
 	void StaticMesh::ProcessNode(aiNode* rootNode, const aiScene* scene)
@@ -134,10 +135,10 @@ namespace Crystal {
 
 	SkeletalMesh::SkeletalMesh(const std::string& meshFilePath) : Mesh(meshFilePath)
 	{
-		/*???? animation file?? path?? ???? ???? ??????*/
-		// CS_INFO("%s ?????? ??? ??????? ?? ...", meshFilePath.c_str());
+		/*만약 animation file의 path가 따로 전달 되었다면*/
+		CS_INFO("%s 스켈레탈 메쉬 불러오는 중 ...", meshFilePath.c_str());
 		ProcessNode(m_MeshScene->mRootNode, m_MeshScene);
-		/*Skeletal Mesh?? ?��?????.*/
+		/*Skeletal Mesh를 로드합니다.*/
 		bool bMeshHasBones = m_MeshScene->HasMeshes() && m_MeshScene->mMeshes[0]->HasBones();
 		
 		// Bones
@@ -155,14 +156,14 @@ namespace Crystal {
 					aiBone* bone = mesh->mBones[i];
 					std::string boneName = bone->mName.C_Str();
 					int boneIndex = i;
-					if (m_BoneMap.find(boneName) == m_BoneMap.end()) // ??? ?????? Bone???
+					if (m_BoneMap.find(boneName) == m_BoneMap.end()) // 처음 등장한 Bone이면
 					{
 						m_BoneOffsets[boneIndex] = Matrix4x4::Transpose(*(DirectX::XMFLOAT4X4*)&bone->mOffsetMatrix);
 						m_BoneMap[boneName] = boneIndex;
 					}
-					else // ?????? Bonemap?? ???????
+					else // 기존에 Bonemap에 있었으면
 					{
-						boneIndex = m_BoneMap[boneName]; // ???? ?????? Bone???? ???
+						boneIndex = m_BoneMap[boneName]; // 현재 등장한 Bone으로 대체
 					}
 
 					for (unsigned int j = 0; j < bone->mNumWeights; j++)
@@ -188,7 +189,7 @@ namespace Crystal {
 
 
 
-		// CS_INFO("%s ?????? ??? ??????? ???", meshFilePath.c_str());
+		CS_INFO("%s 스켈레탈 메쉬 불러오기 완료", meshFilePath.c_str());
 	}
 
 

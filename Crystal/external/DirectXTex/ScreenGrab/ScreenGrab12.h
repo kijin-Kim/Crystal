@@ -43,3 +43,5 @@ namespace DirectX
         _In_opt_ std::function<void __cdecl(IPropertyBag2*)> setCustomProps = nullptr,
         bool forceSRGB = false);
 }
+
+

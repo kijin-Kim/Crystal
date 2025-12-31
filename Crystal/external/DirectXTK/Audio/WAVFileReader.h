@@ -56,3 +56,5 @@ namespace DirectX
         _Inout_ std::unique_ptr<uint8_t[]>& wavData,
         _Out_ WAVData& result) noexcept;
 }
+
+

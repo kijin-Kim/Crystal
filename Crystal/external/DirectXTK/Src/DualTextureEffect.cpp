@@ -440,3 +440,5 @@ void DualTextureEffect::SetTexture2(D3D12_GPU_DESCRIPTOR_HANDLE srvDescriptor, D
     pImpl->texture2 = srvDescriptor;
     pImpl->texture2Sampler = samplerDescriptor;
 }
+
+

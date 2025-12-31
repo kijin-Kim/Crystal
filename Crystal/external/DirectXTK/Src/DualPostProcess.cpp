@@ -361,3 +361,5 @@ void DualPostProcess::SetBloomCombineParameters(float bloom, float base, float b
     pImpl->bloomBaseSaturation = baseSaturation;
     pImpl->SetDirtyFlag();
 }
+
+

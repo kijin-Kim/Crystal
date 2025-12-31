@@ -788,3 +788,5 @@ void BasicEffect::SetTexture(D3D12_GPU_DESCRIPTOR_HANDLE srvDescriptor, D3D12_GP
     pImpl->texture = srvDescriptor;
     pImpl->sampler = samplerDescriptor;
 }
+
+

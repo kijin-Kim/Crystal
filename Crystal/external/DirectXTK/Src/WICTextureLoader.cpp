@@ -969,3 +969,5 @@ HRESULT DirectX::CreateWICTextureFromFileEx(
 
     return hr;
 }
+
+

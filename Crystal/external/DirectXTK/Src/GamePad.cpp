@@ -1755,3 +1755,5 @@ void GamePad::ButtonStateTracker::Reset() noexcept
 {
     memset(this, 0, sizeof(ButtonStateTracker));
 }
+
+

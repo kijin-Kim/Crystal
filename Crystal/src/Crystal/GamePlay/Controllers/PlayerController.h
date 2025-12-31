@@ -36,9 +36,9 @@ namespace Crystal {
 	enum class EInputMode : uint32_t
 	{
 		IM_Game,
-		// °ÔÀÓ ¸¸
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 		IM_UI,
-		// UI ¸¸
+		// UI ï¿½ï¿½
 	};
 
 	class PlayerController : public Controller
@@ -54,7 +54,7 @@ namespace Crystal {
 		void AddAxisMapping(const std::string& axisName, int key, float scale);
 		void AddActionMapping(const std::string& actionName, const ActionMapping& key);
 
-		/*°ÔÀÓÄÁÆ®·Ñ·¯°¡ Æ¯Á¤ ÆùÀÇ ÀÔ·ÂÀ» ¹Þ°ÔÇÕ´Ï´Ù*/
+		/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ Æ¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½Þ°ï¿½ï¿½Õ´Ï´ï¿½*/
 		void Possess(std::shared_ptr<Pawn> pawn) override;
 		bool OnInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -63,7 +63,7 @@ namespace Crystal {
 
 		void SetInputMode(EInputMode inputMode);
 		EInputMode GetInputMode() const { return m_InputMode; }
-		/*UI¸ðµå¿Í Game¸ðµå¸¦ Æ¯Á¤ Å°¸¦ ÅëÇÏ¿© ½ºÀ§Ä¡ ÇÒ ¼ö ÀÖ°Ô ÇÕ´Ï´Ù. µðÆúÆ® ¿À¸¥ÂÊ ¸¶¿ì½º Å°*/
+		/*UIï¿½ï¿½ï¿½ï¿½ Gameï¿½ï¿½å¸¦ Æ¯ï¿½ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö°ï¿½ ï¿½Õ´Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ì½º Å°*/
 		void EnableModeSwitching(bool bEnable, int64_t keyCode = Crystal::Mouse::Right);
 
 		const std::multimap<int64_t, std::pair<std::string, float>>& GetAxisMap() const { return m_AxisMap; }
@@ -82,9 +82,9 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(PlayerController)
 	private:
-		/*À¯Àú ÀÎÅÍÆäÀÌ½º ÀÎÇ²*/
+		/*ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½Ç²*/
 		std::unique_ptr<InputComponent> m_UserInterfaceInputComponent = nullptr;
-		/*°ÔÀÓ¸ðµå ÀÎÇ²*/
+		/*ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½ ï¿½ï¿½Ç²*/
 		std::unique_ptr<InputComponent> m_GameInputComponent = nullptr;
 		/* KeyCode, AxisName, Scale */
 		std::multimap<int64_t, std::pair<std::string, float>> m_AxisMap;
@@ -102,3 +102,5 @@ namespace Crystal {
 		
 	};
 }
+
+

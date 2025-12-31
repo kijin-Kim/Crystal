@@ -56,3 +56,5 @@ void PolluteSphere::Initialize()
 
 	m_MainComponent = m_StaticMeshComponent;
 }
+
+

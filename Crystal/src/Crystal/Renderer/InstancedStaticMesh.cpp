@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "InstancedStaticMesh.h"
 #include "Crystal/Core/Device.h"
 
@@ -177,3 +177,5 @@ namespace Crystal {
 		MaterialCount = 0;
 	}
 }
+
+

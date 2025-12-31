@@ -119,7 +119,7 @@ namespace Crystal {
 	void SkeletalMeshComponent::ReadNodeHierarchy(float animationTime, const aiNode* pNode, const DirectX::XMFLOAT4X4& parentTransform)
 	{
 		// Reference : http://ogldev.atspace.co.uk/www/tutorial38/tutorial38.html
-		/*ºÎ¸ğ³ëµåºÎÅÍ ÀÚ½Ä³ëµå ±îÁö ³»·Á°¡¸é¼­ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» °è»ê*/
+		/*ë¶€ëª¨ë…¸ë“œë¶€í„° ìì‹ë…¸ë“œ ê¹Œì§€ ë‚´ë ¤ê°€ë©´ì„œ ì• ë‹ˆë©”ì´ì…˜ì„ ê³„ì‚°*/
 		std::string nodeName = pNode->mName.C_Str();
 		unsigned int animationIndex = 0;
 
@@ -128,10 +128,10 @@ namespace Crystal {
 			return;
 
 		
-		aiAnimation* anim = animation->GetAnimScene()->mAnimations[animationIndex]; // animationIndex¹øÂ° animation
+		aiAnimation* anim = animation->GetAnimScene()->mAnimations[animationIndex]; // animationIndexë²ˆì§¸ animation
 		DirectX::XMFLOAT4X4 nodeTransform = Matrix4x4::Transpose(*(DirectX::XMFLOAT4X4*)&pNode->mTransformation);
 		aiNodeAnim* nodeAnim = nullptr;
-		/* NodeÀÇ ÀÌ¸§°ú, animationIndex¸¦ °¡Áö°í º¯È¯ Á¤º¸¸¦ °¡Áö°í ÀÖ´Â Ã¤³ÎÀÇ Index¸¦ °Ë»ö*/
+		/* Nodeì˜ ì´ë¦„ê³¼, animationIndexë¥¼ ê°€ì§€ê³  ë³€í™˜ ì •ë³´ë¥¼ ê°€ì§€ê³  ìˆëŠ” ì±„ë„ì˜ Indexë¥¼ ê²€ìƒ‰*/
 		int channelIndex = animation->FindNodeAnimIndex(animationIndex, nodeName);
 		if (channelIndex != -1)
 			nodeAnim = anim->mChannels[channelIndex];
@@ -160,7 +160,7 @@ namespace Crystal {
 		if (boneMap.find(nodeName) != boneMap.end())
 		{
 			uint32_t boneIndex = boneMap[nodeName];
-			/* Local x parentTransform(ToWorld) (ºÎ¸ğºÎÅÍ Â÷·Ê´ë·Î °è»êÇÏ´Â ÀÌÀ¯.)*/
+			/* Local x parentTransform(ToWorld) (ë¶€ëª¨ë¶€í„° ì°¨ë¡€ëŒ€ë¡œ ê³„ì‚°í•˜ëŠ” ì´ìœ .)*/
 			m_BoneTransforms[boneIndex] = Matrix4x4::Transpose(
 				Matrix4x4::Multiply(Matrix4x4::Multiply(boneOffset[boneIndex], transform), m_InverseGlobalTransform));
 		}

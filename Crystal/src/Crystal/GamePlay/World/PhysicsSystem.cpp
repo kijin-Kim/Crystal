@@ -852,10 +852,10 @@ namespace Crystal {
 		if (seperatingVelocity > 0)
 			return Vector3::Zero;
 
-		// ºÐ¸®¼Óµµ, Ãæ°Ý·®
+		// ï¿½Ð¸ï¿½ï¿½Óµï¿½, ï¿½ï¿½Ý·ï¿½
 		const float restitution = 1.0f;
-		float newSepVelocity = -seperatingVelocity * restitution; // Ãæµ¹ÈÄ ºÐ¸®¼Óµµ = -Ãæµ¹Àü ºÐ¸®¼Óµµ * ¹Ý¹ß°è¼ö
-		float deltaVelocity = newSepVelocity - seperatingVelocity; // ¼Óµµ º¯È­·®
+		float newSepVelocity = -seperatingVelocity * restitution; // ï¿½æµ¹ï¿½ï¿½ ï¿½Ð¸ï¿½ï¿½Óµï¿½ = -ï¿½æµ¹ï¿½ï¿½ ï¿½Ð¸ï¿½ï¿½Óµï¿½ * ï¿½Ý¹ß°ï¿½ï¿½
+		float deltaVelocity = newSepVelocity - seperatingVelocity; // ï¿½Óµï¿½ ï¿½ï¿½È­ï¿½ï¿½
 
 
 		return Vector3::Multiply(contactNormal, deltaVelocity);
@@ -1007,3 +1007,5 @@ namespace Crystal {
 
 
 }
+
+

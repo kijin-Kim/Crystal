@@ -1193,3 +1193,5 @@ void DirectX::ComputeTeapot(VertexCollection& vertices, IndexCollection& indices
     if (!rhcoords)
         ReverseWinding(indices, vertices);
 }
+
+

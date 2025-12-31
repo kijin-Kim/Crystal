@@ -58,11 +58,11 @@ namespace Crystal {
 					return;
 				}
 			}
-			// CS_DEBUG_INFO("ÃÖ´ë Á¤Á¡ÀÇ ¿µÇâÀ» ÁÖ´Â º»ÀÇ °¹¼ö¸¦ ÃÊ°úÇÏ¿´½À´Ï´Ù. °¹¼ö¸¦ ÃÊ°úÇÏ´Â º»ÀÇ Weight´Â »èÁ¦ µË´Ï´Ù");
+			CS_DEBUG_INFO("ìµœëŒ€ ì •ì ì˜ ì˜í–¥ì„ ì£¼ëŠ” ë³¸ì˜ ê°¯ìˆ˜ë¥¼ ì´ˆê³¼í•˜ì˜€ìŠµë‹ˆë‹¤. ê°¯ìˆ˜ë¥¼ ì´ˆê³¼í•˜ëŠ” ë³¸ì˜ WeightëŠ” ì‚­ì œ ë©ë‹ˆë‹¤");
 		}
 	};
 
-	/*½ÇÁúÀûÀÎ Á¤Á¡ Á¤º¸¸¦ ´ã°í ÀÖ´Â Å¬·¡½ºÀÔ´Ï´Ù.*/
+	/*ì‹¤ì§ˆì ì¸ ì •ì  ì •ë³´ë¥¼ ë‹´ê³  ìˆëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.*/
 	struct SubMesh
 	{
 		SubMesh() = default;
@@ -105,7 +105,7 @@ namespace Crystal {
 		Assimp::Importer* m_Importer = nullptr;
 	};
 
-	/*SubMeshµéÀÇ ÄÁÅ×ÀÌ³Ê ÀÔ´Ï´Ù.*/
+	/*SubMeshë“¤ì˜ ì»¨í…Œì´ë„ˆ ì…ë‹ˆë‹¤.*/
 	class StaticMesh : public Mesh
 	{
 	public:
@@ -133,7 +133,7 @@ namespace Crystal {
 		void ProcessNode(aiNode* rootNode, const aiScene* scene) override;
 
 	private:
-		std::vector <DirectX::XMFLOAT4X4> m_BoneOffsets; // BoneÀÇ Local Transform
-		std::unordered_map <std::string, uint32_t> m_BoneMap; // m_BoneTransformsÀÇ Index¸¦ °¡Áö°í ÀÖÀ½. [³ëµåÀÇ ÀÌ¸§, m_BoneTransformsÀÇ ÀÎµ¦½º]
+		std::vector <DirectX::XMFLOAT4X4> m_BoneOffsets; // Boneì˜ Local Transform
+		std::unordered_map <std::string, uint32_t> m_BoneMap; // m_BoneTransformsì˜ Indexë¥¼ ê°€ì§€ê³  ìˆìŒ. [ë…¸ë“œì˜ ì´ë¦„, m_BoneTransformsì˜ ì¸ë±ìŠ¤]
 	};
 }

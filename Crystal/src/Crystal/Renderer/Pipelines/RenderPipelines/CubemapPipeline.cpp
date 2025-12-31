@@ -25,7 +25,7 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
-		// CS_FATAL(SUCCEEDED(hr), "CBV_SRVÈüÀ» »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRVï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perFrameDescriptorRanges[] = {
@@ -50,10 +50,10 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ ½Ã¸®¾óÈ­ÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(SUCCEEDED(hr), "Root Signatureï¿½ï¿½ ï¿½Ã¸ï¿½ï¿½ï¿½È­ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 		                                 rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature¸¦ »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(SUCCEEDED(hr), "Root Signatureï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -162,3 +162,5 @@ namespace Crystal {
 		}
 	}
 }
+
+

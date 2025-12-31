@@ -87,3 +87,5 @@ namespace Crystal {
 		return m_bIsOverlapped;
 	}
 }
+
+

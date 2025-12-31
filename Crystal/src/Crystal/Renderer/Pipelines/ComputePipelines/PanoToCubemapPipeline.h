@@ -19,3 +19,5 @@ namespace Crystal {
 		unsigned int m_DestinationTextureHeight = 0;
 	};
 }
+
+

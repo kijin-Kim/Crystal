@@ -544,3 +544,5 @@ D3D12_GPU_DESCRIPTOR_HANDLE CommonStates::AnisotropicWrap() const { return pImpl
 D3D12_GPU_DESCRIPTOR_HANDLE CommonStates::AnisotropicClamp() const { return pImpl->Get(SamplerIndex::AnisotropicClamp); }
 
 ID3D12DescriptorHeap* CommonStates::Heap() const noexcept { return pImpl->Heap(); }
+
+

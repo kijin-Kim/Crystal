@@ -52,12 +52,12 @@ namespace Crystal
     class Texture
     {
     public:
-        /*¿©·¯°¡Áö ¼Ó¼ºµéÀ» ¹Þ°í Á÷Á¢ ¸®¼Ò½º¸¦ ¸¸µì´Ï´Ù.*/
+        /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ò½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.*/
         Texture(int width, int height, int depth, int mipLevels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS resourceFlags,
                 D3D12_RESOURCE_STATES initialStates);
-        /*ÆÄÀÏ·ÎºÎÅÍ ÅØ½ºÃÄ¸¦ ·ÎµåÇÕ´Ï´Ù.*/
+        /*ï¿½ï¿½ï¿½Ï·Îºï¿½ï¿½ï¿½ ï¿½Ø½ï¿½ï¿½Ä¸ï¿½ ï¿½Îµï¿½ï¿½Õ´Ï´ï¿½.*/
         Texture(const std::string& filePath, D3D12_RESOURCE_FLAGS resourceFlags = D3D12_RESOURCE_FLAG_NONE);
-        /*¸®¼Ò½º¸¦ °Ç³×¹Þ¾Æ ºä¸¦ ¸¸µì´Ï´Ù.*/
+        /*ï¿½ï¿½ï¿½Ò½ï¿½ï¿½ï¿½ ï¿½Ç³×¹Þ¾ï¿½ ï¿½ä¸¦ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.*/
         Texture(ID3D12Resource* resource, D3D12_RESOURCE_FLAGS resourceFlags = D3D12_RESOURCE_FLAG_NONE);
         virtual ~Texture() = default;
 
@@ -87,3 +87,5 @@ namespace Crystal
         std::unordered_map<DescriptorKey, DescriptorAllocation, DescriptorKeyHasher> m_DepthStencilViews;
     };
 }
+
+

@@ -298,3 +298,5 @@ HRESULT DirectX::CreateTextureFromMemory(
 
     return S_OK;
 }
+
+

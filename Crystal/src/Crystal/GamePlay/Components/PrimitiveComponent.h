@@ -6,7 +6,7 @@
 
 
 namespace Crystal {
-	/*¹°¸®ÀûÀÎ À§Ä¡¿Í ´«¿¡ º¸ÀÌ´Â ·»´õ¸µ °¡´ÉÇÑ ¿ÀºêÁ§Æ®¸¦ °¡Áö°í ÀÖ´Â ÄÄÆ÷³ÍÆ®µéÀÇ º£ÀÌ½º Å¬·¡½º*/
+	/*ë¬¼ë¦¬ì ì¸ ìœ„ì¹˜ì™€ ëˆˆì— ë³´ì´ëŠ” ë Œë”ë§ ê°€ëŠ¥í•œ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì§€ê³  ìžˆëŠ” ì»´í¬ë„ŒíŠ¸ë“¤ì˜ ë² ì´ìŠ¤ í´ëž˜ìŠ¤*/
 
 	class PrimitiveComponent : public TransformComponent
 	{
@@ -54,3 +54,5 @@ namespace Crystal {
 		bool m_bHiddenInGame = false;
 	};
 }
+
+

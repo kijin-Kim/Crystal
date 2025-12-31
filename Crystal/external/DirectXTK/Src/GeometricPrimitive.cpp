@@ -704,3 +704,5 @@ std::unique_ptr<GeometricPrimitive> GeometricPrimitive::CreateCustom(
 
     return primitive;
 }
+
+

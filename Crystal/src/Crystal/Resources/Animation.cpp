@@ -13,7 +13,7 @@ namespace Crystal {
 
 		m_AnimationScene = m_AnimationFileImporter->ReadFile(filePath, aiProcess_ConvertToLeftHanded);
 
-		// CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode), "%s ¾Ö´Ï¸ŞÀÌ¼Ç µ¥ÀÌÅÍ¸¦ ·ÎµåÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù", filePath.c_str());
+		CS_FATAL(!(!m_AnimationScene || !m_AnimationScene->mRootNode), "%s ì• ë‹ˆë©”ì´ì…˜ ë°ì´í„°ë¥¼ ë¡œë“œí•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤", filePath.c_str());
 
 		m_AnimationChannelMaps.resize(m_AnimationScene->mNumAnimations);
 		for (unsigned int i = 0; i < m_AnimationScene->mNumAnimations; i++)
@@ -26,7 +26,7 @@ namespace Crystal {
 			}
 		}
 
-		// CS_DEBUG_INFO("%s ¾Ö´Ï¸ŞÀÌ¼Ç µ¥ÀÌÅÍ¸¦ ·ÎµåÇÏ¿´½À´Ï´Ù.", filePath.c_str());
+		CS_DEBUG_INFO("%s ì• ë‹ˆë©”ì´ì…˜ ë°ì´í„°ë¥¼ ë¡œë“œí•˜ì˜€ìŠµë‹ˆë‹¤.", filePath.c_str());
 
 	}
 
@@ -47,3 +47,5 @@ namespace Crystal {
 	}
 
 }
+
+

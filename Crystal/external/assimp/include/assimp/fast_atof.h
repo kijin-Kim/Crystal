@@ -371,3 +371,5 @@ ai_real fast_atof( const char** inout) {
 } //! namespace Assimp
 
 #endif // FAST_A_TO_F_H_INCLUDED
+
+

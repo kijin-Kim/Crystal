@@ -527,3 +527,5 @@ void AlphaTestEffect::SetReferenceAlpha(int value)
 
     pImpl->dirtyFlags |= EffectDirtyFlags::AlphaTest;
 }
+
+

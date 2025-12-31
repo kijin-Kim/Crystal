@@ -26,18 +26,18 @@ namespace Crystal {
 		                                             D3D12_HEAP_FLAG_NONE,
 		                                             &textureDesc, initialStates,
 		                                             nullptr, IID_PPV_ARGS(&m_Resource));
-		// CS_FATAL(SUCCEEDED(hr), "ÅØ½ºÃÄ µğÆúÆ® ¹öÆÛ¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "í…ìŠ¤ì³ ë””í´íŠ¸ ë²„í¼ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 	}
 
 	Texture::Texture(const std::string& fileName, D3D12_RESOURCE_FLAGS resourceFlags)
 	{
-		// CS_INFO("%s ÅØ½ºÃÄ ºÒ·¯¿À´Â Áß...", fileName.c_str());
+		CS_INFO("%s í…ìŠ¤ì³ ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...", fileName.c_str());
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 		auto commandQueue = device.GetCommandQueue();
 
 		std::filesystem::path filePath(fileName.c_str());
-		// CS_FATAL(std::filesystem::exists(filePath), "%s ÆÄÀÏÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.", filePath.string().c_str());
+		CS_FATAL(std::filesystem::exists(filePath), "%s íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.", filePath.string().c_str());
 
 		DirectX::TexMetadata metaData;
 		DirectX::ScratchImage scratchImage;
@@ -59,12 +59,12 @@ namespace Crystal {
 		{
 			hr = LoadFromWICFile(filePath.wstring().c_str(), DirectX::WIC_FLAGS_FORCE_RGB, &metaData, scratchImage);
 		}
-		// CS_FATAL(SUCCEEDED(hr), "%s ÅØ½ºÃÄ¸¦ ·ÎµåÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.", filePath.string().c_str());
+		CS_FATAL(SUCCEEDED(hr), "%s í…ìŠ¤ì³ë¥¼ ë¡œë“œí•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.", filePath.string().c_str());
 
 		DirectX::ScratchImage mipChain;
 		hr = GenerateMipMaps(scratchImage.GetImages(), scratchImage.GetImageCount(), scratchImage.GetMetadata(),
 		                     DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
-		// CS_FATAL(SUCCEEDED(hr), "%s ÅØ½ºÃÄÀÇ ¹Ó Ã¼ÀÎÀ» »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.", filePath.string().c_str());
+		CS_FATAL(SUCCEEDED(hr), "%s í…ìŠ¤ì³ì˜ ë°‰ ì²´ì¸ì„ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.", filePath.string().c_str());
 
 
 
@@ -81,7 +81,7 @@ namespace Crystal {
 		hr = d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 		                                        &textureDesc, D3D12_RESOURCE_STATE_COMMON,
 		                                        nullptr, IID_PPV_ARGS(&m_Resource));
-		// CS_FATAL(SUCCEEDED(hr), "ÅØ½ºÃÄ µğÆúÆ® ¹öÆÛ¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "í…ìŠ¤ì³ ë””í´íŠ¸ ë²„í¼ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 
 		std::vector<D3D12_SUBRESOURCE_DATA> subResources(mipChain.GetImageCount());
 		const DirectX::Image* image = mipChain.GetImages();
@@ -102,7 +102,7 @@ namespace Crystal {
 		                                        &CD3DX12_RESOURCE_DESC::Buffer(requiredSize),
 		                                        D3D12_RESOURCE_STATE_GENERIC_READ,
 		                                        nullptr, IID_PPV_ARGS(&textureUploadBuffer));
-		// CS_FATAL(SUCCEEDED(hr), "ÅØ½ºÃÄ ¾÷·Îµå ¹öÆÛ¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "í…ìŠ¤ì³ ì—…ë¡œë“œ ë²„í¼ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 
 		auto cmdList = commandQueue->GetCommandList();
 		UpdateSubresources(cmdList.Get(), m_Resource.Get(), textureUploadBuffer.Get(), 0, 0, (UINT)subResources.size(),
@@ -122,7 +122,7 @@ namespace Crystal {
 		commandQueue->Execute(cmdList);
 		commandQueue->Flush();
 
-		// CS_INFO("%s ÅØ½ºÃÄ ºÒ·¯¿À±â ¿Ï·á", fileName.c_str());
+		CS_INFO("%s í…ìŠ¤ì³ ë¶ˆëŸ¬ì˜¤ê¸° ì™„ë£Œ", fileName.c_str());
 	}
 
 	Texture::Texture(ID3D12Resource* resource, D3D12_RESOURCE_FLAGS resourceFlags /*= D3D12_RESOURCE_FLAG_NONE*/) :
@@ -135,7 +135,7 @@ namespace Crystal {
 
 		
 		
-		/*¼ÎÀÌ´õ ¸®¼Ò½º ºä¸¦ »ı¼ºÇÕ´Ï´Ù.*/
+		/*ì…°ì´ë” ë¦¬ì†ŒìŠ¤ ë·°ë¥¼ ìƒì„±í•©ë‹ˆë‹¤.*/
 		auto& device = Device::Instance();
 		auto d3dDevice = device.GetD3DDevice();
 
@@ -156,7 +156,7 @@ namespace Crystal {
 			break;
 		default:
 			break;
-			// CS_FATAL(false, "Áö¿øµÇÁö ¾Ê´Â SRV DIMENSION ÀÔ´Ï´Ù");
+			CS_FATAL(false, "ì§€ì›ë˜ì§€ ì•ŠëŠ” SRV DIMENSION ì…ë‹ˆë‹¤");
 		}
 
 		DescriptorAllocation newAllocation = device.AllocateDescriptors(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);

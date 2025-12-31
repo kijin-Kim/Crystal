@@ -7,7 +7,7 @@
 namespace Crystal {
 	PlayerController::PlayerController()
 	{
-		/*À¯Àú ÀÎÅÍÆäÀÌ½º¿ë ÀÎÇ² ÄÄÆ÷³ÍÆ®¸¦ ¼³Á¤ÇÕ´Ï´Ù.*/
+		/*ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç² ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		m_UserInterfaceInputComponent = std::make_unique<InputComponent>();
 
 
@@ -119,7 +119,7 @@ namespace Crystal {
 		const auto camera = Cast<CameraComponent>(pawn->GetComponentByClass("CameraComponent"));
 		if (!camera)
 		{
-			// CS_WARN("PossessÇÏ´Â Pawn¿¡ Ä«¸Þ¶ó°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù");
+			CS_WARN("Possessï¿½Ï´ï¿½ Pawnï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½");
 			return;
 		}
 
@@ -129,7 +129,7 @@ namespace Crystal {
 		scene->SetMainCamera(camera);
 
 		m_GameInputComponent = std::make_unique<InputComponent>();
-		m_GameInputComponent->BindCursor(true); // Ä¿¼­¸¦ È­¸é »ó¿¡ °íÁ¤½ÃÅµ´Ï´Ù.
+		m_GameInputComponent->BindCursor(true); // Ä¿ï¿½ï¿½ï¿½ï¿½ È­ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Ï´ï¿½.
 		m_GameInputComponent->ShowCursor(false);
 		m_GameInputComponent->SetOuter(pawn);
 		m_GameInputComponent->ReadyCursorBinding();
@@ -191,7 +191,7 @@ namespace Crystal {
 		case Crystal::EInputMode::IM_UI:
 			return m_UserInterfaceInputComponent->ProcessInputEvent(hWnd, uMsg, wParam, lParam);
 		default:
-			// CS_FATAL(false, "À¯È¿ÇÏÁö ¾ÊÀº °ÔÀÓ ¸ðµåÀÔ´Ï´Ù.");
+			CS_FATAL(false, "ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 			break;
 		}
 		return false;
@@ -220,7 +220,7 @@ namespace Crystal {
 
 	void PlayerController::EnableModeSwitching(bool bEnable, int64_t keyCode /*= Crystal::Mouse::Right*/)
 	{
-		/*UI, Game ÀÎÇ²¿¡ °¢°¢ ¸ðµå¸¦ ¹Ù²Ù´Â ActionÀ» ¹ÙÀÎµå ÇÕ´Ï´Ù.*/
+		/*UI, Game ï¿½ï¿½Ç²ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å¸¦ ï¿½Ù²Ù´ï¿½ Actionï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½Õ´Ï´ï¿½.*/
 
 		bool bIsSwitchableMode = bEnable;
 		bool bWasSwitchableMode = m_bIsSwitchableMode;
@@ -229,7 +229,7 @@ namespace Crystal {
 		if (bIsSwitchableMode == bWasSwitchableMode)
 			return;
 
-		/*Switchable Mode¿¡ µé¾î°¡¸é ÃÖÃÊ UI ¸ðµå·Î ¼³Á¤µË´Ï´Ù.*/
+		/*Switchable Modeï¿½ï¿½ ï¿½ï¿½î°¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ë´Ï´ï¿½.*/
 		m_InputMode = EInputMode::IM_UI;
 
 		ActionMapping actionKey = {};
@@ -239,16 +239,16 @@ namespace Crystal {
 		actionKey.bShiftDown = false;
 		AddActionMapping("UIToGameToUI", actionKey);
 
-		/*¸¸¾à ¿ø·¡ Switchable Mode°¡ ¾Æ´Ï¾ú°í, ÀÌ¹ø¿¡ Switchable ¸ðµå°¡ µÈ´Ù¸é,*/
+		/*ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Switchable Modeï¿½ï¿½ ï¿½Æ´Ï¾ï¿½ï¿½ï¿½, ï¿½Ì¹ï¿½ï¿½ï¿½ Switchable ï¿½ï¿½å°¡ ï¿½È´Ù¸ï¿½,*/
 		if (!bWasSwitchableMode && bIsSwitchableMode)
 		{
 			if (!m_GameInputComponent)
-				// CS_FATAL(false, "°ÔÀÓ ¸ðµå¸¦ À§ÇÑ ÀÎÇ²ÀÌ ÁØºñµÇ¾î ÀÖÁö ¾Ê½À´Ï´Ù. ¸ÕÀú PawnÀ» ºùÀÇ ÇØÁÖ¼¼¿ä.");
+				CS_FATAL(false, "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç²ï¿½ï¿½ ï¿½Øºï¿½Ç¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ Pawnï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½.");
 
 			m_UserInterfaceInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_Game); });
 			m_GameInputComponent->BindAction("UIToGameToUI", EKeyEvent::KE_Pressed, [this]() { SetInputMode(EInputMode::IM_UI); });
 		}
-			/*¸¸¾à ¿ø·¡ Switchable Mode¿´°í, ÀÌ¹ø¿¡ Switchable ¸ðµå°¡ µÈ´Ù¸é,*/
+			/*ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Switchable Modeï¿½ï¿½ï¿½ï¿½, ï¿½Ì¹ï¿½ï¿½ï¿½ Switchable ï¿½ï¿½å°¡ ï¿½È´Ù¸ï¿½,*/
 		else if (bWasSwitchableMode && !bIsSwitchableMode)
 		{
 			m_UserInterfaceInputComponent->UnBindAction("UIToGameToUI", EKeyEvent::KE_Pressed);
@@ -289,3 +289,5 @@ namespace Crystal {
 		return cameraComponent->ProjectWorldToCameraSpace(worldPosition);
 	}
 }
+
+

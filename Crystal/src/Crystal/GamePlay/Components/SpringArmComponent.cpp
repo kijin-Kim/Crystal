@@ -10,7 +10,7 @@ namespace Crystal
 
         if (m_ParentComponent.expired())
         {
-            // CS_WARN("dasd");
+            CS_WARN("dasd");
             return;
         }
 
@@ -64,3 +64,5 @@ namespace Crystal
         m_OffsetPosition = offset;
     }
 }
+
+

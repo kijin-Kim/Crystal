@@ -286,3 +286,5 @@ void PrimitiveBatchBase::Draw(D3D12_PRIMITIVE_TOPOLOGY topology, bool isIndexed,
 {
     pImpl->Draw(topology, isIndexed, indices, indexCount, vertexCount, pMappedVertices);
 }
+
+

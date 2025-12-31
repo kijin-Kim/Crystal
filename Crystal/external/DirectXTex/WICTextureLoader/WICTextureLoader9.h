@@ -56,3 +56,5 @@ namespace DirectX
         _In_ size_t maxsize = 0,
         _In_ unsigned int loadFlags = 0) noexcept;
 }
+
+

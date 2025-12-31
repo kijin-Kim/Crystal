@@ -38,11 +38,11 @@ namespace Crystal {
 		void Begin() override;
 		
 		void UpdateComponents(float deltaTime);
-		/*Component¸¦ actorÀÇ ÄÁÅ×ÀÌ³Ê¿¡ ÀúÀåÇÏ°í Owner¸¦ ÇöÀç Actor·Î ÁöÁ¤ÇÕ´Ï´Ù.*/
+		/*Componentë¥¼ actorì˜ ì»¨í…Œì´ë„ˆì— ì €ì¥í•˜ê³  Ownerë¥¼ í˜„ì¬ Actorë¡œ ì§€ì •í•©ë‹ˆë‹¤.*/
 		void AddComponent(const std::shared_ptr<Component>& component);
 		void RegisterComponents();
 
-		/*Component¸¦ TransformComponentµéÀÇ Hierarchy¿¡ ¿Å±é´Ï´Ù.*/
+		/*Componentë¥¼ TransformComponentë“¤ì˜ Hierarchyì— ì˜®ê¹ë‹ˆë‹¤.*/
 		void MoveToTransformComponentHierarchy(const std::shared_ptr<TransformComponent>& component);
 
 		std::weak_ptr<TransformComponent> GetMainComponent() const { return m_MainComponent; }
@@ -95,11 +95,11 @@ namespace Crystal {
 
 		STATIC_TYPE_IMPLE(Actor)
 	protected:
-		/*Component¸¦ »ı¼ºÇÏ°í RegisterÇÕ´Ï´Ù.*/
+		/*Componentë¥¼ ìƒì„±í•˜ê³  Registerí•©ë‹ˆë‹¤.*/
 		template <class T>
 		std::shared_ptr<T> CreateComponent(const std::string& name = "")
 		{
-			/*TODO : Component¸¸ ¹Ş°Ô Ã¼Å©...*/
+			/*TODO : Componentë§Œ ë°›ê²Œ ì²´í¬...*/
 			std::shared_ptr<T> newComponent = CreateObject<T>();
 			newComponent->SetObjectName(name);
 			newComponent->SetOuter(weak_from_this());
@@ -111,7 +111,7 @@ namespace Crystal {
 	protected:
 		std::shared_ptr<TransformComponent> m_MainComponent = nullptr;
 		std::vector<std::shared_ptr<Component>> m_Components;
-		/*ºÎ¸ğ, ÀÚ½Ä¼øÀ¸·Î Transform °¡ ¹èÄ¡µÇ¾îÀÖ´Â ÄÁÅ×ÀÌ³Ê (MainComponent Á¦¿Ü)*/
+		/*ë¶€ëª¨, ìì‹ìˆœìœ¼ë¡œ Transform ê°€ ë°°ì¹˜ë˜ì–´ìˆëŠ” ì»¨í…Œì´ë„ˆ (MainComponent ì œì™¸)*/
 		std::vector<std::shared_ptr<TransformComponent>> m_TransformHierarchy;
 
 		bool m_bIsDead = false;

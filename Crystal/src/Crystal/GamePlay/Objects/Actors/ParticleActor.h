@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Actor.h"
 #include "Crystal/GamePlay/Components/ParticleComponent.h"
 
@@ -22,3 +22,5 @@ namespace Crystal {
 		Timer m_Timer;
 	};
 }
+
+

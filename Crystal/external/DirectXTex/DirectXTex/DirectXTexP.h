@@ -343,3 +343,5 @@ namespace DirectX
         _Out_writes_bytes_to_opt_(maxsize, required) void* pDestination, _In_ size_t maxsize, _Out_ size_t& required) noexcept;
 
 } // namespace
+
+

@@ -24,3 +24,5 @@ private:
 	Crystal::Shared<Crystal::TransformComponent> m_FireSocketComponent = nullptr;
 	Crystal::Shared<Crystal::TextureComponent> m_IndicatorTextureComponent = nullptr;
 };
+
+

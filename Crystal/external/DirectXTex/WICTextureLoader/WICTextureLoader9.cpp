@@ -595,3 +595,5 @@ HRESULT DirectX::CreateWICTextureFromFile(
 
     return CreateTextureFromWIC(d3dDevice, frame.Get(), maxsize, loadFlags, texture);
 }
+
+

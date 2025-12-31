@@ -736,3 +736,5 @@ void PBREffect::SetRenderTargetSizeInPixels(int width, int height)
 
     pImpl->dirtyFlags |= EffectDirtyFlags::ConstantBuffer;
 }
+
+

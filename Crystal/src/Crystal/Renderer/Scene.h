@@ -11,10 +11,8 @@
 namespace Crystal {
 	class ButtonComponent;
 	class PostProcessComponent;
-
-	/*
-	 * ·»´õ¸µ¿¡ »ç¿ëµÇ´Â ¸®¼Ò½ºµéÀ» ÁØºñÇÕ´Ï´Ù.
-	 */
+	
+	// ë Œë”ë§ì— ì‚¬ìš©ë˜ëŠ” ë¦¬ì†ŒìŠ¤ë“¤ì„ ì¤€ë¹„í•©ë‹ˆë‹¤.
 
 	struct Scene
 	{
@@ -114,3 +112,5 @@ namespace Crystal {
 	};
 
 }
+
+

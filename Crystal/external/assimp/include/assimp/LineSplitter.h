@@ -283,3 +283,5 @@ void LineSplitter::swallow_next_increment() {
 } // Namespace Assimp
 
 #endif // INCLUDED_LINE_SPLITTER_H
+
+

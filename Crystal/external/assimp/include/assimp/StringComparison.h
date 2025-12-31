@@ -231,3 +231,5 @@ unsigned int integer_pow( unsigned int base, unsigned int power ) {
 } // end of namespace
 
 #endif // !  AI_STRINGCOMPARISON_H_INC
+
+

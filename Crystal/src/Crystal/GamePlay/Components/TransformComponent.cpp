@@ -58,7 +58,7 @@ namespace Crystal {
 
 	void TransformComponent::UpdateWorldTransform()
 	{
-		/*ParentºÎÅÍ ÀÚ½Ä ¼øÀ¸·Î °è»êÇÏ¿©¾ß ÇÔ*/
+		/*Parentï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ ï¿½ï¿½*/
 		if (!m_ParentComponent.expired())
 			m_WorldTransform = Matrix4x4::Multiply(m_LocalTransform, m_ParentComponent.lock()->GetWorldTransform());
 		else
@@ -69,7 +69,7 @@ namespace Crystal {
 	{
 		SetParentComponent(component);
 		auto actor = Cast<Actor>(GetOuter());
-		// CS_FATAL(actor, "Outer°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
+		CS_FATAL(actor, "Outerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		actor->MoveToTransformComponentHierarchy(Cast<TransformComponent>(shared_from_this()));
 	}
 
@@ -205,7 +205,7 @@ namespace Crystal {
 
 	float TransformComponent::GetMass() const
 	{
-		// CS_FATAL(m_InverseMass != 0, "Áú·®ÀÌ ¹«ÇÑ´ë ÀÔ´Ï´Ù. ¸ÕÀú HasFiniteMass()·Î °Ë»çµÇ¾î¾ßÇÕ´Ï´Ù");
+		CS_FATAL(m_InverseMass != 0, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ñ´ï¿½ ï¿½Ô´Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ HasFiniteMass()ï¿½ï¿½ ï¿½Ë»ï¿½Ç¾ï¿½ï¿½ï¿½Õ´Ï´ï¿½");
 		return 1.0f / m_InverseMass;
 	}
 
@@ -298,3 +298,5 @@ namespace Crystal {
 	}
 
 }
+
+

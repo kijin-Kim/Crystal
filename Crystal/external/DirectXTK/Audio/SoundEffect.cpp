@@ -624,3 +624,5 @@ void SoundEffect::FillSubmitBuffer(_Out_ XAUDIO2_BUFFER& buffer) const
 }
 
 #endif
+
+

@@ -397,3 +397,5 @@ ID3D12RootSignature* EffectDeviceResources::DemandCreateRootSig(_Inout_ Microsof
         return hr;
     });
 }
+
+

@@ -616,3 +616,5 @@ void BasicPostProcess::SetBloomBlurParameters(bool horizontal, float size, float
     pImpl->bloomHorizontal = horizontal;
     pImpl->SetDirtyFlag();
 }
+
+

@@ -821,3 +821,5 @@ bool ScratchImage::IsAlphaAllOpaque() const noexcept
 
     return true;
 }
+
+

@@ -234,3 +234,5 @@ public:
 private:
 	QuestReward m_Reward;
 };
+
+

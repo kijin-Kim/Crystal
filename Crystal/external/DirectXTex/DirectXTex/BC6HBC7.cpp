@@ -3564,3 +3564,5 @@ void DirectX::D3DXEncodeBC7(uint8_t *pBC, const XMVECTOR *pColor, uint32_t flags
     static_assert(sizeof(D3DX_BC7) == 16, "D3DX_BC7 should be 16 bytes");
     reinterpret_cast<D3DX_BC7*>(pBC)->Encode(flags, reinterpret_cast<const HDRColorA*>(pColor));
 }
+
+

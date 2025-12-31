@@ -214,3 +214,5 @@ void DescriptorPile::AllocateRange(size_t numDescriptors, _Out_ IndexType& start
         throw std::runtime_error("Can't allocate more descriptors");
     }
 }
+
+

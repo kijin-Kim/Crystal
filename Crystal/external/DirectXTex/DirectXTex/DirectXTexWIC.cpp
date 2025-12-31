@@ -1363,3 +1363,5 @@ HRESULT DirectX::SaveToWICFile(
 
     return S_OK;
 }
+
+

@@ -336,3 +336,5 @@ static_assert( sizeof(DXUT::SDKMESH_MATERIAL_V2) == sizeof(DXUT::SDKMESH_MATERIA
 static_assert( sizeof(DXUT::SDKANIMATION_FILE_HEADER) == 40, "SDK Mesh structure size incorrect" );
 static_assert( sizeof(DXUT::SDKANIMATION_DATA) == 40, "SDK Mesh structure size incorrect" );
 static_assert( sizeof(DXUT::SDKANIMATION_FRAME_DATA) == 112, "SDK Mesh structure size incorrect" );
+
+

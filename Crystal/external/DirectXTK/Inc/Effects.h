@@ -850,3 +850,5 @@ namespace DirectX
         std::shared_ptr<Impl> pImpl;
     };
 }
+
+

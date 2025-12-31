@@ -630,3 +630,5 @@ void Model::Transition(
         commandList->ResourceBarrier(count, barrier);
     }
 }
+
+

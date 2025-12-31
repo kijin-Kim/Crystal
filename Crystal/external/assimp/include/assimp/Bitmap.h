@@ -119,3 +119,5 @@ namespace Assimp {
 }
 
 #endif // AI_BITMAP_H_INC
+
+

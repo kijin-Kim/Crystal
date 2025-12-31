@@ -3484,3 +3484,5 @@ HRESULT DirectX::ScaleMipMapsAlphaForCoverage(
     
     return S_OK;
 }
+
+

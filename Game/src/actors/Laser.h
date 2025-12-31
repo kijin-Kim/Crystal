@@ -20,3 +20,5 @@ private:
 	float m_LaserLifeTime = 2.0f;
 };
 
+
+

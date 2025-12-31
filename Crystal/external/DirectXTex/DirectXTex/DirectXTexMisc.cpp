@@ -759,3 +759,5 @@ HRESULT DirectX::TransformImage(
 
     return S_OK;
 }
+
+

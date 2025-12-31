@@ -26,3 +26,5 @@ namespace Crystal {
 		bool m_bIsEnabled = true;
 	};
 }
+
+

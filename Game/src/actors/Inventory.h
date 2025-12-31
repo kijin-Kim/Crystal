@@ -46,3 +46,5 @@ private:
 	std::map<EItemType, uint32_t> m_ItemCost;
 	std::map<EItemType, Crystal::Shared<Crystal::Material>> m_ItemThumbNails;
 };
+
+

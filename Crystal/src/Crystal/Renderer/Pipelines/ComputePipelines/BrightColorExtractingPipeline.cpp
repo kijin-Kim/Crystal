@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "BrightColorExtractingPipeline.h"
 
 #include "Crystal/Core/Device.h"
@@ -21,3 +21,5 @@ namespace Crystal {
 			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 }
+
+

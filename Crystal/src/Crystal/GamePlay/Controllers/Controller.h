@@ -31,3 +31,5 @@ namespace Crystal {
 		Weak<Pawn> m_PossessedPawn;
 	};
 }
+
+

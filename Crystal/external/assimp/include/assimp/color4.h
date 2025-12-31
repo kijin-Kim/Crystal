@@ -102,3 +102,5 @@ struct aiColor4D {
 #endif // __cplusplus
 
 #endif // AI_COLOR4D_H_INC
+
+

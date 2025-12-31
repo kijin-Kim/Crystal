@@ -228,3 +228,5 @@ namespace DirectX
         static SharedResourcePool<ID3D12Device*, DeviceResources> deviceResourcesPool;
     };
 }
+
+

@@ -53,3 +53,5 @@ private:
 	const float m_DamagePerceptionInterval = 2.0f;
 
 };
+
+

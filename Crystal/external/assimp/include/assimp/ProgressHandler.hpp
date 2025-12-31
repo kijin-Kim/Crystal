@@ -143,3 +143,5 @@ public:
 } // Namespace Assimp
 
 #endif // AI_PROGRESSHANDLER_H_INC
+
+

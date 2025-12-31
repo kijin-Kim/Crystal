@@ -1242,3 +1242,5 @@ HRESULT DirectX::SaveWICTextureToFile(
 
     return S_OK;
 }
+
+

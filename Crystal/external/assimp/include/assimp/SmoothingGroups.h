@@ -106,3 +106,5 @@ void ComputeNormalsWithSmoothingsGroups(MeshWithSmoothingGroups<T>& sMesh);
 #include "SmoothingGroups.inl"
 
 #endif // !! AI_SMOOTHINGGROUPS_H_INC
+
+

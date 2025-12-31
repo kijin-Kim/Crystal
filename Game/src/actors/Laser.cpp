@@ -58,3 +58,5 @@ void Laser::Update(float deltaTime)
 		Destroy();
 	}
 }
+
+

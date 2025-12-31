@@ -84,3 +84,5 @@ namespace DirectX
         std::unique_ptr<uint8_t[]>& decodedData,
         D3D12_SUBRESOURCE_DATA& subresource) noexcept;
 }
+
+

@@ -26,7 +26,7 @@ namespace Crystal {
 
 		void BindCursor(bool bShouldBindCursor) { m_bShouldBindCursor = bShouldBindCursor; }
 		bool IsCursorBind() const { return m_bShouldBindCursor; }
-		/*Ä¿¼­¸¦ ¹ÙÀÎµù ÇÏ±âÀü ¹ÙÀÎµùÇÒ À§Ä¡¸¦ ÁöÁ¤ÇÕ´Ï´Ù.*/
+		/*Ä¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½Ï±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		void ReadyCursorBinding()
 		{
 			GetCursorPos(&m_BindPosition);
@@ -53,3 +53,5 @@ namespace Crystal {
 		POINT m_BindPosition = {};
 	};
 }
+
+

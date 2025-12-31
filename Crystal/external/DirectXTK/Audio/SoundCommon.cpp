@@ -891,3 +891,5 @@ void AudioEmitter::EnableDefaultMultiChannel(unsigned int channels, float radius
         memset(EmitterAzimuths, 0, sizeof(float) * size_t(channels));
     }
 }
+
+

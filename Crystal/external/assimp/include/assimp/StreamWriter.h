@@ -301,3 +301,5 @@ typedef StreamWriter<true,true> StreamWriterAny;
 } // end namespace Assimp
 
 #endif // !! AI_STREAMWriter_H_INCLUDED
+
+

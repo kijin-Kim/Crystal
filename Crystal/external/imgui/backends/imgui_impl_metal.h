@@ -28,3 +28,5 @@ IMGUI_IMPL_API bool ImGui_ImplMetal_CreateFontsTexture(id<MTLDevice> device);
 IMGUI_IMPL_API void ImGui_ImplMetal_DestroyFontsTexture();
 IMGUI_IMPL_API bool ImGui_ImplMetal_CreateDeviceObjects(id<MTLDevice> device);
 IMGUI_IMPL_API void ImGui_ImplMetal_DestroyDeviceObjects();
+
+

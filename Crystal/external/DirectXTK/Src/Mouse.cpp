@@ -1499,3 +1499,5 @@ void Mouse::ButtonStateTracker::Reset() noexcept
 {
     memset(this, 0, sizeof(ButtonStateTracker));
 }
+
+

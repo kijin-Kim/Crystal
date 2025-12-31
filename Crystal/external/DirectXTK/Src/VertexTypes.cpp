@@ -160,3 +160,5 @@ const D3D12_INPUT_LAYOUT_DESC VertexPositionNormalColorTexture::InputLayout =
 //--------------------------------------------------------------------------------------
 // VertexPositionNormalTangentColorTexture, VertexPositionNormalTangentColorTextureSkinning are not
 // supported for DirectX 12 since they were only present for DGSL
+
+

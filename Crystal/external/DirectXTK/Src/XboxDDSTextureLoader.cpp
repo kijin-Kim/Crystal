@@ -649,3 +649,5 @@ void Xbox::FreeDDSTextureMemory(void* grfxMemory) noexcept
         XMemFree(grfxMemory, c_XMemAllocAttributes);
     }
 }
+
+

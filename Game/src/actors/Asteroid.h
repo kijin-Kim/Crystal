@@ -140,3 +140,5 @@ public:
 	STATIC_TYPE_IMPLE(YellowOreAsteroid)
 
 };
+
+

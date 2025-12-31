@@ -21,3 +21,5 @@ private:
 	float m_LaserLifeTime = 2.0f;
 	float m_Damage = 10.0f;
 };
+
+

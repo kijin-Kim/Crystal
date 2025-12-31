@@ -343,3 +343,5 @@ namespace DirectX
         static const D3D12_INPUT_ELEMENT_DESC InputElements[InputElementCount];
     };
 }
+
+

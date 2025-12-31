@@ -559,3 +559,5 @@ void EffectFactory::EnableNormalMapEffect(bool enabled) noexcept
 {
     pImpl->mUseNormalMapEffect = enabled;
 }
+
+

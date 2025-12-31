@@ -426,3 +426,5 @@ void ImGui_ImplAllegro5_NewFrame()
 
     ImGui_ImplAllegro5_UpdateMouseCursor();
 }
+
+

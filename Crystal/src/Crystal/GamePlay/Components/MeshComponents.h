@@ -90,7 +90,7 @@ namespace Crystal {
 	private:
 		Weak<Animation> m_Animation;
 		
-		std::vector <DirectX::XMFLOAT4X4> m_BoneTransforms; // ÃÖÁ¾ÀûÀ¸·Î º¯È¯µÈ BoneµéÀÇ °ª (World Space)
+		std::vector <DirectX::XMFLOAT4X4> m_BoneTransforms; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ Boneï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ (World Space)
 		
 		DirectX::XMFLOAT4X4 m_InverseGlobalTransform = Matrix4x4::Identity();		
 		
@@ -107,3 +107,5 @@ namespace Crystal {
 		bool m_bIsPlayingAnimation = false;
 	};
 }
+
+

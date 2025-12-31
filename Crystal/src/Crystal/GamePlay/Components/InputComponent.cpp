@@ -26,7 +26,7 @@ namespace Crystal {
 
 	bool InputComponent::ProcessInputEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		/*À©µµ¿ì Ä¿¼­ Ä«¿îÆÃ ½Ã½ºÅÛ¿¡ µû¶ó Ã³¸®*/
+		/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä¿ï¿½ï¿½ Ä«ï¿½ï¿½ï¿½ï¿½ ï¿½Ã½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½*/
 
 		CURSORINFO cursorInfo = {};
 		cursorInfo.cbSize = sizeof(CURSORINFO);
@@ -41,7 +41,7 @@ namespace Crystal {
 			while (::ShowCursor(false) >= 0);
 		}
 
-		/*¾×¼Ç ¸ÅÇÎÀ» Ã³¸®ÇÕ´Ï´Ù.*/
+		/*ï¿½×¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 
 		
 		
@@ -51,13 +51,13 @@ namespace Crystal {
 		{
 		case EKeyEvent::KE_None: break;
 		case EKeyEvent::KE_Pressed:
-			// CS_DEBUG_INFO("Pressed : %d", keyCode);
+			CS_DEBUG_INFO("Pressed : %d", keyCode);
 			break;
 		case EKeyEvent::KE_Released:
-			// CS_DEBUG_INFO("Released : %d", keyCode);
+			CS_DEBUG_INFO("Released : %d", keyCode);
 			break;
 		case EKeyEvent::KE_Repeat:
-			// CS_DEBUG_INFO("Repeat : %d", keyCode);
+			CS_DEBUG_INFO("Repeat : %d", keyCode);
 			break;
 		default: ;
 		}*/
@@ -73,7 +73,7 @@ namespace Crystal {
 		ProcessActionMappedInput(uMsg, mouseCodes.VWheel.first, lParam, EKeyEvent::KE_Pressed);
 		ProcessActionMappedInput(uMsg, mouseCodes.HWheel.first, lParam, EKeyEvent::KE_Pressed);
 
-		/*¾×½Ã½º ¸ÅÇÎÀ» Ã³¸®ÇÕ´Ï´Ù.*/
+		/*ï¿½×½Ã½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.*/
 		static UCHAR pKeysBuffer[256];
 		for (int i = 0; i < 256; i++)
 		{
@@ -480,3 +480,5 @@ namespace Crystal {
 		return codes;
 	}
 }
+
+

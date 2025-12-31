@@ -90,3 +90,5 @@ namespace DirectX
         static const XMFLOAT2 Float2Zero;
     };
 }
+
+

@@ -96,3 +96,5 @@ HRESULT BinaryReader::ReadEntireFile(
 
     return S_OK;
 }
+
+

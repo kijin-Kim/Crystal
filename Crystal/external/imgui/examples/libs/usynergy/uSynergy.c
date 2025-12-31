@@ -634,3 +634,5 @@ void uSynergySendClipboard(uSynergyContext *context, const char *text)
 	sAddString(context, text);
 	sSendReply(context);
 }
+
+

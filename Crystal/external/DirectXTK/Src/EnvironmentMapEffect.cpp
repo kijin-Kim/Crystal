@@ -762,3 +762,5 @@ void EnvironmentMapEffect::SetFresnelFactor(float value)
 
     pImpl->dirtyFlags |= EffectDirtyFlags::ConstantBuffer;
 }
+
+

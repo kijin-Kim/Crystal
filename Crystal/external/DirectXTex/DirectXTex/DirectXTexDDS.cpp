@@ -2312,3 +2312,5 @@ HRESULT DirectX::SaveToDDSFile(
 
     return S_OK;
 }
+
+

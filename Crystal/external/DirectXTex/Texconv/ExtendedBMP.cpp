@@ -189,3 +189,5 @@ HRESULT __cdecl LoadFromBMPEx(
 
     return hr;
 }
+
+

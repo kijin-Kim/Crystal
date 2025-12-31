@@ -335,3 +335,5 @@ namespace Crystal {
 		DirectX::BoundingSphere m_BoundingSphere = DirectX::BoundingSphere();
 	};
 }
+
+

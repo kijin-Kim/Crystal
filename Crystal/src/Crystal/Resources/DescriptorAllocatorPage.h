@@ -41,7 +41,7 @@ namespace Crystal {
 
 		D3D12_DESCRIPTOR_HEAP_TYPE GetDescriptorHeapType() const { return m_DescriptorHeapType; }
 
-		bool HasSpace(uint32_t descriptorCount) // descriptor count ¸¸Å­ÀÇ space°¡ ÀÖ´ÂÁö Ã¼Å©ÇÕ´Ï´Ù.
+		bool HasSpace(uint32_t descriptorCount) // descriptor count ë§Œí¼ì˜ spaceê°€ ìˆëŠ”ì§€ ì²´í¬í•©ë‹ˆë‹¤.
 		{
 			return m_FreeListBySize.lower_bound(descriptorCount) != m_FreeListBySize.end();
 		}
@@ -49,17 +49,17 @@ namespace Crystal {
 		uint32_t GetFreeHandleCount() const { return m_FreeHandleCount; }
 
 		/*
-		* ÇöÀç descriptor heap¿¡ descriptorCount¸¸Å­ÀÇ descriptor¸¦ ÇÒ´ç
-		* descriptorCount¸¸Å­ ÇÒ´çÀ» ÇÒ ¼ö ¾øÀ¸¸é null DescriptorAllocationÀ» ¸®ÅÏ
-		* Free Handle Countº¸´Ù descriptorCount°¡ ÀÛ¾Æµµ ´ÜÆíÈ­·Î ÀÎÇØ ½ÇÆĞ ÇÒ ¼ö ÀÖÀ½.
+		* í˜„ì¬ descriptor heapì— descriptorCountë§Œí¼ì˜ descriptorë¥¼ í• ë‹¹
+		* descriptorCountë§Œí¼ í• ë‹¹ì„ í•  ìˆ˜ ì—†ìœ¼ë©´ null DescriptorAllocationì„ ë¦¬í„´
+		* Free Handle Countë³´ë‹¤ descriptorCountê°€ ì‘ì•„ë„ ë‹¨í¸í™”ë¡œ ì¸í•´ ì‹¤íŒ¨ í•  ìˆ˜ ìˆìŒ.
 		*/
 		DescriptorAllocation Allocate(uint32_t descriptorCount);
 
 		/*
-		* Descriptor¸¦ heap¿¡ ´Ù½Ã µ¹·ÁÁİ´Ï´Ù.
-		* Stale AllocationÀº Á÷Á¢ÀûÀ¸·Î ÇØÁ¦µÇÁö ¾Ê°í ´Ù¸¥ ÄÁÅ×ÀÌ³Ê·Î ¿Å°ÜÁö°í ÇØÁ¦ µË´Ï´Ù.
-		* r-value reference·Î DescriptorAllocationÀ» ¹Ş±â ¶§¹®¿¡ Free ÇÔ¼ö ÀÌÈÄ¿¡
-		* DescriptorAllocationÀº empty°¡ µË´Ï´Ù.
+		* Descriptorë¥¼ heapì— ë‹¤ì‹œ ëŒë ¤ì¤ë‹ˆë‹¤.
+		* Stale Allocationì€ ì§ì ‘ì ìœ¼ë¡œ í•´ì œë˜ì§€ ì•Šê³  ë‹¤ë¥¸ ì»¨í…Œì´ë„ˆë¡œ ì˜®ê²¨ì§€ê³  í•´ì œ ë©ë‹ˆë‹¤.
+		* r-value referenceë¡œ DescriptorAllocationì„ ë°›ê¸° ë•Œë¬¸ì— Free í•¨ìˆ˜ ì´í›„ì—
+		* DescriptorAllocationì€ emptyê°€ ë©ë‹ˆë‹¤.
 		*/
 		void Free(DescriptorAllocation&& descriptor);
 
@@ -71,8 +71,8 @@ namespace Crystal {
 		void AddNewBlock(uint32_t offset, uint32_t descriptorCount);
 
 		/*
-		* BlockÀ» FreeÇÕ´Ï´Ù.
-		* FreeµÈ BlockÀº Free list¿¡¼­ mergeµÇ¾î Å« BlockÀ» ¸¸µì´Ï´Ù.
+		* Blockì„ Freeí•©ë‹ˆë‹¤.
+		* Freeëœ Blockì€ Free listì—ì„œ mergeë˜ì–´ í° Blockì„ ë§Œë“­ë‹ˆë‹¤.
 		*/
 		void FreeBlock(uint32_t offset, uint32_t descriptorCount);
 
@@ -87,7 +87,7 @@ namespace Crystal {
 		using FreeListBySize = std::multimap<SizeType, FreeListByOffset::iterator>;
 
 		/*
-		* FreeListByOffsetÀÇ ¿ÀºêÁ§Æ®.
+		* FreeListByOffsetì˜ ì˜¤ë¸Œì íŠ¸.
 		*/
 		struct FreeBlockInfo
 		{
@@ -96,7 +96,7 @@ namespace Crystal {
 			}
 
 			SizeType Size;
-			FreeListBySize::iterator FreeListBySizeIt; // MergingÇÏ±â À§ÇØ 
+			FreeListBySize::iterator FreeListBySizeIt; // Mergingí•˜ê¸° ìœ„í•´ 
 		};
 
 		struct StaleDescriptorInfo

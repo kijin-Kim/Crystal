@@ -95,3 +95,5 @@ void PlayerShield::UpdateHealth() const
 	healthPercent = std::clamp(healthPercent, 0.0f, 1.0f);
 	m_HealthBarFillComponent->SetScaleX(m_HealthBarBgComponent->GetScale().x * healthPercent);
 }
+
+

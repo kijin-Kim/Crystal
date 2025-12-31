@@ -8,3 +8,5 @@ public:
 	~InventoryLevel() override = default;
 
 };
+
+

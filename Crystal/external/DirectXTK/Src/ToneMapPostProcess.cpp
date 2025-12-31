@@ -508,3 +508,5 @@ void ToneMapPostProcess::SetST2084Parameter(float paperWhiteNits)
     pImpl->paperWhiteNits = paperWhiteNits;
     pImpl->SetDirtyFlag();
 }
+
+

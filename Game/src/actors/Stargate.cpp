@@ -46,3 +46,4 @@ void Stargate::Initialize()
 	circleMeshComponent->SetRenderable(resourceManager.GetRenderable<Crystal::StaticMesh>("assets/models/stargate_circle.fbx"));
 
 }
+

@@ -144,3 +144,5 @@ struct aiVector3D {
 #endif // __cplusplus
 
 #endif // AI_VECTOR3D_H_INC
+
+

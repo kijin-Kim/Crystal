@@ -34,3 +34,5 @@ namespace Crystal {
 		bool m_bShouldReset = true;
 	};
 }
+
+

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Crystal/Renderer/Pipelines/Pipelines.h"
 #include "Crystal/Resources/Material.h"
 
@@ -79,4 +79,6 @@ namespace Crystal {
 	};
 	
 }
+
+
 

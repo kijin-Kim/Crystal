@@ -45,3 +45,5 @@ public:
 
 	STATIC_TYPE_IMPLE(GameClearLevel)
 };
+
+

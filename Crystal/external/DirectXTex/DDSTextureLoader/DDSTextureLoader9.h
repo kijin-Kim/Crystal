@@ -76,3 +76,5 @@ namespace DirectX
         _In_z_ const wchar_t* fileName,
         _Outptr_ LPDIRECT3DVOLUMETEXTURE9* texture) noexcept;
 }
+
+

@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "MovementComponent.h"
 #include "Crystal/Gameplay/Objects/Actors/Pawn.h"
 
@@ -11,3 +11,5 @@ namespace Crystal {
 		return Cast<Pawn>(m_TargetComponent->GetOuter());
 	}
 }
+
+

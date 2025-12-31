@@ -5182,3 +5182,5 @@ DirectX::FORMAT_TYPE DirectX::FormatDataType(_In_ DXGI_FORMAT fmt) noexcept
         return FORMAT_TYPE_TYPELESS;
     }
 }
+
+

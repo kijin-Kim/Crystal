@@ -601,3 +601,5 @@ void SharedGraphicsResource::Reset(const SharedGraphicsResource& resource) noexc
 {
     mSharedResource = resource.mSharedResource;
 }
+
+

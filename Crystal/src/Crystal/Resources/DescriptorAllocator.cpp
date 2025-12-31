@@ -40,7 +40,7 @@ namespace Crystal {
 		}
 
 
-		if (allocation.IsNull()) // 현재 Page에 descriptorCount를 충족할 만한 Page가 없으면,
+		if (allocation.IsNull())
 		{
 			m_MaxDescriptorCountPerHeap = max(m_MaxDescriptorCountPerHeap, descriptorCount);
 
@@ -59,7 +59,7 @@ namespace Crystal {
 			auto page = m_HeapPool[i];
  			page->ReleaseStaleDescriptors();
 
-			if (page->GetFreeHandleCount() > 0) // Stale Descriptor를 삭제하고 남은 Descriptor Count을 다시 insert한다. 
+			if (page->GetFreeHandleCount() > 0)
 			{
 				m_FreeHeaps.insert(i);
 			}
@@ -77,4 +77,6 @@ namespace Crystal {
 		return page;
 	}
 }
+
+
 

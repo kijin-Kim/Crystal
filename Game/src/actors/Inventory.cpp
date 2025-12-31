@@ -98,3 +98,5 @@ uint32_t Inventory::GetItemCost(EItemType type)
 	return m_ItemCost[type];
 }
 
+
+

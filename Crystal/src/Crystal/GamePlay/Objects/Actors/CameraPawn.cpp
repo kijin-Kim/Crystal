@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "CameraPawn.h"
 
 
@@ -71,3 +71,5 @@ namespace Crystal {
 		m_MainComponent->RotateRoll(-value);
 	}
 }
+
+

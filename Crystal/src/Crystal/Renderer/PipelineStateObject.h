@@ -128,7 +128,7 @@ namespace Crystal {
 			D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = { sizeof(pipelineStateStream), &pipelineStateStream };
 
 			HRESULT hr = device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_PipelineState));
-			// CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Object¸¦ »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+			CS_FATAL(SUCCEEDED(hr), "Graphics Pipeline State Objectï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 		}
 		
 		~GraphicsPipelineState() = default;
@@ -139,3 +139,5 @@ namespace Crystal {
 		
 	};
 }
+
+

@@ -48,3 +48,5 @@ namespace Crystal {
 		bool IsFirstVisible(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, Weak<Actor> actor, Weak<Actor> selfActor, const std::vector<std::string>& visibilityWhitelist);
 	};
 }
+
+

@@ -156,3 +156,5 @@ RECT DirectX::SimpleMath::Viewport::ComputeTitleSafeArea(UINT backBufferWidth, U
 
     return rct;
 }
+
+

@@ -391,3 +391,5 @@ const WAVEFORMATEX* DynamicSoundEffectInstance::GetFormat() const noexcept
 {
     return pImpl->GetFormat();
 }
+
+

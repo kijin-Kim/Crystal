@@ -613,3 +613,5 @@ bool WaveBank::GetPrivateData(unsigned int index, void* data, size_t datasize)
             return false;
     }
 }
+
+

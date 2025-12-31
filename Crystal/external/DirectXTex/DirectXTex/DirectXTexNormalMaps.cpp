@@ -390,3 +390,5 @@ HRESULT DirectX::ComputeNormalMap(
 
     return S_OK;
 }
+
+

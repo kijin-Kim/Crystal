@@ -186,3 +186,5 @@ private:
 } // Namespace Assimp
 
 #endif // !! INCLUDED_AI_DEFAULTLOGGER
+
+

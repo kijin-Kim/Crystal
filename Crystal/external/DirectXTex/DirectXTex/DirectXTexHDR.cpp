@@ -1178,3 +1178,5 @@ HRESULT DirectX::SaveToHDRFile(const Image& image, const wchar_t* szFile) noexce
 
     return S_OK;
 }
+
+

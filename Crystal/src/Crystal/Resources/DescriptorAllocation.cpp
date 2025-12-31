@@ -59,7 +59,7 @@ namespace Crystal {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocation::GetDescriptorHandle(uint32_t offset /*= 0*/) const
 	{
-		// CS_FATAL(offset < m_HandleCount, "offsetÀÌ HandleCountº¸´Ù Å®´Ï´Ù");
+		CS_FATAL(offset < m_HandleCount, "offsetï¿½ï¿½ HandleCountï¿½ï¿½ï¿½ï¿½ Å®ï¿½Ï´ï¿½");
 		return { m_Descriptor.ptr + (m_DescriptorSize * offset) };
 	}
 
@@ -91,6 +91,8 @@ namespace Crystal {
 	
 
 }
+
+
 
 
 

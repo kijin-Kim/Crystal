@@ -173,3 +173,5 @@ void main_loop(void* arg)
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(g_Window);
 }
+
+

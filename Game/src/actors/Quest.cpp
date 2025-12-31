@@ -28,3 +28,5 @@ void Quest::Update(float deltaTime)
 	default: ;
 	}
 }
+
+

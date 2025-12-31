@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "ParticleActor.h"
 
 #include "Crystal/Resources/ResourceManager.h"
@@ -108,3 +108,5 @@ namespace Crystal {
 	}
 
 }
+
+

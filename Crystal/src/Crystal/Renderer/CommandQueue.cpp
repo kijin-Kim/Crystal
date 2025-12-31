@@ -13,13 +13,13 @@ namespace Crystal {
 		d3d12CommandQueueDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateCommandQueue(&d3d12CommandQueueDesc, IID_PPV_ARGS(&m_d3d12CommandQueue));
-		// CS_FATAL(SUCCEEDED(hr), "CommandQueue¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "CommandQueueë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 
 		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_d3d12Fence));
-		// CS_FATAL(SUCCEEDED(hr), "Fence¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "Fenceë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 
 		m_FenceEvent = ::CreateEvent(NULL, false, false, NULL);
-		// CS_FATAL(m_FenceEvent, "Fence Event¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(m_FenceEvent, "Fence Eventë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤");
 	}
 
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> CommandQueue::GetCommandList()
@@ -37,7 +37,7 @@ namespace Crystal {
 		{
 			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&d3d12CommandAllcator));
-			// CS_FATAL(SUCCEEDED(hr), "CommandAllocator¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			CS_FATAL(SUCCEEDED(hr), "CommandAllocatorë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 		}
 
 		if (!m_CommandListQueue.empty())
@@ -50,7 +50,7 @@ namespace Crystal {
 		{
 			auto device = Device::Instance().GetD3DDevice();
 			HRESULT hr = device->CreateCommandList(0, m_d3d12CommandListType, d3d12CommandAllcator.Get(), nullptr, IID_PPV_ARGS(&d3d12CommandList));
-			// CS_FATAL(SUCCEEDED(hr), "CommandList¸¦ »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			CS_FATAL(SUCCEEDED(hr), "CommandListë¥¼ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 		}
 
 		d3d12CommandList->SetPrivateDataInterface(__uuidof(ID3D12CommandAllocator), d3d12CommandAllcator.Get());
@@ -103,3 +103,5 @@ namespace Crystal {
 		}
 	}
 }
+
+

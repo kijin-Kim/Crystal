@@ -539,3 +539,5 @@ struct aiMemoryInfo
 #include "matrix4x4.inl"
 
 #endif // AI_TYPES_H_INC
+
+

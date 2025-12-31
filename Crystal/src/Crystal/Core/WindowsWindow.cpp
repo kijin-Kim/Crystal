@@ -90,7 +90,7 @@ namespace Crystal {
 			nullptr, nullptr, HINST_THISCOMPONENT, this);
 
 
-		// CS_FATAL(m_Handle, "�����츦 �����ϴµ� �����Ͽ����ϴ�");
+		CS_FATAL(m_Handle, "�����츦 �����ϴµ� �����Ͽ����ϴ�");
 		ShowWindow(m_Handle, SW_SHOW);
 		SetFocus(m_Handle);
 
@@ -126,3 +126,4 @@ namespace Crystal {
 		m_InputEventFunction = std::bind(function, app, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	}
 }
+

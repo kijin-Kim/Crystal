@@ -353,3 +353,5 @@ bool IOStreamBuffer<T>::getNextBlock( std::vector<T> &buffer) {
 }
 
 } // !ns Assimp
+
+

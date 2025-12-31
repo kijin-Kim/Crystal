@@ -657,3 +657,5 @@ AI_FORCE_INLINE bool Importer::IsExtensionSupported(const std::string& szExtensi
 } // !namespace Assimp
 
 #endif // AI_ASSIMP_HPP_INC
+
+

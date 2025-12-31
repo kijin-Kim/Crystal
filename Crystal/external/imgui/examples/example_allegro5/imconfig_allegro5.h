@@ -9,3 +9,5 @@
 // Use 32-bit vertex indices because Allegro doesn't support 16-bit ones
 // This allows us to avoid converting vertices format at runtime
 #define ImDrawIdx  int
+
+

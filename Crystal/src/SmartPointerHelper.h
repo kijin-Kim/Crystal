@@ -14,11 +14,13 @@ namespace Crystal {
 	inline std::shared_ptr<TargetType> Cast(std::weak_ptr<SourceType> weak)
 	{
 		std::shared_ptr<SourceType> strong = weak.lock();
-		if(!strong) // Strong pointer°¡ ¼Ò¸êÇßÀ» °æ¿ì
+		if(!strong) // Strong pointerï¿½ï¿½ ï¿½Ò¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 			return nullptr;
 
 		return std::static_pointer_cast<TargetType>(strong);
 	}
 
 }
+
+
 

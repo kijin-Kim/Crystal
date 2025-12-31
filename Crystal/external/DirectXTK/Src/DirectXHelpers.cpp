@@ -88,3 +88,5 @@ void DirectX::CreateShaderResourceView(
 
     device->CreateShaderResourceView(tex, &srvDesc, srvDescriptor);
 }
+
+

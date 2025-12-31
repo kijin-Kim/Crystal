@@ -1098,3 +1098,5 @@ bool __cdecl ResourceUploadBatch::IsSupportedForGenerateMips(DXGI_FORMAT format)
 {
     return pImpl->IsSupportedForGenerateMips(format);
 }
+
+

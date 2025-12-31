@@ -174,3 +174,5 @@ void Cruiser::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 
 	UpdateHealth();
 }
+
+

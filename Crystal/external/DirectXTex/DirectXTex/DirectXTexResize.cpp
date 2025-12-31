@@ -1092,3 +1092,5 @@ HRESULT DirectX::Resize(
 
     return S_OK;
 }
+
+

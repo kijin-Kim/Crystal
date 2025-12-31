@@ -1,4 +1,4 @@
-﻿#include "Kraken.h"
+#include "Kraken.h"
 
 #include "SpaceWhale.h"
 #include "SpaceWhaleAIController.h"
@@ -270,7 +270,7 @@ void Kraken::UpdateHealth()
 
 void Kraken::OnSmashAttack()
 {
-	// CS_INFO("Smash");
+	CS_INFO("Smash");
 	auto& resourceManager = Crystal::ResourceManager::Instance();
 	m_SkeletalMeshComponent->PlayAnimationWithEndEvent(resourceManager.GetAnimation("assets/models/KRAKEN_smashAttack.fbx"), false,
 	                                                   CS_ANIMATION_FN(Kraken::OnIdle));
@@ -288,7 +288,7 @@ void Kraken::OnIdle()
 
 void Kraken::AddImpulseOnSmash()
 {
-	// CS_INFO("Impulse");
+	CS_INFO("Impulse");
 	auto& overalppeds = m_SmashAttackBoxComponent->GetOverlappedComponents();
 	for (auto& weak : overalppeds)
 	{
@@ -495,3 +495,5 @@ void Kraken::SetShowHealthBar(bool bShow)
 	m_HealthBarBgComponent->SetHiddenInGame(!bShow);
 	m_HealthBarFillComponent->SetHiddenInGame(!bShow);
 }
+
+

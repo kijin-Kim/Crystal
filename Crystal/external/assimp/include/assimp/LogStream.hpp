@@ -109,3 +109,5 @@ LogStream::~LogStream() {
 } // Namespace Assimp
 
 #endif
+
+

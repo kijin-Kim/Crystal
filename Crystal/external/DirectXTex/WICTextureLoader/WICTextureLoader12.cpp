@@ -803,3 +803,5 @@ HRESULT DirectX::LoadWICTextureFromFileEx(
 
     return hr;
 }
+
+

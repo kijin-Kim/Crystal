@@ -99,3 +99,5 @@ namespace DirectX
         uint32_t            nodeMask;
     };
 }
+
+

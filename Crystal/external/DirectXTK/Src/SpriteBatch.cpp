@@ -1246,3 +1246,5 @@ void SpriteBatch::SetViewport(const D3D12_VIEWPORT& viewPort)
     pImpl->mSetViewport = true;
     pImpl->mViewPort = viewPort;
 }
+
+

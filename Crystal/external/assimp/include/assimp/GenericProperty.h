@@ -131,3 +131,5 @@ bool HasGenericProperty(const std::map< unsigned int, T >& list,
 }
 
 #endif // !! AI_GENERIC_PROPERTY_H_INCLUDED
+
+

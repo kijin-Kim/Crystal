@@ -303,3 +303,5 @@ void Logger::info(const std::string &message) {
 } // Namespace Assimp
 
 #endif // !! INCLUDED_AI_LOGGER_H
+
+

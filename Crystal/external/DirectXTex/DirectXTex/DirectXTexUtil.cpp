@@ -1498,3 +1498,5 @@ HRESULT Blob::Trim(size_t size) noexcept
 
     return S_OK;
 }
+
+

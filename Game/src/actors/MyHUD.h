@@ -115,3 +115,5 @@ private:
 	DirectX::XMFLOAT2 m_SpaceStationBarScale = {1.0f, 1.0f};
 	DirectX::XMFLOAT2 m_PolluteBarScale = {1.0f, 1.0f};
 };
+
+

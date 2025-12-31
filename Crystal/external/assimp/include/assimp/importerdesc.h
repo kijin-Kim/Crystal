@@ -144,3 +144,5 @@ Will return a NULL-pointer if no assigned importer desc. was found for the given
 ASSIMP_API const C_STRUCT aiImporterDesc* aiGetImporterDesc( const char *extension );
 
 #endif // AI_IMPORTER_DESC_H_INC
+
+

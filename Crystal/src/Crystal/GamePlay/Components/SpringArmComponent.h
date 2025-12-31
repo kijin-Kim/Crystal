@@ -25,3 +25,5 @@ namespace Crystal {
 		DirectX::XMFLOAT3 m_WorldLastPosition = Vector3::Zero;
 	};
 }
+
+

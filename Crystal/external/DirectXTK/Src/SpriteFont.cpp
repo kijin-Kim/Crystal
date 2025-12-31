@@ -691,3 +691,5 @@ XMUINT2 SpriteFont::GetSpriteSheetSize() const noexcept
 {
     return pImpl->textureSize;
 }
+
+

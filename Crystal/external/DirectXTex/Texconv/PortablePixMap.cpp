@@ -678,3 +678,5 @@ HRESULT __cdecl SaveToPortablePixMapHDR(
 
     return S_OK;
 }
+
+

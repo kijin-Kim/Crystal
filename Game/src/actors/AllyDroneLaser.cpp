@@ -64,3 +64,4 @@ void AllyDroneLaser::Update(float deltaTime)
 		Destroy();
 	}
 }
+

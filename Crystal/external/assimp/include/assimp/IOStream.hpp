@@ -140,3 +140,5 @@ IOStream::~IOStream() {
 } //!namespace Assimp
 
 #endif //!!AI_IOSTREAM_H_INC
+
+

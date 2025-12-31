@@ -163,3 +163,5 @@ AI_FORCE_INLINE ai_real get_qnan()
 }
 
 #endif // !! AI_QNAN_H_INCLUDED
+
+

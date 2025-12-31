@@ -15,3 +15,5 @@ public:
 
 	STATIC_TYPE_IMPLE(SpaceWhaleAIController)
 };
+
+

@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "Scene.h"
 
 
@@ -245,3 +245,5 @@ namespace Crystal {
 
 }
 ;
+
+

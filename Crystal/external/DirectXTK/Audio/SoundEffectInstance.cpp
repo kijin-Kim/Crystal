@@ -345,3 +345,5 @@ IVoiceNotify* SoundEffectInstance::GetVoiceNotify() const noexcept
 {
     return pImpl.get();
 }
+
+

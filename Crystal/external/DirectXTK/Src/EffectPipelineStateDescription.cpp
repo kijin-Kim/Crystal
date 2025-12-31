@@ -106,3 +106,5 @@ void EffectPipelineStateDescription::CreatePipelineState(
         throw std::runtime_error("CreateGraphicsPipelineState");
     }
 }
+
+

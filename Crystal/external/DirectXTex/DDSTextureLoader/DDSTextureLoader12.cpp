@@ -1635,3 +1635,5 @@ HRESULT DirectX::LoadDDSTextureFromFileEx(
 
     return hr;
 }
+
+

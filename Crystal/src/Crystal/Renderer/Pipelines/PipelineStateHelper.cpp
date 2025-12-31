@@ -262,8 +262,10 @@ namespace Crystal {
 		D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {sizeof(m_PipelineStateStream), &m_PipelineStateStream};
 
 		HRESULT hr = d3dDevice->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&outPipelineState));
-		// CS_FATAL(SUCCEEDED(hr), "Pipeline State ¸¦ »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù");
+		CS_FATAL(SUCCEEDED(hr), "Pipeline State ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
 	}
 
 
 }
+
+

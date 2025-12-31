@@ -130,3 +130,5 @@ namespace Crystal {
 		D3D12_RT_FORMAT_ARRAY m_RenderTargetFormats = {};
 	};
 }
+
+

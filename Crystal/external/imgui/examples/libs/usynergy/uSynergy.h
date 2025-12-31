@@ -418,3 +418,5 @@ extern void		uSynergySendClipboard(uSynergyContext *context, const char *text);
 #ifdef __cplusplus
 };
 #endif
+
+

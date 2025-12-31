@@ -123,3 +123,5 @@ struct ExceptionSwallower<void> {
 }
 
 #endif // INCLUDED_EXCEPTIONAL_H
+
+

@@ -405,3 +405,5 @@ HRESULT LoadAnimatedGif(const wchar_t* szFile, std::vector<std::unique_ptr<Scrat
 
     return S_OK;
 }
+
+

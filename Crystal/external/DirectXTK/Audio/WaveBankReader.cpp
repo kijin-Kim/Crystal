@@ -1388,3 +1388,5 @@ HANDLE WaveBankReader::GetAsyncHandle() const noexcept
 {
     return (pImpl->m_data.dwFlags & BANKDATA::TYPE_STREAMING) ? pImpl->m_async : INVALID_HANDLE_VALUE;
 }
+
+

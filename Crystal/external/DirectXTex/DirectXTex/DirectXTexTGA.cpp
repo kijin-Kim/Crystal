@@ -1681,3 +1681,5 @@ HRESULT DirectX::SaveToTGAFile(const Image& image, const wchar_t* szFile, const 
 
     return S_OK;
 }
+
+

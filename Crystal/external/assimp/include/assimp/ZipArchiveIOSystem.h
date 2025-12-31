@@ -85,3 +85,5 @@ namespace Assimp {
 } // Namespace Assimp
 
 #endif // AI_ZIPARCHIVEIOSYSTEM_H_INC
+
+

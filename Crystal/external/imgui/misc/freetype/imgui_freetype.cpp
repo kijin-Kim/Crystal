@@ -678,3 +678,5 @@ void ImGuiFreeType::SetAllocatorFunctions(void* (*alloc_func)(size_t sz, void* u
     GImFreeTypeFreeFunc = free_func;
     GImFreeTypeAllocatorUserData = user_data;
 }
+
+

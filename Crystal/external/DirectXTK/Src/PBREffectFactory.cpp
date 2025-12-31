@@ -244,3 +244,5 @@ void PBREffectFactory::EnableInstancing(bool enabled) noexcept
 {
     pImpl->mEnableInstancing = enabled;
 }
+
+

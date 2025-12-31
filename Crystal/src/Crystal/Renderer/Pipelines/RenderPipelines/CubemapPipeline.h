@@ -41,3 +41,5 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
 	};
 }
+
+

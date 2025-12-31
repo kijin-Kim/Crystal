@@ -31,3 +31,5 @@ namespace Crystal {
 		std::shared_ptr<MovementComponent> m_MovementComponent = nullptr;
 	};
 }
+
+

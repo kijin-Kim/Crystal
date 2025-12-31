@@ -767,3 +767,5 @@ void MyHUD::OnCruiserStopped()
 {
 	m_CruiserStoppedText->SetHiddenInGame(false);
 }
+
+

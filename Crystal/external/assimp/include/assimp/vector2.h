@@ -105,3 +105,5 @@ struct aiVector2D {
 #endif // __cplusplus
 
 #endif // AI_VECTOR2D_H_INC
+
+

@@ -857,3 +857,5 @@ IVoiceNotify* SoundStreamInstance::GetVoiceNotify() const noexcept
 {
     return pImpl.get();
 }
+
+

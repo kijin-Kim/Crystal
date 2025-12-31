@@ -503,3 +503,5 @@ aiReturn Exporter :: Export( const aiScene* pScene, const std::string& pFormatId
 
 #endif // ASSIMP_BUILD_NO_EXPORT
 #endif // AI_EXPORT_HPP_INC
+
+

@@ -159,7 +159,7 @@ void DroneAIController::Begin()
 
 		m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
 			{
-				// CS_DEBUG_INFO("Find Sight");
+				CS_DEBUG_INFO("Find Sight");
 
 				auto instigator = sightStimulus.Instigator.lock();
 				if (!instigator)
@@ -191,7 +191,7 @@ void DroneAIController::Begin()
 
 		m_AIPerceptionComponent->BindOnHearingUpdatedEvent([this](const Crystal::NoiseStimulus& noiseStimulus)
 			{
-				// CS_DEBUG_INFO("Find Noise");
+				CS_DEBUG_INFO("Find Noise");
 
 				auto instigator = noiseStimulus.Instigator.lock();
 				if (!instigator)
@@ -326,7 +326,7 @@ void DroneAIController::Begin()
 
 		m_AIPerceptionComponent->BindOnSightUpdatedEvent([this](const Crystal::SightStimulus& sightStimulus)
 			{
-				// CS_DEBUG_INFO("Find Sight");
+				CS_DEBUG_INFO("Find Sight");
 
 				auto instigator = sightStimulus.Instigator.lock();
 				if (!instigator)
@@ -406,3 +406,5 @@ void DroneAIController::Update(float deltaTime)
 	}
 
 }
+
+

@@ -242,3 +242,5 @@ private:
 } // end namespace Assimp
 
 #endif
+
+

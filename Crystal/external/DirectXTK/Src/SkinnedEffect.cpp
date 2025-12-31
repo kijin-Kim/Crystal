@@ -570,3 +570,5 @@ void SkinnedEffect::ResetBoneTransforms()
 
     pImpl->dirtyFlags |= EffectDirtyFlags::ConstantBuffer;
 }
+
+

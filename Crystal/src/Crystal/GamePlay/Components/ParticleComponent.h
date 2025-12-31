@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "PrimitiveComponent.h"
 #include "Crystal/Core/Timer.h"
 
@@ -137,3 +137,5 @@ namespace Crystal {
 	};
 
 }
+
+

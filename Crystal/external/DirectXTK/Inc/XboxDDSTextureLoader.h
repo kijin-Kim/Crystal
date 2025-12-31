@@ -95,3 +95,5 @@ namespace Xbox
 
     void FreeDDSTextureMemory(_In_opt_ void* grfxMemory) noexcept;
 }
+
+

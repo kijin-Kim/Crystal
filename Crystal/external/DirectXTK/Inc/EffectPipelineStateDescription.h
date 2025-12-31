@@ -92,3 +92,5 @@ namespace DirectX
         D3D12_INDEX_BUFFER_STRIP_CUT_VALUE  stripCutValue;
     };
 }
+
+

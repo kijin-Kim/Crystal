@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "GameMode.h"
 
 
@@ -6,3 +6,5 @@ namespace Crystal {
 
 
 }
+
+

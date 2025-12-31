@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "ParticleComponent.h"
 
 
@@ -126,3 +126,5 @@ namespace Crystal {
 
 
 }
+
+

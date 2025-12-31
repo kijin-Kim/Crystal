@@ -22,7 +22,7 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
-		// CS_FATAL(SUCCEEDED(hr), "CBV_SRVÈüÀ» »ý¼ºÇÏ´Âµ¥ ½ÇÆÐÇÏ¿´½À´Ï´Ù.");
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRVï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 
 
 		auto inputLayout = m_Shader->GetInputLayout();
@@ -89,3 +89,5 @@ namespace Crystal {
 
 
 }
+
+

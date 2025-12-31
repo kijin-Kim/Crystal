@@ -480,3 +480,5 @@ void DummySpaceStation::OnTakeDamage(float damage, Crystal::Weak<Actor> causer)
 
 	UpdateHealth();
 }
+
+

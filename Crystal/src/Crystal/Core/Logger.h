@@ -66,3 +66,5 @@ namespace Crystal
 	MessageBoxA(NULL, formatted.c_str(), "Assertion Failed", MB_OK);\
 }
 #endif
+
+

@@ -56,3 +56,5 @@ namespace DirectX
         return result;
     }
 }
+
+

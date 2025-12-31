@@ -391,3 +391,5 @@ namespace DirectX
         uint32_t        tag;
     };
 }
+
+

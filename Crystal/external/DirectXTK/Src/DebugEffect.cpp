@@ -467,3 +467,5 @@ void DebugEffect::SetAlpha(float value)
 
     pImpl->dirtyFlags |= EffectDirtyFlags::ConstantBuffer;
 }
+
+

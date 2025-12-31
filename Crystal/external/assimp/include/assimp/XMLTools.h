@@ -81,3 +81,5 @@ namespace Assimp {
 }
 
 #endif // INCLUDED_ASSIMP_XML_TOOLS_H
+
+

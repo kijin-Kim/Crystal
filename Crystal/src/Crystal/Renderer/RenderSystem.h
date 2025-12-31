@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <dxgi1_2.h>
 
 #include "Crystal/Core/Timer.h"
@@ -87,4 +87,6 @@ namespace Crystal {
 
 	};
 }
+
+
 

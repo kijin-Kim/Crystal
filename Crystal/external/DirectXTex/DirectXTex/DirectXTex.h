@@ -821,3 +821,5 @@ namespace DirectX
 #endif
 
 } // namespace
+
+

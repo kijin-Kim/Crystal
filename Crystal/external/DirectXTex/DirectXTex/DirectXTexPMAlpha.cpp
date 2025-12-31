@@ -341,3 +341,5 @@ HRESULT DirectX::PremultiplyAlpha(
 
     return S_OK;
 }
+
+

@@ -563,3 +563,5 @@ ASSIMP_API const C_STRUCT aiImporterDesc* aiGetImportFormatDescription( size_t p
 #endif
 
 #endif // AI_ASSIMP_H_INC
+
+

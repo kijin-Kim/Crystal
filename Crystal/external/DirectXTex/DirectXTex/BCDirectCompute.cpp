@@ -614,3 +614,5 @@ HRESULT GPUCompressBC::Compress(const Image& srcImage, const Image& destImage)
 
     return hr;
 }
+
+

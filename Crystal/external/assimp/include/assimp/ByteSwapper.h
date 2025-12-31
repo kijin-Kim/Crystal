@@ -279,3 +279,5 @@ namespace Assimp {
 } // end Assimp
 
 #endif //!! AI_BYTESWAPPER_H_INC
+
+

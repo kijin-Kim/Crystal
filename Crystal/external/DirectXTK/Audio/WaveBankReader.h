@@ -79,3 +79,5 @@ namespace DirectX
         std::unique_ptr<Impl> pImpl;
     };
 }
+
+

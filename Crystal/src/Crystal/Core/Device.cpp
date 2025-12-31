@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "Device.h"
 #include "Crystal/Renderer/CommandQueue.h"
 #include "Crystal/Resources/DescriptorAllocation.h"
@@ -37,13 +37,13 @@ namespace Crystal {
 #if defined CS_DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
 		hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
-		// CS_FATAL(SUCCEEDED(hr), "D3D디버그 인터페이스를 가져오는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "D3D디버그 인터페이스를 가져오는데 실패하였습니다.");
 		debugController->EnableDebugLayer();
 		createFactoryDebugFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
 		// #DirectX Create DXGI factory
 		hr = CreateDXGIFactory2(createFactoryDebugFlags, IID_PPV_ARGS(m_Factory.GetAddressOf()));
-		// CS_FATAL(SUCCEEDED(hr), "DXGI Factory를 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "DXGI Factory를 생성하는데 실패하였습니다.");
 
 		// #DirectX Create Grahpics Adapter
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter = nullptr;
@@ -57,7 +57,7 @@ namespace Crystal {
 				// #DirectX Create Device
 				hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_Device));
 				m_Device->SetName(L"D3D12 Device");
-				// CS_FATAL(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다.");
+				CS_FATAL(SUCCEEDED(hr), "D3D Device를 생성하는데 실패하였습니다.");
 
 				break;
 			}
@@ -75,7 +75,8 @@ namespace Crystal {
 
 			D3D12_MESSAGE_ID denyIDs[] = {
 				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
-				D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE
+				D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE,
+				D3D12_MESSAGE_ID_CREATERESOURCE_STATE_IGNORED
 			};
 
 			D3D12_INFO_QUEUE_FILTER newFilter = {};
@@ -106,3 +107,5 @@ namespace Crystal {
 	}
 
 }
+
+

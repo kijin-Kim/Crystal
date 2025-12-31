@@ -123,3 +123,5 @@ protected:
 } // end of namespace Assimp
 
 #endif // AI_SKELETONMESHBUILDER_H_INC
+
+

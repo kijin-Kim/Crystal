@@ -35,3 +35,5 @@ namespace Crystal {
 		std::function<bool(HWND, UINT, WPARAM, LPARAM)> m_InputEventFunction = nullptr;
 	};
 };
+
+

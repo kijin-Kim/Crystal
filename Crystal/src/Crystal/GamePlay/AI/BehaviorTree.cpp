@@ -77,7 +77,7 @@ namespace Crystal {
 					break;
 				default:
 					break;
-					// CS_FATAL(false, "");
+					CS_FATAL(false, "");
 				}
 			}
 		}
@@ -228,3 +228,5 @@ namespace Crystal {
 		m_BehaviorTree->GetRootNode()->PrepareAbortDecorators();
 	}
 }
+
+

@@ -1,4 +1,4 @@
-﻿#include "cspch.h"
+#include "cspch.h"
 #include "ForwardStaticBlendingPipeline.h"
 
 #include "Crystal/Core/Device.h"
@@ -17,7 +17,7 @@ namespace Crystal {
 		descriptorHeapDesc.NodeMask = 0;
 
 		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap));
-		// CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
+		CS_FATAL(SUCCEEDED(hr), "CBV_SRV힙을 생성하는데 실패하였습니다.");
 
 
 		CD3DX12_DESCRIPTOR_RANGE1 perFrameDescriptorRanges[] = {
@@ -52,10 +52,10 @@ namespace Crystal {
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureDataBlob = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> rootSignatureErrorBlob = nullptr;
 		hr = D3D12SerializeVersionedRootSignature(&rootSigDesc, &rootSignatureDataBlob, &rootSignatureErrorBlob);
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
+		CS_FATAL(SUCCEEDED(hr), "Root Signature를 시리얼화하는데 실패하였습니다");
 		hr = device->CreateRootSignature(0, rootSignatureDataBlob->GetBufferPointer(),
 			rootSignatureDataBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		// CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
+		CS_FATAL(SUCCEEDED(hr), "Root Signature를 생성하는데 실패하였습니다");
 
 
 		D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -434,3 +434,5 @@ namespace Crystal {
 
 
 }
+
+
