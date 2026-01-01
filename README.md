@@ -1,4 +1,9 @@
 
+# SPACE COMBAT 2200
+https://github.com/user-attachments/assets/af751028-2ca1-409f-b576-5073f8565d01
+
+
+
 # 목차
 
 **1. Deferred Rendering**
@@ -91,6 +96,7 @@ HDR 밝기 영역으로 표현된 Scene을 모니터가 표현할 수 있는 영
 
 ## 세부 설명
 Directional Light로부터 생기는 Shadow를 구현. Directional Light의 방향을 바라보는 플레이어를 따라다니는 카메라를 만들고, Scene을 렌더링(Depth만). 렌더링된 Shadow Map을 이후에 라이팅을 계산할 때, 월드공간의 좌표를 Shadow Map의 공간으로 변환 후 샘플링 하여 사용. PCF(Percentage Closer Filtering)기법을 사용하여 그림자의 외곽부분을 자연스럽게 표현.
+
 
 
 
