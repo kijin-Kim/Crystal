@@ -47,13 +47,17 @@ Post-Process → HDR Bloom + Tone Mapping
     ↓
 Back Buffer
 ```
-<img src="ReadMeResource/Albedo.png" width="30%" height="30%"></img> 
-<img src="ReadMeResource/Emissive.png" width="30%" height="30%"></img>
-<img src="ReadMeResource/Irradiance.png" width="30%" height="30%"></img>
-<img src="ReadMeResource/RoughnessMetallic.png" width="30%" height="30%"></img>
-<img src="ReadMeResource/WorldNormal.png" width="30%" height="30%"></img>
-<img src="ReadMeResource/WorldPosition.png" width="30%" height="30%"></img>
-###### <center><순서대로 AlbedoBuffer, EmissiveBuffer, RoughnessMetallicBuffer, WorldNormalBuffer, WorldPositionBuffer></center>
+
+### G-Buffer Visualization
+
+| Albedo | World Normal |
+|--------|--------------|
+| ![](ReadMeResource/Albedo.png) | ![](ReadMeResource/WorldNormal.png) |
+
+| World Position | Emissive |
+|----------------|----------|
+| ![](ReadMeResource/WorldPosition.png) | ![](ReadMeResource/Emissive.png) |
+
 
 
 ### 트러블슈팅: Root Signature 계층 분리
@@ -70,6 +74,10 @@ int GetPerFrameParameterIndex() const;    // 카메라, 라이트 등
 int GetPerObjectParameterIndex() const;   // 오브젝트별 트랜스폼
 int GetPerExecuteParameterIndex() const;  // 머티리얼별 텍스처
 ```
+
+[Shader.h - RootSignature 클래스](https://github.com/kijin-Kim/Crystal/blob/533519a8673dbf06c727d979c84e2a0afe0716f6/Crystal/src/Crystal/Resources/Shader.h#L41)
+[Shader.cpp - 구현](https://github.com/kijin-Kim/Crystal/blob/533519a8673dbf06c727d979c84e2a0afe0716f6/Crystal/src/Crystal/Resources/Shader.cpp#L11)
+
 
 <img src="https://github.com/user-attachments/assets/b7751fbd-11fe-4da3-84dd-fac4cd3c353f" width="80%" height="80%" style="margin-left: auto; margin-right: auto; display: block;"></img>
 
@@ -109,6 +117,8 @@ enum class EDecoratorAbortType {
     DAT_Both            // 양쪽 모두
 };
 ```
+[Decorator.h - Abort 정의](https://github.com/kijin-Kim/Crystal/blob/main/Crystal/src/Crystal/GamePlay/AI/Decorator.h)
+[BehaviorTree.cpp:176 - Abort 실행 로직](https://github.com/kijin-Kim/Crystal/blob/533519a8673dbf06c727d979c84e2a0afe0716f6/Crystal/src/Crystal/GamePlay/AI/BehaviorTree.cpp#L176)
 
 `OnResultChange`는 단순 true/false 변화를 감지하고, `OnValueChange`는 
 값의 ID 자체가 바뀌어야 트리거됩니다 (같은 결과여도 대상이 바뀌면 재평가 필요).
@@ -140,6 +150,8 @@ enum class EDecoratorAbortType {
 ```cpp
 Initialize() → OnCreate() → Begin() → Update(dt) → ~Object()
 ```
+[Object.h - 베이스 클래스](https://github.com/kijin-Kim/Crystal/blob/533519a8673dbf06c727d979c84e2a0afe0716f6/Crystal/src/Crystal/GamePlay/Objects/Object.h#L14)
+
 ---
 
 ## 추가 구현 기능
